@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="config-server" />
+        <module name="msproperties" />
+        <module name="discovery" />
+        <module name="ms-property-category" />
+        <module name="mslogin" />
+        <module name="demo" />
+        <module name="msorder" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="gateway" target="17" />
+      <module name="msproduct" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="config-server" options="-parameters" />
+      <module name="demo" options="-parameters" />
+      <module name="discovery" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="ms-property-category" options="-parameters" />
+      <module name="mslogin" options="-parameters" />
+      <module name="msorder" options="-parameters" />
+      <module name="msproduct" options="-parameters" />
+      <module name="msproperties" options="-parameters" />
+    </option>
+  </component>
+</project>
