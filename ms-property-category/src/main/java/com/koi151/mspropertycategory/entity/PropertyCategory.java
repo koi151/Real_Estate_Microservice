@@ -29,22 +29,24 @@ public class PropertyCategory {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    @Column(name = "deleted", columnDefinition = "boolean default false")
+    @Column(name = "deleted")
     private boolean deleted;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
     @PrePersist
-    protected void onCreate() { // if set to private, Hibernate cannot access to this method from outside class
-        createdAt = LocalDateTime.now();
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
     }
-
-    @PreUpdate
-    protected void onUpdate() {
-        updatedAt = LocalDateTime.now();
-    }
+//
+//    @PreUpdate
+//    protected void onUpdate() {
+//        updatedAt = LocalDateTime.now();
+//    }
 }

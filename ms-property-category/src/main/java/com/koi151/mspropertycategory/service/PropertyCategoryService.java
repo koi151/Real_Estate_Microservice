@@ -8,6 +8,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+
 @Service
 @RequiredArgsConstructor
 public class PropertyCategoryService implements PropertyCategoryImp {
@@ -27,6 +30,8 @@ public class PropertyCategoryService implements PropertyCategoryImp {
             propertyCategory.setTitle(propertyCategoryRequest.getTitle());
             propertyCategory.setDescription(propertyCategoryRequest.getDescription());
             propertyCategory.setStatus(propertyCategoryRequest.getStatus());
+            propertyCategory.setDeleted(false);
+            propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             propertyCategoryRepository.save(propertyCategory);
             isInsertSuccess = true;
