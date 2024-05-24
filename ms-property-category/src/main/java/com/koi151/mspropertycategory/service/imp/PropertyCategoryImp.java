@@ -8,6 +8,7 @@ import java.util.List;
 public interface PropertyCategoryImp {
 
     List<PropertyCategoryDTO> getCategoriesHomePage();
+    List<PropertyCategoryDTO> getCategories(String title);
     boolean createCategory(PropertyCategoryRequest propertyCategoryRequest);
 
 }

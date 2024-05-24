@@ -16,6 +16,14 @@ public class PropertyCategoryController {
     PropertyCategoryImp propertyCategoryImp;
 
     @GetMapping("/")
+    public ResponseEntity<?> getCategories(@RequestParam(value="title", required=false) String title) {
+        ResponseData responseData = new ResponseData();
+        responseData.setData(propertyCategoryImp.getCategories(title));
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
+    }
+
+    @GetMapping("/home-categories")
     public ResponseEntity<?> getCategoriesHomePage() {
         // tempo
         ResponseData responseData = new ResponseData();

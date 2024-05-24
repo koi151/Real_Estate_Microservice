@@ -25,6 +25,20 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     PropertyCategoryRepository propertyCategoryRepository;
 
     @Override
+    public List<PropertyCategoryDTO> getCategories(String title) {
+        List<PropertyCategory> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
+        List<PropertyCategoryDTO> propertyCategoryDTOList = new ArrayList<>();
+
+        for (PropertyCategory categoryDTO: propertyCategories) {
+            PropertyCategoryDTO propertyCategoryDTO = new PropertyCategoryDTO();
+            propertyCategoryDTO.setTitle(categoryDTO.getTitle());
+            propertyCategoryDTOList.add(propertyCategoryDTO);
+        }
+
+        return propertyCategoryDTOList;
+    }
+
+    @Override
     public List<PropertyCategoryDTO> getCategoriesHomePage() {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
         Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
