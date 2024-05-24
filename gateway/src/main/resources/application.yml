@@ -17,12 +17,12 @@ spring:
         - id: login
           uri: http://localhost:8080/
           predicates:
-            - Path=/login
+            - Path=/api/v1/login
         - id: properties
           uri: http://localhost:8081/
           predicates:
-            - Path=/properties/**
+            - Path=/api/v1/properties/**
         - id: property-category
           uri: http://localhost:8082/
           predicates:
-            - Path=/property-category/**
+            - Path=/api/v1/property-category/**

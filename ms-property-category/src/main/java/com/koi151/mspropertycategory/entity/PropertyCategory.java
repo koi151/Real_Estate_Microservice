@@ -5,7 +5,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity
+@Entity(name="property-category")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -20,8 +20,8 @@ public class PropertyCategory {
     @Column(name = "title", nullable = false, length = 100)
     private String title;
 
-    @Column(name = "desc")
-    private String desc;
+    @Column(name = "description")
+    private String description;
 
     @Column(name = "images")
     private String images;
@@ -29,13 +29,22 @@ public class PropertyCategory {
     @Column(name = "status", nullable = false, length = 20)
     private String status;
 
-    @Column(name = "deleted", columnDefinition = "boolean default true")
+    @Column(name = "deleted", columnDefinition = "boolean default false")
     private boolean deleted;
 
-    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "created_at")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @PrePersist
+    protected void onCreate() { // if set to private, Hibernate cannot access to this method from outside class
+        createdAt = LocalDateTime.now();
+    }
+
+    @PreUpdate
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
+    }
 }

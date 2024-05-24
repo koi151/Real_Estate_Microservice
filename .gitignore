@@ -7,6 +7,7 @@ src/test/
 
 # ENV
 .env
+.env.*
 local.env
 
 # Maven specific
