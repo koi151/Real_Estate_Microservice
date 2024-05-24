@@ -16,15 +16,18 @@ public class PropertyCategoryController {
     PropertyCategoryImp propertyCategoryImp;
 
     @GetMapping("/")
-    public String getCategories () {
-        return "get categories";
+    public ResponseEntity<?> getCategoriesHomePage() {
+        // tempo
+        ResponseData responseData = new ResponseData();
+        responseData.setData(propertyCategoryImp.getCategoriesHomePage());
+        responseData.setDesc("Success");
+
+        return new ResponseEntity<>(responseData, HttpStatus.OK);
     }
 
     @PostMapping("/create")
     public ResponseEntity<?> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
         ResponseData responseData = new ResponseData();
-
-        System.out.println("data: "+ System.getenv("DATABASE_URL"));
 
         try {
             responseData.setData(propertyCategoryImp.createCategory(propertyCategoryRequest));
@@ -39,7 +42,6 @@ public class PropertyCategoryController {
             responseData.setDesc("Failed to create category");
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
-
     }
 
 

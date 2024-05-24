@@ -15,7 +15,7 @@ public class PropertyCategory {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int category_id;
+    private int categoryId;
 
     @Column(name = "title", nullable = false, length = 100)
     private String title;
