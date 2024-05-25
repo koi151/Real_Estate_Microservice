@@ -27,7 +27,7 @@ public class PropertyCategoryController {
     public ResponseEntity<?> getCategoryTitleById(@PathVariable(name = "id") int id) {
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyCategoryImp.getCategoryTitleById(id));
-
+        responseData.setDesc("Success");
         return ResponseEntity.ok(responseData);
     }
 

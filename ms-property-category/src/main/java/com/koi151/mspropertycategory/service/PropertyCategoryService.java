@@ -1,6 +1,7 @@
 package com.koi151.mspropertycategory.service;
 
 import com.koi151.mspropertycategory.dto.PropertyCategoryDTO;
+import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
@@ -39,15 +40,15 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public PropertyCategoryDTO getCategoryTitleById(int id) {
-        PropertyCategoryDTO propertyCategoryDTO = new PropertyCategoryDTO();
+    public PropertyCategoryTitleDTO getCategoryTitleById(int id) {
+        PropertyCategoryTitleDTO propertyCategoryTitleDTO = new PropertyCategoryTitleDTO();
         PropertyCategory propertyCategory = propertyCategoryRepository.findById(id)
                 .orElse(PropertyCategory.builder()
                         .title("NOT_FOUND")
                         .build());
 
-        propertyCategoryDTO.setTitle(propertyCategory.getTitle());
-        return propertyCategoryDTO;
+        propertyCategoryTitleDTO.setTitle(propertyCategory.getTitle());
+        return propertyCategoryTitleDTO;
     }
 
     @Override
