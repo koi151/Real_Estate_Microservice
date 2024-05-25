@@ -39,6 +39,18 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
+    public PropertyCategoryDTO getCategoryTitleById(int id) {
+        PropertyCategoryDTO propertyCategoryDTO = new PropertyCategoryDTO();
+        PropertyCategory propertyCategory = propertyCategoryRepository.findById(id)
+                .orElse(PropertyCategory.builder()
+                        .title("NOT_FOUND")
+                        .build());
+
+        propertyCategoryDTO.setTitle(propertyCategory.getTitle());
+        return propertyCategoryDTO;
+    }
+
+    @Override
     public List<PropertyCategoryDTO> getCategoriesHomePage() {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
         Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);

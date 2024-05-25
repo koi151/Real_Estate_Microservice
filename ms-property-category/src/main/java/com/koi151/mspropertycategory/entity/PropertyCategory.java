@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Properties;
+import java.util.Set;
 
 @Entity(name="property-category")
 @Getter
@@ -37,6 +39,10 @@ public class PropertyCategory {
 
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
+//
+//    @OneToMany(mappedBy = "propertyCategory")
+////    private Set<RatingRestaurant> ratingRestaurant;
+//    private Set<Properties> properties;
 
     @PrePersist
     protected void onCreate() {

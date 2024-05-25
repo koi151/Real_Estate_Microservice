@@ -15,13 +15,22 @@ public class PropertyCategoryController {
     @Autowired
     PropertyCategoryImp propertyCategoryImp;
 
-    @GetMapping("/")
-    public ResponseEntity<?> getCategories(@RequestParam(value="title", required=false) String title) {
+    @GetMapping("/{title}")
+    public ResponseEntity<?> getCategories(@PathVariable(name = "title") String title) {
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyCategoryImp.getCategories(title));
 
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return ResponseEntity.ok(responseData);
     }
+
+    @GetMapping("/title/{id}")
+    public ResponseEntity<?> getCategoryTitleById(@PathVariable(name = "id") int id) {
+        ResponseData responseData = new ResponseData();
+        responseData.setData(propertyCategoryImp.getCategoryTitleById(id));
+
+        return ResponseEntity.ok(responseData);
+    }
+
 
     @GetMapping("/home-categories")
     public ResponseEntity<?> getCategoriesHomePage() {
@@ -30,7 +39,7 @@ public class PropertyCategoryController {
         responseData.setData(propertyCategoryImp.getCategoriesHomePage());
         responseData.setDesc("Success");
 
-        return new ResponseEntity<>(responseData, HttpStatus.OK);
+        return ResponseEntity.ok(responseData);
     }
 
     @PostMapping("/create")
@@ -43,7 +52,7 @@ public class PropertyCategoryController {
             responseData.setStatus(200);
             responseData.setDesc("Success");
 
-            return new ResponseEntity<>(responseData, HttpStatus.OK);
+            return ResponseEntity.ok(responseData);
 
         } catch (Exception e) { // temporary error handle
             responseData.setStatus(400);

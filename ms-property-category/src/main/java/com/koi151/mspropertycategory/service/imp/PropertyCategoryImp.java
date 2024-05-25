@@ -9,6 +9,7 @@ public interface PropertyCategoryImp {
 
     List<PropertyCategoryDTO> getCategoriesHomePage();
     List<PropertyCategoryDTO> getCategories(String title);
+    PropertyCategoryDTO getCategoryTitleById(int id);
     boolean createCategory(PropertyCategoryRequest propertyCategoryRequest);
 
 }
