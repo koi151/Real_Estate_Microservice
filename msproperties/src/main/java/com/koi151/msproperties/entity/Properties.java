@@ -18,7 +18,7 @@ public class Properties {
     private int id;
 
     @Column(name = "available_from", nullable = false)
-    private LocalDateTime availabeFrom;
+    private String availabeFrom;
 
     @Column(name = "title", nullable = false, length = 100)
     private String title;
@@ -38,9 +38,6 @@ public class Properties {
     @Column(name = "total_floor")
     private int totalFloor;
 
-    @Column(name = "post_position")
-    private int postPosition;
-
     // slug
 
     @Column(name = "house_direction", length = 20)
@@ -49,16 +46,23 @@ public class Properties {
     @Column(name = "balcony_direction", length = 20)
     private String balconyDirection;
 
-    @Column(name = "deleted", nullable = false, length = 10)
-    private boolean deleted;
+    @Column(name = "deleted")
+    private boolean deleted = false;
 
-    @Column(name = "created_at")
+    @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at")
+    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
 
 //    @ManyToOne
 //    @JoinColumn(name = "propertyCategory")
 //    private PropertyCategory propertyCategory;
+
+    @PrePersist
+    protected void onCreate() {
+        if (createdAt == null) {
+            createdAt = LocalDateTime.now();
+        }
+    }
 }

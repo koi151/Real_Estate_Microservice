@@ -32,7 +32,7 @@ public class PropertyCategory {
     private String status;
 
     @Column(name = "deleted")
-    private boolean deleted;
+    private boolean deleted = false;
 
     @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
