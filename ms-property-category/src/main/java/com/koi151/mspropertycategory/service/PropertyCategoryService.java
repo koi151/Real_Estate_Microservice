@@ -1,7 +1,8 @@
 package com.koi151.mspropertycategory.service;
 
 import com.koi151.mspropertycategory.client.PropertiesClient;
-import com.koi151.mspropertycategory.dto.PropertyCategoryDTO;
+import com.koi151.mspropertycategory.dto.PropertyCategoryDetailDTO;
+import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
@@ -9,7 +10,6 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
-import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -33,12 +33,12 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     PropertiesClient propertiesClient;
 
     @Override
-    public List<PropertyCategoryDTO> getCategories(String title) {
+    public List<PropertyCategoryHomeDTO> getCategories(String title) {
         List<PropertyCategory> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
-        List<PropertyCategoryDTO> propertyCategoryDTOList = new ArrayList<>();
+        List<PropertyCategoryHomeDTO> propertyCategoryDTOList = new ArrayList<>();
 
         for (PropertyCategory categoryDTO: propertyCategories) {
-            PropertyCategoryDTO propertyCategoryDTO = new PropertyCategoryDTO();
+            PropertyCategoryHomeDTO propertyCategoryDTO = new PropertyCategoryHomeDTO();
             propertyCategoryDTO.setTitle(categoryDTO.getTitle());
             propertyCategoryDTOList.add(propertyCategoryDTO);
         }
@@ -81,14 +81,14 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public List<PropertyCategoryDTO> getCategoriesHomePage() {
+    public List<PropertyCategoryHomeDTO> getCategoriesHomePage() {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
         Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
 
-        List<PropertyCategoryDTO> propertyCategoryDTOList = new ArrayList<>();
+        List<PropertyCategoryHomeDTO> propertyCategoryDTOList = new ArrayList<>();
 
         for (PropertyCategory category: categories) {
-            PropertyCategoryDTO propertyCategoryDTO = new PropertyCategoryDTO();
+            PropertyCategoryHomeDTO propertyCategoryDTO = new PropertyCategoryHomeDTO();
 
             propertyCategoryDTO.setTitle(category.getTitle());
             propertyCategoryDTO.setDescription(category.getDescription());
@@ -124,5 +124,38 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
         return isInsertSuccess;
     }
+
+    @Override
+    public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest categoryRequest) {
+        return propertyCategoryRepository.findById(id)
+                .map(existingCategory -> {
+                    if (categoryRequest.getTitle() != null)
+                        existingCategory.setTitle(categoryRequest.getTitle());
+                    if (categoryRequest.getDescription() != null)
+                        existingCategory.setDescription(categoryRequest.getDescription());
+                    if (categoryRequest.getImages() != null)
+                        existingCategory.setImages(categoryRequest.getImages());
+                    if (categoryRequest.getStatus() != null)
+                        existingCategory.setStatus(categoryRequest.getStatus());
+
+                    return propertyCategoryRepository.save(existingCategory);
+                })
+                .map(PropertyCategoryDetailDTO::new) // Map to DTO after saving
+                .orElseThrow(() -> new RuntimeException("Property category not found with id: " + id));
+    }
+
+
+
+    // Helper method to map PropertyCategory entity to PropertyCategoryDetailDTO
+    private PropertyCategoryDetailDTO mapToDetailDTO(PropertyCategory category) {
+        PropertyCategoryDetailDTO categoryDetailDTO = new PropertyCategoryDetailDTO();
+        categoryDetailDTO.setTitle(category.getTitle());
+        categoryDetailDTO.setImages(category.getImages());
+        categoryDetailDTO.setDescription(category.getDescription());
+        categoryDetailDTO.setStatus(category.getStatus());
+        return categoryDetailDTO;
+    }
+
+
 }
 

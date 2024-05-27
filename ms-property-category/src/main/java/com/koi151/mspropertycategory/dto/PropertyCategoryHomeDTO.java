@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PropertyCategoryDTO {
+public class PropertyCategoryHomeDTO {
 
     private String title;
     private String description;

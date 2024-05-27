@@ -9,7 +9,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/property-category")
@@ -19,7 +18,7 @@ public class PropertyCategoryController {
     PropertyCategoryImp propertyCategoryImp;
 
     @GetMapping("/{title}")
-    public ResponseEntity<?> getCategories(@PathVariable(name = "title") String title) {
+    public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyCategoryImp.getCategories(title));
 
@@ -27,7 +26,7 @@ public class PropertyCategoryController {
     }
 
     @GetMapping("/title/{id}")
-    public ResponseEntity<?> getCategoryTitleById(@PathVariable(name = "id") int id) {
+    public ResponseEntity<ResponseData> getCategoryTitleById(@PathVariable(name = "id") int id) {
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyCategoryImp.getCategoryTitleById(id));
         responseData.setDesc("Success");
@@ -36,7 +35,7 @@ public class PropertyCategoryController {
 
 
     @GetMapping("/home-categories")
-    public ResponseEntity<?> getCategoriesHomePage() {
+    public ResponseEntity<ResponseData> getCategoriesHomePage() {
         // tempo
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyCategoryImp.getCategoriesHomePage());
@@ -51,7 +50,7 @@ public class PropertyCategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
+    public ResponseEntity<ResponseData> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
         ResponseData responseData = new ResponseData();
 
         try {
@@ -69,5 +68,13 @@ public class PropertyCategoryController {
         }
     }
 
+    @PatchMapping("/{id}")
+    public ResponseEntity<ResponseData> updateCategory(@PathVariable(name = "id") Integer id, @RequestBody PropertyCategoryRequest categoryRequest) {
+        ResponseData responseData = new ResponseData();
 
+        responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
+        responseData.setDesc("Updated successfully");
+
+        return ResponseEntity.ok(responseData);
+    }
 }

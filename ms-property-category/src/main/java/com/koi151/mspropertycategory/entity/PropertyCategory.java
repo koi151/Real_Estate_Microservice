@@ -39,10 +39,6 @@ public class PropertyCategory {
 
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
     private LocalDateTime updatedAt;
-//
-//    @OneToMany(mappedBy = "propertyCategory")
-////    private Set<RatingRestaurant> ratingRestaurant;
-//    private Set<Properties> properties;
 
     @PrePersist
     protected void onCreate() {
@@ -50,9 +46,4 @@ public class PropertyCategory {
             createdAt = LocalDateTime.now();
         }
     }
-//
-//    @PreUpdate
-//    protected void onUpdate() {
-//        updatedAt = LocalDateTime.now();
-//    }
 }
