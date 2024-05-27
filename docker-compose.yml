@@ -1,0 +1,47 @@
+services:
+
+  mysql:
+    container_name: mysql
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: real_estate
+      MYSQL_USER: koi151
+      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - mysql_network
+    restart: unless-stopped
+
+  adminer:
+    container_name: adminer
+    image: adminer
+    environment:
+      ADMINER_DEFAULT_SERVER: mysql
+    ports:
+      - "9091:9091"
+    networks:
+      - mysql_network
+    restart: unless-stopped
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin
+    ports:
+      - "9411:9411"
+    networks:
+      - zipkin_network
+    restart: unless-stopped
+
+networks:
+  mysql_network:
+    driver: bridge
+
+  zipkin_network:
+    driver: bridge
+
+volumes:
+  mysql_data:

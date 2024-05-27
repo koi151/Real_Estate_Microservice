@@ -25,3 +25,8 @@ spring:
   servlet:
     multipart:
       max-file-size: 10MB
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

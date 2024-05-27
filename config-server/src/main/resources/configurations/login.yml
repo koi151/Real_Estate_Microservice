@@ -21,3 +21,8 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0

@@ -24,3 +24,8 @@ spring:
           uri: http://localhost:8082/
           predicates:
             - Path=/api/v1/property-category/**
+
+management:
+  tracing:
+    sampling:
+      probability: 1.0
