@@ -1,11 +1,15 @@
 package com.koi151.mspropertycategory.service;
 
+import com.koi151.mspropertycategory.client.PropertiesClient;
 import com.koi151.mspropertycategory.dto.PropertyCategoryDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
+import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
+import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
+import jakarta.inject.Inject;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -25,6 +29,9 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     @Autowired
     PropertyCategoryRepository propertyCategoryRepository;
 
+    @Autowired
+    PropertiesClient propertiesClient;
+
     @Override
     public List<PropertyCategoryDTO> getCategories(String title) {
         List<PropertyCategory> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
@@ -40,7 +47,29 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public PropertyCategoryTitleDTO getCategoryTitleById(int id) {
+    public FullCategoryResponse findCategoryWithProperties(Integer categoryId) {
+        var category = propertyCategoryRepository.findById(categoryId)
+                .orElse(
+                        PropertyCategory.builder()
+                                .title("NOT FOUND")
+                                .images("NOT FOUND")
+                                .description("NOT FOUND")
+                                .build()
+                );
+
+
+        List<Properties> properties = propertiesClient.findAllPropertiesByCategory(categoryId);
+
+        return FullCategoryResponse.builder()
+                .title(category.getTitle())
+                .description(category.getDescription())
+                .status(category.getStatus())
+                .properties(properties)
+                .build();
+    }
+
+    @Override
+    public PropertyCategoryTitleDTO getCategoryTitleById(Integer id) {
         PropertyCategoryTitleDTO propertyCategoryTitleDTO = new PropertyCategoryTitleDTO();
         PropertyCategory propertyCategory = propertyCategoryRepository.findById(id)
                 .orElse(PropertyCategory.builder()

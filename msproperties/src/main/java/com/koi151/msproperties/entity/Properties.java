@@ -17,6 +17,9 @@ public class Properties {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @Column(name = "category_id")
+    private int categoryId;
+
     @Column(name = "available_from", nullable = false)
     private String availabeFrom;
 
@@ -37,6 +40,9 @@ public class Properties {
 
     @Column(name = "total_floor")
     private int totalFloor;
+
+    @Column(name = "status", nullable = false, length = 20)
+    private String status = "active";
 
     // slug
 

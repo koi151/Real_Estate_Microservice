@@ -2,10 +2,11 @@ package com.koi151.msproperties;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.openfeign.EnableFeignClients;
 
+@EnableFeignClients
 @SpringBootApplication
 public class MspropertiesApplication {
-
 	public static void main(String[] args) {
 		SpringApplication.run(MspropertiesApplication.class, args);
 	}

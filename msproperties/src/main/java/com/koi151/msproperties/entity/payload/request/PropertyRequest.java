@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 public class PropertyRequest {
 
     private String title;
+    private int categoryId;
     private float area;
     private String description;
     private String images;

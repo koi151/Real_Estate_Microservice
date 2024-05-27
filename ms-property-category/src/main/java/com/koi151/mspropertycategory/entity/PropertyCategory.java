@@ -29,7 +29,7 @@ public class PropertyCategory {
     private String images;
 
     @Column(name = "status", nullable = false, length = 20)
-    private String status;
+    private String status = "active";
 
     @Column(name = "deleted")
     private boolean deleted = false;

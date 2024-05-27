@@ -1,5 +1,6 @@
 package com.koi151.mspropertycategory.controller;
 
+import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
@@ -7,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/property-category")
@@ -40,6 +43,11 @@ public class PropertyCategoryController {
         responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/with-properties/{category-id}")
+    public ResponseEntity<FullCategoryResponse> findCategoryWithProperties(@PathVariable(name = "category-id") Integer categoryId) {
+        return ResponseEntity.ok(propertyCategoryImp.findCategoryWithProperties(categoryId));
     }
 
     @PostMapping("/create")

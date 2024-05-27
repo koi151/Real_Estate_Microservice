@@ -1,28 +1,5 @@
-eureka:
-  client:
-    register-with-eureka: false
-server:
-  port: 9090
 spring:
   application:
     name: gateway
   config:
     import: optional:configserver:http://localhost:8888
-  cloud:
-    gateway:
-      discovery:
-        locator:
-          enabled: true
-      routes:
-        - id: login
-          uri: http://localhost:8080/
-          predicates:
-            - Path=/api/v1/login
-        - id: properties
-          uri: http://localhost:8081/
-          predicates:
-            - Path=/api/v1/properties/**
-        - id: property-category
-          uri: http://localhost:8082/
-          predicates:
-            - Path=/api/v1/property-category/**
