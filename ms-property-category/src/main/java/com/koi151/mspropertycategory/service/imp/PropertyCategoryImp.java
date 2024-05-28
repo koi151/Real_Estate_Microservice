@@ -16,4 +16,5 @@ public interface PropertyCategoryImp {
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
     boolean createCategory(PropertyCategoryRequest propertyCategoryRequest);
     PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest propertyCategory);
+    void deleteCategory(Integer id);
 }

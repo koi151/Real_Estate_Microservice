@@ -4,7 +4,7 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
-import customExceptions.FieldRequiredException;
+import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +17,8 @@ public class PropertyCategoryController {
 
     @Autowired
     PropertyCategoryImp propertyCategoryImp;
+
+    PropertyCategoryValidator propertyCategoryValidator;
 
     @GetMapping("/{title}")
     public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
@@ -52,9 +54,9 @@ public class PropertyCategoryController {
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
         ResponseData responseData = new ResponseData();
-        validate(propertyCategoryRequest);
 
         try {
+            PropertyCategoryValidator.validateCategoryRequest(propertyCategoryRequest);
             responseData.setData(propertyCategoryImp.createCategory(propertyCategoryRequest));
 
             responseData.setStatus(200);
@@ -69,24 +71,34 @@ public class PropertyCategoryController {
         }
     }
 
-    public void validate(PropertyCategoryRequest categoryRequest) {
-        if (categoryRequest.getTitle() == null) {
-            throw new FieldRequiredException("Title of category is null");
-        }
-    }
-
-
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseData> updateCategory(@PathVariable(name = "id") Integer id, @RequestBody PropertyCategoryRequest categoryRequest) {
         ResponseData responseData = new ResponseData();
 
         try {
+            PropertyCategoryValidator.validateCategoryRequest(categoryRequest);
             responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
             responseData.setDesc("Updated successfully");
             return ResponseEntity.ok(responseData);
 
         } catch (Exception e) {
-            System.out.println("Error occurred: " + e.getMessage());
+            System.out.println("Error occurred while updating category: " + e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseData> deleteCategory(@PathVariable(name = "id") Integer id) {
+        ResponseData responseData = new ResponseData();
+
+        try {
+            propertyCategoryImp.deleteCategory(id);
+            responseData.setDesc("Deleted successful");
+
+            return ResponseEntity.ok(responseData);
+
+        } catch (Exception e) {
+            System.out.println("Error occurred while deleting category: " + e.getMessage());
             return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
         }
 
