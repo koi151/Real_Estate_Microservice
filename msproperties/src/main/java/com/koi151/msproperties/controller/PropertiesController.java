@@ -49,9 +49,15 @@ public class PropertiesController {
         }
     }
 
-    @GetMapping("/")
-    public String getProperties () {
-        return "Get properties";
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseData> deleteProperty (@PathVariable(name = "id") Integer id) {
+        ResponseData responseData = new ResponseData();
+
+        propertiesServiceImp.deleteProperty(id);
+        responseData.setDesc("Property deleted successfully");
+
+        return ResponseEntity.ok(responseData);
+
     }
 
 }

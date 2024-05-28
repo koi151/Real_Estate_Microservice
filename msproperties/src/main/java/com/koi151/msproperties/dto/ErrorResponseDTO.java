@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory.dto;
+package com.koi151.msproperties.dto;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -9,6 +9,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ErrorResponseDTO {
+
     private String error;
     private List<String> detail = new ArrayList<>();
 }

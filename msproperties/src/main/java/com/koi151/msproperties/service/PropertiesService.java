@@ -5,6 +5,7 @@ import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.payload.request.PropertyRequest;
 import com.koi151.msproperties.repository.PropertiesRepository;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
+import customExceptions.PropertyNotFoundException;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -93,5 +94,15 @@ public class PropertiesService implements PropertiesServiceImp {
         }
 
         return propertiesHomeDTOList;
+    }
+
+    @Override
+    public void deleteProperty(Integer id) throws PropertyNotFoundException {
+        propertiesRepository.findById(id)
+                .map(existingProperty -> {
+                    existingProperty.setDeleted(true);
+                    return propertiesRepository.save(existingProperty);
+                })
+                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
     }
 }
