@@ -1,6 +1,7 @@
 package com.koi151.mspropertycategory.controllerAdvice;
 
 import com.koi151.mspropertycategory.dto.ErrorResponseDTO;
+import customExceptions.CategoryNotFoundException;
 import customExceptions.FieldRequiredException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,5 +28,16 @@ public class ControllerAdvisor extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
     }
 
-//    @ExceptionHandler
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Object> handleCategoryNotFoundException
+            (CategoryNotFoundException ex, WebRequest request) {
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        List<String> details = new ArrayList<>();
+        details.add("Property category not found");
+        errorResponseDTO.setDetail(details);
+
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
+    }
 }

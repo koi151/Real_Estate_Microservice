@@ -11,6 +11,7 @@ import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequ
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import customExceptions.CategoryNotFoundException;
+import customExceptions.FieldRequiredException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -127,7 +128,10 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest categoryRequest) {
+    public PropertyCategoryDetailDTO
+        updateCategory(Integer id, PropertyCategoryRequest categoryRequest)
+        throws FieldRequiredException
+    {
         return propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
                     if (categoryRequest.getTitle() != null)
@@ -142,16 +146,17 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                     return propertyCategoryRepository.save(existingCategory);
                 })
                 .map(PropertyCategoryDetailDTO::new) // Map to DTO after saving
-                .orElseThrow(() -> new RuntimeException("Property category not found with id: " + id));
+                .orElseThrow(() -> new FieldRequiredException("Property category not found with id: " + id));
     }
 
     @Override
     public void deleteCategory(Integer id) throws CategoryNotFoundException {
-        PropertyCategory category = propertyCategoryRepository.findById(id)
+        propertyCategoryRepository.findById(id)
+                .map(existingCategory -> {
+                    existingCategory.setDeleted(true);
+                    return propertyCategoryRepository.save(existingCategory);
+                })
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
-
-        category.setDeleted(true);
-        propertyCategoryRepository.save(category);
     }
 
 

@@ -55,7 +55,6 @@ public class PropertyCategoryController {
     public ResponseEntity<ResponseData> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
         ResponseData responseData = new ResponseData();
 
-        try {
             PropertyCategoryValidator.validateCategoryRequest(propertyCategoryRequest);
             responseData.setData(propertyCategoryImp.createCategory(propertyCategoryRequest));
 
@@ -63,44 +62,25 @@ public class PropertyCategoryController {
             responseData.setDesc("Success");
 
             return ResponseEntity.ok(responseData);
-
-        } catch (Exception e) { // temporary error handle
-            responseData.setStatus(400);
-            responseData.setDesc("Failed to create category");
-            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
-        }
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseData> updateCategory(@PathVariable(name = "id") Integer id, @RequestBody PropertyCategoryRequest categoryRequest) {
         ResponseData responseData = new ResponseData();
 
-        try {
-            PropertyCategoryValidator.validateCategoryRequest(categoryRequest);
-            responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
-            responseData.setDesc("Updated successfully");
-            return ResponseEntity.ok(responseData);
-
-        } catch (Exception e) {
-            System.out.println("Error occurred while updating category: " + e.getMessage());
-            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
-        }
+        PropertyCategoryValidator.validateCategoryRequest(categoryRequest);
+        responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
+        responseData.setDesc("Updated successfully");
+        return ResponseEntity.ok(responseData);
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseData> deleteCategory(@PathVariable(name = "id") Integer id) {
         ResponseData responseData = new ResponseData();
 
-        try {
-            propertyCategoryImp.deleteCategory(id);
-            responseData.setDesc("Deleted successful");
+        propertyCategoryImp.deleteCategory(id);
+        responseData.setDesc("Deleted successful");
 
-            return ResponseEntity.ok(responseData);
-
-        } catch (Exception e) {
-            System.out.println("Error occurred while deleting category: " + e.getMessage());
-            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
-        }
-
+        return ResponseEntity.ok(responseData);
     }
 }
