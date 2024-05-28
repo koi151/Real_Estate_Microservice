@@ -4,6 +4,7 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
+import customExceptions.FieldRequiredException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +34,6 @@ public class PropertyCategoryController {
         return ResponseEntity.ok(responseData);
     }
 
-
     @GetMapping("/home-categories")
     public ResponseEntity<ResponseData> getCategoriesHomePage() {
         // tempo
@@ -52,6 +52,7 @@ public class PropertyCategoryController {
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
         ResponseData responseData = new ResponseData();
+        validate(propertyCategoryRequest);
 
         try {
             responseData.setData(propertyCategoryImp.createCategory(propertyCategoryRequest));
@@ -68,13 +69,26 @@ public class PropertyCategoryController {
         }
     }
 
+    public void validate(PropertyCategoryRequest categoryRequest) {
+        if (categoryRequest.getTitle() == null) {
+            throw new FieldRequiredException("Title of category is null");
+        }
+    }
+
+
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseData> updateCategory(@PathVariable(name = "id") Integer id, @RequestBody PropertyCategoryRequest categoryRequest) {
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
-        responseData.setDesc("Updated successfully");
+        try {
+            responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
+            responseData.setDesc("Updated successfully");
+            return ResponseEntity.ok(responseData);
 
-        return ResponseEntity.ok(responseData);
+        } catch (Exception e) {
+            System.out.println("Error occurred: " + e.getMessage());
+            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
+        }
+
     }
 }
