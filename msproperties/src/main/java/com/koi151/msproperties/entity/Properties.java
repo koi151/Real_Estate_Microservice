@@ -33,7 +33,7 @@ public class Properties {
     private String description;
 
     @Column(name = "images")
-    private String images;
+    private String imageUrls;
 
     @Column(name = "view")
     private int view;
@@ -44,21 +44,19 @@ public class Properties {
     @Column(name = "status", nullable = false, length = 20)
     private String status = "active";
 
-    // slug
-
     @Column(name = "house_direction", length = 20)
     private String houseDirection;
 
     @Column(name = "balcony_direction", length = 20)
     private String balconyDirection;
 
-    @Column(name = "deleted")
+    @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
 
     @Column(name = "created_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
-    @Column(name = "updated_at", columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP")
+    @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
 //    @ManyToOne

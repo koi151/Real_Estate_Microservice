@@ -34,19 +34,12 @@ public class PropertiesController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProperty(@RequestBody PropertyRequest propertyRequest) {
+    public ResponseEntity<?> createProperty(@ModelAttribute PropertyRequest propertyRequest) {
         ResponseData responseData = new ResponseData();
 
-        try {
-            responseData.setData(propertiesServiceImp.createProperty(propertyRequest));
-            responseData.setDesc("Success");
-            return ResponseEntity.ok(responseData);
-
-        } catch (Exception e) { // temporary err handle
-            responseData.setStatus(400);
-            responseData.setDesc("Failed to create category");
-            return new ResponseEntity<>(responseData, HttpStatus.BAD_REQUEST);
-        }
+        responseData.setData(propertiesServiceImp.createProperty(propertyRequest));
+        responseData.setDesc("Success");
+        return ResponseEntity.ok(responseData);
     }
 
     @DeleteMapping("/{id}")

@@ -8,7 +8,6 @@ import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -72,7 +71,7 @@ public class PropertyCategoryController {
 
         ResponseData responseData = new ResponseData();
 
-        PropertyCategoryValidator.validateCategoryRequest(request);
+//        PropertyCategoryValidator.validateCategoryRequest(request);
 
         responseData.setData(propertyCategoryImp.updateCategory(id, request));
         responseData.setDesc("Updated successfully");

@@ -162,6 +162,8 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                         existingCategory.setImageUrls(imageUrls);
                     }
 
+                    existingCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
                     return propertyCategoryRepository.save(existingCategory);
                 })
                 .map(PropertyCategoryDetailDTO::new) // Map to DTO after saving

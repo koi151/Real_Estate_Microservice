@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory;
+package com.koi151.msproperties.config;
 
 import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;

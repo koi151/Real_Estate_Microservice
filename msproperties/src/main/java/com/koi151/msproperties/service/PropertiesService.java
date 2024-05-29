@@ -25,6 +25,9 @@ public class PropertiesService implements PropertiesServiceImp {
     @Autowired
     PropertiesRepository propertiesRepository;
 
+    @Autowired
+    CloudinaryService cloudinaryService;
+
     @Override
     public List<PropertiesHomeDTO> getHomeProperties() {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("id"));
@@ -47,22 +50,28 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public boolean createProperty(PropertyRequest propertyRequest) {
+    public boolean createProperty(PropertyRequest request) {
         boolean isCreateSuccess = false;
 
         try {
             Properties properties = new Properties();
 
-            properties.setTitle(propertyRequest.getTitle());
-            properties.setCategoryId(propertyRequest.getCategoryId());
-            properties.setArea(propertyRequest.getArea());
-            properties.setDescription(propertyRequest.getDescription());
-            properties.setImages(propertyRequest.getImages());
-            properties.setTotalFloor(propertyRequest.getTotalFloor());
-            properties.setHouseDirection(propertyRequest.getHouseDirection());
-            properties.setBalconyDirection(propertyRequest.getBalconyDirection());
-            properties.setAvailabeFrom(propertyRequest.getAvailableFrom());
+            properties.setTitle(request.getTitle());
+            properties.setCategoryId(request.getCategoryId());
+            properties.setArea(request.getArea());
+            properties.setDescription(request.getDescription());
+            properties.setTotalFloor(request.getTotalFloor());
+            properties.setHouseDirection(request.getHouseDirection());
+            properties.setBalconyDirection(request.getBalconyDirection());
+            properties.setAvailabeFrom(request.getAvailableFrom());
             properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+            if(request.getImages() != null && !request.getImages().isEmpty()) {
+                String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");                if (imageUrls == null || imageUrls.isEmpty()) {
+                    throw new RuntimeException("Failed to upload image to Cloudinary");
+                }
+                properties.setImageUrls(imageUrls);
+            }
 
             propertiesRepository.save(properties);
             isCreateSuccess = true;
@@ -87,7 +96,7 @@ public class PropertiesService implements PropertiesServiceImp {
             propertiesHomeDTO.setTitle(property.getTitle());
             propertiesHomeDTO.setDescription(property.getDescription());
             propertiesHomeDTO.setStatus(property.getStatus());
-            propertiesHomeDTO.setImages(property.getImages());
+            propertiesHomeDTO.setImages(property.getImageUrls());
             propertiesHomeDTO.setView(property.getView());
 
             propertiesHomeDTOList.add(propertiesHomeDTO);
