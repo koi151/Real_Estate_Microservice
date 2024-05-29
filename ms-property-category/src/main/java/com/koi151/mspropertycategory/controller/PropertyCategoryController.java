@@ -4,11 +4,10 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
-import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 
 @RestController
@@ -18,7 +17,7 @@ public class PropertyCategoryController {
     @Autowired
     PropertyCategoryImp propertyCategoryImp;
 
-    PropertyCategoryValidator propertyCategoryValidator;
+//    PropertyCategoryValidator propertyCategoryValidator;
 
     @GetMapping("/{title}")
     public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
@@ -52,23 +51,28 @@ public class PropertyCategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseData> createCategory (@RequestBody PropertyCategoryRequest propertyCategoryRequest) {
+    public ResponseEntity<ResponseData> createCategory (
+            @RequestParam(name = "title", required = true) String title,
+            @RequestParam String description,
+            @RequestParam String status,
+            @RequestParam MultipartFile images)
+    {
         ResponseData responseData = new ResponseData();
 
-            PropertyCategoryValidator.validateCategoryRequest(propertyCategoryRequest);
-            responseData.setData(propertyCategoryImp.createCategory(propertyCategoryRequest));
+//        PropertyCategoryValidator.validateCategoryRequest(propertyCategoryRequest);
+        responseData.setData(propertyCategoryImp.createCategory(title, description, status, images));
 
-            responseData.setStatus(200);
-            responseData.setDesc("Success");
+        responseData.setStatus(200);
+        responseData.setDesc("Success");
 
-            return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(responseData);
     }
 
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseData> updateCategory(@PathVariable(name = "id") Integer id, @RequestBody PropertyCategoryRequest categoryRequest) {
         ResponseData responseData = new ResponseData();
 
-        PropertyCategoryValidator.validateCategoryRequest(categoryRequest);
+//        PropertyCategoryValidator.validateCategoryRequest(categoryRequest);
         responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
         responseData.setDesc("Updated successfully");
         return ResponseEntity.ok(responseData);

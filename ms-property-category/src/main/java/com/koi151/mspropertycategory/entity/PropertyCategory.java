@@ -26,7 +26,7 @@ public class PropertyCategory {
     private String description;
 
     @Column(name = "images")
-    private String images;
+    private String imageUrls;
 
     @Column(name = "status", nullable = false, length = 20)
     private String status = "active";

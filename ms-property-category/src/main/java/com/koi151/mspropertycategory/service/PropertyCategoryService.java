@@ -18,11 +18,13 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +35,9 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
     @Autowired
     PropertiesClient propertiesClient;
+
+    @Autowired
+    private CloudinaryService cloudinaryService;
 
     @Override
     public List<PropertyCategoryHomeDTO> getCategories(String title) {
@@ -54,7 +59,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 .orElse(
                         PropertyCategory.builder()
                                 .title("NOT FOUND")
-                                .images("NOT FOUND")
+                                .imageUrls("NOT FOUND")
                                 .description("NOT FOUND")
                                 .build()
                 );
@@ -94,7 +99,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
             propertyCategoryDTO.setTitle(category.getTitle());
             propertyCategoryDTO.setDescription(category.getDescription());
-            propertyCategoryDTO.setImages(category.getImages());
+            propertyCategoryDTO.setImages(category.getImageUrls());
 
             propertyCategoryDTOList.add((propertyCategoryDTO));
         }
@@ -102,20 +107,26 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return propertyCategoryDTOList;
     }
 
+
     @Override
-    public boolean createCategory(PropertyCategoryRequest propertyCategoryRequest) {
+    public boolean createCategory(String title, String description, String status, MultipartFile images) {
         boolean isInsertSuccess = false;
 
         try {
             // add saving images later
-
             PropertyCategory propertyCategory = new PropertyCategory();
 
-            propertyCategory.setTitle(propertyCategoryRequest.getTitle());
-            propertyCategory.setDescription(propertyCategoryRequest.getDescription());
-            propertyCategory.setStatus(propertyCategoryRequest.getStatus());
+            propertyCategory.setTitle(title);
+            propertyCategory.setDescription(description);
+            propertyCategory.setStatus(status);
             propertyCategory.setDeleted(false);
             propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+
+            if (!images.isEmpty()) {
+                String imageUrls = (cloudinaryService.uploadFile(images, "real_estate_categories"));
+//                if (imagesUrl.isEmpty()) throw RuntimeException()
+                  propertyCategory.setImageUrls(imageUrls);
+            }
 
             propertyCategoryRepository.save(propertyCategory);
             isInsertSuccess = true;
@@ -129,8 +140,8 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
     @Override
     public PropertyCategoryDetailDTO
-        updateCategory(Integer id, PropertyCategoryRequest categoryRequest)
-        throws FieldRequiredException
+    updateCategory(Integer id, PropertyCategoryRequest categoryRequest)
+            throws FieldRequiredException
     {
         return propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
@@ -139,7 +150,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                     if (categoryRequest.getDescription() != null)
                         existingCategory.setDescription(categoryRequest.getDescription());
                     if (categoryRequest.getImages() != null)
-                        existingCategory.setImages(categoryRequest.getImages());
+                        existingCategory.setImageUrls(categoryRequest.getImages());
                     if (categoryRequest.getStatus() != null)
                         existingCategory.setStatus(categoryRequest.getStatus());
 
@@ -164,12 +175,9 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     private PropertyCategoryDetailDTO mapToDetailDTO(PropertyCategory category) {
         PropertyCategoryDetailDTO categoryDetailDTO = new PropertyCategoryDetailDTO();
         categoryDetailDTO.setTitle(category.getTitle());
-        categoryDetailDTO.setImages(category.getImages());
+        categoryDetailDTO.setImages(category.getImageUrls());
         categoryDetailDTO.setDescription(category.getDescription());
         categoryDetailDTO.setStatus(category.getStatus());
         return categoryDetailDTO;
     }
-
-
 }
-

@@ -7,6 +7,7 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.FieldRequiredException;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -16,8 +17,9 @@ public interface PropertyCategoryImp {
     List<PropertyCategoryHomeDTO> getCategories(String title); // !
     FullCategoryResponse findCategoryWithProperties(Integer categoryId);
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
-    boolean createCategory(PropertyCategoryRequest propertyCategoryRequest);
+    boolean createCategory(String title, String description, String status, MultipartFile images);
     PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest propertyCategory)
             throws FieldRequiredException;
     void deleteCategory(Integer id) throws CategoryNotFoundException;
 }
+

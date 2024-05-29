@@ -18,7 +18,7 @@ public class PropertyCategoryDetailDTO {
     public PropertyCategoryDetailDTO(PropertyCategory propertyCategory) {
         this.title = propertyCategory.getTitle();
         this.description = propertyCategory.getDescription();
-        this.images = propertyCategory.getImages();
+        this.images = propertyCategory.getImageUrls();
         this.status = propertyCategory.getStatus();
     }
 }
