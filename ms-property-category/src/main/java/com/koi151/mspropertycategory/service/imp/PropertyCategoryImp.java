@@ -17,7 +17,7 @@ public interface PropertyCategoryImp {
     List<PropertyCategoryHomeDTO> getCategories(String title); // !
     FullCategoryResponse findCategoryWithProperties(Integer categoryId);
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
-    boolean createCategory(String title, String description, String status, MultipartFile images);
+    boolean createCategory(PropertyCategoryRequest request);
     PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest request)
             throws FieldRequiredException;
     void deleteCategory(Integer id) throws CategoryNotFoundException;

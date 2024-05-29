@@ -107,23 +107,20 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return propertyCategoryDTOList;
     }
 
-
-    @Override
-    public boolean createCategory(String title, String description, String status, MultipartFile images) {
+    public boolean createCategory(PropertyCategoryRequest request) { // throws CloudinaryUploadException
         boolean isInsertSuccess = false;
 
         try {
-            // add saving images later
             PropertyCategory propertyCategory = new PropertyCategory();
 
-            propertyCategory.setTitle(title);
-            propertyCategory.setDescription(description);
-            propertyCategory.setStatus(status);
+            propertyCategory.setTitle(request.getTitle());
+            propertyCategory.setDescription(request.getDescription());
+            propertyCategory.setStatus(request.getStatus());
             propertyCategory.setDeleted(false);
             propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-            if (images != null && !images.isEmpty()) {
-                String imageUrls = cloudinaryService.uploadFile(images, "real_estate_categories");
+            if (request.getImages() != null && !request.getImages().isEmpty()) {
+                String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_categories");
                 if (imageUrls == null || imageUrls.isEmpty()) {
                     throw new RuntimeException("Failed to upload image to Cloudinary");
                 }
@@ -140,6 +137,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return isInsertSuccess;
 
     }
+
 
     @Override
     public PropertyCategoryDetailDTO

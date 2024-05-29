@@ -4,6 +4,7 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
+import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -51,16 +52,11 @@ public class PropertyCategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseData> createCategory (
-            @RequestParam(name = "title", required = true) String title,
-            @RequestParam String description,
-            @RequestParam String status,
-            @RequestParam MultipartFile images)
-    {
+    public ResponseEntity<ResponseData> createCategory(@ModelAttribute PropertyCategoryRequest request) {
         ResponseData responseData = new ResponseData();
 
-//        PropertyCategoryValidator.validateCategoryRequest(propertyCategoryRequest);
-        responseData.setData(propertyCategoryImp.createCategory(title, description, status, images));
+        PropertyCategoryValidator.validateCategoryRequest(request);
+        responseData.setData(propertyCategoryImp.createCategory(request));
 
         responseData.setStatus(200);
         responseData.setDesc("Success");
@@ -75,6 +71,8 @@ public class PropertyCategoryController {
     ){
 
         ResponseData responseData = new ResponseData();
+
+        PropertyCategoryValidator.validateCategoryRequest(request);
 
         responseData.setData(propertyCategoryImp.updateCategory(id, request));
         responseData.setDesc("Updated successfully");
