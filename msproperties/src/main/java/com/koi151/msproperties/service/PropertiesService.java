@@ -106,6 +106,50 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
+    public Properties updateProperty(Integer id, PropertyRequest request) throws PropertyNotFoundException {
+        return propertiesRepository.findById(id)
+                .map(existingProperty -> {
+
+                    if (request.getTitle() != null)
+                        existingProperty.setTitle(request.getTitle());
+                    if (request.getDescription() != null)
+                        existingProperty.setDescription(request.getDescription());
+                    if (request.getCategoryId() != null)
+                        existingProperty.setCategoryId(request.getCategoryId());
+
+                    if (request.getArea() != null)
+                        existingProperty.setArea(request.getArea());
+                    if (request.getHouseDirection() != null)
+                        existingProperty.setHouseDirection(request.getHouseDirection());
+                    if (request.getBalconyDirection() != null)
+                        existingProperty.setBalconyDirection(request.getBalconyDirection());
+
+                    if (request.getAvailableFrom() != null)
+                        existingProperty.setAvailabeFrom(request.getAvailableFrom());
+                    if(request.getStatus() != null)
+                        existingProperty.setStatus(request.getStatus());
+                    if (request.getPrice() != null) {
+                        existingProperty.setPrice(request.getPrice());
+                    }
+
+                    if (request.getImages() != null) {
+                        String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");
+                        if (imageUrls == null || imageUrls.isEmpty()) {
+                            throw new RuntimeException("Failed to upload image to Cloudinary");
+                        }
+                        existingProperty.setImageUrls(imageUrls);
+                    }
+
+                    existingProperty.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+                    return propertiesRepository.save(existingProperty);
+
+                })
+                .map(Properties::new)
+                .orElseThrow(() -> new PropertyNotFoundException("Cannot found property with id: " + id));
+
+    }
+
+    @Override
     public void deleteProperty(Integer id) throws PropertyNotFoundException {
         propertiesRepository.findById(id)
                 .map(existingProperty -> {

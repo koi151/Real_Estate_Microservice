@@ -142,7 +142,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     @Override
     public PropertyCategoryDetailDTO
     updateCategory(Integer id, PropertyCategoryRequest categoryRequest)
-            throws FieldRequiredException
+            throws CategoryNotFoundException
     {
         return propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
@@ -167,7 +167,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                     return propertyCategoryRepository.save(existingCategory);
                 })
                 .map(PropertyCategoryDetailDTO::new) // Map to DTO after saving
-                .orElseThrow(() -> new FieldRequiredException("Property category not found with id: " + id));
+                .orElseThrow(() -> new CategoryNotFoundException("Property category not found with id: " + id));
     }
 
     @Override

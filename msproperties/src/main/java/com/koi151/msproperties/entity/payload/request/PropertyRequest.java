@@ -12,12 +12,16 @@ import java.time.format.DateTimeFormatter;
 public class PropertyRequest {
 
     private String title;
-    private int categoryId;
-    private float area;
+    private Integer categoryId;
+    private Float area;
     private String description;
-    private int totalFloor;
+
+    private Integer totalFloor;
     private String houseDirection;
     private String balconyDirection;
+    private Float price;
+
     private String availableFrom;
+    private String status;
     private MultipartFile images;
 }

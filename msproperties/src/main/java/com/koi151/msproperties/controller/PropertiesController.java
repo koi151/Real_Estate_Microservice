@@ -50,7 +50,21 @@ public class PropertiesController {
         responseData.setDesc("Property deleted successfully");
 
         return ResponseEntity.ok(responseData);
+    }
 
+    @PatchMapping("/{id}")
+    public  ResponseEntity<ResponseData> updateProperty(
+            @PathVariable(name = "id") Integer id,
+            @ModelAttribute PropertyRequest request
+    ){
+//        request.setPriceProvided(request.getPrice() != null);
+
+        ResponseData responseData = new ResponseData();
+
+        responseData.setData(propertiesServiceImp.updateProperty(id, request));
+        responseData.setDesc("Property updated successfully");
+
+        return ResponseEntity.ok(responseData);
     }
 
 }
