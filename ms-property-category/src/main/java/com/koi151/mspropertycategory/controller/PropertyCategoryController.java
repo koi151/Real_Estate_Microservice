@@ -69,11 +69,14 @@ public class PropertyCategoryController {
     }
 
     @PatchMapping("/{id}")
-    public ResponseEntity<ResponseData> updateCategory(@PathVariable(name = "id") Integer id, @RequestBody PropertyCategoryRequest categoryRequest) {
+    public ResponseEntity<ResponseData> updateCategory(
+            @PathVariable(name = "id") Integer id,
+            @ModelAttribute PropertyCategoryRequest request
+    ){
+
         ResponseData responseData = new ResponseData();
 
-//        PropertyCategoryValidator.validateCategoryRequest(categoryRequest);
-        responseData.setData(propertyCategoryImp.updateCategory(id, categoryRequest));
+        responseData.setData(propertyCategoryImp.updateCategory(id, request));
         responseData.setDesc("Updated successfully");
         return ResponseEntity.ok(responseData);
     }

@@ -9,9 +9,6 @@ public class PropertyCategoryRequest {
 
     private String title;
     private String description;
-    private String images;
     private String status;
-    private MultipartFile file;
-    private String fileName;
-    private ImageModel imageModel;
+    private MultipartFile images;
 }

@@ -122,10 +122,12 @@ public class PropertyCategoryService implements PropertyCategoryImp {
             propertyCategory.setDeleted(false);
             propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-            if (!images.isEmpty()) {
-                String imageUrls = (cloudinaryService.uploadFile(images, "real_estate_categories"));
-//                if (imagesUrl.isEmpty()) throw RuntimeException()
-                  propertyCategory.setImageUrls(imageUrls);
+            if (images != null && !images.isEmpty()) {
+                String imageUrls = cloudinaryService.uploadFile(images, "real_estate_categories");
+                if (imageUrls == null || imageUrls.isEmpty()) {
+                    throw new RuntimeException("Failed to upload image to Cloudinary");
+                }
+                propertyCategory.setImageUrls(imageUrls);
             }
 
             propertyCategoryRepository.save(propertyCategory);
@@ -136,6 +138,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         }
 
         return isInsertSuccess;
+
     }
 
     @Override
@@ -145,14 +148,21 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     {
         return propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
+
                     if (categoryRequest.getTitle() != null)
                         existingCategory.setTitle(categoryRequest.getTitle());
                     if (categoryRequest.getDescription() != null)
                         existingCategory.setDescription(categoryRequest.getDescription());
-                    if (categoryRequest.getImages() != null)
-                        existingCategory.setImageUrls(categoryRequest.getImages());
                     if (categoryRequest.getStatus() != null)
                         existingCategory.setStatus(categoryRequest.getStatus());
+
+                    if (categoryRequest.getImages() != null) {
+                        String imageUrls = cloudinaryService.uploadFile(categoryRequest.getImages(), "real_estate_categories");
+                        if (imageUrls == null || imageUrls.isEmpty()) {
+                            throw new RuntimeException("Failed to upload image to Cloudinary");
+                        }
+                        existingCategory.setImageUrls(imageUrls);
+                    }
 
                     return propertyCategoryRepository.save(existingCategory);
                 })
