@@ -1,5 +1,9 @@
 package com.koi151.msproperties.entity.payload.request;
 
+import com.koi151.msproperties.entity.Direction;
+import com.koi151.msproperties.entity.Status;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -17,6 +21,7 @@ public class PropertyRequest {
     private String title;
 
     @NotNull(message = "Category id is empty")
+    @Positive(message = "Category id must be positive")
     private Integer categoryId;
 
     @NotNull(message = "Area is empty")
@@ -32,10 +37,17 @@ public class PropertyRequest {
     @PositiveOrZero(message = "Total floor must be positive or zero")
     private Integer totalFloor;
 
-    private String houseDirection;
-    private String balconyDirection;
+    @Enumerated(EnumType.STRING)
+    private Direction houseDirection;
 
+    @Enumerated(EnumType.STRING)
+    private Direction balconyDirection;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
+
+    @Enumerated(EnumType.STRING)
     private String availableFrom;
-    private String status;
+
     private MultipartFile images;
 }
