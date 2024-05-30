@@ -2,11 +2,11 @@ package com.koi151.msproperties.controller;
 
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.payload.ResponseData;
-import com.koi151.msproperties.entity.payload.request.PropertyRequest;
+import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
+import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,10 +35,10 @@ public class PropertiesController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<?> createProperty(@ModelAttribute @Valid PropertyRequest propertyRequest) {
+    public ResponseEntity<?> createProperty(@ModelAttribute @Valid PropertyCreateRequest propertyCreateRequest) {
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(propertiesServiceImp.createProperty(propertyRequest));
+        responseData.setData(propertiesServiceImp.createProperty(propertyCreateRequest));
         responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
@@ -57,7 +57,7 @@ public class PropertiesController {
     @PatchMapping("/{id}")
     public  ResponseEntity<ResponseData> updateProperty(
             @PathVariable(name = "id") Integer id,
-            @ModelAttribute @Valid PropertyRequest request
+            @ModelAttribute @Valid PropertyUpdateRequest request
     ){
 //        request.setPriceProvided(request.getPrice() != null);
 

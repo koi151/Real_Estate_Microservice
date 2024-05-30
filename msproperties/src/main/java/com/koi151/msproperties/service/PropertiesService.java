@@ -2,7 +2,8 @@ package com.koi151.msproperties.service;
 
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.Properties;
-import com.koi151.msproperties.entity.payload.request.PropertyRequest;
+import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
+import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.repository.PropertiesRepository;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
 import customExceptions.PropertyNotFoundException;
@@ -50,7 +51,7 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public boolean createProperty(PropertyRequest request) {
+    public boolean createProperty(PropertyCreateRequest request) {
         boolean isCreateSuccess = false;
 
         try {
@@ -60,10 +61,12 @@ public class PropertiesService implements PropertiesServiceImp {
             properties.setCategoryId(request.getCategoryId());
             properties.setArea(request.getArea());
             properties.setDescription(request.getDescription());
+
             properties.setTotalFloor(request.getTotalFloor());
-            properties.setHouseDirection(request.getHouseDirection());
-            properties.setBalconyDirection(request.getBalconyDirection());
+            properties.setHouseDirection(request.getHouseDirection().name());
+            properties.setBalconyDirection(request.getBalconyDirection().name());
             properties.setAvailabeFrom(request.getAvailableFrom());
+
             properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
             if(request.getImages() != null && !request.getImages().isEmpty()) {
@@ -106,7 +109,7 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public Properties updateProperty(Integer id, PropertyRequest request) throws PropertyNotFoundException {
+    public Properties updateProperty(Integer id, PropertyUpdateRequest request) throws PropertyNotFoundException {
         return propertiesRepository.findById(id)
                 .map(existingProperty -> {
 
@@ -120,14 +123,14 @@ public class PropertiesService implements PropertiesServiceImp {
                     if (request.getArea() != null)
                         existingProperty.setArea(request.getArea());
                     if (request.getHouseDirection() != null)
-                        existingProperty.setHouseDirection(request.getHouseDirection());
+                        existingProperty.setHouseDirection(request.getHouseDirection().name());
                     if (request.getBalconyDirection() != null)
-                        existingProperty.setBalconyDirection(request.getBalconyDirection());
+                        existingProperty.setBalconyDirection(request.getBalconyDirection().name());
 
                     if (request.getAvailableFrom() != null)
                         existingProperty.setAvailabeFrom(request.getAvailableFrom());
                     if(request.getStatus() != null)
-                        existingProperty.setStatus(request.getStatus());
+                        existingProperty.setStatus(request.getStatus().name());
                     if (request.getPrice() != null) {
                         existingProperty.setPrice(request.getPrice());
                     }

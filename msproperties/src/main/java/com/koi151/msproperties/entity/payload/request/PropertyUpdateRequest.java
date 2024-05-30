@@ -9,26 +9,19 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-
 @Getter
 @Setter
-public class PropertyRequest {
+public class PropertyUpdateRequest {
 
-    @NotEmpty(message = "Title is empty")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
-    @NotNull(message = "Category id is empty")
     @Positive(message = "Category id must be positive")
     private Integer categoryId;
 
-    @NotNull(message = "Area is empty")
     @PositiveOrZero(message = "Area must be positive or zero")
     private Float area;
 
-    @NotNull(message = "Price is empty")
     @PositiveOrZero(message = "Price must be positive or zero")
     private Float price;
 
@@ -46,7 +39,6 @@ public class PropertyRequest {
     @Enumerated(EnumType.STRING)
     private Status status;
 
-    @Enumerated(EnumType.STRING)
     private String availableFrom;
 
     private MultipartFile images;
