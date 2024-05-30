@@ -39,7 +39,7 @@ public class PropertiesController {
         ResponseData responseData = new ResponseData();
 
         responseData.setData(propertiesServiceImp.createProperty(propertyCreateRequest));
-        responseData.setDesc("Success");
+        responseData.setDesc("Property created successful");
 
         return ResponseEntity.ok(responseData);
     }

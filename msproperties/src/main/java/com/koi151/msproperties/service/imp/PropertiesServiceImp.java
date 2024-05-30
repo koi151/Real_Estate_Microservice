@@ -11,7 +11,7 @@ import java.util.List;
 public interface PropertiesServiceImp {
 
     List<PropertiesHomeDTO> getHomeProperties();
-    boolean createProperty(PropertyCreateRequest propertyCreateRequest);
+    Properties createProperty(PropertyCreateRequest propertyCreateRequest);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
     Properties updateProperty(Integer id, PropertyUpdateRequest request);
     void deleteProperty(Integer id) throws PropertyNotFoundException;

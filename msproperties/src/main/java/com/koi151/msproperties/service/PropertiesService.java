@@ -51,39 +51,31 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public boolean createProperty(PropertyCreateRequest request) {
-        boolean isCreateSuccess = false;
+    public Properties createProperty(PropertyCreateRequest request) {
+        Properties properties = new Properties();
 
-        try {
-            Properties properties = new Properties();
+        properties.setTitle(request.getTitle());
+        properties.setCategoryId(request.getCategoryId());
+        properties.setArea(request.getArea());
+        properties.setDescription(request.getDescription());
 
-            properties.setTitle(request.getTitle());
-            properties.setCategoryId(request.getCategoryId());
-            properties.setArea(request.getArea());
-            properties.setDescription(request.getDescription());
+        properties.setTotalFloor(request.getTotalFloor());
+        properties.setHouseDirection(request.getHouseDirection());
+        properties.setBalconyDirection(request.getBalconyDirection());
+        properties.setAvailableFrom(request.getAvailableFrom());
 
-            properties.setTotalFloor(request.getTotalFloor());
-            properties.setHouseDirection(request.getHouseDirection());
-            properties.setBalconyDirection(request.getBalconyDirection());
-            properties.setAvailableFrom(request.getAvailableFrom());
+        properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-            properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
-
-            if(request.getImages() != null && !request.getImages().isEmpty()) {
-                String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");                if (imageUrls == null || imageUrls.isEmpty()) {
-                    throw new RuntimeException("Failed to upload image to Cloudinary");
-                }
-                properties.setImageUrls(imageUrls);
+        if(request.getImages() != null && !request.getImages().isEmpty()) {
+            String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");                if (imageUrls == null || imageUrls.isEmpty()) {
+                throw new RuntimeException("Failed to upload image to Cloudinary");
             }
-
-            propertiesRepository.save(properties);
-            isCreateSuccess = true;
-
-        } catch (Exception e) {
-            System.out.println("Error occurred while creating property: " + e.getMessage());
+            properties.setImageUrls(imageUrls);
         }
 
-        return isCreateSuccess;
+        propertiesRepository.save(properties);
+
+        return properties;
     }
 
     @Override
