@@ -11,5 +11,5 @@ import java.util.List;
 public class ErrorResponseDTO {
 
     private String error;
-    private List<String> detail = new ArrayList<>();
+    private List<String> details = new ArrayList<>();
 }
