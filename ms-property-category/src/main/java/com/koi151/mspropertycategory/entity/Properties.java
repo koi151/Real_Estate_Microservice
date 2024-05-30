@@ -8,11 +8,13 @@ import lombok.*;
 @NoArgsConstructor
 @Builder
 public class Properties {
+    // used to get data from Properties application -> No validation needed
 
     private String title;
-    private String images;
+    private String imageUrls;
     private String description;
-    private String status;
+    private Status status = Status.ACTIVE;
     private int view;
+
     private boolean deleted;
 }

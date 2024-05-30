@@ -41,7 +41,7 @@ public class PropertyCreateRequest {
     private Direction balconyDirection;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.ACTIVE;
 
     @NotEmpty(message = "Available time cannot be empty")
     private String availableFrom;

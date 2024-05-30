@@ -63,9 +63,9 @@ public class PropertiesService implements PropertiesServiceImp {
             properties.setDescription(request.getDescription());
 
             properties.setTotalFloor(request.getTotalFloor());
-            properties.setHouseDirection(request.getHouseDirection().name());
-            properties.setBalconyDirection(request.getBalconyDirection().name());
-            properties.setAvailabeFrom(request.getAvailableFrom());
+            properties.setHouseDirection(request.getHouseDirection());
+            properties.setBalconyDirection(request.getBalconyDirection());
+            properties.setAvailableFrom(request.getAvailableFrom());
 
             properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
@@ -123,14 +123,14 @@ public class PropertiesService implements PropertiesServiceImp {
                     if (request.getArea() != null)
                         existingProperty.setArea(request.getArea());
                     if (request.getHouseDirection() != null)
-                        existingProperty.setHouseDirection(request.getHouseDirection().name());
+                        existingProperty.setHouseDirection(request.getHouseDirection());
                     if (request.getBalconyDirection() != null)
-                        existingProperty.setBalconyDirection(request.getBalconyDirection().name());
+                        existingProperty.setBalconyDirection(request.getBalconyDirection());
 
                     if (request.getAvailableFrom() != null)
-                        existingProperty.setAvailabeFrom(request.getAvailableFrom());
+                        existingProperty.setAvailableFrom(request.getAvailableFrom());
                     if(request.getStatus() != null)
-                        existingProperty.setStatus(request.getStatus().name());
+                        existingProperty.setStatus(request.getStatus());
                     if (request.getPrice() != null) {
                         existingProperty.setPrice(request.getPrice());
                     }

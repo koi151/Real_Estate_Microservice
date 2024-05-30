@@ -31,15 +31,7 @@ public class ControllerAdvisor {
 
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
     }
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Map<String, List<String>>> handleValidationErrors(MethodArgumentNotValidException ex) {
-//        List<String> errors = ex.getBindingResult().getFieldErrors()
-//                .stream().map(FieldError::getDefaultMessage).collect(Collectors.toList());
-//
-//        Map<String, List<String>> errorsMap = getErrorsMap(errors);
-//
-//        return new ResponseEntity<>(errorsMap, new HttpHeaders(), HttpStatus.BAD_REQUEST);
-//    }
+
     private Map<String, List<String>> getErrorsMap(List<String> errors) {
         Map<String, List<String>> errorsMap = new HashMap<>();
         errorsMap.put("errors", errors);

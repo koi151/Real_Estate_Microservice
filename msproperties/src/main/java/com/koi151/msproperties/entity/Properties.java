@@ -23,11 +23,10 @@ public class Properties {
     @Positive(message = "Category id must be positive")
     private int categoryId;
 
-    @Column(name = "available_from", nullable = false)
+    @Column(name = "available_from", nullable = false, length = 30)
     @NotEmpty(message = "Available time cannot be empty")
     private String availableFrom;
 
-    @Column(name = "title", nullable = false)
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
@@ -41,10 +40,10 @@ public class Properties {
     @PositiveOrZero(message = "Area must be positive or zero")
     private float area;
 
-    @Column(name = "description")
+    @Column(name = "description", columnDefinition = "TEXT")
     private String description;
 
-    @Column(name = "images")
+    @Column(name = "images", columnDefinition = "TEXT")
     private String imageUrls;
 
     @Column(name = "view", nullable = false)
@@ -58,7 +57,7 @@ public class Properties {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private String status = "ACTIVE";
+    private Status status = Status.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "house_direction", length = 20)

@@ -1,6 +1,9 @@
 package com.koi151.mspropertycategory.entity.payload;
 
 import com.koi151.mspropertycategory.entity.Properties;
+import com.koi151.mspropertycategory.entity.Status;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -14,7 +17,9 @@ public class FullCategoryResponse {
 
     private String title;
     private String description;
-    private String status;
+
+    @Enumerated(EnumType.STRING)
+    private Status status;
 
     List<Properties> properties;
 }
