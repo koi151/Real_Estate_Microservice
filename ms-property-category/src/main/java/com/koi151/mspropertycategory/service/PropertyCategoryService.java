@@ -107,35 +107,27 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return propertyCategoryDTOList;
     }
 
-    public boolean createCategory(PropertyCategoryRequest request) { // throws CloudinaryUploadException
-        boolean isInsertSuccess = false;
+    public PropertyCategory createCategory(PropertyCategoryRequest request) { // throws CloudinaryUploadException
 
-        try {
-            PropertyCategory propertyCategory = new PropertyCategory();
+        PropertyCategory propertyCategory = new PropertyCategory();
 
-            propertyCategory.setTitle(request.getTitle());
-            propertyCategory.setDescription(request.getDescription());
-            propertyCategory.setStatus(request.getStatus());
-            propertyCategory.setDeleted(false);
-            propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+        propertyCategory.setTitle(request.getTitle());
+        propertyCategory.setDescription(request.getDescription());
+        propertyCategory.setStatus(request.getStatus());
+        propertyCategory.setDeleted(false);
+        propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
-            if (request.getImages() != null && !request.getImages().isEmpty()) {
-                String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_categories");
-                if (imageUrls == null || imageUrls.isEmpty()) {
-                    throw new RuntimeException("Failed to upload image to Cloudinary");
-                }
-                propertyCategory.setImageUrls(imageUrls);
+        if (request.getImages() != null && !request.getImages().isEmpty()) {
+            String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_categories");
+            if (imageUrls == null || imageUrls.isEmpty()) {
+                throw new RuntimeException("Failed to upload image to Cloudinary");
             }
-
-            propertyCategoryRepository.save(propertyCategory);
-            isInsertSuccess = true;
-
-        } catch (Exception e) {
-            System.out.println("Error occurred while creating category: " + e.getMessage());
+            propertyCategory.setImageUrls(imageUrls);
         }
 
-        return isInsertSuccess;
+        propertyCategoryRepository.save(propertyCategory);
 
+        return propertyCategory;
     }
 
 

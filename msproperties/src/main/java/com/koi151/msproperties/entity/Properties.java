@@ -63,6 +63,7 @@ public class Properties {
     @Column(name = "house_direction", length = 20)
     private Direction houseDirection;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
     private Direction balconyDirection;
 
