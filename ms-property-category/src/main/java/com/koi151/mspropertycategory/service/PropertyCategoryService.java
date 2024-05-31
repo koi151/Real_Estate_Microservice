@@ -171,15 +171,4 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 })
                 .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
     }
-
-
-    // Helper method to map PropertyCategory entity to PropertyCategoryDetailDTO
-    private PropertyCategoryDetailDTO mapToDetailDTO(PropertyCategory category) {
-        PropertyCategoryDetailDTO categoryDetailDTO = new PropertyCategoryDetailDTO();
-        categoryDetailDTO.setTitle(category.getTitle());
-        categoryDetailDTO.setImages(category.getImageUrls());
-        categoryDetailDTO.setDescription(category.getDescription());
-        categoryDetailDTO.setStatus(category.getStatus());
-        return categoryDetailDTO;
-    }
 }

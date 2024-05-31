@@ -1,7 +1,6 @@
 package com.koi151.msproperties.dto;
 
-import com.koi151.msproperties.entity.Properties;
-import com.koi151.msproperties.entity.Status;
+import com.koi151.msproperties.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
@@ -18,8 +17,7 @@ public class PropertiesHomeDTO {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusEnum statusEnum;
 
     private int view;
-    private boolean deleted;
 }

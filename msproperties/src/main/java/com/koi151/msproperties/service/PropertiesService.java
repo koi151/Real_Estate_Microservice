@@ -2,6 +2,7 @@ package com.koi151.msproperties.service;
 
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.Properties;
+import com.koi151.msproperties.entity.StatusEnum;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.repository.PropertiesRepository;
@@ -41,7 +42,7 @@ public class PropertiesService implements PropertiesServiceImp {
             propertiesHomeDTO.setTitle(property.getTitle());
             propertiesHomeDTO.setDescription(property.getDescription());
             propertiesHomeDTO.setImages(propertiesHomeDTO.getImages());
-            propertiesHomeDTO.setStatus(propertiesHomeDTO.getStatus());
+            propertiesHomeDTO.setStatusEnum(propertiesHomeDTO.getStatusEnum());
             propertiesHomeDTO.setView(propertiesHomeDTO.getView());
 
             propertiesHomeDTOList.add((propertiesHomeDTO));
@@ -60,8 +61,8 @@ public class PropertiesService implements PropertiesServiceImp {
         properties.setDescription(request.getDescription());
 
         properties.setTotalFloor(request.getTotalFloor());
-        properties.setHouseDirection(request.getHouseDirection());
-        properties.setBalconyDirection(request.getBalconyDirection());
+        properties.setHouseDirectionEnum(request.getHouseDirectionEnum());
+        properties.setBalconyDirectionEnum(request.getBalconyDirectionEnum());
         properties.setAvailableFrom(request.getAvailableFrom());
 
         properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
@@ -90,9 +91,36 @@ public class PropertiesService implements PropertiesServiceImp {
 
             propertiesHomeDTO.setTitle(property.getTitle());
             propertiesHomeDTO.setDescription(property.getDescription());
-            propertiesHomeDTO.setStatus(property.getStatus());
+            propertiesHomeDTO.setStatusEnum(property.getStatusEnum());
             propertiesHomeDTO.setImages(property.getImageUrls());
             propertiesHomeDTO.setView(property.getView());
+
+            propertiesHomeDTOList.add(propertiesHomeDTO);
+        }
+
+        return propertiesHomeDTOList;
+    }
+
+
+//    @Override
+//    public Page<Properties> findByStatus(StatusEnum status, PageRequest pageable) {
+//        return propertiesRepository.findAll(Specification.where(property -> property.getDeleted().equals(false))
+//                .and(property -> property.getStatus().equals(status)), pageable);
+//    }
+
+    @Override
+    public List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status) {
+        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
+        Page<Properties> properties = propertiesRepository.findByStatusEnum(status, pageRequest);
+
+        List<PropertiesHomeDTO> propertiesHomeDTOList = new ArrayList<>();
+        for (Properties property: properties) {
+            PropertiesHomeDTO propertiesHomeDTO = new PropertiesHomeDTO();
+
+            propertiesHomeDTO.setDescription(property.getDescription());
+            propertiesHomeDTO.setStatusEnum(property.getStatusEnum());
+            propertiesHomeDTO.setView(property.getView());
+            propertiesHomeDTO.setImages(property.getImageUrls());
 
             propertiesHomeDTOList.add(propertiesHomeDTO);
         }
@@ -114,15 +142,15 @@ public class PropertiesService implements PropertiesServiceImp {
 
                     if (request.getArea() != null)
                         existingProperty.setArea(request.getArea());
-                    if (request.getHouseDirection() != null)
-                        existingProperty.setHouseDirection(request.getHouseDirection());
-                    if (request.getBalconyDirection() != null)
-                        existingProperty.setBalconyDirection(request.getBalconyDirection());
+                    if (request.getHouseDirectionEnum() != null)
+                        existingProperty.setHouseDirectionEnum(request.getHouseDirectionEnum());
+                    if (request.getBalconyDirectionEnum() != null)
+                        existingProperty.setBalconyDirectionEnum(request.getBalconyDirectionEnum());
 
                     if (request.getAvailableFrom() != null)
                         existingProperty.setAvailableFrom(request.getAvailableFrom());
-                    if(request.getStatus() != null)
-                        existingProperty.setStatus(request.getStatus());
+                    if(request.getStatusEnum() != null)
+                        existingProperty.setStatusEnum(request.getStatusEnum());
                     if (request.getPrice() != null) {
                         existingProperty.setPrice(request.getPrice());
                     }

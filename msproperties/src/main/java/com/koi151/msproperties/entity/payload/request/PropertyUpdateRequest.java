@@ -1,7 +1,7 @@
 package com.koi151.msproperties.entity.payload.request;
 
-import com.koi151.msproperties.entity.Direction;
-import com.koi151.msproperties.entity.Status;
+import com.koi151.msproperties.entity.DirectionEnum;
+import com.koi151.msproperties.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
@@ -31,13 +31,13 @@ public class PropertyUpdateRequest {
     private Integer totalFloor;
 
     @Enumerated(EnumType.STRING)
-    private Direction houseDirection;
+    private DirectionEnum houseDirectionEnum;
 
     @Enumerated(EnumType.STRING)
-    private Direction balconyDirection;
+    private DirectionEnum balconyDirectionEnum;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusEnum statusEnum;
 
     private String availableFrom;
 

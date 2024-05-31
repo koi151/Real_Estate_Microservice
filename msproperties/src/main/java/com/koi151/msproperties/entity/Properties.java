@@ -57,15 +57,15 @@ public class Properties {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private Status status = Status.ACTIVE;
+    private StatusEnum statusEnum = StatusEnum.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "house_direction", length = 20)
-    private Direction houseDirection;
+    private DirectionEnum houseDirectionEnum;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
-    private Direction balconyDirection;
+    private DirectionEnum balconyDirectionEnum;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
@@ -87,9 +87,9 @@ public class Properties {
         this.view = properties.view;
         this.totalFloor = properties.totalFloor;
         this.price = properties.price;
-        this.status = properties.status;
-        this.houseDirection = properties.houseDirection;
-        this.balconyDirection = properties.balconyDirection;
+        this.statusEnum = properties.statusEnum;
+        this.houseDirectionEnum = properties.houseDirectionEnum;
+        this.balconyDirectionEnum = properties.balconyDirectionEnum;
         this.deleted = properties.deleted;
         this.createdAt = properties.createdAt;
         this.updatedAt = properties.updatedAt;

@@ -1,5 +1,5 @@
 package com.koi151.msproperties.entity;
 
-public enum Status {
+public enum StatusEnum {
     ACTIVE, INACTIVE, PENDING
 }

@@ -8,7 +8,6 @@ import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.FieldRequiredException;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
