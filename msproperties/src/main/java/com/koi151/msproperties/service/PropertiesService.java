@@ -36,20 +36,9 @@ public class PropertiesService implements PropertiesServiceImp {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("id"));
         Page<Properties> properties = propertiesRepository.findByDeleted(false, pageRequest);
 
-        List<PropertiesHomeDTO> propertiesHomeDTOList = new ArrayList<>();
-
-        for (Properties property: properties) {
-            PropertiesHomeDTO propertiesHomeDTO = new PropertiesHomeDTO();
-            propertiesHomeDTO.setTitle(property.getTitle());
-            propertiesHomeDTO.setDescription(property.getDescription());
-            propertiesHomeDTO.setImages(propertiesHomeDTO.getImages());
-            propertiesHomeDTO.setStatusEnum(propertiesHomeDTO.getStatusEnum());
-            propertiesHomeDTO.setView(propertiesHomeDTO.getView());
-
-            propertiesHomeDTOList.add((propertiesHomeDTO));
-        }
-
-        return propertiesHomeDTOList;
+        return properties.stream()
+                .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatusEnum(), property.getView()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -85,42 +74,10 @@ public class PropertiesService implements PropertiesServiceImp {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
         Page<Properties> properties = propertiesRepository.findPropertiesByCategoryId(categoryId, pageRequest);
 
-        List<PropertiesHomeDTO> propertiesHomeDTOList = new ArrayList<>();
-
-        for (Properties property: properties) {
-            PropertiesHomeDTO propertiesHomeDTO = new PropertiesHomeDTO();
-
-            propertiesHomeDTO.setTitle(property.getTitle());
-            propertiesHomeDTO.setDescription(property.getDescription());
-            propertiesHomeDTO.setStatusEnum(property.getStatusEnum());
-            propertiesHomeDTO.setImages(property.getImageUrls());
-            propertiesHomeDTO.setView(property.getView());
-
-            propertiesHomeDTOList.add(propertiesHomeDTO);
-        }
-
-        return propertiesHomeDTOList;
+        return properties.stream()
+                .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatusEnum(), property.getView()))
+                .collect(Collectors.toList());
     }
-
-//    @Override
-//    public List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status) {
-//        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
-//        Page<Properties> properties = propertiesRepository.findByStatusEnum(status, pageRequest);
-//
-//        List<PropertiesHomeDTO> propertiesHomeDTOList = new ArrayList<>();
-//        for (Properties property: properties) {
-//            PropertiesHomeDTO propertiesHomeDTO = new PropertiesHomeDTO();
-//
-//            propertiesHomeDTO.setDescription(property.getDescription());
-//            propertiesHomeDTO.setStatusEnum(property.getStatusEnum());
-//            propertiesHomeDTO.setView(property.getView());
-//            propertiesHomeDTO.setImages(property.getImageUrls());
-//
-//            propertiesHomeDTOList.add(propertiesHomeDTO);
-//        }
-//
-//        return propertiesHomeDTOList;
-//    }
 
     @Override
     public List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status) {
