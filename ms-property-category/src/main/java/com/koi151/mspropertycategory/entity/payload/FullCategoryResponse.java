@@ -1,7 +1,7 @@
 package com.koi151.mspropertycategory.entity.payload;
 
 import com.koi151.mspropertycategory.entity.Properties;
-import com.koi151.mspropertycategory.entity.Status;
+import com.koi151.mspropertycategory.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.Builder;
@@ -19,7 +19,7 @@ public class FullCategoryResponse {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusEnum statusEnum;
 
     List<Properties> properties;
 }

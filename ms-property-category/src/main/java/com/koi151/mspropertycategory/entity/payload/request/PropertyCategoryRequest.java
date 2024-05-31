@@ -1,6 +1,6 @@
 package com.koi151.mspropertycategory.entity.payload.request;
 
-import com.koi151.mspropertycategory.entity.Status;
+import com.koi151.mspropertycategory.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import lombok.*;
@@ -14,7 +14,7 @@ public class PropertyCategoryRequest {
     private String description;
 
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private StatusEnum statusEnum;
 
     private MultipartFile images;
 }

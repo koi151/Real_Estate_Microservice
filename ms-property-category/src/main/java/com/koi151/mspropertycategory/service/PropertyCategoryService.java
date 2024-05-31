@@ -6,25 +6,23 @@ import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
+import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import customExceptions.CategoryNotFoundException;
-import customExceptions.FieldRequiredException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -54,6 +52,15 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
+    public List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum) {
+        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
+//        Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
+
+
+        return null;
+    }
+
+    @Override
     public FullCategoryResponse findCategoryWithProperties(Integer categoryId) {
         var category = propertyCategoryRepository.findById(categoryId)
                 .orElse(
@@ -70,7 +77,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return FullCategoryResponse.builder()
                 .title(category.getTitle())
                 .description(category.getDescription())
-                .status(category.getStatus())
+                .statusEnum(category.getStatusEnum())
                 .properties(properties)
                 .build();
     }
@@ -113,7 +120,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
         propertyCategory.setTitle(request.getTitle());
         propertyCategory.setDescription(request.getDescription());
-        propertyCategory.setStatus(request.getStatus());
+        propertyCategory.setStatusEnum(request.getStatusEnum());
         propertyCategory.setDeleted(false);
         propertyCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
@@ -143,8 +150,8 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                         existingCategory.setTitle(categoryRequest.getTitle());
                     if (categoryRequest.getDescription() != null)
                         existingCategory.setDescription(categoryRequest.getDescription());
-                    if (categoryRequest.getStatus() != null)
-                        existingCategory.setStatus(categoryRequest.getStatus());
+                    if (categoryRequest.getStatusEnum() != null)
+                        existingCategory.setStatusEnum(categoryRequest.getStatusEnum());
 
                     if (categoryRequest.getImages() != null) {
                         String imageUrls = cloudinaryService.uploadFile(categoryRequest.getImages(), "real_estate_categories");

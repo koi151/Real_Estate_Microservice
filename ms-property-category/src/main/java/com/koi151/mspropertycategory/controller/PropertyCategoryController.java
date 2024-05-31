@@ -50,6 +50,15 @@ public class PropertyCategoryController {
         return ResponseEntity.ok(propertyCategoryImp.findCategoryWithProperties(categoryId));
     }
 
+    @GetMapping("/status/{status}")
+    public ResponseEntity<ResponseData> getCategoriesByStatus(@PathVariable(name = "status") String status) {
+        ResponseData responseData = new ResponseData();
+
+//        responseData.setData(propertyCategoryImp.);
+
+        return ResponseEntity.ok(responseData);
+    }
+
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createCategory(@ModelAttribute PropertyCategoryRequest request) {
         ResponseData responseData = new ResponseData();

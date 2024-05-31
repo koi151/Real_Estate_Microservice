@@ -19,6 +19,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -101,11 +102,24 @@ public class PropertiesService implements PropertiesServiceImp {
         return propertiesHomeDTOList;
     }
 
-
 //    @Override
-//    public Page<Properties> findByStatus(StatusEnum status, PageRequest pageable) {
-//        return propertiesRepository.findAll(Specification.where(property -> property.getDeleted().equals(false))
-//                .and(property -> property.getStatus().equals(status)), pageable);
+//    public List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status) {
+//        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
+//        Page<Properties> properties = propertiesRepository.findByStatusEnum(status, pageRequest);
+//
+//        List<PropertiesHomeDTO> propertiesHomeDTOList = new ArrayList<>();
+//        for (Properties property: properties) {
+//            PropertiesHomeDTO propertiesHomeDTO = new PropertiesHomeDTO();
+//
+//            propertiesHomeDTO.setDescription(property.getDescription());
+//            propertiesHomeDTO.setStatusEnum(property.getStatusEnum());
+//            propertiesHomeDTO.setView(property.getView());
+//            propertiesHomeDTO.setImages(property.getImageUrls());
+//
+//            propertiesHomeDTOList.add(propertiesHomeDTO);
+//        }
+//
+//        return propertiesHomeDTOList;
 //    }
 
     @Override
@@ -113,20 +127,11 @@ public class PropertiesService implements PropertiesServiceImp {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
         Page<Properties> properties = propertiesRepository.findByStatusEnum(status, pageRequest);
 
-        List<PropertiesHomeDTO> propertiesHomeDTOList = new ArrayList<>();
-        for (Properties property: properties) {
-            PropertiesHomeDTO propertiesHomeDTO = new PropertiesHomeDTO();
-
-            propertiesHomeDTO.setDescription(property.getDescription());
-            propertiesHomeDTO.setStatusEnum(property.getStatusEnum());
-            propertiesHomeDTO.setView(property.getView());
-            propertiesHomeDTO.setImages(property.getImageUrls());
-
-            propertiesHomeDTOList.add(propertiesHomeDTO);
-        }
-
-        return propertiesHomeDTOList;
+        return properties.stream()
+                .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatusEnum(), property.getView()))
+                .collect(Collectors.toList());
     }
+
 
     @Override
     public Properties updateProperty(Integer id, PropertyUpdateRequest request) throws PropertyNotFoundException {
