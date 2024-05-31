@@ -23,6 +23,7 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -52,12 +53,13 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum) {
+    public List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum status) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
-//        Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
+        Page<PropertyCategory> categories = propertyCategoryRepository.findByStatusEnum(status, pageRequest);
 
-
-        return null;
+        return categories.stream()
+                .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
+                .collect(Collectors.toList());
     }
 
     @Override

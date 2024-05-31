@@ -1,5 +1,7 @@
 package com.koi151.mspropertycategory.controller;
 
+import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
+import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
@@ -8,6 +10,8 @@ import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 
 @RestController
@@ -53,8 +57,13 @@ public class PropertyCategoryController {
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData> getCategoriesByStatus(@PathVariable(name = "status") String status) {
         ResponseData responseData = new ResponseData();
+        StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
 
-//        responseData.setData(propertyCategoryImp.);
+        List<PropertyCategoryHomeDTO> properties = propertyCategoryImp.getCategoriesByStatus(se);
+
+        responseData.setData(properties);
+        responseData.setDesc(properties.isEmpty() ?
+                "No property categories found with status " + status : "Success");
 
         return ResponseEntity.ok(responseData);
     }

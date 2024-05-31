@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/properties")
@@ -41,8 +42,11 @@ public class PropertiesController {
 
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
 
-        responseData.setData(propertiesServiceImp.getPropertiesWithStatus(se));
-        responseData.setDesc("Success");
+        List<PropertiesHomeDTO> properties = propertiesServiceImp.getPropertiesWithStatus(se);
+
+        responseData.setData(properties);
+        responseData.setDesc(properties.isEmpty() ?
+                "No properties found with status " + status : "Success");
 
         return ResponseEntity.ok(responseData);
     }
