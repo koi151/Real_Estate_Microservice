@@ -1,5 +1,7 @@
 package com.koi151.mspropertycategory.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.core.type.TypeReference;
 import com.koi151.mspropertycategory.client.PropertiesClient;
 import com.koi151.mspropertycategory.dto.PropertyCategoryDetailDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
@@ -8,6 +10,7 @@ import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
+import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
@@ -17,12 +20,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,6 +41,9 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
     @Autowired
     private CloudinaryService cloudinaryService;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @Override
     public List<PropertyCategoryHomeDTO> getCategories(String title) {
@@ -62,7 +69,15 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         var category = propertyCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("No category found with id " + categoryId));
 
-        List<Properties> properties = propertiesClient.findAllPropertiesByCategory(categoryId);
+        ResponseEntity<ResponseData> responseEntity = propertiesClient.findAllPropertiesByCategory(categoryId);
+        ResponseData responseData = Objects.requireNonNull(responseEntity.getBody());
+
+        List<Properties> properties;
+        try {
+            properties = objectMapper.convertValue(responseData.getData(), new TypeReference<List<Properties>>() {});
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to deserialize properties data", e);
+        }
 
         return FullCategoryResponse.builder()
                 .title(category.getTitle())
