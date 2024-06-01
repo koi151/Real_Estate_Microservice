@@ -17,11 +17,11 @@ public interface PropertyCategoryImp {
     List<PropertyCategoryHomeDTO> getCategoriesHomePage();
     List<PropertyCategoryHomeDTO> getCategories(String title);
     List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum);
-    FullCategoryResponse findCategoryWithProperties(Integer categoryId);
+    PropertyCategory getCategoryById(Integer id);
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
+    FullCategoryResponse findCategoryWithProperties(Integer categoryId);
     PropertyCategory createCategory(PropertyCategoryRequest request);
-    PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest request)
-            throws FieldRequiredException;
+    PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest request);
     void deleteCategory(Integer id) throws CategoryNotFoundException;
 }
 

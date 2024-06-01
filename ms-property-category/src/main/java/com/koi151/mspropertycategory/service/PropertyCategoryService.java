@@ -65,6 +65,12 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
+    public PropertyCategory getCategoryById(Integer id) {
+        return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
+                .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
+    }
+
+    @Override
     public FullCategoryResponse findCategoryWithProperties(Integer categoryId) {
         var category = propertyCategoryRepository.findById(categoryId)
                 .orElseThrow(() -> new CategoryNotFoundException("No category found with id " + categoryId));
@@ -88,16 +94,12 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public PropertyCategoryTitleDTO getCategoryTitleById(Integer id) {
-        PropertyCategoryTitleDTO propertyCategoryTitleDTO = new PropertyCategoryTitleDTO();
-        PropertyCategory propertyCategory = propertyCategoryRepository.findById(id)
-                .orElse(PropertyCategory.builder()
-                        .title("NOT_FOUND")
-                        .build());
-
-        propertyCategoryTitleDTO.setTitle(propertyCategory.getTitle());
-        return propertyCategoryTitleDTO;
+    public PropertyCategoryTitleDTO getCategoryTitleById(Integer id){
+        PropertyCategory category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
+                .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
+        return new PropertyCategoryTitleDTO(category.getTitle());
     }
+
 
     @Override
     public List<PropertyCategoryHomeDTO> getCategoriesHomePage() {
@@ -165,7 +167,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public void deleteCategory(Integer id) throws CategoryNotFoundException {
+    public void deleteCategory(Integer id) {
         propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
                     existingCategory.setDeleted(true);

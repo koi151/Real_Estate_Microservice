@@ -1,12 +1,15 @@
 package com.koi151.mspropertycategory.controller;
 
 import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
+import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
+import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
+import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +25,6 @@ public class PropertyCategoryController {
     @Autowired
     PropertyCategoryImp propertyCategoryImp;
 
-//    PropertyCategoryValidator propertyCategoryValidator;
-
     @GetMapping("/{title}")
     public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
         ResponseData responseData = new ResponseData();
@@ -34,21 +35,34 @@ public class PropertyCategoryController {
 
     @GetMapping("/title/{id}")
     public ResponseEntity<ResponseData> getCategoryTitleById(@PathVariable(name = "id") int id) {
+        PropertyCategoryTitleDTO category = propertyCategoryImp.getCategoryTitleById(id);
+
         ResponseData responseData = new ResponseData();
-        responseData.setData(propertyCategoryImp.getCategoryTitleById(id));
+        responseData.setData(category);
         responseData.setDesc("Success");
+
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/home-categories")
     public ResponseEntity<ResponseData> getCategoriesHomePage() {
-        // tempo
-        ResponseData responseData = new ResponseData();
-
         List<PropertyCategoryHomeDTO> properties = propertyCategoryImp.getCategoriesHomePage();
+
+        ResponseData responseData = new ResponseData();
         responseData.setData(properties);
         responseData.setDesc(properties.isEmpty() ?
                 "No property category found" : "Success");
+
+        return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ResponseData> getCategoryById(@PathVariable(name = "id") Integer id) {
+        PropertyCategory category = propertyCategoryImp.getCategoryById(id);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(category);
+        responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
     }
@@ -65,7 +79,6 @@ public class PropertyCategoryController {
 
         return ResponseEntity.ok(responseData);
     }
-
 
 
     @GetMapping("/status/{status}")
