@@ -5,6 +5,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Entity(name = "properties")
 @Getter
@@ -18,6 +19,9 @@ public class Properties {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @OneToMany(mappedBy = "properties")
+    private Set<Room> roomSet;
+
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id cannot be null")
     @Positive(message = "Category id must be positive")
@@ -25,6 +29,7 @@ public class Properties {
 
     @Column(name = "available_from", nullable = false, length = 30)
     @NotEmpty(message = "Available time cannot be empty")
+    @Size(max = 30, message = "Available time cannot longer than 30 characters")
     private String availableFrom;
 
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
@@ -93,6 +98,7 @@ public class Properties {
         this.deleted = properties.deleted;
         this.createdAt = properties.createdAt;
         this.updatedAt = properties.updatedAt;
+        this.roomSet = properties.roomSet;
     }
 
     @PrePersist

@@ -2,9 +2,10 @@ package com.koi151.msproperties.controllerAdvice;
 
 import com.koi151.msproperties.dto.ErrorResponseDTO;
 import customExceptions.PropertyNotFoundException;
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -39,7 +40,7 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<Object> handleBindException(MethodArgumentNotValidException ex) {
+    public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getBindingResult().getFieldErrors()
                 .stream() // create new stream
@@ -53,5 +54,33 @@ public class ControllerAdvisor {
         return ResponseEntity.badRequest().body(errorResponseDTO);
     }
 
+    //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
+    // The below error type occurred when violated @NotNull validate
+    @ExceptionHandler(ConstraintViolationException.class)
+    protected ResponseEntity<Object> handleConstraintViolationException(
+            ConstraintViolationException ex) {
 
+        List<String> constraintViolations = ex.getConstraintViolations()
+                .stream()
+                .map(ConstraintViolation::getMessage)
+                .collect(Collectors.toList());
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError("Validation Failed");
+        errorResponseDTO.setDetails(constraintViolations);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+//    handleConstraintViolationException return :
+//    Validation failed for classes [com.koi151.msproperties.entity.Room] during persist time for groups [jakarta.validation.groups.Default, ]
+//    List of constraint violations:[
+//    ConstraintViolationImpl{interpolatedMessage='Property id cannot be null', propertyPath=properties, rootBeanClass=class com.koi151.msproperties.entity.Room, messageTemplate='Property id cannot be null'}
+//
+//    make the response value the same as previous error handle format
+
+    // json caused err:
+//{
+//    "roomType": "bedroom",
+//    "quantity": 2
+//}
 }
