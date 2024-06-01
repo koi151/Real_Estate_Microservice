@@ -73,7 +73,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         ResponseData responseData = Objects.requireNonNull(responseEntity.getBody());
 
         List<Properties> properties;
-        try {
+        try { // convert object to List<Properties>
             properties = objectMapper.convertValue(responseData.getData(), new TypeReference<List<Properties>>() {});
         } catch (Exception e) {
             throw new RuntimeException("Failed to deserialize properties data", e);

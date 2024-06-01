@@ -41,6 +41,13 @@ public class PropertiesService implements PropertiesServiceImp {
                 .collect(Collectors.toList());
     }
 
+
+    @Override
+    public Properties getPropertyById(Integer id) {
+        return propertiesRepository.findByIdAndDeleted(id, false)
+                .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
+    }
+
     @Override
     public Properties createProperty(PropertyCreateRequest request) {
         Properties properties = new Properties();
@@ -73,7 +80,7 @@ public class PropertiesService implements PropertiesServiceImp {
     @Override
     public List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
-        Page<Properties> properties = propertiesRepository.findPropertiesByCategoryId(categoryId, pageRequest);
+        Page<Properties> properties = propertiesRepository.findByCategoryIdAndDeleted(categoryId, false, pageRequest);
 
         return properties.stream()
                 .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatusEnum(), property.getView()))

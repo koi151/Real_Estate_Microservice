@@ -12,6 +12,7 @@ import java.util.List;
 public interface PropertiesServiceImp {
 
     List<PropertiesHomeDTO> getHomeProperties();
+    Properties getPropertyById(Integer id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
     List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
     Properties createProperty(PropertyCreateRequest propertyCreateRequest);

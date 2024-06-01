@@ -1,6 +1,7 @@
 package com.koi151.msproperties.controller;
 
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
+import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.StatusEnum;
 import com.koi151.msproperties.entity.payload.ResponseData;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
@@ -23,21 +24,33 @@ public class PropertiesController {
 
     @GetMapping("/home-properties")
     public ResponseEntity<?> getHomeProperties() {
-        ResponseData responseData = new ResponseData();
-
         List<PropertiesHomeDTO> properties = propertiesServiceImp.getHomeProperties();
+
+        ResponseData responseData = new ResponseData();
         responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty() ?
-                "No property found" : "Success");
+        responseData.setDesc(properties.isEmpty()
+                ? "No property found"
+                : "Success");
+
+        return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/detail/{id}")
+    public ResponseEntity<ResponseData> getPropertyById(@PathVariable(name = "id") Integer id) {
+        Properties properties = propertiesServiceImp.getPropertyById(id);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(properties);
+        responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/category/{category-id}")
     public ResponseEntity<ResponseData> getPropertiesByCategory(@PathVariable(name="category-id") Integer categoryId) {
-        ResponseData responseData = new ResponseData();
-
         List<PropertiesHomeDTO> properties = propertiesServiceImp.findAllPropertiesByCategory(categoryId);
+
+        ResponseData responseData = new ResponseData();
         responseData.setData(properties);
         responseData.setDesc(properties.isEmpty() ?
                 "No properties found with category id: " + categoryId : "Success");
@@ -47,15 +60,14 @@ public class PropertiesController {
 
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData> getPropertiesWithStatus(@PathVariable(name = "status") String status) {
-        ResponseData responseData = new ResponseData();
-
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
-
         List<PropertiesHomeDTO> properties = propertiesServiceImp.getPropertiesWithStatus(se);
 
+        ResponseData responseData = new ResponseData();
         responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty() ?
-                "No properties found with status " + status : "Success");
+        responseData.setDesc(properties.isEmpty()
+                ? "No properties found with status " + status
+                : "Success");
 
         return ResponseEntity.ok(responseData);
     }

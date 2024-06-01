@@ -11,10 +11,12 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface PropertiesRepository extends JpaRepository<Properties, Integer> {
-    Page<Properties> findByDeleted(boolean deleted, PageRequest pageRequest);
+    Page<Properties> findByDeleted(boolean deleted, PageRequest request);
+    Page<Properties> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, PageRequest request);
     Page<Properties> findByStatusEnum(StatusEnum status, PageRequest pageRequest);
-    Page<Properties> findPropertiesByCategoryId(Integer categoryId, PageRequest pageRequest);
+    Optional<Properties> findByIdAndDeleted(Integer categoryId, boolean deleted);
 }
