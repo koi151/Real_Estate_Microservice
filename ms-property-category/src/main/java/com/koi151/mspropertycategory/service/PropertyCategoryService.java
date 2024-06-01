@@ -41,15 +41,10 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     @Override
     public List<PropertyCategoryHomeDTO> getCategories(String title) {
         List<PropertyCategory> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
-        List<PropertyCategoryHomeDTO> propertyCategoryDTOList = new ArrayList<>();
 
-        for (PropertyCategory categoryDTO: propertyCategories) {
-            PropertyCategoryHomeDTO propertyCategoryDTO = new PropertyCategoryHomeDTO();
-            propertyCategoryDTO.setTitle(categoryDTO.getTitle());
-            propertyCategoryDTOList.add(propertyCategoryDTO);
-        }
-
-        return propertyCategoryDTOList;
+        return propertyCategories.stream()
+                .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -65,14 +60,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     @Override
     public FullCategoryResponse findCategoryWithProperties(Integer categoryId) {
         var category = propertyCategoryRepository.findById(categoryId)
-                .orElse(
-                        PropertyCategory.builder()
-                                .title("NOT FOUND")
-                                .imageUrls("NOT FOUND")
-                                .description("NOT FOUND")
-                                .build()
-                );
-
+                .orElseThrow(() -> new CategoryNotFoundException("No category found with id " + categoryId));
 
         List<Properties> properties = propertiesClient.findAllPropertiesByCategory(categoryId);
 
@@ -101,19 +89,9 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
         Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
 
-        List<PropertyCategoryHomeDTO> propertyCategoryDTOList = new ArrayList<>();
-
-        for (PropertyCategory category: categories) {
-            PropertyCategoryHomeDTO propertyCategoryDTO = new PropertyCategoryHomeDTO();
-
-            propertyCategoryDTO.setTitle(category.getTitle());
-            propertyCategoryDTO.setDescription(category.getDescription());
-            propertyCategoryDTO.setImages(category.getImageUrls());
-
-            propertyCategoryDTOList.add((propertyCategoryDTO));
-        }
-
-        return propertyCategoryDTOList;
+        return categories.stream()
+                .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
+                .collect(Collectors.toList());
     }
 
     public PropertyCategory createCategory(PropertyCategoryRequest request) { // throws CloudinaryUploadException

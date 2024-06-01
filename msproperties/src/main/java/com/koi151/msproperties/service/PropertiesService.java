@@ -58,7 +58,8 @@ public class PropertiesService implements PropertiesServiceImp {
         properties.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
 
         if(request.getImages() != null && !request.getImages().isEmpty()) {
-            String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");                if (imageUrls == null || imageUrls.isEmpty()) {
+            String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");
+            if (imageUrls == null || imageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload image to Cloudinary");
             }
             properties.setImageUrls(imageUrls);

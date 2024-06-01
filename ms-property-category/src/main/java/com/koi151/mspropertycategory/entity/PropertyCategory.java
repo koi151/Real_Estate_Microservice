@@ -30,6 +30,10 @@ public class PropertyCategory {
     @Column(name = "images", columnDefinition = "TEXT")
     private String imageUrls;
 
+//    @Column(name = "slug", length = 200)
+//    @NotEmpty(message = "Property slug cannot be empty")
+//    private String slug;
+
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private StatusEnum statusEnum = StatusEnum.ACTIVE;

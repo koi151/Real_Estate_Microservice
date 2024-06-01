@@ -11,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -43,16 +44,29 @@ public class PropertyCategoryController {
     public ResponseEntity<ResponseData> getCategoriesHomePage() {
         // tempo
         ResponseData responseData = new ResponseData();
-        responseData.setData(propertyCategoryImp.getCategoriesHomePage());
-        responseData.setDesc("Success");
+
+        List<PropertyCategoryHomeDTO> properties = propertyCategoryImp.getCategoriesHomePage();
+        responseData.setData(properties);
+        responseData.setDesc(properties.isEmpty() ?
+                "No property category found" : "Success");
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/with-properties/{category-id}")
-    public ResponseEntity<FullCategoryResponse> findCategoryWithProperties(@PathVariable(name = "category-id") Integer categoryId) {
-        return ResponseEntity.ok(propertyCategoryImp.findCategoryWithProperties(categoryId));
+    public ResponseEntity<ResponseData> findCategoryWithProperties(@PathVariable(name = "category-id") Integer categoryId) {
+        FullCategoryResponse res = propertyCategoryImp.findCategoryWithProperties(categoryId);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(res);
+        responseData.setDesc(res.getProperties().isEmpty()
+                ? "No property found with category id " + categoryId
+                : "Success");
+
+        return ResponseEntity.ok(responseData);
     }
+
+
 
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData> getCategoriesByStatus(@PathVariable(name = "status") String status) {
@@ -63,7 +77,7 @@ public class PropertyCategoryController {
 
         responseData.setData(properties);
         responseData.setDesc(properties.isEmpty() ?
-                "No property categories found with status " + status : "Success");
+                "No property category found with status " + status : "Success");
 
         return ResponseEntity.ok(responseData);
     }
@@ -89,8 +103,6 @@ public class PropertyCategoryController {
 
         ResponseData responseData = new ResponseData();
 
-//        PropertyCategoryValidator.validateCategoryRequest(request);
-
         responseData.setData(propertyCategoryImp.updateCategory(id, request));
         responseData.setDesc("Updated successfully");
         return ResponseEntity.ok(responseData);
@@ -101,7 +113,7 @@ public class PropertyCategoryController {
         ResponseData responseData = new ResponseData();
 
         propertyCategoryImp.deleteCategory(id);
-        responseData.setDesc("Deleted successful");
+        responseData.setDesc("Deleted property with id " + id);
 
         return ResponseEntity.ok(responseData);
     }

@@ -24,16 +24,25 @@ public class PropertiesController {
     @GetMapping("/home-properties")
     public ResponseEntity<?> getHomeProperties() {
         ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesServiceImp.getHomeProperties());
-        responseData.setDesc("Success");
+
+        List<PropertiesHomeDTO> properties = propertiesServiceImp.getHomeProperties();
+        responseData.setData(properties);
+        responseData.setDesc(properties.isEmpty() ?
+                "No property found" : "Success");
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/category/{category-id}")
-    public ResponseEntity<List<PropertiesHomeDTO>> getPropertiesByCategory(@PathVariable(name="category-id") Integer categoryId) {
-        List<PropertiesHomeDTO> propertiesList = propertiesServiceImp.findAllPropertiesByCategory(categoryId);
-        return ResponseEntity.ok(propertiesList);
+    public List<PropertiesHomeDTO> getPropertiesByCategory(@PathVariable(name="category-id") Integer categoryId) {
+        ResponseData responseData = new ResponseData();
+//        List<PropertiesHomeDTO> properties =
+        return propertiesServiceImp.findAllPropertiesByCategory(categoryId);
+//        responseData.setData(properties);
+//        responseData.setDesc(properties.isEmpty() ?
+//                "No properties found with category id: " + categoryId : "Success");
+//
+//        return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/status/{status}")

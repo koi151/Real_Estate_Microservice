@@ -4,15 +4,15 @@ import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 import java.util.List;
 
 @Getter
 @Setter
 @Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class FullCategoryResponse {
 
     private String title;
