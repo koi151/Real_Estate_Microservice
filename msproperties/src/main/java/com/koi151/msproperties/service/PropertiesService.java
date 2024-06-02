@@ -86,6 +86,7 @@ public class PropertiesService implements PropertiesServiceImp {
 
     @Override
     public FullPropertiesDTO createProperty(PropertyCreateRequest request) {
+
         Properties properties = Properties.builder()
                 .title(request.getTitle())
                 .categoryId(request.getCategoryId())

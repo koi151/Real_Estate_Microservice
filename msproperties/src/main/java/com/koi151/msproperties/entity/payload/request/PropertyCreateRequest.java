@@ -1,6 +1,7 @@
 package com.koi151.msproperties.entity.payload.request;
 
 import com.koi151.msproperties.entity.DirectionEnum;
+import com.koi151.msproperties.entity.PropertyTypeEnum;
 import com.koi151.msproperties.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -19,6 +20,10 @@ public class PropertyCreateRequest {
     @NotEmpty(message = "Title cannot be empty")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
+
+    @Enumerated(EnumType.STRING)
+    @NotEmpty(message = "Property type cannot be empty")
+    private PropertyTypeEnum type;
 
     @NotNull(message = "Category id cannot be null")
     @Positive(message = "Category id must be positive")
