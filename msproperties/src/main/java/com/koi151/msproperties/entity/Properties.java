@@ -25,6 +25,11 @@ public class Properties {
     @OneToOne(mappedBy = "properties", cascade = CascadeType.ALL)
     private PropertyForRent propertyForRent;
 
+    @OneToOne
+    @JoinColumn(name = "address_id", nullable = false)
+    @NotNull(message = "Address id cannot be null")
+    private Address address;
+
     @OneToMany(mappedBy = "properties")
     private Set<Room> roomSet;
 
