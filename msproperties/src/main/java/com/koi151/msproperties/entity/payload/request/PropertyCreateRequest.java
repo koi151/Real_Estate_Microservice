@@ -9,6 +9,9 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.List;
+import java.util.Map;
+
 @Getter
 @Setter
 public class PropertyCreateRequest {
@@ -47,4 +50,9 @@ public class PropertyCreateRequest {
     private String availableFrom;
 
     private MultipartFile images;
+
+    //  JSON string representing the list of rooms
+    private String rooms;
+
 }
+

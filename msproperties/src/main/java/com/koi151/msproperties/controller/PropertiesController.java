@@ -1,5 +1,6 @@
 package com.koi151.msproperties.controller;
 
+import com.koi151.msproperties.dto.FullPropertiesDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.StatusEnum;
@@ -9,6 +10,7 @@ import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -74,12 +76,13 @@ public class PropertiesController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createProperty(@ModelAttribute @Valid PropertyCreateRequest propertyCreateRequest) {
+        FullPropertiesDTO properties = propertiesServiceImp.createProperty(propertyCreateRequest);
+
         ResponseData responseData = new ResponseData();
+        responseData.setData(properties);
+        responseData.setDesc("Property created successfully");
 
-        responseData.setData(propertiesServiceImp.createProperty(propertyCreateRequest));
-        responseData.setDesc("Property created successful");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
 
     @DeleteMapping("/{id}")

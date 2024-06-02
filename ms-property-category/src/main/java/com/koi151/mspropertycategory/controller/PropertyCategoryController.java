@@ -11,6 +11,7 @@ import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -105,7 +106,7 @@ public class PropertyCategoryController {
         responseData.setStatus(200);
         responseData.setDesc("Success");
 
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }
 
     @PatchMapping("/{id}")
