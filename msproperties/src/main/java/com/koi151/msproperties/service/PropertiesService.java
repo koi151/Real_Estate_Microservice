@@ -90,7 +90,6 @@ public class PropertiesService implements PropertiesServiceImp {
                 .title(request.getTitle())
                 .categoryId(request.getCategoryId())
                 .area(request.getArea())
-                .price(request.getPrice())
                 .description(request.getDescription())
                 .totalFloor(request.getTotalFloor())
                 .houseDirectionEnum(request.getHouseDirectionEnum())
@@ -136,7 +135,6 @@ public class PropertiesService implements PropertiesServiceImp {
                 .title(properties.getTitle())
                 .categoryId(properties.getCategoryId())
                 .area(properties.getArea())
-                .price(properties.getPrice())
                 .description(properties.getDescription())
                 .totalFloor(properties.getTotalFloor())
                 .houseDirectionEnum(properties.getHouseDirectionEnum())
@@ -173,10 +171,6 @@ public class PropertiesService implements PropertiesServiceImp {
                         existingProperty.setAvailableFrom(request.getAvailableFrom());
                     if(request.getStatusEnum() != null)
                         existingProperty.setStatusEnum(request.getStatusEnum());
-                    if (request.getPrice() != null) {
-                        existingProperty.setPrice(request.getPrice());
-                    }
-
                     if (request.getImages() != null) {
                         String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");
                         if (imageUrls == null || imageUrls.isEmpty()) {

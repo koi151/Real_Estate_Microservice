@@ -19,6 +19,12 @@ public class Properties {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
+    @OneToOne(mappedBy = "properties", cascade = CascadeType.ALL)
+    private PropertyForSale propertyForSale;
+
+    @OneToOne(mappedBy = "properties", cascade = CascadeType.ALL)
+    private PropertyForRent propertyForRent;
+
     @OneToMany(mappedBy = "properties")
     private Set<Room> roomSet;
 
@@ -34,11 +40,6 @@ public class Properties {
 
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
-
-    @Column(name = "price", nullable = false)
-    @NotNull(message = "Price cannot be empty")
-    @PositiveOrZero(message = "Price must be positive or zero")
-    private float price;
 
     @Column(name = "area", nullable = false)
     @NotNull(message = "Area cannot be empty")
@@ -91,7 +92,6 @@ public class Properties {
         this.imageUrls = properties.imageUrls;
         this.view = properties.view;
         this.totalFloor = properties.totalFloor;
-        this.price = properties.price;
         this.statusEnum = properties.statusEnum;
         this.houseDirectionEnum = properties.houseDirectionEnum;
         this.balconyDirectionEnum = properties.balconyDirectionEnum;
@@ -99,6 +99,7 @@ public class Properties {
         this.createdAt = properties.createdAt;
         this.updatedAt = properties.updatedAt;
         this.roomSet = properties.roomSet;
+        this.propertyForSale = properties.propertyForSale;
     }
 
     @PrePersist
