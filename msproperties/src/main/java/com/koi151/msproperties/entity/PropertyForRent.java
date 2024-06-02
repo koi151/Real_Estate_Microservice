@@ -4,16 +4,14 @@ import com.koi151.msproperties.entity.payload.PaymentScheduleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
-@Entity
+@Entity(name = "property_for_rent")
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PropertyForRent {
 
     @Id
@@ -33,6 +31,6 @@ public class PropertyForRent {
     @NotNull(message = "Payment schedule cannot be null")
     private PaymentScheduleEnum paymentSchedule;
 
-    @Column(name = "rent_term", columnDefinition = "TEXT")
+    @Column(name = "rental_term", columnDefinition = "TEXT")
     private String rentTerm;
 }

@@ -1,6 +1,7 @@
 package com.koi151.msproperties.controllerAdvice;
 
 import com.koi151.msproperties.dto.ErrorResponseDTO;
+import customExceptions.PaymentScheduleNotFoundException;
 import customExceptions.PropertyNotFoundException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -34,10 +35,16 @@ public class ControllerAdvisor {
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
     }
 
-    private Map<String, List<String>> getErrorsMap(List<String> errors) {
-        Map<String, List<String>> errorsMap = new HashMap<>();
-        errorsMap.put("errors", errors);
-        return errorsMap;
+    @ExceptionHandler(PaymentScheduleNotFoundException.class)
+    public ResponseEntity<Object> handlePaymentScheduleNotFoundException(PaymentScheduleNotFoundException ex) {
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+
+        List<String> details = new ArrayList<>();
+        details.add("Please add valid payment schedule for property");
+        errorResponseDTO.setDetails(details);
+
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -73,15 +80,15 @@ public class ControllerAdvisor {
         return ResponseEntity.badRequest().body(errorResponseDTO);
     }
 
-    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
-    public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
-
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Error");
-        errorResponseDTO.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponseDTO);
-    }
+//    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
+//    public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
+//        List<String> details = new ArrayList<>();
+//        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
+//
+//        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+//        errorResponseDTO.setError("Validation Error");
+//        errorResponseDTO.setDetails(details);
+//
+//        return ResponseEntity.badRequest().body(errorResponseDTO);
+//    }
 }

@@ -99,7 +99,8 @@ public class Properties {
         this.createdAt = properties.createdAt;
         this.updatedAt = properties.updatedAt;
         this.roomSet = properties.roomSet;
-        this.propertyForSale = properties.propertyForSale;
+        this.propertyForSale = properties.propertyForSale;  // !
+        this.propertyForRent = properties.propertyForRent;
     }
 
     @PrePersist

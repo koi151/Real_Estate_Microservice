@@ -5,7 +5,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
-@Entity
+@Entity(name = "property_for_sale")
 @Getter
 @Setter
 @NoArgsConstructor

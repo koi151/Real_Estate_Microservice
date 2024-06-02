@@ -5,15 +5,16 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.dto.FullPropertiesDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.dto.RoomDTO;
-import com.koi151.msproperties.entity.Properties;
-import com.koi151.msproperties.entity.Room;
-import com.koi151.msproperties.entity.StatusEnum;
+import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.entity.payload.request.RoomCreateRequest;
 import com.koi151.msproperties.repository.PropertiesRepository;
+import com.koi151.msproperties.repository.PropertyForRentRepository;
+import com.koi151.msproperties.repository.PropertyForSaleRepository;
 import com.koi151.msproperties.repository.RoomRepository;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
+import customExceptions.PaymentScheduleNotFoundException;
 import customExceptions.PropertyNotFoundException;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,7 +45,13 @@ public class PropertiesService implements PropertiesServiceImp {
     RoomRepository roomRepository;
 
     @Autowired
-    private ObjectMapper objectMapper; // For parsing JSON strings
+    PropertyForSaleRepository propertyForSaleRepository;
+
+    @Autowired
+    PropertyForRentRepository propertyForRentRepository;
+
+    @Autowired
+    ObjectMapper objectMapper; // For parsing JSON strings
 
     @Override
     public List<PropertiesHomeDTO> getHomeProperties() {
@@ -87,15 +94,18 @@ public class PropertiesService implements PropertiesServiceImp {
     @Override
     public FullPropertiesDTO createProperty(PropertyCreateRequest request) {
 
+        if (request.getType() == PropertyTypeEnum.RENT && request.getPaymentSchedule() == null)
+            throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
+
         Properties properties = Properties.builder()
                 .title(request.getTitle())
                 .categoryId(request.getCategoryId())
                 .area(request.getArea())
                 .description(request.getDescription())
                 .totalFloor(request.getTotalFloor())
-                .houseDirectionEnum(request.getHouseDirectionEnum())
-                .balconyDirectionEnum(request.getBalconyDirectionEnum())
-                .statusEnum(request.getStatusEnum())
+                .houseDirectionEnum(request.getHouseDirection())
+                .balconyDirectionEnum(request.getBalconyDirection())
+                .statusEnum(request.getStatus())
                 .availableFrom(request.getAvailableFrom())
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
@@ -110,6 +120,29 @@ public class PropertiesService implements PropertiesServiceImp {
 
         // Save the properties entity first to ensure it is persistent
         propertiesRepository.save(properties);
+
+        // Save PropertyForRent or PropertyForSale base on type, validated
+        if(request.getType() == PropertyTypeEnum.RENT) {
+            PropertyForRent propertyForRent = PropertyForRent.builder()
+                    .property_id(properties.getId())
+                    .properties(properties)
+                    .rentalPrice(request.getPrice())
+                    .paymentSchedule(request.getPaymentSchedule())
+                    .rentTerm(request.getTerm())
+                    .build();
+
+            propertyForRentRepository.save(propertyForRent);
+
+        } else {
+            PropertyForSale propertyForSale = PropertyForSale.builder()
+                    .propertyId(properties.getId())
+                    .salePrice(request.getPrice())
+                    .properties(properties)
+                    .saleTerm(request.getTerm())
+                    .build();
+
+            propertyForSaleRepository.save(propertyForSale);
+        }
 
         if (request.getRooms() != null && !request.getRooms().isEmpty()) {
             try {
@@ -138,9 +171,9 @@ public class PropertiesService implements PropertiesServiceImp {
                 .area(properties.getArea())
                 .description(properties.getDescription())
                 .totalFloor(properties.getTotalFloor())
-                .houseDirectionEnum(properties.getHouseDirectionEnum())
-                .balconyDirectionEnum(properties.getBalconyDirectionEnum())
-                .statusEnum(properties.getStatusEnum())
+                .houseDirection(properties.getHouseDirectionEnum())
+                .balconyDirection(properties.getBalconyDirectionEnum())
+                .status(properties.getStatusEnum())
                 .availableFrom(properties.getAvailableFrom())
                 .imageUrls(properties.getImageUrls())
                 .rooms(properties.getRoomSet().stream()

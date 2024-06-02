@@ -3,6 +3,7 @@ package com.koi151.msproperties.entity.payload.request;
 import com.koi151.msproperties.entity.DirectionEnum;
 import com.koi151.msproperties.entity.PropertyTypeEnum;
 import com.koi151.msproperties.entity.StatusEnum;
+import com.koi151.msproperties.entity.payload.PaymentScheduleEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
@@ -21,9 +22,12 @@ public class PropertyCreateRequest {
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
-    @Enumerated(EnumType.STRING)
-    @NotEmpty(message = "Property type cannot be empty")
+    @Enumerated(EnumType.STRING) // enum cannot use @NotEmpty
+    @NotNull(message = "Property type cannot be null")
     private PropertyTypeEnum type;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentScheduleEnum paymentSchedule;
 
     @NotNull(message = "Category id cannot be null")
     @Positive(message = "Category id must be positive")
@@ -43,16 +47,18 @@ public class PropertyCreateRequest {
     private Integer totalFloor;
 
     @Enumerated(EnumType.STRING)
-    private DirectionEnum houseDirectionEnum;
+    private DirectionEnum houseDirection;
 
     @Enumerated(EnumType.STRING)
-    private DirectionEnum balconyDirectionEnum;
+    private DirectionEnum balconyDirection;
 
     @Enumerated(EnumType.STRING)
-    private StatusEnum statusEnum = StatusEnum.ACTIVE;
+    private StatusEnum status = StatusEnum.ACTIVE;
 
     @NotEmpty(message = "Available time cannot be empty")
     private String availableFrom;
+
+    private String term;
 
     private MultipartFile images;
 

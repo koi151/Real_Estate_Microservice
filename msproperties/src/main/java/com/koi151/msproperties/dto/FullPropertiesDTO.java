@@ -18,9 +18,9 @@ public class FullPropertiesDTO {
     private Float price;
     private String description;
     private Integer totalFloor;
-    private DirectionEnum houseDirectionEnum;
-    private DirectionEnum balconyDirectionEnum;
-    private StatusEnum statusEnum;
+    private DirectionEnum houseDirection;
+    private DirectionEnum balconyDirection;
+    private StatusEnum status;
     private String availableFrom;
     private String imageUrls;
     List<RoomDTO> rooms;
