@@ -65,14 +65,5 @@ public class PropertyCreateRequest {
 
     @Valid
     private AddressRequest address;
-
-    @AssertTrue(message = "Invalid address information")
-    public boolean isAddressValid() {
-        // Implement additional validation logic here (optional)
-        return address != null &&
-                address.getCity() != null && !address.getCity().isEmpty() &&
-                address.getDistrict() != null && !address.getDistrict().isEmpty() &&
-                address.getStreetAddress() != null && !address.getStreetAddress().isEmpty();
-    }
 }
 

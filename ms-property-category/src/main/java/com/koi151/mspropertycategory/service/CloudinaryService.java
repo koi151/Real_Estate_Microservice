@@ -8,7 +8,9 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 public class CloudinaryService implements CloudinaryServiceImp {
@@ -33,5 +35,13 @@ public class CloudinaryService implements CloudinaryServiceImp {
             System.out.println("Error occurred in Cloudinary service: " + e.getMessage());
             return null;
         }
+    }
+
+    @Override
+    public String uploadFiles(List<MultipartFile> files, String folderName) {
+        return files.stream()
+                .map(file -> uploadFile(file, folderName))
+                .filter(url -> url != null && !url.isEmpty())
+                .collect(Collectors.joining(","));
     }
 }

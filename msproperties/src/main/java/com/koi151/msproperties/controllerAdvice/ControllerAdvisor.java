@@ -80,15 +80,15 @@ public class ControllerAdvisor {
         return ResponseEntity.badRequest().body(errorResponseDTO);
     }
 
-//    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
-//    public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
-//        List<String> details = new ArrayList<>();
-//        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
-//
-//        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-//        errorResponseDTO.setError("Validation Error");
-//        errorResponseDTO.setDetails(details);
-//
-//        return ResponseEntity.badRequest().body(errorResponseDTO);
-//    }
+    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
+    public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
 }

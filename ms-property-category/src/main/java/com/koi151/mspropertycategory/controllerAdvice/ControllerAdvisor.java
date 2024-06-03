@@ -3,6 +3,7 @@ package com.koi151.mspropertycategory.controllerAdvice;
 import com.koi151.mspropertycategory.dto.ErrorResponseDTO;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.FieldRequiredException;
+import jakarta.validation.UnexpectedTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -55,6 +56,18 @@ public class ControllerAdvisor {
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
         errorResponseDTO.setError("Invalid request");
         errorResponseDTO.setDetails(errors);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
+    public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setDetails(details);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
     }

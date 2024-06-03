@@ -24,7 +24,7 @@ public class CloudinaryService implements CloudinaryServiceImp {
             HashMap<Object, Object> options = new HashMap<>();
             options.put("folder", folderName); // name of folder in Cloudinary
 
-            // upload file to CLoudinary and get file info
+            // upload file to Cloudinary and get file info
             Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);
 
             String publicId = (String) uploadedFile.get("public_id");

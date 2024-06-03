@@ -16,5 +16,5 @@ public interface PropertyCategoryRepository extends JpaRepository<PropertyCatego
     List<PropertyCategory> findByTitleContainingIgnoreCase(String title);
     Optional<PropertyCategory> findByCategoryIdAndDeleted(Integer id, boolean deleted);
 //    Optional<PropertyCategory> findByIdAndDeleted(Integer categoryId, boolean deleted);
-    Page<PropertyCategory> findByStatusEnum(StatusEnum statusEnum, PageRequest pageRequest);
+    Page<PropertyCategory> findByStatus(StatusEnum statusEnum, PageRequest pageRequest);
 }

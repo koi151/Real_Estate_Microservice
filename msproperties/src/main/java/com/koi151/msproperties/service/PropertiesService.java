@@ -62,7 +62,6 @@ public class PropertiesService implements PropertiesServiceImp {
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
     }
 
-
     @Override
     public List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
@@ -113,8 +112,6 @@ public class PropertiesService implements PropertiesServiceImp {
                 .availableFrom(request.getAvailableFrom())
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
-
-        System.out.println("Img check: " + imageFiles.get(0));
 
         if (!imageFiles.isEmpty()) {
             String imageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_properties");

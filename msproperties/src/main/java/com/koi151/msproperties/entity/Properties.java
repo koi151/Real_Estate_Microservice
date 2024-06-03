@@ -107,6 +107,7 @@ public class Properties {
         this.roomSet = properties.roomSet;
         this.propertyForSale = properties.propertyForSale;  // !
         this.propertyForRent = properties.propertyForRent;
+        this.address = properties.address;
     }
 
     @PrePersist

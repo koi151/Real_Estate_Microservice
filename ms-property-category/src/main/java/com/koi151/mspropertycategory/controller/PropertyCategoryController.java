@@ -9,11 +9,13 @@ import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
+import jakarta.validation.Valid;
 import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -97,12 +99,13 @@ public class PropertyCategoryController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseData> createCategory(@ModelAttribute PropertyCategoryRequest request) {
+    public ResponseEntity<ResponseData> createCategory(
+            @RequestPart @Valid PropertyCategoryRequest propertyCategory,
+            @RequestPart List<MultipartFile> images
+    ){
         ResponseData responseData = new ResponseData();
 
-        PropertyCategoryValidator.validateCategoryRequest(request);
-        responseData.setData(propertyCategoryImp.createCategory(request));
-
+        responseData.setData(propertyCategoryImp.createCategory(propertyCategory, images));
         responseData.setStatus(200);
         responseData.setDesc("Success");
 

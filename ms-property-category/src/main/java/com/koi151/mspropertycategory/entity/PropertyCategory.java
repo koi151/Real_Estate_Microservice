@@ -36,7 +36,7 @@ public class PropertyCategory {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private StatusEnum statusEnum = StatusEnum.ACTIVE;
+    private StatusEnum status = StatusEnum.ACTIVE;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
