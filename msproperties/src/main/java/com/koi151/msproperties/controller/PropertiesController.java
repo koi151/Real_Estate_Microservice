@@ -1,5 +1,6 @@
 package com.koi151.msproperties.controller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.dto.FullPropertiesDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.Properties;
@@ -13,9 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/v1/properties")
@@ -23,6 +24,9 @@ public class PropertiesController {
 
     @Autowired
     PropertiesServiceImp propertiesServiceImp;
+
+    @Autowired
+    ObjectMapper objectMapper;
 
     @GetMapping("/home-properties")
     public ResponseEntity<?> getHomeProperties() {
@@ -75,11 +79,15 @@ public class PropertiesController {
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ResponseData> createProperty(@ModelAttribute @Valid PropertyCreateRequest propertyCreateRequest) {
-        FullPropertiesDTO properties = propertiesServiceImp.createProperty(propertyCreateRequest);
+    public ResponseEntity<ResponseData> createProperty(
+            @RequestPart @Valid PropertyCreateRequest properties,
+            @RequestPart(name = "images") MultipartFile images
+
+    ) {
+        FullPropertiesDTO propertiesRes = propertiesServiceImp.createProperty(properties, images);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
+        responseData.setData(propertiesRes);
         responseData.setDesc("Property created successfully");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);

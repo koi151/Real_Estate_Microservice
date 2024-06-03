@@ -6,16 +6,16 @@ import com.koi151.msproperties.entity.StatusEnum;
 import com.koi151.msproperties.entity.payload.PaymentScheduleEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
+import lombok.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
 public class PropertyCreateRequest {
 
     @NotEmpty(message = "Title cannot be empty")
@@ -60,10 +60,19 @@ public class PropertyCreateRequest {
 
     private String term;
 
-    private MultipartFile images;
+    @Valid
+    private List<RoomCreateRequest> rooms;
 
-    //  JSON string representing the list of rooms
-    private String rooms;
+    @Valid
+    private AddressRequest address;
 
+    @AssertTrue(message = "Invalid address information")
+    public boolean isAddressValid() {
+        // Implement additional validation logic here (optional)
+        return address != null &&
+                address.getCity() != null && !address.getCity().isEmpty() &&
+                address.getDistrict() != null && !address.getDistrict().isEmpty() &&
+                address.getStreetAddress() != null && !address.getStreetAddress().isEmpty();
+    }
 }
 

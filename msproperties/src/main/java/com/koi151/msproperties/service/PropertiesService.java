@@ -1,18 +1,12 @@
 package com.koi151.msproperties.service;
 
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.dto.FullPropertiesDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.dto.RoomDTO;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
-import com.koi151.msproperties.entity.payload.request.RoomCreateRequest;
-import com.koi151.msproperties.repository.PropertiesRepository;
-import com.koi151.msproperties.repository.PropertyForRentRepository;
-import com.koi151.msproperties.repository.PropertyForSaleRepository;
-import com.koi151.msproperties.repository.RoomRepository;
+import com.koi151.msproperties.repository.*;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
 import customExceptions.PaymentScheduleNotFoundException;
 import customExceptions.PropertyNotFoundException;
@@ -22,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
@@ -51,7 +46,7 @@ public class PropertiesService implements PropertiesServiceImp {
     PropertyForRentRepository propertyForRentRepository;
 
     @Autowired
-    ObjectMapper objectMapper; // For parsing JSON strings
+    AddressRepository addressRepository;
 
     @Override
     public List<PropertiesHomeDTO> getHomeProperties() {
@@ -62,7 +57,6 @@ public class PropertiesService implements PropertiesServiceImp {
                 .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatusEnum(), property.getView()))
                 .collect(Collectors.toList());
     }
-
 
     @Override
     public Properties getPropertyById(Integer id) {
@@ -92,14 +86,26 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public FullPropertiesDTO createProperty(PropertyCreateRequest request) {
+    public FullPropertiesDTO createProperty(PropertyCreateRequest request, MultipartFile images) {
 
         if (request.getType() == PropertyTypeEnum.RENT && request.getPaymentSchedule() == null)
             throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
 
+        Address address = new Address(
+                request.getAddress().getCity(),
+                request.getAddress().getDistrict(),
+                request.getAddress().getWard(),
+                request.getAddress().getStreetAddress()
+        );
+
+        // Saved address first since its dependent ------------------------------------------------------------
+        addressRepository.save(address);
+
+
         Properties properties = Properties.builder()
                 .title(request.getTitle())
                 .categoryId(request.getCategoryId())
+                .address(address)
                 .area(request.getArea())
                 .description(request.getDescription())
                 .totalFloor(request.getTotalFloor())
@@ -110,16 +116,30 @@ public class PropertiesService implements PropertiesServiceImp {
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
 
-        if (request.getImages() != null && !request.getImages().isEmpty()) {
-            String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");
-            if (imageUrls == null || imageUrls.isEmpty()) {
+        if (images != null && !images.isEmpty()) {
+            String imageUrls = cloudinaryService.uploadFile(images, "real_estate_properties");
+            if (imageUrls == null || imageUrls.isEmpty())
                 throw new RuntimeException("Failed to upload image to Cloudinary");
-            }
+
             properties.setImageUrls(imageUrls);
         }
 
-        // Save the properties entity first to ensure it is persistent
+
+        // Save the properties entity second to ensure it is persistent --------------------------------
         propertiesRepository.save(properties);
+
+        List<Room> rooms = request.getRooms().stream()
+                .map(roomCreateRequest -> {
+                    Room room = new Room();
+                    room.setProperties(properties);
+                    room.setRoomType(roomCreateRequest.getRoomType());
+                    room.setQuantity(roomCreateRequest.getQuantity());
+                    return room;
+                })
+                .toList();
+
+        // Save multiple room at once --------------------------------------------------
+        roomRepository.saveAll(rooms);
 
         // Save PropertyForRent or PropertyForSale base on type, validated
         if(request.getType() == PropertyTypeEnum.RENT) {
@@ -144,30 +164,10 @@ public class PropertiesService implements PropertiesServiceImp {
             propertyForSaleRepository.save(propertyForSale);
         }
 
-        if (request.getRooms() != null && !request.getRooms().isEmpty()) {
-            try {
-                List<RoomCreateRequest> roomRequests = objectMapper.readValue(request.getRooms(), new TypeReference<List<RoomCreateRequest>>() {});
-                List<Room> rooms = roomRequests.stream()
-                        .map(roomRequest -> {
-                            Room room = new Room();
-                            room.setProperties(properties); // Associate with the already saved properties
-                            room.setRoomType(roomRequest.getRoomType());
-                            room.setQuantity(roomRequest.getQuantity());
-                            return room;
-                        })
-                        .collect(Collectors.toList());
-
-                roomRepository.saveAll(rooms);
-                properties.setRoomSet(new HashSet<>(rooms));
-
-            } catch (Exception e) {
-                throw new RuntimeException("Failed to parse rooms JSON", e);
-            }
-        }
-
         return FullPropertiesDTO.builder()
                 .title(properties.getTitle())
                 .categoryId(properties.getCategoryId())
+                .price(request.getPrice())
                 .area(properties.getArea())
                 .description(properties.getDescription())
                 .totalFloor(properties.getTotalFloor())
@@ -176,7 +176,7 @@ public class PropertiesService implements PropertiesServiceImp {
                 .status(properties.getStatusEnum())
                 .availableFrom(properties.getAvailableFrom())
                 .imageUrls(properties.getImageUrls())
-                .rooms(properties.getRoomSet().stream()
+                .rooms(rooms.stream()
                         .map(room -> new RoomDTO(room.getRoomId(), properties.getId(), room.getRoomType(), room.getQuantity()))
                         .collect(Collectors.toList()))
                 .build();
@@ -232,3 +232,8 @@ public class PropertiesService implements PropertiesServiceImp {
                 .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
     }
 }
+
+
+
+//java.lang.NullPointerException: Cannot invoke "java.util.Set.stream()" because the return value of "com.koi151.msproperties.entity.Properties.getRoomSet()" is null
+//at com.koi151.msproperties.service.PropertiesService.createProperty(PropertiesService.java:180) ~[classes/:na]

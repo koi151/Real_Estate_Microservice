@@ -1,21 +1,17 @@
-package com.koi151.msproperties.entity;
+package com.koi151.msproperties.entity.payload.request;
 
-import jakarta.persistence.*;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-@Entity(name = "address")
 @Getter
 @Setter
-@NoArgsConstructor
 @AllArgsConstructor
-@Builder
-public class Address {
-
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
-
+@NoArgsConstructor
+public class AddressRequest {
     @Column(name = "city", nullable = false, length = 50)
     @NotEmpty(message = "City cannot be empty")
     private String city;
@@ -30,11 +26,4 @@ public class Address {
 
     @Column(name = "street_address", length = 150)
     private String streetAddress;
-
-    public Address(String city, String district, String ward, String streetAddress) {
-        this.city = city;
-        this.district = district;
-        this.ward = ward;
-        this.streetAddress = streetAddress;
-    }
 }
