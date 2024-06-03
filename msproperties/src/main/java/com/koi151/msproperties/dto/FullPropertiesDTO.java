@@ -22,6 +22,6 @@ public class FullPropertiesDTO {
     private DirectionEnum balconyDirection;
     private StatusEnum status;
     private String availableFrom;
-    private String imageUrls;
+    private List<String> imageUrls;
     List<RoomDTO> rooms;
 }

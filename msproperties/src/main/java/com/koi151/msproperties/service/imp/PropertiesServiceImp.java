@@ -17,7 +17,7 @@ public interface PropertiesServiceImp {
     Properties getPropertyById(Integer id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
     List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
-    FullPropertiesDTO createProperty(PropertyCreateRequest request, MultipartFile images);
+    FullPropertiesDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
     Properties updateProperty(Integer id, PropertyUpdateRequest request);
     void deleteProperty(Integer id) throws PropertyNotFoundException;
 }

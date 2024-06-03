@@ -4,6 +4,7 @@ import com.koi151.msproperties.dto.FullPropertiesDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.dto.RoomDTO;
 import com.koi151.msproperties.entity.*;
+import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.repository.*;
@@ -20,10 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -86,7 +84,7 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public FullPropertiesDTO createProperty(PropertyCreateRequest request, MultipartFile images) {
+    public FullPropertiesDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
 
         if (request.getType() == PropertyTypeEnum.RENT && request.getPaymentSchedule() == null)
             throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
@@ -116,10 +114,12 @@ public class PropertiesService implements PropertiesServiceImp {
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
 
-        if (images != null && !images.isEmpty()) {
-            String imageUrls = cloudinaryService.uploadFile(images, "real_estate_properties");
+        System.out.println("Img check: " + imageFiles.get(0));
+
+        if (!imageFiles.isEmpty()) {
+            String imageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_properties");
             if (imageUrls == null || imageUrls.isEmpty())
-                throw new RuntimeException("Failed to upload image to Cloudinary");
+                throw new RuntimeException("Failed to upload images to Cloudinary");
 
             properties.setImageUrls(imageUrls);
         }
@@ -175,7 +175,9 @@ public class PropertiesService implements PropertiesServiceImp {
                 .balconyDirection(properties.getBalconyDirectionEnum())
                 .status(properties.getStatusEnum())
                 .availableFrom(properties.getAvailableFrom())
-                .imageUrls(properties.getImageUrls())
+                .imageUrls(Arrays.stream(properties.getImageUrls().split(",")) // convert string to list of strings
+                        .map(String::trim)
+                        .collect(Collectors.toList()))
                 .rooms(rooms.stream()
                         .map(room -> new RoomDTO(room.getRoomId(), properties.getId(), room.getRoomType(), room.getQuantity()))
                         .collect(Collectors.toList()))
@@ -235,5 +237,4 @@ public class PropertiesService implements PropertiesServiceImp {
 
 
 
-//java.lang.NullPointerException: Cannot invoke "java.util.Set.stream()" because the return value of "com.koi151.msproperties.entity.Properties.getRoomSet()" is null
-//at com.koi151.msproperties.service.PropertiesService.createProperty(PropertiesService.java:180) ~[classes/:na]
+//https://res.cloudinary.com/dd3xua0wu/image/upload/v1/real_estate_properties/io4iddpjl6xpjlp1fegn

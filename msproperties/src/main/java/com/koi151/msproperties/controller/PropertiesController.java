@@ -81,7 +81,7 @@ public class PropertiesController {
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest properties,
-            @RequestPart(name = "images") MultipartFile images
+            @RequestPart(name = "images") List<MultipartFile> images
 
     ) {
         FullPropertiesDTO propertiesRes = propertiesServiceImp.createProperty(properties, images);
