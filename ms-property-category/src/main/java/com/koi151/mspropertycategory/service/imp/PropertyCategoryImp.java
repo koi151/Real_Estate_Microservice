@@ -6,9 +6,9 @@ import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
+import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
+import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
 import customExceptions.CategoryNotFoundException;
-import customExceptions.FieldRequiredException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -21,8 +21,8 @@ public interface PropertyCategoryImp {
     PropertyCategory getCategoryById(Integer id);
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
     FullCategoryResponse findCategoryWithProperties(Integer categoryId);
-    PropertyCategory createCategory(PropertyCategoryRequest request, List<MultipartFile> images);
-    PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryRequest request);
+    PropertyCategory createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> images);
+    PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> files);
     void deleteCategory(Integer id) throws CategoryNotFoundException;
 }
 

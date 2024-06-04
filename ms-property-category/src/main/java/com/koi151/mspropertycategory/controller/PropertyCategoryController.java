@@ -1,23 +1,22 @@
 package com.koi151.mspropertycategory.controller;
 
+import com.koi151.mspropertycategory.dto.PropertyCategoryDetailDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
+import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
+import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
-import com.koi151.mspropertycategory.validate.PropertyCategoryValidator;
 import jakarta.validation.Valid;
-import jakarta.ws.rs.Path;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -100,7 +99,7 @@ public class PropertyCategoryController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createCategory(
-            @RequestPart @Valid PropertyCategoryRequest propertyCategory,
+            @RequestPart @Valid PropertyCategoryCreateRequest propertyCategory,
             @RequestPart List<MultipartFile> images
     ){
         ResponseData responseData = new ResponseData();
@@ -115,13 +114,15 @@ public class PropertyCategoryController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseData> updateCategory(
             @PathVariable(name = "id") Integer id,
-            @ModelAttribute PropertyCategoryRequest request
+            @RequestPart @Valid PropertyCategoryUpdateRequest category,
+            @RequestPart List<MultipartFile> images
     ){
+        PropertyCategoryDetailDTO categoryRes = propertyCategoryImp.updateCategory(id, category, images);
 
         ResponseData responseData = new ResponseData();
-
-        responseData.setData(propertyCategoryImp.updateCategory(id, request));
+        responseData.setData(categoryRes);
         responseData.setDesc("Updated successfully");
+
         return ResponseEntity.ok(responseData);
     }
 

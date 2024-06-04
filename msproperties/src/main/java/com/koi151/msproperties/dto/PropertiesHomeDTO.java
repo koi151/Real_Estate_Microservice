@@ -1,5 +1,6 @@
 package com.koi151.msproperties.dto;
 
+import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;

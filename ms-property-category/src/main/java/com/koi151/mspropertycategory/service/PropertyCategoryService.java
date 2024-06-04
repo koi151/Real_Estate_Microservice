@@ -11,7 +11,8 @@ import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryRequest;
+import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
+import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import customExceptions.CategoryNotFoundException;
@@ -26,8 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -112,7 +112,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 .collect(Collectors.toList());
     }
 
-    public PropertyCategory createCategory(PropertyCategoryRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
+    public PropertyCategory createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
 
         PropertyCategory propertyCategory = PropertyCategory.builder()
                 .title(request.getTitle())
@@ -136,29 +136,47 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
 
     @Override
-    public PropertyCategoryDetailDTO
-    updateCategory(Integer id, PropertyCategoryRequest categoryRequest) ///////////////////////////////////
-            throws CategoryNotFoundException
-    {
+    public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
         return propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
 
-                    if (categoryRequest.getTitle() != null)
-                        existingCategory.setTitle(categoryRequest.getTitle());
-                    if (categoryRequest.getDescription() != null)
-                        existingCategory.setDescription(categoryRequest.getDescription());
-//                    if (categoryRequest.getStatus() != null)
-//                        existingCategory.setStatus(categoryRequest.getStatus());
+                    if (request.getTitle() != null)
+                        existingCategory.setTitle(request.getTitle());
+                    if (request.getDescription() != null)
+                        existingCategory.setDescription(request.getDescription());
+                    if (request.getStatus() != null)
+                        existingCategory.setStatus(request.getStatus());
 
-//                    if (categoryRequest.getImages() != null) {
-//                        String imageUrls = cloudinaryService.uploadFile(categoryRequest.getImages(), "real_estate_categories");
-//                        if (imageUrls == null || imageUrls.isEmpty()) {
-//                            throw new RuntimeException("Failed to upload image to Cloudinary");
-//                        }
-//                        existingCategory.setImageUrls(imageUrls);
-//                    }
 
-                    existingCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
+                    if (!imageFiles.isEmpty()) {
+                        String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
+                        if (newImageUrls == null || newImageUrls.isEmpty()) {
+                            throw new RuntimeException("Failed to upload images to Cloudinary");
+                        }
+
+                        // Get set of existing images and images that needs to remove.
+
+                        if (existingCategory.getImageUrls() == null) {
+                            existingCategory.setImageUrls(newImageUrls);
+                        } else {
+                            Set<String> existingImagesUrlSet = new HashSet<>(Arrays.asList(existingCategory.getImageUrls().split(",")));
+                            Set<String> imageUrlsToRemove = new HashSet<>(request.getImageUrlsRemove());
+
+                            // Remove all images urls that needs to remove as requested
+                            existingImagesUrlSet.removeAll(imageUrlsToRemove);
+
+                            // Convert current image url back to string and concatenate with new urls created
+                            String updatedImageUrls;
+                            if (existingImagesUrlSet.isEmpty())
+                                updatedImageUrls = "," + newImageUrls;
+                            else
+                                updatedImageUrls = String.join(",", existingImagesUrlSet).concat("," + newImageUrls);
+
+                            existingCategory.setImageUrls(updatedImageUrls);
+                        }
+                    }
+
+                    existingCategory.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS)); // temporary update time set
 
                     return propertyCategoryRepository.save(existingCategory);
                 })
