@@ -2,6 +2,7 @@ package com.koi151.mspropertycategory.service;
 
 import com.cloudinary.Cloudinary;
 import com.koi151.mspropertycategory.service.imp.CloudinaryServiceImp;
+import customExceptions.EmptyFileException;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,6 +24,9 @@ public class CloudinaryService implements CloudinaryServiceImp {
             // upload file option
             HashMap<Object, Object> options = new HashMap<>();
             options.put("folder", folderName); // name of folder in Cloudinary
+
+            if (file.getOriginalFilename() == null || file.getOriginalFilename().isEmpty())
+                throw new EmptyFileException("Empty file");
 
             // upload file to CLoudinary and get file info
             Map uploadedFile = cloudinary.uploader().upload(file.getBytes(), options);

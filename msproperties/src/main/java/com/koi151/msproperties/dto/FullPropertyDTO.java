@@ -1,7 +1,6 @@
 package com.koi151.msproperties.dto;
 
 import com.koi151.msproperties.entity.DirectionEnum;
-import com.koi151.msproperties.entity.Room;
 import com.koi151.msproperties.entity.StatusEnum;
 import lombok.*;
 import java.util.List;
@@ -11,7 +10,7 @@ import java.util.List;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class FullPropertiesDTO {
+public class FullPropertyDTO {
     private String title;
     private Integer categoryId;
     private Float area;

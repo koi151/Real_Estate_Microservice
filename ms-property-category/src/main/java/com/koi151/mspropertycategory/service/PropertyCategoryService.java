@@ -121,7 +121,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
 
-        if ( imageFiles != null && !imageFiles.isEmpty()) {
+        if (imageFiles != null && !imageFiles.isEmpty()) {
             String imageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
             if (imageUrls == null || imageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
@@ -148,7 +148,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                         existingCategory.setStatus(request.getStatus());
 
 
-                    if (!imageFiles.isEmpty()) {
+                    if (imageFiles != null) {
                         String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
                         if (newImageUrls == null || newImageUrls.isEmpty()) {
                             throw new RuntimeException("Failed to upload images to Cloudinary");
@@ -168,7 +168,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                             // Convert current image url back to string and concatenate with new urls created
                             String updatedImageUrls;
                             if (existingImagesUrlSet.isEmpty())
-                                updatedImageUrls = "," + newImageUrls;
+                                updatedImageUrls = newImageUrls;
                             else
                                 updatedImageUrls = String.join(",", existingImagesUrlSet).concat("," + newImageUrls);
 

@@ -1,7 +1,7 @@
 package com.koi151.msproperties.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.koi151.msproperties.dto.FullPropertiesDTO;
+import com.koi151.msproperties.dto.FullPropertyDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.StatusEnum;
@@ -81,10 +81,10 @@ public class PropertiesController {
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest properties,
-            @RequestPart(name = "images") List<MultipartFile> images
+            @RequestPart(required = false) List<MultipartFile> images
 
     ) {
-        FullPropertiesDTO propertiesRes = propertiesServiceImp.createProperty(properties, images);
+        FullPropertyDTO propertiesRes = propertiesServiceImp.createProperty(properties, images);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertiesRes);
@@ -106,11 +106,12 @@ public class PropertiesController {
     @PatchMapping("/{id}")
     public  ResponseEntity<ResponseData> updateProperty(
             @PathVariable(name = "id") Integer id,
-            @ModelAttribute @Valid PropertyUpdateRequest request
+            @RequestPart(required = false) @Valid PropertyUpdateRequest property,
+            @RequestPart(required = false) List<MultipartFile> images
     ){
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(propertiesServiceImp.updateProperty(id, request));
+        responseData.setData(propertiesServiceImp.updateProperty(id, property, images));
         responseData.setDesc("Property updated successfully");
 
         return ResponseEntity.ok(responseData);

@@ -1,6 +1,6 @@
 package com.koi151.msproperties.service;
 
-import com.koi151.msproperties.dto.FullPropertiesDTO;
+import com.koi151.msproperties.dto.FullPropertyDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.dto.RoomDTO;
 import com.koi151.msproperties.entity.*;
@@ -83,7 +83,7 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public FullPropertiesDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
 
         if (request.getType() == PropertyTypeEnum.RENT && request.getPaymentSchedule() == null)
             throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
@@ -97,7 +97,6 @@ public class PropertiesService implements PropertiesServiceImp {
 
         // Saved address first since its dependent ------------------------------------------------------------
         addressRepository.save(address);
-
 
         Properties properties = Properties.builder()
                 .title(request.getTitle())
@@ -113,7 +112,7 @@ public class PropertiesService implements PropertiesServiceImp {
                 .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
 
-        if (!imageFiles.isEmpty()) {
+        if (imageFiles != null) {
             String imageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_properties");
             if (imageUrls == null || imageUrls.isEmpty())
                 throw new RuntimeException("Failed to upload images to Cloudinary");
@@ -161,7 +160,7 @@ public class PropertiesService implements PropertiesServiceImp {
             propertyForSaleRepository.save(propertyForSale);
         }
 
-        return FullPropertiesDTO.builder()
+        return FullPropertyDTO.builder()
                 .title(properties.getTitle())
                 .categoryId(properties.getCategoryId())
                 .price(request.getPrice())
@@ -172,9 +171,11 @@ public class PropertiesService implements PropertiesServiceImp {
                 .balconyDirection(properties.getBalconyDirectionEnum())
                 .status(properties.getStatusEnum())
                 .availableFrom(properties.getAvailableFrom())
-                .imageUrls(Arrays.stream(properties.getImageUrls().split(",")) // convert string to list of strings
-                        .map(String::trim)
-                        .collect(Collectors.toList()))
+                .imageUrls(properties.getImageUrls() != null && !properties.getImageUrls().isEmpty()
+                        ? Arrays.stream(properties.getImageUrls().split(","))
+                            .map(String::trim)
+                            .collect(Collectors.toList())
+                        : Collections.emptyList())
                 .rooms(rooms.stream()
                         .map(room -> new RoomDTO(room.getRoomId(), properties.getId(), room.getRoomType(), room.getQuantity()))
                         .collect(Collectors.toList()))
@@ -182,43 +183,89 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
     @Override
-    public Properties updateProperty(Integer id, PropertyUpdateRequest request) throws PropertyNotFoundException {
-        return propertiesRepository.findById(id)
+    public FullPropertyDTO updateProperty(Integer id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
+
+        Properties properties = propertiesRepository.findById(id)
                 .map(existingProperty -> {
+                    if (request != null) {
+                        if (request.getTitle() != null)
+                            existingProperty.setTitle(request.getTitle());
+                        if (request.getDescription() != null)
+                            existingProperty.setDescription(request.getDescription());
+                        if (request.getCategoryId() != null)
+                            existingProperty.setCategoryId(request.getCategoryId());
 
-                    if (request.getTitle() != null)
-                        existingProperty.setTitle(request.getTitle());
-                    if (request.getDescription() != null)
-                        existingProperty.setDescription(request.getDescription());
-                    if (request.getCategoryId() != null)
-                        existingProperty.setCategoryId(request.getCategoryId());
+                        if (request.getArea() != null)
+                            existingProperty.setArea(request.getArea());
+                        if (request.getHouseDirectionEnum() != null)
+                            existingProperty.setHouseDirectionEnum(request.getHouseDirectionEnum());
+                        if (request.getBalconyDirectionEnum() != null)
+                            existingProperty.setBalconyDirectionEnum(request.getBalconyDirectionEnum());
 
-                    if (request.getArea() != null)
-                        existingProperty.setArea(request.getArea());
-                    if (request.getHouseDirectionEnum() != null)
-                        existingProperty.setHouseDirectionEnum(request.getHouseDirectionEnum());
-                    if (request.getBalconyDirectionEnum() != null)
-                        existingProperty.setBalconyDirectionEnum(request.getBalconyDirectionEnum());
+                        if (request.getAvailableFrom() != null)
+                            existingProperty.setAvailableFrom(request.getAvailableFrom());
+                        if(request.getStatusEnum() != null)
+                            existingProperty.setStatusEnum(request.getStatusEnum());
+                    }
 
-                    if (request.getAvailableFrom() != null)
-                        existingProperty.setAvailableFrom(request.getAvailableFrom());
-                    if(request.getStatusEnum() != null)
-                        existingProperty.setStatusEnum(request.getStatusEnum());
-                    if (request.getImages() != null) {
-                        String imageUrls = cloudinaryService.uploadFile(request.getImages(), "real_estate_properties");
-                        if (imageUrls == null || imageUrls.isEmpty()) {
-                            throw new RuntimeException("Failed to upload image to Cloudinary");
+                    if (imageFiles != null) {
+                        String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
+                        if (newImageUrls == null || newImageUrls.isEmpty()) {
+                            throw new RuntimeException("Failed to upload images to Cloudinary");
                         }
-                        existingProperty.setImageUrls(imageUrls);
+
+                        // Get set of existing images and images that needs to remove.
+
+                        if (existingProperty.getImageUrls() == null) {
+                            existingProperty.setImageUrls(newImageUrls);
+                        } else {
+                            Set<String> existingImagesUrlSet = new HashSet<>(Arrays.asList(existingProperty.getImageUrls().split(",")));
+                            Set<String> imageUrlsToRemove = new HashSet<>(request.getImageUrlsRemove());
+
+                            // Remove all images urls that needs to remove as requested
+                            existingImagesUrlSet.removeAll(imageUrlsToRemove);
+
+                            // Convert current image url back to string and concatenate with new urls created
+                            String updatedImageUrls;
+                            if (existingImagesUrlSet.isEmpty())
+                                updatedImageUrls = newImageUrls;
+                            else
+                                updatedImageUrls = String.join(",", existingImagesUrlSet).concat("," + newImageUrls);
+
+                            existingProperty.setImageUrls(updatedImageUrls);
+                        }
                     }
 
                     existingProperty.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
                     return propertiesRepository.save(existingProperty);
-
                 })
                 .map(Properties::new)
                 .orElseThrow(() -> new PropertyNotFoundException("Cannot found property with id: " + id));
 
+
+        Float price = request != null ? request.getPrice() :
+                (properties.getPropertyForRent() != null ? properties.getPropertyForRent().getRentalPrice() : properties.getPropertyForSale().getSalePrice());
+
+        return FullPropertyDTO.builder()
+                .title(properties.getTitle())
+                .categoryId(properties.getCategoryId())
+                .price(price)
+                .area(properties.getArea())
+                .description(properties.getDescription())
+                .totalFloor(properties.getTotalFloor())
+                .houseDirection(properties.getHouseDirectionEnum())
+                .balconyDirection(properties.getBalconyDirectionEnum())
+                .status(properties.getStatusEnum())
+                .availableFrom(properties.getAvailableFrom())
+                .imageUrls(properties.getImageUrls() != null && !properties.getImageUrls().isEmpty()
+                        ? Arrays.stream(properties.getImageUrls().split(","))
+                        .map(String::trim)
+                        .collect(Collectors.toList())
+                        : Collections.emptyList())
+                .rooms(properties.getRoomSet().stream()
+                        .map(room -> new RoomDTO(room.getRoomId(), properties.getId(), room.getRoomType(), room.getQuantity()))
+                        .collect(Collectors.toList()))
+                .build();
     }
 
     @Override

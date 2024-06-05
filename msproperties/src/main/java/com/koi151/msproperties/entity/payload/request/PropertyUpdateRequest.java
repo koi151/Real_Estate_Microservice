@@ -9,6 +9,8 @@ import lombok.Getter;
 import lombok.Setter;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Set;
+
 @Getter
 @Setter
 public class PropertyUpdateRequest {
@@ -41,5 +43,5 @@ public class PropertyUpdateRequest {
 
     private String availableFrom;
 
-    private MultipartFile images;
+    Set<String> imageUrlsRemove;
 }

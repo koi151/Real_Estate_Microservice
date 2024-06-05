@@ -1,6 +1,6 @@
 package com.koi151.msproperties.service.imp;
 
-import com.koi151.msproperties.dto.FullPropertiesDTO;
+import com.koi151.msproperties.dto.FullPropertyDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.Properties;
 import com.koi151.msproperties.entity.StatusEnum;
@@ -17,7 +17,7 @@ public interface PropertiesServiceImp {
     Properties getPropertyById(Integer id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
     List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
-    FullPropertiesDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
-    Properties updateProperty(Integer id, PropertyUpdateRequest request);
+    FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
+    FullPropertyDTO updateProperty(Integer id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Integer id) throws PropertyNotFoundException;
 }

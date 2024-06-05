@@ -100,7 +100,7 @@ public class PropertyCategoryController {
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createCategory(
             @RequestPart @Valid PropertyCategoryCreateRequest propertyCategory,
-            @RequestPart List<MultipartFile> images
+            @RequestPart(required = false) List<MultipartFile> images
     ){
         ResponseData responseData = new ResponseData();
 

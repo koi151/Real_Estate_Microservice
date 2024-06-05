@@ -1,6 +1,7 @@
 package com.koi151.msproperties.controllerAdvice;
 
 import com.koi151.msproperties.dto.ErrorResponseDTO;
+import customExceptions.EmptyFileException;
 import customExceptions.PaymentScheduleNotFoundException;
 import customExceptions.PropertyNotFoundException;
 import jakarta.validation.ConstraintViolation;
@@ -84,6 +85,18 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
         List<String> details = new ArrayList<>();
         details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(EmptyFileException.class)
+    public ResponseEntity<Object> handleEmptyFileException(EmptyFileException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Images file is empty, recheck file value again");
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
         errorResponseDTO.setError("Validation Error");
