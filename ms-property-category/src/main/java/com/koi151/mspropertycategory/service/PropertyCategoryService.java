@@ -140,13 +140,14 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return propertyCategoryRepository.findById(id)
                 .map(existingCategory -> {
 
-                    if (request.getTitle() != null)
-                        existingCategory.setTitle(request.getTitle());
-                    if (request.getDescription() != null)
-                        existingCategory.setDescription(request.getDescription());
-                    if (request.getStatus() != null)
-                        existingCategory.setStatus(request.getStatus());
-
+                    if (request != null) {
+                        if (request.getTitle() != null)
+                            existingCategory.setTitle(request.getTitle());
+                        if (request.getDescription() != null)
+                            existingCategory.setDescription(request.getDescription());
+                        if (request.getStatus() != null)
+                            existingCategory.setStatus(request.getStatus());
+                    }
 
                     if (imageFiles != null) {
                         String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
