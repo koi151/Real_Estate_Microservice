@@ -21,12 +21,12 @@ public class Account {
     @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
     private AdminAccount adminAccount;
 
-    @Column(name = "user_name", length = 50, nullable = false)
+    @Column(name = "user_name", length = 50, nullable = false, unique = true)
     @NotNull(message = "User name cannot be null")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
     private String userName;
 
-    @Column(name = "phone", length = 20, nullable = false)
+    @Column(name = "phone", length = 20, nullable = false, unique = true)
     @NotNull(message = "Phone number cannot be null")
     private String phone;
 

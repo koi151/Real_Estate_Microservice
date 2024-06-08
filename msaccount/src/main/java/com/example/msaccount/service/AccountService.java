@@ -6,17 +6,17 @@ import com.example.msaccount.entity.Account;
 import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.service.imp.AccountServiceImp;
 import customExceptions.CloudinaryUploadFailedException;
+import customExceptions.PhoneAlreadyExistsException;
+import customExceptions.UserNameAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 
 @Service
 public class AccountService implements AccountServiceImp {
-
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -29,6 +29,13 @@ public class AccountService implements AccountServiceImp {
 
     @Override
     public AccountDTO createAccount(AccountRequest request, MultipartFile avatar) {
+
+        if (accountRepository.existsByPhone(request.getPhone()))
+            throw new PhoneAlreadyExistsException("Phone number already exists");
+
+        if(accountRepository.existsByUserName(request.getUserName()))
+            throw new UserNameAlreadyExistsException("User name already exists");
+
         // length = 60
         String hashedPassword = passwordEncoder.encode(request.getPassword());
 
@@ -43,7 +50,6 @@ public class AccountService implements AccountServiceImp {
                 .createdAt(LocalDateTime.now())
                 .updatedAt(LocalDateTime.now())
                 .build();
-
 
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUploadedUrl = cloudinaryService.uploadFile(avatar, "real_estate_account");

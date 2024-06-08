@@ -60,7 +60,7 @@ public class ControllerAdvisor {
         errorResponseDTO.setError("Invalid request");
         errorResponseDTO.setDetails(errors);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
     }
 
     //handleConstraintViolationException > MethodArgumentNotValidException > Binding...

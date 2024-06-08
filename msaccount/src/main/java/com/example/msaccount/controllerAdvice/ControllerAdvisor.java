@@ -2,7 +2,9 @@ package com.example.msaccount.controllerAdvice;
 
 import com.example.msaccount.dto.ErrorResponseDTO;
 import customExceptions.CloudinaryUploadFailedException;
+import customExceptions.PhoneAlreadyExistsException;
 import customExceptions.EmptyFileException;
+import customExceptions.UserNameAlreadyExistsException;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
@@ -84,5 +86,30 @@ public class ControllerAdvisor {
         errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponseDTO);    }
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(PhoneAlreadyExistsException.class)
+    public ResponseEntity<Object> handlePhoneAlreadyExistsException(PhoneAlreadyExistsException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Phone number already existed, please choose another one");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(UserNameAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserNameAlreadyExistsException(UserNameAlreadyExistsException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("User name already existed, please choose another one");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
+    }
 }
