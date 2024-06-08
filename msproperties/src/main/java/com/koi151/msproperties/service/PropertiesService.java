@@ -185,7 +185,7 @@ public class PropertiesService implements PropertiesServiceImp {
     @Override
     public FullPropertyDTO updateProperty(Integer id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
 
-        Properties properties = propertiesRepository.findById(id)
+        return propertiesRepository.findById(id)
                 .map(existingProperty -> {
                     if (request != null) {
                         if (request.getTitle() != null)
@@ -214,9 +214,9 @@ public class PropertiesService implements PropertiesServiceImp {
                             throw new RuntimeException("Failed to upload images to Cloudinary");
                         }
 
-                        // Get set of existing images and images that needs to remove.
+                        // Get Set of existing images and images that needs to remove.
 
-                        if (existingProperty.getImageUrls() == null) {
+                        if (existingProperty.getImageUrls() == null || request == null) { // in case of no img deleting requested or no img exists, just add img if requested
                             existingProperty.setImageUrls(newImageUrls);
                         } else {
                             Set<String> existingImagesUrlSet = new HashSet<>(Arrays.asList(existingProperty.getImageUrls().split(",")));
@@ -239,35 +239,34 @@ public class PropertiesService implements PropertiesServiceImp {
                     existingProperty.setUpdatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS));
                     return propertiesRepository.save(existingProperty);
                 })
-                .map(Properties::new)
+                .map(savedProperty -> {
+                    Float price = request != null ? request.getPrice() :
+                            (savedProperty.getPropertyForRent() != null ? savedProperty.getPropertyForRent().getRentalPrice() : savedProperty.getPropertyForSale().getSalePrice());
+
+                    return FullPropertyDTO.builder()
+                            .title(savedProperty.getTitle())
+                            .categoryId(savedProperty.getCategoryId())
+                            .price(price)
+                            .area(savedProperty.getArea())
+                            .description(savedProperty.getDescription())
+                            .totalFloor(savedProperty.getTotalFloor())
+                            .houseDirection(savedProperty.getHouseDirectionEnum())
+                            .balconyDirection(savedProperty.getBalconyDirectionEnum())
+                            .status(savedProperty.getStatusEnum())
+                            .availableFrom(savedProperty.getAvailableFrom())
+                            .imageUrls(savedProperty.getImageUrls() != null && !savedProperty.getImageUrls().isEmpty()
+                                    ? Arrays.stream(savedProperty.getImageUrls().split(","))
+                                    .map(String::trim)
+                                    .collect(Collectors.toList())
+                                    : Collections.emptyList())
+                            .rooms(savedProperty.getRoomSet().stream()
+                                    .map(room -> new RoomDTO(room.getRoomId(), savedProperty.getId(), room.getRoomType(), room.getQuantity()))
+                                    .collect(Collectors.toList()))
+                            .build();
+                })
+
                 .orElseThrow(() -> new PropertyNotFoundException("Cannot found property with id: " + id));
-
-
-        Float price = request != null ? request.getPrice() :
-                (properties.getPropertyForRent() != null ? properties.getPropertyForRent().getRentalPrice() : properties.getPropertyForSale().getSalePrice());
-
-        return FullPropertyDTO.builder()
-                .title(properties.getTitle())
-                .categoryId(properties.getCategoryId())
-                .price(price)
-                .area(properties.getArea())
-                .description(properties.getDescription())
-                .totalFloor(properties.getTotalFloor())
-                .houseDirection(properties.getHouseDirectionEnum())
-                .balconyDirection(properties.getBalconyDirectionEnum())
-                .status(properties.getStatusEnum())
-                .availableFrom(properties.getAvailableFrom())
-                .imageUrls(properties.getImageUrls() != null && !properties.getImageUrls().isEmpty()
-                        ? Arrays.stream(properties.getImageUrls().split(","))
-                        .map(String::trim)
-                        .collect(Collectors.toList())
-                        : Collections.emptyList())
-                .rooms(properties.getRoomSet().stream()
-                        .map(room -> new RoomDTO(room.getRoomId(), properties.getId(), room.getRoomType(), room.getQuantity()))
-                        .collect(Collectors.toList()))
-                .build();
     }
-
     @Override
     public void deleteProperty(Integer id) throws PropertyNotFoundException {
         propertiesRepository.findById(id)

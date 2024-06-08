@@ -30,10 +30,10 @@ public class ControllerAdvisor {
         errorResponseDTO.setError(ex.getMessage());
 
         List<String> details = new ArrayList<>();
-        details.add("Cannot find property");
+        details.add("Property not existed or might be deleted");
         errorResponseDTO.setDetails(details);
 
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(PaymentScheduleNotFoundException.class)

@@ -1,10 +1,7 @@
 package com.example.msaccount.controllerAdvice;
 
 import com.example.msaccount.dto.ErrorResponseDTO;
-import customExceptions.CloudinaryUploadFailedException;
-import customExceptions.PhoneAlreadyExistsException;
-import customExceptions.EmptyFileException;
-import customExceptions.UserNameAlreadyExistsException;
+import customExceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
@@ -111,5 +108,17 @@ public class ControllerAdvisor {
         errorResponseDTO.setDetails(details);
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(customExceptions.AccountNotFoundException.class)
+    public  ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Account not existed or might be deleted");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
     }
 }

@@ -155,9 +155,9 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                             throw new RuntimeException("Failed to upload images to Cloudinary");
                         }
 
-                        // Get set of existing images and images that needs to remove.
+                        // Get Set of existing images and images that needs to remove.
 
-                        if (existingCategory.getImageUrls() == null) {
+                        if (existingCategory.getImageUrls() == null || request == null) { // in case of no img deleting requested or no img exists, just add img if requested
                             existingCategory.setImageUrls(newImageUrls);
                         } else {
                             Set<String> existingImagesUrlSet = new HashSet<>(Arrays.asList(existingCategory.getImageUrls().split(",")));

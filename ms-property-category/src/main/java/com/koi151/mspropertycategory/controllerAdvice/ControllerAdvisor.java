@@ -40,7 +40,7 @@ public class ControllerAdvisor {
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
         errorResponseDTO.setError(ex.getMessage());
         List<String> details = new ArrayList<>();
-        details.add("Property category not found");
+        details.add("Property category not existed or might be deleted");
         errorResponseDTO.setDetails(details);
 
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
