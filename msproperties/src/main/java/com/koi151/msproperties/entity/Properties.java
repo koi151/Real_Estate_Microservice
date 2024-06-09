@@ -68,15 +68,15 @@ public class Properties {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private StatusEnum statusEnum = StatusEnum.ACTIVE;
+    private StatusEnum status = StatusEnum.ACTIVE;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "house_direction", length = 20)
-    private DirectionEnum houseDirectionEnum;
+    private DirectionEnum houseDirection;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
-    private DirectionEnum balconyDirectionEnum;
+    private DirectionEnum balconyDirection;
 
     @Column(name = "deleted", nullable = false)
     private boolean deleted = false;
@@ -87,27 +87,6 @@ public class Properties {
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedAt;
 
-    public Properties(Properties properties) {
-        this.id = properties.id;
-        this.categoryId = properties.categoryId;
-        this.availableFrom = properties.availableFrom;
-        this.title = properties.title;
-        this.area = properties.area;
-        this.description = properties.description;
-        this.imageUrls = properties.imageUrls;
-        this.view = properties.view;
-        this.totalFloor = properties.totalFloor;
-        this.statusEnum = properties.statusEnum;
-        this.houseDirectionEnum = properties.houseDirectionEnum;
-        this.balconyDirectionEnum = properties.balconyDirectionEnum;
-        this.deleted = properties.deleted;
-        this.createdAt = properties.createdAt;
-        this.updatedAt = properties.updatedAt;
-        this.roomSet = properties.roomSet;
-        this.propertyForSale = properties.propertyForSale;  // !
-        this.propertyForRent = properties.propertyForRent;
-        this.address = properties.address;
-    }
 
     @PrePersist
     protected void onCreate() {

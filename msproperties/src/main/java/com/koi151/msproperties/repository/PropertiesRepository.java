@@ -17,6 +17,6 @@ import java.util.Optional;
 public interface PropertiesRepository extends JpaRepository<Properties, Integer> {
     Page<Properties> findByDeleted(boolean deleted, PageRequest request);
     Page<Properties> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, PageRequest request);
-    Page<Properties> findByStatusEnum(StatusEnum status, PageRequest pageRequest);
+    Page<Properties> findByStatus(StatusEnum status, PageRequest pageRequest);
     Optional<Properties> findByIdAndDeleted(Integer categoryId, boolean deleted);
 }

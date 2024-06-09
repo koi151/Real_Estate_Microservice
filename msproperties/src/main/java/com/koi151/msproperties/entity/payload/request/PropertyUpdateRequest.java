@@ -33,13 +33,13 @@ public class PropertyUpdateRequest {
     private Integer totalFloor;
 
     @Enumerated(EnumType.STRING)
-    private DirectionEnum houseDirectionEnum;
+    private DirectionEnum houseDirection;
 
     @Enumerated(EnumType.STRING)
-    private DirectionEnum balconyDirectionEnum;
+    private DirectionEnum balconyDirection;
 
     @Enumerated(EnumType.STRING)
-    private StatusEnum statusEnum;
+    private StatusEnum status;
 
     private String availableFrom;
 

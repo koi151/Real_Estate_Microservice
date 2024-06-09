@@ -2,6 +2,7 @@ package com.koi151.msproperties.controllerAdvice;
 
 import com.koi151.msproperties.dto.ErrorResponseDTO;
 import customExceptions.EmptyFileException;
+import customExceptions.MaxImagesExceededException;
 import customExceptions.PaymentScheduleNotFoundException;
 import customExceptions.PropertyNotFoundException;
 import jakarta.validation.ConstraintViolation;
@@ -57,7 +58,7 @@ public class ControllerAdvisor {
                 .collect(Collectors.toList()); // convert to list
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Invalid request");
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(errors);
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
@@ -75,7 +76,7 @@ public class ControllerAdvisor {
                 .collect(Collectors.toList());
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Failed");
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(constraintViolations);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
@@ -87,7 +88,7 @@ public class ControllerAdvisor {
         details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
@@ -99,7 +100,19 @@ public class ControllerAdvisor {
         details.add("Images file is empty, recheck file value again");
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(MaxImagesExceededException.class)
+    public ResponseEntity<Object> handleMaxImagesExceededException(MaxImagesExceededException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Maximum 8 images allow reached, cannot add more images");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
