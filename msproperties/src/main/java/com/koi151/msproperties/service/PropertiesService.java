@@ -276,7 +276,6 @@ public class PropertiesService implements PropertiesServiceImp {
     }
 
 
-    //
     @Override
     public void deleteProperty(Integer id) throws PropertyNotFoundException {
         propertiesRepository.findById(id)

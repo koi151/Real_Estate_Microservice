@@ -13,7 +13,7 @@ public class Properties {
     private String title;
     private String imageUrls;
     private String description;
-    private StatusEnum statusEnum = StatusEnum.ACTIVE;
+    private StatusEnum status = StatusEnum.ACTIVE;
     private int view;
 
     private boolean deleted;

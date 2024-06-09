@@ -7,6 +7,9 @@ import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
+import java.util.Collections;
+import java.util.List;
+
 @Getter
 @Setter
 @Builder
@@ -18,15 +21,16 @@ public class PropertyCategoryDetailDTO {
     private String title;
 
     private String description;
-    private String images;
 
     @Enumerated(EnumType.STRING)
-    private StatusEnum statusEnum;
+    private StatusEnum status;
+
+    private List<String> imageUrls;
 
     public PropertyCategoryDetailDTO(PropertyCategory propertyCategory) {
         this.title = propertyCategory.getTitle();
         this.description = propertyCategory.getDescription();
-        this.images = propertyCategory.getImageUrls();
-        this.statusEnum = propertyCategory.getStatus();
+        this.imageUrls = List.of(propertyCategory.getImageUrls().split(","));
+        this.status = propertyCategory.getStatus();
     }
 }

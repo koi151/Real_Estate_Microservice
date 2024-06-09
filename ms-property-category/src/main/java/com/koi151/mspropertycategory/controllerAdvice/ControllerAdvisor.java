@@ -4,6 +4,7 @@ import com.koi151.mspropertycategory.dto.ErrorResponseDTO;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.EmptyFileException;
 import customExceptions.FieldRequiredException;
+import customExceptions.MaxImagesExceededException;
 import jakarta.validation.UnexpectedTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -55,7 +56,7 @@ public class ControllerAdvisor {
                 .collect(Collectors.toList()); // convert to list
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Invalid request");
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(errors);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
@@ -67,7 +68,7 @@ public class ControllerAdvisor {
         details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
@@ -79,7 +80,19 @@ public class ControllerAdvisor {
         details.add("Images file is empty, recheck file value again");
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Error");
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(MaxImagesExceededException.class)
+    public ResponseEntity<Object> handleMaxImagesExceededException(MaxImagesExceededException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Maximum 8 images allow reached, cannot add more images");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
