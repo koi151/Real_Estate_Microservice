@@ -41,5 +41,5 @@ public class AccountUpdateRequest {
     @Email(message = "Invalid email")
     private String email;
 
-    private Boolean avatarUrlRemove; // due to single img, not multi
+    private Boolean avatarUrlRemove = false; // due to single img, not multi
 }

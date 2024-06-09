@@ -286,7 +286,3 @@ public class PropertiesService implements PropertiesServiceImp {
                 .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
     }
 }
-
-
-
-//https://res.cloudinary.com/dd3xua0wu/image/upload/v1/real_estate_properties/io4iddpjl6xpjlp1fegn

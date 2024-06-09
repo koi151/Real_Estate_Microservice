@@ -135,58 +135,6 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         return propertyCategory;
     }
 
-//
-//    @Override
-//    public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
-//        return propertyCategoryRepository.findById(id)
-//                .map(existingCategory -> {
-//
-//                    if (request != null) {
-//                        if (request.getTitle() != null)
-//                            existingCategory.setTitle(request.getTitle());
-//                        if (request.getDescription() != null)
-//                            existingCategory.setDescription(request.getDescription());
-//                        if (request.getStatus() != null)
-//                            existingCategory.setStatus(request.getStatus());
-//                    }
-//
-//                    if (imageFiles != null) {
-//                        String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
-//                        if (newImageUrls == null || newImageUrls.isEmpty()) {
-//                            throw new RuntimeException("Failed to upload images to Cloudinary");
-//                        }
-//
-//                        // Get Set of existing images and images that needs to remove.
-//
-//                        if (existingCategory.getImageUrls() == null || request == null) { // in case of no img deleting requested or no img exists, just add img if requested
-//                            existingCategory.setImageUrls(newImageUrls);
-//                        } else {
-//                            Set<String> existingImagesUrlSet = new HashSet<>(Arrays.asList(existingCategory.getImageUrls().split(",")));
-//                            Set<String> imageUrlsToRemove = new HashSet<>(request.getImageUrlsRemove());
-//
-//                            // Remove all images urls that needs to remove as requested
-//                            existingImagesUrlSet.removeAll(imageUrlsToRemove);
-//
-//                            // Convert current image url back to string and concatenate with new urls created
-//                            String updatedImageUrls;
-//                            if (existingImagesUrlSet.isEmpty())
-//                                updatedImageUrls = newImageUrls;
-//                            else
-//                                updatedImageUrls = String.join(",", existingImagesUrlSet).concat("," + newImageUrls);
-//
-//                            existingCategory.setImageUrls(updatedImageUrls);
-//                        }
-//                    }
-//
-//                    existingCategory.setUpdatedAt(LocalDateTime.now());
-//
-//                    return propertyCategoryRepository.save(existingCategory);
-//                })
-//                .map(PropertyCategoryDetailDTO::new) // Map to DTO after saving
-//                .orElseThrow(() -> new CategoryNotFoundException("Property category not found with id: " + id));
-//    }
-
-    ////////////
     @Override
     public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
         return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
@@ -257,11 +205,6 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                         : Collections.emptyList())
                 .build();
     }
-
-
-
-    //////////
-
 
     @Override
     public void deleteCategory(Integer id) {

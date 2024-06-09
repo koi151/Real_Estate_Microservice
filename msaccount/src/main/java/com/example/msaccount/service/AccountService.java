@@ -4,6 +4,7 @@ import com.example.msaccount.dto.AccountDTO;
 import com.example.msaccount.dto.payload.request.AccountCreateRequest;
 import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.entity.AccountStatusEnum;
 import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.service.imp.AccountServiceImp;
 import customExceptions.AccountNotFoundException;
@@ -11,12 +12,18 @@ import customExceptions.CloudinaryUploadFailedException;
 import customExceptions.PhoneAlreadyExistsException;
 import customExceptions.UserNameAlreadyExistsException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class AccountService implements AccountServiceImp {
@@ -81,6 +88,18 @@ public class AccountService implements AccountServiceImp {
                 .map(this::convertToAccountDTO)
                 .orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: " + id));
     }
+
+
+    public List<AccountDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
+        PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by("accountId"));
+        Page<Account> accounts = accountRepository.findByAccountStatusAndDeleted(status, false, pageRequest);
+
+        return accounts.stream()
+                .map(account -> new AccountDTO(account.getAccountId(), account.getUserName(), account.getPhone(), account.getAccountStatus(),
+                        account.getFirstName(), account.getLastName(), account.getEmail(), account.getAvatarUrl()))
+                .collect(Collectors.toList());
+    }
+
 
     private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {
