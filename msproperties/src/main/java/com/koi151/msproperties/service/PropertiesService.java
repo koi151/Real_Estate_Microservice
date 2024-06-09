@@ -210,9 +210,8 @@ public class PropertiesService implements PropertiesServiceImp {
 
                     if (imageFiles != null) {
                         String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
-                        if (newImageUrls == null || newImageUrls.isEmpty()) {
+                        if (newImageUrls == null || newImageUrls.isEmpty())
                             throw new RuntimeException("Failed to upload images to Cloudinary");
-                        }
 
                         // Get Set of existing images and images that needs to remove.
 
