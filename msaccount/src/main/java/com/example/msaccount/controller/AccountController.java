@@ -61,4 +61,15 @@ public class AccountController {
 
         return ResponseEntity.ok(responseData);
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<ResponseData> deleteAccount(@PathVariable(name = "id") Integer id) {
+        accountServiceImp.deleteAccount(id);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setDesc("Account deleted successful");
+
+        return ResponseEntity.ok(responseData);
+    }
+
 }

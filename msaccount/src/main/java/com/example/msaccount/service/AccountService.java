@@ -20,7 +20,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -98,6 +97,15 @@ public class AccountService implements AccountServiceImp {
                 .map(account -> new AccountDTO(account.getAccountId(), account.getUserName(), account.getPhone(), account.getAccountStatus(),
                         account.getFirstName(), account.getLastName(), account.getEmail(), account.getAvatarUrl()))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void deleteAccount(Integer id) {
+        Account account = accountRepository.findById(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
+
+        account.setDeleted(true);
+        accountRepository.save(account);
     }
 
 

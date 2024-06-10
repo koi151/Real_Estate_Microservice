@@ -13,4 +13,5 @@ public interface AccountServiceImp {
     AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
     AccountDTO updateAccount(Integer id, AccountUpdateRequest request, MultipartFile avatar);
     List<AccountDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize);
+    void deleteAccount(Integer id);
 }
