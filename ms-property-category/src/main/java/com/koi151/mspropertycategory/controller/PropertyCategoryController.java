@@ -3,13 +3,12 @@ package com.koi151.mspropertycategory.controller;
 import com.koi151.mspropertycategory.dto.PropertyCategoryDetailDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
-import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
-import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
+import com.koi151.mspropertycategory.service.imp.PropertyCategory;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -27,19 +26,19 @@ import java.util.List;
 public class PropertyCategoryController {
 
     @Autowired
-    PropertyCategoryImp propertyCategoryImp;
+    PropertyCategory propertyCategory;
 
     @GetMapping("/{title}")
     public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
         ResponseData responseData = new ResponseData();
-        responseData.setData(propertyCategoryImp.getCategories(title));
+        responseData.setData(propertyCategory.getCategories(title));
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/title/{id}")
     public ResponseEntity<ResponseData> getCategoryTitleById(@PathVariable(name = "id") int id) {
-        PropertyCategoryTitleDTO category = propertyCategoryImp.getCategoryTitleById(id);
+        PropertyCategoryTitleDTO category = propertyCategory.getCategoryTitleById(id);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(category);
@@ -50,7 +49,7 @@ public class PropertyCategoryController {
 
     @GetMapping("/home-categories")
     public ResponseEntity<ResponseData> getCategoriesHomePage() {
-        List<PropertyCategoryHomeDTO> properties = propertyCategoryImp.getCategoriesHomePage();
+        List<PropertyCategoryHomeDTO> properties = propertyCategory.getCategoriesHomePage();
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
@@ -62,7 +61,7 @@ public class PropertyCategoryController {
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<ResponseData> getCategoryById(@PathVariable(name = "id") Integer id) {
-        PropertyCategory category = propertyCategoryImp.getCategoryById(id);
+        com.koi151.mspropertycategory.entity.PropertyCategory category = propertyCategory.getCategoryById(id);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(category);
@@ -73,7 +72,7 @@ public class PropertyCategoryController {
 
     @GetMapping("/with-properties/{category-id}")
     public ResponseEntity<ResponseData> findCategoryWithProperties(@PathVariable(name = "category-id") Integer categoryId) {
-        FullCategoryResponse res = propertyCategoryImp.findCategoryWithProperties(categoryId);
+        FullCategoryResponse res = propertyCategory.findCategoryWithProperties(categoryId);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(res);
@@ -90,7 +89,7 @@ public class PropertyCategoryController {
         ResponseData responseData = new ResponseData();
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
 
-        List<PropertyCategoryHomeDTO> properties = propertyCategoryImp.getCategoriesByStatus(se);
+        List<PropertyCategoryHomeDTO> properties = propertyCategory.getCategoriesByStatus(se);
 
         responseData.setData(properties);
         responseData.setDesc(properties.isEmpty() ?
@@ -106,7 +105,7 @@ public class PropertyCategoryController {
     ){
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(propertyCategoryImp.createCategory(propertyCategory, images));
+        responseData.setData(this.propertyCategory.createCategory(propertyCategory, images));
         responseData.setStatus(200);
         responseData.setDesc("Success");
 
@@ -119,7 +118,7 @@ public class PropertyCategoryController {
             @RequestPart @Valid PropertyCategoryUpdateRequest category,
             @RequestPart List<MultipartFile> images
     ){
-        PropertyCategoryDetailDTO categoryRes = propertyCategoryImp.updateCategory(id, category, images);
+        PropertyCategoryDetailDTO categoryRes = propertyCategory.updateCategory(id, category, images);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(categoryRes);
@@ -132,7 +131,7 @@ public class PropertyCategoryController {
     public ResponseEntity<ResponseData> deleteCategory(@PathVariable(name = "id") Integer id) {
         ResponseData responseData = new ResponseData();
 
-        propertyCategoryImp.deleteCategory(id);
+        propertyCategory.deleteCategory(id);
         responseData.setDesc("Deleted property with id " + id);
 
         return ResponseEntity.ok(responseData);

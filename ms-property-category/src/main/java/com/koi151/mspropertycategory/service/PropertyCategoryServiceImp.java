@@ -7,14 +7,13 @@ import com.koi151.mspropertycategory.dto.PropertyCategoryDetailDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.Properties;
-import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
 import com.koi151.mspropertycategory.entity.payload.ResponseData;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
 import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
-import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
+import com.koi151.mspropertycategory.service.imp.PropertyCategory;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.MaxImagesExceededException;
 import lombok.RequiredArgsConstructor;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PropertyCategoryService implements PropertyCategoryImp {
+public class PropertyCategoryServiceImp implements PropertyCategory {
 
     @Autowired
     PropertyCategoryRepository propertyCategoryRepository;
@@ -42,14 +41,14 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     PropertiesClient propertiesClient;
 
     @Autowired
-    CloudinaryService cloudinaryService;
+    CloudinaryServiceImp cloudinaryServiceImp;
 
     @Autowired
     ObjectMapper objectMapper;
 
     @Override
     public List<PropertyCategoryHomeDTO> getCategories(String title) {
-        List<PropertyCategory> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
+        List<com.koi151.mspropertycategory.entity.PropertyCategory> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
 
         return propertyCategories.stream()
                 .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
@@ -59,7 +58,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     @Override
     public List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum status) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
-        Page<PropertyCategory> categories = propertyCategoryRepository.findByStatus(status, pageRequest);
+        Page<com.koi151.mspropertycategory.entity.PropertyCategory> categories = propertyCategoryRepository.findByStatus(status, pageRequest);
 
         return categories.stream()
                 .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
@@ -67,7 +66,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     }
 
     @Override
-    public PropertyCategory getCategoryById(Integer id) {
+    public com.koi151.mspropertycategory.entity.PropertyCategory getCategoryById(Integer id) {
         return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
@@ -97,7 +96,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
 
     @Override
     public PropertyCategoryTitleDTO getCategoryTitleById(Integer id){
-        PropertyCategory category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
+        com.koi151.mspropertycategory.entity.PropertyCategory category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
         return new PropertyCategoryTitleDTO(category.getTitle());
     }
@@ -106,16 +105,16 @@ public class PropertyCategoryService implements PropertyCategoryImp {
     @Override
     public List<PropertyCategoryHomeDTO> getCategoriesHomePage() {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
-        Page<PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
+        Page<com.koi151.mspropertycategory.entity.PropertyCategory> categories = propertyCategoryRepository.findAll(pageRequest);
 
         return categories.stream()
                 .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
                 .collect(Collectors.toList());
     }
 
-    public PropertyCategory createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
+    public com.koi151.mspropertycategory.entity.PropertyCategory createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
 
-        PropertyCategory propertyCategory = PropertyCategory.builder()
+        com.koi151.mspropertycategory.entity.PropertyCategory propertyCategory = com.koi151.mspropertycategory.entity.PropertyCategory.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .status(request.getStatus())
@@ -123,7 +122,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 .build();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
-            String imageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
+            String imageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_categories");
             if (imageUrls == null || imageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }
@@ -148,7 +147,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
 
-    private void updateImages(PropertyCategory existingProperty, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
+    private void updateImages(com.koi151.mspropertycategory.entity.PropertyCategory existingProperty, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
         Set<String> existingImagesUrlSet = new HashSet<>();
 
         // Initialize existingImagesUrlSet with current image URLs if they exist
@@ -168,7 +167,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
                 throw new MaxImagesExceededException("Cannot store more than 8 images. You are trying to add " + imageFiles.size() + " images to the existing " + existingImagesUrlSet.size() + " images.");
             }
 
-            String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
+            String newImageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_categories");
             if (newImageUrls == null || newImageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }
@@ -180,7 +179,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         existingProperty.setImageUrls(updatedImageUrls.isEmpty() ? null : updatedImageUrls);
     }
 
-    private void updateCategoryDetails(PropertyCategory existingCategory, PropertyCategoryUpdateRequest request) {
+    private void updateCategoryDetails(com.koi151.mspropertycategory.entity.PropertyCategory existingCategory, PropertyCategoryUpdateRequest request) {
         if (request != null) {
 
             // Use Optional for Null check
@@ -192,7 +191,7 @@ public class PropertyCategoryService implements PropertyCategoryImp {
         }
     }
 
-    private PropertyCategoryDetailDTO convertToPropertyCategoryDTO(PropertyCategory savedProperty, PropertyCategoryUpdateRequest request) {
+    private PropertyCategoryDetailDTO convertToPropertyCategoryDTO(com.koi151.mspropertycategory.entity.PropertyCategory savedProperty, PropertyCategoryUpdateRequest request) {
 
         return PropertyCategoryDetailDTO.builder()
                 .title(savedProperty.getTitle())
