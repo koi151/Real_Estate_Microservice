@@ -1,7 +1,7 @@
 package com.koi151.msproperties.service;
 
 import com.cloudinary.Cloudinary;
-import com.koi151.msproperties.service.imp.CloudinaryServiceImp;
+import com.koi151.msproperties.service.imp.CloudinaryService;
 import customExceptions.EmptyFileException;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -14,7 +14,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class CloudinaryService implements CloudinaryServiceImp {
+public class CloudinaryServiceImp implements CloudinaryService {
     @Resource
     private Cloudinary cloudinary;
 

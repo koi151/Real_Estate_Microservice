@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 import java.util.Map;
 
-public interface PropertiesServiceImp {
+public interface PropertiesService {
 
     List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
     PropertyEntity getPropertyById(Integer id);

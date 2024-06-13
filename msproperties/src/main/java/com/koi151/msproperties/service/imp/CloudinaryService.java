@@ -4,7 +4,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
-public interface CloudinaryServiceImp {
+public interface CloudinaryService {
     String uploadFile(MultipartFile file, String folderName);
     String uploadFiles(List<MultipartFile> files, String folderName);
 }

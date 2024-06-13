@@ -8,7 +8,7 @@ import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.repository.*;
-import com.koi151.msproperties.service.imp.PropertiesServiceImp;
+import com.koi151.msproperties.service.imp.PropertiesService;
 import customExceptions.MaxImagesExceededException;
 import customExceptions.PropertyNotFoundException;
 import lombok.*;
@@ -26,13 +26,13 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PropertyService implements PropertiesServiceImp {
+public class PropertyServiceImp implements PropertiesService {
 
     @Autowired
     PropertyRepository propertyRepository;
 
     @Autowired
-    CloudinaryService cloudinaryService;
+    CloudinaryServiceImp cloudinaryServiceImp;
 
     @Autowired
     RoomRepository roomRepository;
@@ -109,7 +109,7 @@ public class PropertyService implements PropertiesServiceImp {
                 .build();
 
         if (imageFiles != null) {
-            String imageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_properties");
+            String imageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_properties");
             if (imageUrls == null || imageUrls.isEmpty())
                 throw new RuntimeException("Failed to upload images to Cloudinary");
 
@@ -211,7 +211,7 @@ public class PropertyService implements PropertiesServiceImp {
                 throw new MaxImagesExceededException("Cannot store more than 8 images. You are trying to add " + imageFiles.size() + " images to the existing " + existingImagesUrlSet.size() + " images.");
             }
 
-            String newImageUrls = cloudinaryService.uploadFiles(imageFiles, "real_estate_categories");
+            String newImageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_categories");
             if (newImageUrls == null || newImageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }

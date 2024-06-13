@@ -6,13 +6,13 @@ import com.koi151.msproperties.entity.RoomEntity;
 import com.koi151.msproperties.entity.payload.request.RoomCreateRequest;
 import com.koi151.msproperties.repository.PropertyRepository;
 import com.koi151.msproperties.repository.RoomRepository;
-import com.koi151.msproperties.service.imp.RoomServiceImp;
+import com.koi151.msproperties.service.imp.RoomService;
 import customExceptions.PropertyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RoomService implements RoomServiceImp {
+public class RoomServiceImp implements RoomService {
 
     @Autowired
     RoomRepository roomRepository;

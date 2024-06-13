@@ -9,7 +9,7 @@ import com.koi151.msproperties.entity.StatusEnum;
 import com.koi151.msproperties.entity.payload.ResponseData;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
-import com.koi151.msproperties.service.imp.PropertiesServiceImp;
+import com.koi151.msproperties.service.imp.PropertiesService;
 import customExceptions.PaymentScheduleNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,14 +28,14 @@ import java.util.Map;
 public class PropertyController {
 
     @Autowired
-    PropertiesServiceImp propertiesServiceImp;
+    PropertiesService propertiesService;
 
     @Autowired
     ObjectMapper objectMapper;
 
     @GetMapping("/home-properties")
     public ResponseEntity<?> getHomeProperties(@RequestParam Map<String, Object> params) {
-        List<PropertiesHomeDTO> properties = propertiesServiceImp.getHomeProperties(params);
+        List<PropertiesHomeDTO> properties = propertiesService.getHomeProperties(params);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
@@ -48,7 +48,7 @@ public class PropertyController {
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<ResponseData> getPropertyById(@PathVariable(name = "id") Integer id) {
-        PropertyEntity propertyEntity = propertiesServiceImp.getPropertyById(id);
+        PropertyEntity propertyEntity = propertiesService.getPropertyById(id);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyEntity);
@@ -59,7 +59,7 @@ public class PropertyController {
 
     @GetMapping("/category/{category-id}")
     public ResponseEntity<ResponseData> getPropertiesByCategory(@PathVariable(name="category-id") Integer categoryId) {
-        List<PropertiesHomeDTO> properties = propertiesServiceImp.findAllPropertiesByCategory(categoryId);
+        List<PropertiesHomeDTO> properties = propertiesService.findAllPropertiesByCategory(categoryId);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
@@ -72,7 +72,7 @@ public class PropertyController {
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData> getPropertiesWithStatus(@PathVariable(name = "status") String status) {
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
-        List<PropertiesHomeDTO> properties = propertiesServiceImp.getPropertiesWithStatus(se);
+        List<PropertiesHomeDTO> properties = propertiesService.getPropertiesWithStatus(se);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
@@ -93,7 +93,7 @@ public class PropertyController {
         if (property.getType() == PropertyTypeEnum.RENT && property.getPaymentSchedule() == null)
             throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
 
-        FullPropertyDTO propertyRes = propertiesServiceImp.createProperty(property, images);
+        FullPropertyDTO propertyRes = propertiesService.createProperty(property, images);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyRes);
@@ -106,7 +106,7 @@ public class PropertyController {
     public ResponseEntity<ResponseData> deleteProperty (@PathVariable(name = "id") Integer id) {
         ResponseData responseData = new ResponseData();
 
-        propertiesServiceImp.deleteProperty(id);
+        propertiesService.deleteProperty(id);
         responseData.setDesc("Property deleted successfully");
 
         return ResponseEntity.ok(responseData);
@@ -121,7 +121,7 @@ public class PropertyController {
     ){
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(propertiesServiceImp.updateProperty(id, property, images));
+        responseData.setData(propertiesService.updateProperty(id, property, images));
         responseData.setDesc("Property updated successfully");
 
         return ResponseEntity.ok(responseData);
