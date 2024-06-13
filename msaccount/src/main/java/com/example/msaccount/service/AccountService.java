@@ -108,7 +108,6 @@ public class AccountService implements AccountServiceImp {
         accountRepository.save(account);
     }
 
-
     private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {
             String uploadedAvatarUrl = cloudinaryService.uploadFile(avatarFile, "real_estate_account");

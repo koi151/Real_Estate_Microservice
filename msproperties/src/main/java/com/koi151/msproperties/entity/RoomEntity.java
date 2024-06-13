@@ -6,13 +6,13 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Entity
+@Entity(name = "room")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Room {
+public class RoomEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class Room {
     @ManyToOne
     @JoinColumn(name = "property_id")
     @NotNull(message = "Property id cannot be null")
-    private Properties properties;
+    private PropertyEntity propertyEntity;
 
     @Column(name = "room_type", nullable = false, length = 50)
     @NotEmpty(message = "Room type cannot be empty")

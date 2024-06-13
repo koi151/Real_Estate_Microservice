@@ -7,6 +7,7 @@ import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
 import com.example.msaccount.entity.AccountStatusEnum;
 import com.example.msaccount.service.imp.AccountServiceImp;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +15,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
+@PropertySource("classpath:application.yml")
 @RequestMapping("/api/v1/account")
 public class AccountController {
 

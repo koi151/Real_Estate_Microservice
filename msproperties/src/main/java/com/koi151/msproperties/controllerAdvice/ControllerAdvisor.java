@@ -1,13 +1,11 @@
 package com.koi151.msproperties.controllerAdvice;
 
 import com.koi151.msproperties.dto.ErrorResponseDTO;
-import customExceptions.EmptyFileException;
-import customExceptions.MaxImagesExceededException;
-import customExceptions.PaymentScheduleNotFoundException;
-import customExceptions.PropertyNotFoundException;
+import customExceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
+import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -110,6 +108,18 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleMaxImagesExceededException(MaxImagesExceededException ex) {
         List<String> details = new ArrayList<>();
         details.add("Maximum 8 images allow reached, cannot add more images");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(InvalidContentTypeException.class)
+    public ResponseEntity<Object> handleInvalidContentTypeException(InvalidContentTypeException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Invalid Content-Type value, recheck again.");
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
         errorResponseDTO.setError(ex.getMessage());

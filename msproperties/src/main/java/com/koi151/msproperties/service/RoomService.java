@@ -1,10 +1,10 @@
 package com.koi151.msproperties.service;
 
 import com.koi151.msproperties.dto.RoomDTO;
-import com.koi151.msproperties.entity.Properties;
-import com.koi151.msproperties.entity.Room;
+import com.koi151.msproperties.entity.PropertyEntity;
+import com.koi151.msproperties.entity.RoomEntity;
 import com.koi151.msproperties.entity.payload.request.RoomCreateRequest;
-import com.koi151.msproperties.repository.PropertiesRepository;
+import com.koi151.msproperties.repository.PropertyRepository;
 import com.koi151.msproperties.repository.RoomRepository;
 import com.koi151.msproperties.service.imp.RoomServiceImp;
 import customExceptions.PropertyNotFoundException;
@@ -18,25 +18,25 @@ public class RoomService implements RoomServiceImp {
     RoomRepository roomRepository;
 
     @Autowired
-    PropertiesRepository propertiesRepository;
+    PropertyRepository propertyRepository;
 
     @Override
     public RoomDTO createRoom(Integer propertyId, RoomCreateRequest request) {
-        Properties property = propertiesRepository.findById(propertyId)
+        PropertyEntity property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + propertyId));
 
-        Room room = Room.builder()
+        RoomEntity roomEntity = RoomEntity.builder()
                 .roomType(request.getRoomType())
                 .quantity(request.getQuantity())
-                .properties(property) // Associate the room with the property
+                .propertyEntity(property) // Associate the room with the property
                 .build();
 
-        Room savedRoom = roomRepository.save(room);
+        RoomEntity savedRoomEntity = roomRepository.save(roomEntity);
 
         return RoomDTO.builder()
-                .roomId(savedRoom.getRoomId())
-                .roomType(savedRoom.getRoomType())
-                .quantity(savedRoom.getQuantity())
+                .roomId(savedRoomEntity.getRoomId())
+                .roomType(savedRoomEntity.getRoomType())
+                .quantity(savedRoomEntity.getQuantity())
                 .propertyId(propertyId)
                 .build();
     }

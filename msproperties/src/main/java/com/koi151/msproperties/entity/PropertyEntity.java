@@ -13,25 +13,25 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Properties {
+public class PropertyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne(mappedBy = "properties", cascade = CascadeType.ALL)
-    private PropertyForSale propertyForSale;
+    @OneToOne(mappedBy = "propertyEntity", cascade = CascadeType.ALL)
+    private PropertyForSaleEntity propertyForSaleEntity;
 
-    @OneToOne(mappedBy = "properties", cascade = CascadeType.ALL)
-    private PropertyForRent propertyForRent;
+    @OneToOne(mappedBy = "propertyEntity", cascade = CascadeType.ALL)
+    private PropertyForRentEntity propertyForRentEntity;
 
     @OneToOne
     @JoinColumn(name = "address_id", nullable = false)
     @NotNull(message = "Address id cannot be null")
-    private Address address;
+    private AddressEntity addressEntity;
 
-    @OneToMany(mappedBy = "properties")
-    private Set<Room> roomSet;
+    @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY)
+    private Set<RoomEntity> roomEntitySet;
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id cannot be null")

@@ -12,6 +12,7 @@ import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpda
 import com.koi151.mspropertycategory.service.imp.PropertyCategoryImp;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -21,6 +22,7 @@ import java.util.List;
 
 
 @RestController
+@PropertySource("classpath:application.yml")
 @RequestMapping("/api/v1/property-category")
 public class PropertyCategoryController {
 

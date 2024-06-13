@@ -7,7 +7,10 @@ eureka:
 
 server:
   port: 8081
+
 spring:
+  profile:
+    active: dev
   application:
     name: properties
   datasource:
@@ -30,3 +33,5 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+#featureX: disabled

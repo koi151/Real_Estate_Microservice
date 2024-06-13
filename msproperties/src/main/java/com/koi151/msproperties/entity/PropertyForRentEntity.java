@@ -12,21 +12,21 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PropertyForRent {
+public class PropertyForRentEntity {
 
     @Id
     private int property_id;
 
     @OneToOne
     @MapsId
-    private Properties properties;
+    private PropertyEntity propertyEntity;
 
     @Column(name = "rental_price", nullable = false)
     @NotNull(message = "Rental price cannot be null")
     @PositiveOrZero(message = "Rental price must be positive or zero")
     private float rentalPrice;
 
-    @Column(name = "payment_scheledule", nullable = false)
+    @Column(name = "payment_schedule", nullable = false)
     @Enumerated(EnumType.STRING)
     @NotNull(message = "Payment schedule cannot be null")
     private PaymentScheduleEnum paymentSchedule;

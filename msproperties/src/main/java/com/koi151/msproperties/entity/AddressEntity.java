@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Address {
+public class AddressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -31,7 +31,7 @@ public class Address {
     @Column(name = "street_address", length = 150)
     private String streetAddress;
 
-    public Address(String city, String district, String ward, String streetAddress) {
+    public AddressEntity(String city, String district, String ward, String streetAddress) {
         this.city = city;
         this.district = district;
         this.ward = ward;

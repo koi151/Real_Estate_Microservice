@@ -13,10 +13,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>mslogin</name>
 	<description>Demo project for Spring Boot</description>
-	<properties>
+	<propertyEntity>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
-	</properties>
+	</propertyEntity>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

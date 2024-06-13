@@ -11,14 +11,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyForSale {
+public class PropertyForSaleEntity {
 
     @Id
     private int propertyId;
 
     @OneToOne
     @MapsId
-    private Properties properties;
+    private PropertyEntity propertyEntity;
 
     @Column(name = "sale_price")
     @NotNull(message = "Price cannot be empty")

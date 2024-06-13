@@ -3,24 +3,29 @@ package com.koi151.msproperties.controller;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.dto.FullPropertyDTO;
 import com.koi151.msproperties.dto.PropertiesHomeDTO;
-import com.koi151.msproperties.entity.Properties;
+import com.koi151.msproperties.entity.PropertyEntity;
+import com.koi151.msproperties.entity.PropertyTypeEnum;
 import com.koi151.msproperties.entity.StatusEnum;
 import com.koi151.msproperties.entity.payload.ResponseData;
 import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
 import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
 import com.koi151.msproperties.service.imp.PropertiesServiceImp;
+import customExceptions.PaymentScheduleNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/v1/properties")
-public class PropertiesController {
+@PropertySource("classpath:application.yml")
+public class PropertyController {
 
     @Autowired
     PropertiesServiceImp propertiesServiceImp;
@@ -29,24 +34,24 @@ public class PropertiesController {
     ObjectMapper objectMapper;
 
     @GetMapping("/home-properties")
-    public ResponseEntity<?> getHomeProperties() {
-        List<PropertiesHomeDTO> properties = propertiesServiceImp.getHomeProperties();
+    public ResponseEntity<?> getHomeProperties(@RequestParam Map<String, Object> params) {
+        List<PropertiesHomeDTO> properties = propertiesServiceImp.getHomeProperties(params);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
         responseData.setDesc(properties.isEmpty()
                 ? "No property found"
-                : "Success");
+                : "Get properties succeed");
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<ResponseData> getPropertyById(@PathVariable(name = "id") Integer id) {
-        Properties properties = propertiesServiceImp.getPropertyById(id);
+        PropertyEntity propertyEntity = propertiesServiceImp.getPropertyById(id);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
+        responseData.setData(propertyEntity);
         responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
@@ -59,7 +64,7 @@ public class PropertiesController {
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
         responseData.setDesc(properties.isEmpty() ?
-                "No properties found with category id: " + categoryId : "Success");
+                "No properties found with id: " + categoryId : "Success");
 
         return ResponseEntity.ok(responseData);
     }
@@ -80,14 +85,18 @@ public class PropertiesController {
 
     @PostMapping("/create")
     public ResponseEntity<ResponseData> createProperty(
-            @RequestPart @Valid PropertyCreateRequest properties,
+            @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
 
     ) {
-        FullPropertyDTO propertiesRes = propertiesServiceImp.createProperty(properties, images);
+
+        if (property.getType() == PropertyTypeEnum.RENT && property.getPaymentSchedule() == null)
+            throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
+
+        FullPropertyDTO propertyRes = propertiesServiceImp.createProperty(property, images);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesRes);
+        responseData.setData(propertyRes);
         responseData.setDesc("Property created successfully");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
@@ -102,6 +111,7 @@ public class PropertiesController {
 
         return ResponseEntity.ok(responseData);
     }
+
 
     @PatchMapping("/{id}")
     public  ResponseEntity<ResponseData> updateProperty(
