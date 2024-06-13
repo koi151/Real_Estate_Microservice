@@ -1,7 +1,6 @@
 package com.example.msaccount.service;
 
 import com.cloudinary.Cloudinary;
-import com.example.msaccount.service.imp.CloudinaryServiceImp;
 import customExceptions.EmptyFileException;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
@@ -14,7 +13,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
-public class CloudinaryService implements CloudinaryServiceImp {
+public class CloudinaryServiceImp implements com.example.msaccount.service.imp.CloudinaryService {
     @Resource
     private Cloudinary cloudinary;
 

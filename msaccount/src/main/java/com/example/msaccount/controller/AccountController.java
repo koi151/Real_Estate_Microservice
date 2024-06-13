@@ -5,7 +5,7 @@ import com.example.msaccount.dto.payload.ResponseData;
 import com.example.msaccount.dto.payload.request.AccountCreateRequest;
 import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
 import com.example.msaccount.entity.AccountStatusEnum;
-import com.example.msaccount.service.imp.AccountServiceImp;
+import com.example.msaccount.service.imp.AccountService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.ResponseEntity;
@@ -20,7 +20,7 @@ import java.util.List;
 public class AccountController {
 
     @Autowired
-    AccountServiceImp accountServiceImp;
+    AccountService accountService;
 
     @PostMapping("/")
     public ResponseEntity<ResponseData> createAccount(
@@ -29,7 +29,7 @@ public class AccountController {
     ) {
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(accountServiceImp.createAccount(account, avatar));
+        responseData.setData(accountService.createAccount(account, avatar));
         responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
@@ -43,7 +43,7 @@ public class AccountController {
     ){
         ResponseData responseData = new ResponseData();
 
-        responseData.setData(accountServiceImp.updateAccount(id, account, avatar));
+        responseData.setData(accountService.updateAccount(id, account, avatar));
         responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
@@ -55,7 +55,7 @@ public class AccountController {
             @RequestParam(defaultValue = "4") Integer pageSize
     ) {
         AccountStatusEnum se = AccountStatusEnum.valueOf(status.toUpperCase());
-        List<AccountDTO> accountsData = accountServiceImp.getAccountsByStatus(se, pageSize);
+        List<AccountDTO> accountsData = accountService.getAccountsByStatus(se, pageSize);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(accountsData);
@@ -66,7 +66,7 @@ public class AccountController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseData> deleteAccount(@PathVariable(name = "id") Integer id) {
-        accountServiceImp.deleteAccount(id);
+        accountService.deleteAccount(id);
 
         ResponseData responseData = new ResponseData();
         responseData.setDesc("Account deleted successful");

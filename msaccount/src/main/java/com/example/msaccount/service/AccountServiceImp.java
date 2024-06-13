@@ -6,7 +6,6 @@ import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.entity.AccountStatusEnum;
 import com.example.msaccount.repository.AccountRepository;
-import com.example.msaccount.service.imp.AccountServiceImp;
 import customExceptions.AccountNotFoundException;
 import customExceptions.CloudinaryUploadFailedException;
 import customExceptions.PhoneAlreadyExistsException;
@@ -25,7 +24,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class AccountService implements AccountServiceImp {
+public class AccountServiceImp implements com.example.msaccount.service.imp.AccountService {
 
     @Autowired
     private PasswordEncoder passwordEncoder;
@@ -34,7 +33,7 @@ public class AccountService implements AccountServiceImp {
     AccountRepository accountRepository;
 
     @Autowired
-    CloudinaryService cloudinaryService;
+    CloudinaryServiceImp cloudinaryServiceImp;
 
     @Override
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar) {
@@ -61,7 +60,7 @@ public class AccountService implements AccountServiceImp {
                 .build();
 
         if (avatar != null && !avatar.isEmpty()) {
-            String avatarUploadedUrl = cloudinaryService.uploadFile(avatar, "real_estate_account");
+            String avatarUploadedUrl = cloudinaryServiceImp.uploadFile(avatar, "real_estate_account");
 
             if (avatarUploadedUrl == null || avatarUploadedUrl.isEmpty())
                 throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary\"");
@@ -110,7 +109,7 @@ public class AccountService implements AccountServiceImp {
 
     private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {
-            String uploadedAvatarUrl = cloudinaryService.uploadFile(avatarFile, "real_estate_account");
+            String uploadedAvatarUrl = cloudinaryServiceImp.uploadFile(avatarFile, "real_estate_account");
             if (uploadedAvatarUrl == null || uploadedAvatarUrl.isEmpty()) {
                 throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
             }
