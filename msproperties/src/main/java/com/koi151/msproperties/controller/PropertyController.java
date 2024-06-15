@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/properties")
+@RequestMapping("/api/v1/property")
 @PropertySource("classpath:application.yml")
 public class PropertyController {
 
@@ -36,7 +36,7 @@ public class PropertyController {
     ObjectMapper objectMapper;
 
     @GetMapping("/property-list")
-    public ResponseEntity<?> propertyList (@ModelAttribute PropertySearchRequest request) {
+    public ResponseEntity<ResponseData> propertyList (@RequestPart @Valid PropertySearchRequest request) {
         List<PropertySearchResponse> properties = propertiesService.findAllProperties(request);
 
         ResponseData responseData = new ResponseData();

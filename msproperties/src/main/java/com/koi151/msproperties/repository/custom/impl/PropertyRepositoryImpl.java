@@ -3,12 +3,11 @@ package com.koi151.msproperties.repository.custom.impl;
 import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
-import com.koi151.msproperties.repository.custom.PropertyRepositoryCustom;
 
+import com.koi151.msproperties.repository.custom.PropertyRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
@@ -16,6 +15,7 @@ import java.lang.reflect.Field;
 import java.util.List;
 
 @Repository
+@Primary // need this to use custom repository instead of Spring Data JPA automatically generate queries based on method names
 public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
     @PersistenceContext
@@ -50,8 +50,8 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     }
 
     public static void applyPriceFilters(PropertySearchRequest request, StringBuilder where) {
-        if (request.getPropertyType() != null) {
-            String priceField = request.getPropertyType() == PropertyTypeEnum.SALE ? "p.sale_price" : "p.rental_price";
+        if (request.getType() != null) {
+            String priceField = request.getType() == PropertyTypeEnum.SALE ? "pfs.sale_price" : "pfr.rental_price";
             if (request.getPriceFrom() != null) {
                 where.append(" AND ").append(priceField).append(" >= ").append(request.getPriceFrom());
             }
@@ -76,7 +76,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
     public static void joinTable(PropertySearchRequest propertySearchRequest, StringBuilder sql) {
         Integer categoryId = propertySearchRequest.getCategoryId();
-        PropertyTypeEnum propertyType = propertySearchRequest.getPropertyType();
+        PropertyTypeEnum propertyType = propertySearchRequest.getType();
 
         if (categoryId != null) {
             sql.append(" INNER JOIN property_category pc ON p.id = pc.property_id ");
@@ -89,27 +89,21 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         }
     }
 
-
-
     @Override
     public List<PropertyEntity> findPropertiesByCriteria(PropertySearchRequest request) {
-        StringBuilder joinClause = new StringBuilder();
-        joinTable(request, joinClause); // Implement your join logic here
+                StringBuilder sql = new StringBuilder(" SELECT p.* FROM property p ");
+                joinTable(request, sql);
+                StringBuilder where = new StringBuilder(" WHERE 1=1 ");
+                queryNormal(request, where);
+                querySpecial(request, where);
+                where.append(" GROUP BY p.id ");
+                sql.append(where);
 
-        StringBuilder whereClause = new StringBuilder(" "); // Remove leading WHERE
-        queryNormal(request, whereClause); // Implement your filtering logic here
-        querySpecial(request, whereClause); // Implement your special logic here
+                System.out.println("sql: " + sql);
 
-        String finalQuery = entityManager.createNativeQuery(
-                        customQuery.toString()
-                                .replace("[JOIN_CLAUSE]", joinClause.toString())
-                                .replace("[WHERE_CLAUSE]", whereClause.toString()), PropertyEntity.class)
-                .toString();
-
-        return entityManager.createNativeQuery(finalQuery, PropertyEntity.class).getResultList();
-    }
-
-
+                Query query = entityManager.createNativeQuery(sql.toString(), PropertyEntity.class);
+                return query.getResultList();
+        }
 }
 
 

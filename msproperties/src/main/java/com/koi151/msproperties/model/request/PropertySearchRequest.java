@@ -7,11 +7,13 @@ import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PropertySearchRequest {
 
     private String title;
@@ -31,14 +33,11 @@ public class PropertySearchRequest {
     @PositiveOrZero(message = "Max area must be positive or zero")
     private Float areaTo;
 
-    @Enumerated(EnumType.STRING)
-    private PropertyTypeEnum propertyType;
-
     @PositiveOrZero(message = "Min price must be positive or zero")
-    private Float priceFrom;
+    private Double priceFrom;
 
     @PositiveOrZero(message = "Max price must be positive or zero")
-    private Float priceTo;
+    private Double priceTo;
 
     private String description;
 
