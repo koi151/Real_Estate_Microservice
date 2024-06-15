@@ -1,4 +1,4 @@
-package com.koi151.msproperties.dto;
+package com.koi151.msproperties.model.dto;
 
 import lombok.*;
 

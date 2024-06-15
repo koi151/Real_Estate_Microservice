@@ -1,14 +1,19 @@
-package com.koi151.msproperties.service;
+package com.koi151.msproperties.service.impl;
 
-import com.koi151.msproperties.dto.FullPropertyDTO;
-import com.koi151.msproperties.dto.PropertiesHomeDTO;
-import com.koi151.msproperties.dto.RoomDTO;
+import com.koi151.msproperties.enums.PropertyTypeEnum;
+import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.model.dto.FullPropertyDTO;
+import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
+import com.koi151.msproperties.model.dto.RoomDTO;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.entity.PropertyEntity;
-import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
-import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
+import com.koi151.msproperties.model.reponse.PropertySearchResponse;
+import com.koi151.msproperties.model.request.PropertyCreateRequest;
+import com.koi151.msproperties.model.request.PropertySearchRequest;
+import com.koi151.msproperties.model.request.PropertyUpdateRequest;
 import com.koi151.msproperties.repository.*;
-import com.koi151.msproperties.service.imp.PropertiesService;
+import com.koi151.msproperties.service.PropertiesService;
+import com.koi151.msproperties.service.converter.PropertyConverter;
 import customExceptions.MaxImagesExceededException;
 import customExceptions.PropertyNotFoundException;
 import lombok.*;
@@ -26,16 +31,19 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PropertyServiceImp implements PropertiesService {
+public class PropertyServiceImpl implements PropertiesService {
 
     @Autowired
     PropertyRepository propertyRepository;
 
     @Autowired
-    CloudinaryServiceImp cloudinaryServiceImp;
+    CloudinaryServiceImpl cloudinaryServiceImpl;
 
     @Autowired
     RoomRepository roomRepository;
+
+    @Autowired
+    PropertyConverter propertyConverter;
 
     @Autowired
     PropertyForSaleRepository propertyForSaleRepository;
@@ -45,6 +53,19 @@ public class PropertyServiceImp implements PropertiesService {
 
     @Autowired
     AddressRepository addressRepository;
+
+    @Override
+    public List<PropertySearchResponse> findAllProperties(PropertySearchRequest request) {
+        List<PropertyEntity> propertyEntities = propertyRepository.findPropertiesByCriteria(request);
+        List<PropertySearchResponse> result = new ArrayList<>();
+
+        for (PropertyEntity item : propertyEntities) {
+            PropertySearchResponse property = propertyConverter.toPropertySearchResponse(item);
+            result.add(property);
+        }
+
+        return result;
+    }
 
     @Override
     public List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params) {
@@ -109,7 +130,7 @@ public class PropertyServiceImp implements PropertiesService {
                 .build();
 
         if (imageFiles != null) {
-            String imageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_properties");
+            String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_properties");
             if (imageUrls == null || imageUrls.isEmpty())
                 throw new RuntimeException("Failed to upload images to Cloudinary");
 
@@ -211,7 +232,7 @@ public class PropertyServiceImp implements PropertiesService {
                 throw new MaxImagesExceededException("Cannot store more than 8 images. You are trying to add " + imageFiles.size() + " images to the existing " + existingImagesUrlSet.size() + " images.");
             }
 
-            String newImageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_categories");
+            String newImageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_categories");
             if (newImageUrls == null || newImageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }
@@ -264,7 +285,7 @@ public class PropertyServiceImp implements PropertiesService {
                         .map(String::trim)
                         .collect(Collectors.toList())
                         : Collections.emptyList())
-                .rooms(savedProperty.getRoomEntitySet().stream()
+                .rooms(savedProperty.getRoomEntities().stream()
                         .map(roomEntity -> new RoomDTO(roomEntity.getRoomId(), savedProperty.getId(), roomEntity.getRoomType(), roomEntity.getQuantity()))
                         .collect(Collectors.toList()))
                 .build();
@@ -281,3 +302,12 @@ public class PropertyServiceImp implements PropertiesService {
                 .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
     }
 }
+
+//Error creating bean with name 'propertyController': Unsatisfied dependency expressed through field 'propertiesService':
+//Error creating bean with name 'propertyServiceImp': Unsatisfied dependency expressed through field 'propertyRepository':
+//Error creating bean with name 'propertyRepository'
+//defined in com.koi151.msproperties.repository.PropertyRepository
+//defined in @EnableJpaRepositories declared on MspropertiesApplication:
+//Could not create query for public abstract java.util.List com.koi151.msproperties.repository.custom.PropertyRepositoryCustom.findPropertiesByCriteria(com.koi151.msproperties.model.request.PropertySearchRequest);
+//Reason: Failed to create query for method public abstract java.util.List com.koi151.msproperties.repository.custom.PropertyRepositoryCustom.findPropertiesByCriteria(com.koi151.msproperties.model.request.PropertySearchRequest);
+//No property 'criteria' found for type 'PropertyEntity'

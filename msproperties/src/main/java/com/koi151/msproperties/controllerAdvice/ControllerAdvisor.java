@@ -1,6 +1,6 @@
 package com.koi151.msproperties.controllerAdvice;
 
-import com.koi151.msproperties.dto.ErrorResponseDTO;
+import com.koi151.msproperties.model.dto.ErrorResponseDTO;
 import customExceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -15,9 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @ControllerAdvice

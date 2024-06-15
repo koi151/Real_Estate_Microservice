@@ -1,9 +1,9 @@
-package com.koi151.msproperties.entity.payload.request;
+package com.koi151.msproperties.model.request;
 
-import com.koi151.msproperties.entity.DirectionEnum;
-import com.koi151.msproperties.entity.PropertyTypeEnum;
-import com.koi151.msproperties.entity.StatusEnum;
-import com.koi151.msproperties.entity.payload.PaymentScheduleEnum;
+import com.koi151.msproperties.enums.DirectionEnum;
+import com.koi151.msproperties.enums.PropertyTypeEnum;
+import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;

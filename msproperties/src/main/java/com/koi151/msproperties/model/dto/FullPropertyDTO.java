@@ -1,7 +1,7 @@
-package com.koi151.msproperties.dto;
+package com.koi151.msproperties.model.dto;
 
-import com.koi151.msproperties.entity.DirectionEnum;
-import com.koi151.msproperties.entity.StatusEnum;
+import com.koi151.msproperties.enums.DirectionEnum;
+import com.koi151.msproperties.enums.StatusEnum;
 import lombok.*;
 import java.util.List;
 

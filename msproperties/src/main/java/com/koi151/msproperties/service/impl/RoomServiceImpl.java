@@ -1,18 +1,18 @@
-package com.koi151.msproperties.service;
+package com.koi151.msproperties.service.impl;
 
-import com.koi151.msproperties.dto.RoomDTO;
+import com.koi151.msproperties.model.dto.RoomDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.entity.RoomEntity;
-import com.koi151.msproperties.entity.payload.request.RoomCreateRequest;
+import com.koi151.msproperties.model.request.RoomCreateRequest;
 import com.koi151.msproperties.repository.PropertyRepository;
 import com.koi151.msproperties.repository.RoomRepository;
-import com.koi151.msproperties.service.imp.RoomService;
+import com.koi151.msproperties.service.RoomService;
 import customExceptions.PropertyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 @Service
-public class RoomServiceImp implements RoomService {
+public class RoomServiceImpl implements RoomService {
 
     @Autowired
     RoomRepository roomRepository;

@@ -13,9 +13,9 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>msorder</name>
 	<description>Demo project for Spring Boot</description>
-	<propertyEntity>
+	<properties>
 		<java.version>17</java.version>
-	</propertyEntity>
+	</properties>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

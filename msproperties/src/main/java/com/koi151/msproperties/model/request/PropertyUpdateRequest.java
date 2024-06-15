@@ -1,13 +1,12 @@
-package com.koi151.msproperties.entity.payload.request;
+package com.koi151.msproperties.model.request;
 
-import com.koi151.msproperties.entity.DirectionEnum;
-import com.koi151.msproperties.entity.StatusEnum;
+import com.koi151.msproperties.enums.DirectionEnum;
+import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.util.Set;
 

@@ -1,6 +1,6 @@
 package com.koi151.msproperties.entity;
 
-import com.koi151.msproperties.entity.payload.PaymentScheduleEnum;
+import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;

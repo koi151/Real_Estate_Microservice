@@ -1,4 +1,4 @@
-package com.koi151.msproperties.entity.payload.request;
+package com.koi151.msproperties.model.request;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;

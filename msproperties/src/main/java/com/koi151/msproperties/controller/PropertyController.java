@@ -1,15 +1,17 @@
 package com.koi151.msproperties.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.koi151.msproperties.dto.FullPropertyDTO;
-import com.koi151.msproperties.dto.PropertiesHomeDTO;
+import com.koi151.msproperties.model.dto.FullPropertyDTO;
+import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
-import com.koi151.msproperties.entity.PropertyTypeEnum;
-import com.koi151.msproperties.entity.StatusEnum;
-import com.koi151.msproperties.entity.payload.ResponseData;
-import com.koi151.msproperties.entity.payload.request.PropertyCreateRequest;
-import com.koi151.msproperties.entity.payload.request.PropertyUpdateRequest;
-import com.koi151.msproperties.service.imp.PropertiesService;
+import com.koi151.msproperties.enums.PropertyTypeEnum;
+import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.model.reponse.PropertySearchResponse;
+import com.koi151.msproperties.model.reponse.ResponseData;
+import com.koi151.msproperties.model.request.PropertyCreateRequest;
+import com.koi151.msproperties.model.request.PropertySearchRequest;
+import com.koi151.msproperties.model.request.PropertyUpdateRequest;
+import com.koi151.msproperties.service.PropertiesService;
 import customExceptions.PaymentScheduleNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,19 @@ public class PropertyController {
 
     @Autowired
     ObjectMapper objectMapper;
+
+    @GetMapping("/property-list")
+    public ResponseEntity<?> propertyList (@ModelAttribute PropertySearchRequest request) {
+        List<PropertySearchResponse> properties = propertiesService.findAllProperties(request);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(properties);
+        responseData.setDesc(properties.isEmpty()
+                ? "No property found"
+                : "Get properties succeed");
+
+        return ResponseEntity.ok(responseData);
+    }
 
     @GetMapping("/home-properties")
     public ResponseEntity<?> getHomeProperties(@RequestParam Map<String, Object> params) {

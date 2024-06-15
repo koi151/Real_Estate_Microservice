@@ -1,5 +1,7 @@
 package com.koi151.msproperties.entity;
 
+import com.koi151.msproperties.enums.DirectionEnum;
+import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -7,7 +9,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.Set;
 
-@Entity(name = "properties")
+@Entity(name = "property")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -31,7 +33,7 @@ public class PropertyEntity {
     private AddressEntity addressEntity;
 
     @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY)
-    private Set<RoomEntity> roomEntitySet;
+    private Set<RoomEntity> roomEntities;
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id cannot be null")
@@ -86,7 +88,6 @@ public class PropertyEntity {
 
     @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedAt;
-
 
     @PrePersist
     protected void onCreate() {

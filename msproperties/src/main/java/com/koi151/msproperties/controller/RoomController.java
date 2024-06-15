@@ -1,9 +1,9 @@
 package com.koi151.msproperties.controller;
 
-import com.koi151.msproperties.dto.RoomDTO;
-import com.koi151.msproperties.entity.payload.ResponseData;
-import com.koi151.msproperties.entity.payload.request.RoomCreateRequest;
-import com.koi151.msproperties.service.imp.RoomService;
+import com.koi151.msproperties.model.dto.RoomDTO;
+import com.koi151.msproperties.model.reponse.ResponseData;
+import com.koi151.msproperties.model.request.RoomCreateRequest;
+import com.koi151.msproperties.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
