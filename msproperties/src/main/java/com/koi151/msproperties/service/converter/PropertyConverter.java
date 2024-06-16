@@ -43,6 +43,7 @@ public class PropertyConverter {
 //        building.setStatus(statusMap.get(item.getStatus()));
 
         building.setStatus(item.getStatus().name());
+        building.setPaymentSchedule(item.getPropertyForRentEntity().getPaymentSchedule());
 
         return building;
     }

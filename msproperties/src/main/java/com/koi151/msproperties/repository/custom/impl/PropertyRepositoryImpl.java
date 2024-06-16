@@ -1,6 +1,7 @@
 package com.koi151.msproperties.repository.custom.impl;
 
 import com.koi151.msproperties.entity.PropertyEntity;
+import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 
@@ -28,12 +29,13 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         for (Field item : fields) {
             try {
                 item.setAccessible(true); // allow access to private fields
-                String fieldName = StringUtil.camelCaseToUnderScore(item.getName());
+                String fieldName = item.getName();
 
-                if (!fieldName.equals("categoryId") && !fieldName.startsWith("area") // skip field that for querySpecial
-                        && !fieldName.startsWith("price") && !fieldName.equals("propertyType")) {
+                if (!fieldName.equals("categoryId") && !fieldName.equals("propertyType") // skip field that for querySpecial
+                        && !fieldName.equals("type") && !fieldName.startsWith("area") && !fieldName.startsWith("price")
+                        && !fieldName.equals("paymentSchedule")) {
+
                     Object value = item.get(propertySearchRequest);
-
                     if (value != null && !value.toString().isEmpty())
                         appendNormalQueryCondition(item, value, where);
                 }
@@ -42,7 +44,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             }
         }
     }
-
 
     private static void appendNormalQueryCondition(Field item, Object value, StringBuilder where) {
         String fieldName = StringUtil.camelCaseToUnderScore(item.getName());
@@ -70,30 +71,31 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     }
 
     public static void querySpecial(PropertySearchRequest request, StringBuilder where) {
-
         Float areaTo = request.getAreaTo();
         Float areaFrom = request.getAreaFrom();
+        PaymentScheduleEnum paymentSchedule= request.getPaymentSchedule();
 
         if (areaFrom != null)
             where.append(" AND p.area >= ").append(areaFrom);
         if (areaTo != null)
             where.append(" AND p.area <= ").append(areaTo);
 
+        if (paymentSchedule != null)
+            where.append(" AND pfr.payment_schedule = '").append(paymentSchedule).append("'");
+
         applyPriceFilters(request, where);
     }
 
-    public static void joinTable(PropertySearchRequest propertySearchRequest, StringBuilder sql) {
-        Integer categoryId = propertySearchRequest.getCategoryId();
-        PropertyTypeEnum propertyType = propertySearchRequest.getType();
+    public static void joinTable(PropertySearchRequest request, StringBuilder sql) {
+        PropertyTypeEnum propertyType = request.getType();
 
-        if (categoryId != null) {
+        if (request.getCategoryId() != null)
             sql.append(" INNER JOIN property_category pc ON p.id = pc.property_id ");
-        }
 
-        if (propertyType == PropertyTypeEnum.SALE) {
-            sql.append(" INNER JOIN property_for_sale pfs ON p.id = pfs.property_entity_id ");
-        } else if (propertyType == PropertyTypeEnum.RENT) {
+        if (propertyType == PropertyTypeEnum.RENT || request.getPaymentSchedule() != null) { // payment schedule filtering only available with property for rent
             sql.append(" INNER JOIN property_for_rent pfr ON p.id = pfr.property_entity_id ");
+        } else if (propertyType == PropertyTypeEnum.SALE) {
+            sql.append(" INNER JOIN property_for_sale pfs ON p.id = pfs.property_entity_id ");
         }
     }
 
