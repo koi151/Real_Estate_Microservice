@@ -53,7 +53,7 @@ public class PropertySearchRequest {
     @Enumerated(EnumType.STRING)
     private StatusEnum status;
 
-    private String availableFrom;
+    private String availableFrom; ////
 
     private String term;
 

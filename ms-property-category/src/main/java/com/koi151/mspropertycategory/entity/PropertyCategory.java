@@ -7,7 +7,7 @@ import lombok.*;
 
 import java.time.LocalDateTime;
 
-@Entity(name="property-category")
+@Entity(name="property_category")
 @Getter
 @Setter
 @NoArgsConstructor

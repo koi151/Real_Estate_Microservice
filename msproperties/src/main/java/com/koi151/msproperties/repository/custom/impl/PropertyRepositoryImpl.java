@@ -31,9 +31,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                 item.setAccessible(true); // allow access to private fields
                 String fieldName = item.getName();
 
-                if (!fieldName.equals("categoryId") && !fieldName.equals("propertyType") // skip field that for querySpecial
-                        && !fieldName.equals("type") && !fieldName.startsWith("area") && !fieldName.startsWith("price")
-                        && !fieldName.equals("paymentSchedule")) {
+                if (!fieldName.equals("propertyType") && !fieldName.equals("type") // skip field that for querySpecial
+                        && !fieldName.startsWith("area") && !fieldName.startsWith("price")
+                        && !fieldName.equals("paymentSchedule") && !fieldName.equals("term")) {
 
                     Object value = item.get(propertySearchRequest);
                     if (value != null && !value.toString().isEmpty())
@@ -74,14 +74,23 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         Float areaTo = request.getAreaTo();
         Float areaFrom = request.getAreaFrom();
         PaymentScheduleEnum paymentSchedule= request.getPaymentSchedule();
+        PropertyTypeEnum type = request.getType();
+        String term = request.getTerm();
 
         if (areaFrom != null)
             where.append(" AND p.area >= ").append(areaFrom);
         if (areaTo != null)
             where.append(" AND p.area <= ").append(areaTo);
 
-        if (paymentSchedule != null)
+        if (paymentSchedule != null) // enum
             where.append(" AND pfr.payment_schedule = '").append(paymentSchedule).append("'");
+
+        if (term != null && !term.isEmpty() && type != null) { // only query term when property type defined
+            where.append(" AND ")
+                    .append(type == PropertyTypeEnum.RENT ? "pfr.rental_term" :
+                            type == PropertyTypeEnum.SALE ? "pfs.sale_term" : null)
+                    .append(" LIKE '%").append(term).append("%'");
+        }
 
         applyPriceFilters(request, where);
     }
@@ -90,7 +99,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         PropertyTypeEnum propertyType = request.getType();
 
         if (request.getCategoryId() != null)
-            sql.append(" INNER JOIN property_category pc ON p.id = pc.property_id ");
+            sql.append(" INNER JOIN property_category pc ON p.id = pc.category_id ");
 
         if (propertyType == PropertyTypeEnum.RENT || request.getPaymentSchedule() != null) { // payment schedule filtering only available with property for rent
             sql.append(" INNER JOIN property_for_rent pfr ON p.id = pfr.property_entity_id ");

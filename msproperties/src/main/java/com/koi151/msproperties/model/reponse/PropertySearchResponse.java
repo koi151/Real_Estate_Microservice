@@ -28,5 +28,6 @@ public class PropertySearchResponse {
     private String status;
     private String availableFrom;
     private String address;
+    private String term;
     private List<RoomDTO> rooms;
 }
