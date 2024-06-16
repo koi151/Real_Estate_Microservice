@@ -62,5 +62,12 @@ public class PropertySearchRequest {
     private String ward;
     private String address;
 
-//room
+    @PositiveOrZero(message = "Number of bedrooms must be positive or zero")
+    private Integer bedrooms;
+
+    @PositiveOrZero(message = "Number of bathrooms must be positive or zero")
+    private Integer bathrooms;
+
+    @PositiveOrZero(message = "Number of kitchens must be positive or zero")
+    private Integer kitchens;
 }

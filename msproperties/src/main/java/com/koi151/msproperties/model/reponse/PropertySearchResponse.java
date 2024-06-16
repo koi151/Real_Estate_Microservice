@@ -4,6 +4,7 @@ import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.model.dto.RoomDTO;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -29,5 +30,5 @@ public class PropertySearchResponse {
     private String availableFrom;
     private String address;
     private String term;
-    private List<RoomDTO> rooms;
+    private List<RoomResponse> rooms;
 }

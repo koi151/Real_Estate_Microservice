@@ -20,6 +20,7 @@ import java.util.Set;
 
 @Repository
 @Primary // need this to use custom repository instead of Spring Data JPA automatically generate queries based on method names
+//@Component("specialCustomImpl")
 public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
     @PersistenceContext
@@ -58,8 +59,8 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     public static void queryNormal(PropertySearchRequest propertySearchRequest, StringBuilder where) {
 
         Set<String> excludedFields = new HashSet<>(Set.of( // using Set for quick lookup
-                "propertyType", "type", "area", "price", "paymentSchedule",
-                "term", "city", "district", "ward", "address"
+                "propertyType", "type", "area", "price", "paymentSchedule", "term",
+                "city", "district", "ward", "address", "kitchens", "bedrooms", "bathrooms"
         ));
 
         Field[] fields = PropertySearchRequest.class.getDeclaredFields();
@@ -101,6 +102,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                     .append(" LIKE '%").append(term).append("%'");
         }
 
+        // address
         if (StringUtil.checkString(request.getCity()))
             where.append(" AND ad.city = '").append(request.getCity()).append("'");
         if (StringUtil.checkString(request.getDistrict()))
@@ -109,6 +111,14 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             where.append(" AND ad.ward = '").append(request.getWard()).append("'");
         if (StringUtil.checkString(request.getAddress()))
             where.append(" AND ad.street_address LIKE '%").append(request.getAddress()).append("%'");
+
+        // rooms
+        if (request.getBedrooms() != null)
+            where.append(" AND r.room_type LIKE '%bedroom%' AND quantity = ").append(request.getBedrooms());
+        if (request.getBathrooms() != null)
+            where.append(" AND r.room_type LIKE '%bathroom%' AND quantity = ").append(request.getBathrooms());
+        if (request.getKitchens() != null)
+            where.append(" AND r.room_type LIKE '%kitchen%' AND quantity = ").append(request.getKitchens());
 
         applyPriceFilters(request, where);
     }
@@ -119,17 +129,23 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         // category
         if (request.getCategoryId() != null)
             sql.append(" INNER JOIN property_category pc ON p.id = pc.category_id ");
+
         // property_for_rent && property_for_sale
         if (propertyType == PropertyTypeEnum.RENT || request.getPaymentSchedule() != null) { // payment schedule filtering only available with property for rent
             sql.append(" INNER JOIN property_for_rent pfr ON p.id = pfr.property_entity_id ");
         } else if (propertyType == PropertyTypeEnum.SALE) {
             sql.append(" INNER JOIN property_for_sale pfs ON p.id = pfs.property_entity_id ");
         }
+
         // address
         if (StringUtil.checkString(request.getCity()) || StringUtil.checkString(request.getDistrict())
                 || StringUtil.checkString(request.getWard()) || StringUtil.checkString(request.getAddress())) {
             sql.append(" INNER JOIN address ad ON p.address_id = ad.id");
         }
+
+        // rooms
+        if (request.getBedrooms() != null || request.getBathrooms() != null || request.getKitchens() != null)
+            sql.append(" INNER JOIN room r ON p.id = r.property_id ");
     }
 
     @Override

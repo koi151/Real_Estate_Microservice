@@ -302,12 +302,3 @@ public class PropertyServiceImpl implements PropertiesService {
                 .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
     }
 }
-
-//Error creating bean with name 'propertyController': Unsatisfied dependency expressed through field 'propertiesService':
-//Error creating bean with name 'propertyServiceImp': Unsatisfied dependency expressed through field 'propertyRepository':
-//Error creating bean with name 'propertyRepository'
-//defined in com.koi151.msproperties.repository.PropertyRepository
-//defined in @EnableJpaRepositories declared on MspropertiesApplication:
-//Could not create query for public abstract java.util.List com.koi151.msproperties.repository.custom.PropertyRepositoryCustom.findPropertiesByCriteria(com.koi151.msproperties.model.request.PropertySearchRequest);
-//Reason: Failed to create query for method public abstract java.util.List com.koi151.msproperties.repository.custom.PropertyRepositoryCustom.findPropertiesByCriteria(com.koi151.msproperties.model.request.PropertySearchRequest);
-//No property 'criteria' found for type 'PropertyEntity'
