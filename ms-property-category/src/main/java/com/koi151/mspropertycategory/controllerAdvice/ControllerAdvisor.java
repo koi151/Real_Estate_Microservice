@@ -1,6 +1,6 @@
 package com.koi151.mspropertycategory.controllerAdvice;
 
-import com.koi151.mspropertycategory.dto.ErrorResponseDTO;
+import com.koi151.mspropertycategory.model.response.ErrorResponse;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.EmptyFileException;
 import customExceptions.FieldRequiredException;
@@ -13,7 +13,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,26 +24,26 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleFieldRequiredException
             (FieldRequiredException ex, WebRequest request) {
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
         List<String> details = new ArrayList<>();
         details.add("Recheck title again, it's return null!");
-        errorResponseDTO.setDetails(details);
+        errorResponse.setDetails(details);
 
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<Object> handleCategoryNotFoundException
             (CategoryNotFoundException ex, WebRequest request) {
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
         List<String> details = new ArrayList<>();
         details.add("Property category not existed or might be deleted");
-        errorResponseDTO.setDetails(details);
+        errorResponse.setDetails(details);
 
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
@@ -55,11 +54,11 @@ public class ControllerAdvisor {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList()); // convert to list
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(errors);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(errors);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
@@ -67,11 +66,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(EmptyFileException.class)
@@ -79,11 +78,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Images file is empty, recheck file value again");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(MaxImagesExceededException.class)
@@ -91,10 +90,10 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Maximum 8 images allow reached, cannot add more images");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 }

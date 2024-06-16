@@ -1,6 +1,6 @@
 package com.koi151.mspropertycategory.validate;
 
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
+import com.koi151.mspropertycategory.model.request.PropertyCategoryCreateRequest;
 import customExceptions.FieldRequiredException;
 
 public class PropertyCategoryValidator {

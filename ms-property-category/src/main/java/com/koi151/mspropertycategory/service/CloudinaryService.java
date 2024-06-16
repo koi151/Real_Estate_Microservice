@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory.service.imp;
+package com.koi151.mspropertycategory.service;
 
 import org.springframework.web.multipart.MultipartFile;
 

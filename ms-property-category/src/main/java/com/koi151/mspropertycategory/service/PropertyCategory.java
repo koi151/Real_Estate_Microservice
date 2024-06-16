@@ -1,12 +1,12 @@
-package com.koi151.mspropertycategory.service.imp;
+package com.koi151.mspropertycategory.service;
 
 import com.koi151.mspropertycategory.dto.PropertyCategoryDetailDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.StatusEnum;
-import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
+import com.koi151.mspropertycategory.model.response.FullCategoryResponse;
+import com.koi151.mspropertycategory.model.request.PropertyCategoryCreateRequest;
+import com.koi151.mspropertycategory.model.request.PropertyCategoryUpdateRequest;
 import customExceptions.CategoryNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 

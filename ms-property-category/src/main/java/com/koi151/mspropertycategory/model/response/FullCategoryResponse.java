@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory.entity.payload;
+package com.koi151.mspropertycategory.model.response;
 
 import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.StatusEnum;

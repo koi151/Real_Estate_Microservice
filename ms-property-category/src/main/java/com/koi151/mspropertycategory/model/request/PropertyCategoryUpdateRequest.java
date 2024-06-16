@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory.entity.payload.request;
+package com.koi151.mspropertycategory.model.request;
 
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import jakarta.persistence.EnumType;

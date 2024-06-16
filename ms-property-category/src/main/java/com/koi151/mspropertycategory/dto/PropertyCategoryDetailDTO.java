@@ -26,11 +26,4 @@ public class PropertyCategoryDetailDTO {
     private StatusEnum status;
 
     private List<String> imageUrls;
-
-    public PropertyCategoryDetailDTO(PropertyCategory propertyCategory) {
-        this.title = propertyCategory.getTitle();
-        this.description = propertyCategory.getDescription();
-        this.imageUrls = List.of(propertyCategory.getImageUrls().split(","));
-        this.status = propertyCategory.getStatus();
-    }
 }

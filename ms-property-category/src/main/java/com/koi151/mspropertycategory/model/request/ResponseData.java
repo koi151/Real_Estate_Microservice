@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory.entity.payload;
+package com.koi151.mspropertycategory.model.request;
 
 import lombok.Getter;
 import lombok.Setter;

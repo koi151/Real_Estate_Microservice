@@ -1,4 +1,4 @@
-package com.koi151.mspropertycategory.service;
+package com.koi151.mspropertycategory.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -8,12 +8,12 @@ import com.koi151.mspropertycategory.dto.PropertyCategoryHomeDTO;
 import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
 import com.koi151.mspropertycategory.entity.Properties;
 import com.koi151.mspropertycategory.entity.StatusEnum;
-import com.koi151.mspropertycategory.entity.payload.FullCategoryResponse;
-import com.koi151.mspropertycategory.entity.payload.ResponseData;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryCreateRequest;
-import com.koi151.mspropertycategory.entity.payload.request.PropertyCategoryUpdateRequest;
+import com.koi151.mspropertycategory.model.response.FullCategoryResponse;
+import com.koi151.mspropertycategory.model.request.ResponseData;
+import com.koi151.mspropertycategory.model.request.PropertyCategoryCreateRequest;
+import com.koi151.mspropertycategory.model.request.PropertyCategoryUpdateRequest;
 import com.koi151.mspropertycategory.repository.PropertyCategoryRepository;
-import com.koi151.mspropertycategory.service.imp.PropertyCategory;
+import com.koi151.mspropertycategory.service.PropertyCategory;
 import customExceptions.CategoryNotFoundException;
 import customExceptions.MaxImagesExceededException;
 import lombok.RequiredArgsConstructor;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-public class PropertyCategoryServiceImp implements PropertyCategory {
+public class PropertyCategoryServiceImpl implements PropertyCategory {
 
     @Autowired
     PropertyCategoryRepository propertyCategoryRepository;
@@ -41,7 +41,7 @@ public class PropertyCategoryServiceImp implements PropertyCategory {
     PropertiesClient propertiesClient;
 
     @Autowired
-    CloudinaryServiceImp cloudinaryServiceImp;
+    CloudinaryServiceImpl cloudinaryServiceImpl;
 
     @Autowired
     ObjectMapper objectMapper;
@@ -122,7 +122,7 @@ public class PropertyCategoryServiceImp implements PropertyCategory {
                 .build();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
-            String imageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_categories");
+            String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_categories");
             if (imageUrls == null || imageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }
@@ -167,7 +167,7 @@ public class PropertyCategoryServiceImp implements PropertyCategory {
                 throw new MaxImagesExceededException("Cannot store more than 8 images. You are trying to add " + imageFiles.size() + " images to the existing " + existingImagesUrlSet.size() + " images.");
             }
 
-            String newImageUrls = cloudinaryServiceImp.uploadFiles(imageFiles, "real_estate_categories");
+            String newImageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_categories");
             if (newImageUrls == null || newImageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }
