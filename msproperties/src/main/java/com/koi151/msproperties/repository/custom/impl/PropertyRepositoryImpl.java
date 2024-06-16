@@ -5,6 +5,7 @@ import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 
 import com.koi151.msproperties.repository.custom.PropertyRepositoryCustom;
+import com.koi151.msproperties.utils.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
@@ -21,31 +22,38 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     @PersistenceContext
     private EntityManager entityManager;
 
-    private PropertyRepositoryCustom customQuery; // Store the interface reference
-
     public static void queryNormal(PropertySearchRequest propertySearchRequest, StringBuilder where) {
-        try {
-            Field[] fields = PropertySearchRequest.class.getDeclaredFields();
-            for (Field item : fields) {
-                item.setAccessible(true); // allow access to private fields
-                String fieldName = item.getName();
-                if (!fieldName.equals("categoryId")
-                        && !fieldName.startsWith("area") && !fieldName.startsWith("price") && !fieldName.equals("propertyType")) {
-                    Object value = item.get(propertySearchRequest);
-                    if (value != null && !value.toString().isEmpty()) {
-                        if (item.getType().getName().equals("java.lang.Long")
-                                || item.getType().getName().equals("java.lang.Integer")
-                                || item.getType().getName().equals("java.lang.Float")) {
-                            where.append(" AND p." + fieldName + " = " + value);
-                        } else if (item.getType().getName().equals("java.lang.String")) {
-                            where.append(" AND p." + fieldName + " LIKE '%" + value + "%' ");
-                        }
-                    }
-                }
-            }
+        Field[] fields = PropertySearchRequest.class.getDeclaredFields();
 
-        } catch (Exception ex) {
-            System.out.println("Error occurred in normal query function " + ex.getMessage());
+        for (Field item : fields) {
+            try {
+                item.setAccessible(true); // allow access to private fields
+                String fieldName = StringUtil.camelCaseToUnderScore(item.getName());
+
+                if (!fieldName.equals("categoryId") && !fieldName.startsWith("area") // skip field that for querySpecial
+                        && !fieldName.startsWith("price") && !fieldName.equals("propertyType")) {
+                    Object value = item.get(propertySearchRequest);
+
+                    if (value != null && !value.toString().isEmpty())
+                        appendNormalQueryCondition(item, value, where);
+                }
+            } catch (IllegalAccessException ex) {
+                System.err.println("Error accessing field value: " + ex.getMessage());
+            }
+        }
+    }
+
+
+    private static void appendNormalQueryCondition(Field item, Object value, StringBuilder where) {
+        String fieldName = StringUtil.camelCaseToUnderScore(item.getName());
+        String dataTypeName = item.getType().getName();
+
+        if (dataTypeName.equals("java.lang.Long") || dataTypeName.equals("java.lang.Integer") || dataTypeName.equals("java.lang.Float")) {
+            where.append(" AND p.").append(fieldName).append(" = ").append(value);
+        } else if (dataTypeName.equals("java.lang.String")) {
+            where.append(" AND p.").append(fieldName).append(" LIKE '%").append(value).append("%'");
+        } else if (value.getClass().isEnum()) {
+            where.append(" AND p.").append(fieldName).append(" = '").append(((Enum<?>) value).name()).append("'");
         }
     }
 

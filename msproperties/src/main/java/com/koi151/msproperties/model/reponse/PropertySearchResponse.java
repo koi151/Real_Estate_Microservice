@@ -20,7 +20,6 @@ public class PropertySearchResponse {
     private PaymentScheduleEnum paymentSchedule;
     private Integer categoryId;
     private Float area;
-    private PropertyTypeEnum propertyType;
     private Float price;
     private String description;
     private Integer totalFloor;
