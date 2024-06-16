@@ -52,32 +52,6 @@ public class PropertyConverter {
         building.setStatus(item.getStatus().name());
         return building;
     }
-
-//    public PropertySearchResponse toPropertySearchResponse(PropertyEntity item) {
-//        PropertySearchResponse building = modelMapper.map(item, PropertySearchResponse.class);
-//
-//        String addressBuilder = item.getAddressEntity().getStreetAddress() +
-//                ", " + item.getAddressEntity().getWard() +
-//                ", " + item.getAddressEntity().getDistrict() +
-//                ", " + item.getAddressEntity().getCity();
-//        building.setAddress(addressBuilder);
-//
-//
-//        if (item.getPropertyForRentEntity() != null) {
-//            building.setPrice(item.getPropertyForRentEntity().getRentalPrice());
-//            building.setPaymentSchedule(item.getPropertyForRentEntity().getPaymentSchedule());
-//            building.setType(PropertyTypeEnum.RENT);
-//            building.setTerm(item.getPropertyForRentEntity().getRentTerm());
-//        } else if (item.getPropertyForSaleEntity() != null) {
-//            building.setPrice(item.getPropertyForSaleEntity().getSalePrice());
-//            building.setType(PropertyTypeEnum.SALE);
-//            building.setTerm(item.getPropertyForSaleEntity().getSaleTerm());
-//        }
-//
-//        building.setStatus(item.getStatus().name());
-//        return building;
-//    }
-
 }
 
 

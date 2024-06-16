@@ -62,9 +62,5 @@ public class PropertySearchRequest {
     private String ward;
     private String address;
 
-//    @Valid
-//    private List<RoomCreateRequest> rooms;
-//
-//    @Valid
-//    private AddressRequest address;
+//room
 }
