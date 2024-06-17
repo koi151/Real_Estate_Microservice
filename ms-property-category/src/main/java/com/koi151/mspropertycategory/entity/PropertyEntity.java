@@ -7,7 +7,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Properties {
+public class PropertyEntity {
     // used to get data from Properties application -> No validation needed
 
     private String title;

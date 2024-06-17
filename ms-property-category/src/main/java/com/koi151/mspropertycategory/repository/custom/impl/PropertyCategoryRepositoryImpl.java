@@ -1,15 +1,22 @@
 package com.koi151.mspropertycategory.repository.custom.impl;
 
 
-import com.koi151.mspropertycategory.entity.PropertyCategory;
+import com.koi151.mspropertycategory.entity.PropertyCategoryEntity;
 import com.koi151.mspropertycategory.model.request.PropertyCategorySearchRequest;
 import com.koi151.mspropertycategory.repository.custom.PropertyCategoryRepositoryCustom;
+import com.koi151.mspropertycategory.utils.QueryConditionContextPropertyCategory;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
+import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
+import jakarta.persistence.criteria.*;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -18,64 +25,67 @@ import java.util.Set;
 public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositoryCustom {
 
     @PersistenceContext // used to inject an EntityManager into a class
-    EntityManager entityManager;
+    private EntityManager entityManager;
 
-    public void joinTable(PropertyCategorySearchRequest request, StringBuilder sql) {
-    }
-
-    public static boolean isExcludedField(String fieldName, Set<String> excludedFields) {
+    private static boolean isExcludedField(String fieldName, Set<String> excludedFields) {
         return excludedFields.contains(fieldName) ||
                 excludedFields.stream().anyMatch(fieldName::startsWith);
     }
 
-    public void appendNormalQueryCondition(Field item, Object value, StringBuilder where) {
-        String fieldName = item.getName();
-        String dataTypeName = item.getType().getName();
-
-        if (dataTypeName.equals("java.lang.Integer") || dataTypeName.equals("java.lang.Long") || dataTypeName.equals("java.lang.Float")) {
-            where.append(" AND pc.").append(fieldName).append(" = ").append(value);
-        } else if (dataTypeName.equals("java.lang.String")) {
-            where.append(" AND pc.").append(fieldName).append(" LIKE '%").append(value).append("%' ");
-        } else if (value.getClass().isEnum()) {
-            where.append(" AND pc.").append(fieldName).append(" = '").append(((Enum<?>) value).name()).append("' ");
-        }
-    }
-
-    public void queryNormal(PropertyCategorySearchRequest request, StringBuilder where) {
-        Set<String> excludedFields = Set.of(""); // add when needed
+    private static void appendNormalQueryCondition (PropertyCategorySearchRequest request, QueryConditionContextPropertyCategory context) {
+        Set<String> excludedFields = new HashSet<>();
 
         Field[] fields = PropertyCategorySearchRequest.class.getDeclaredFields();
-        for (Field item : fields) {
+
+        for (Field field : fields) {
             try {
-                item.setAccessible(true); // allow access to private fields
-                if (!isExcludedField(item.getName(), excludedFields)) {
-                    Object value = item.get(request);
-                    if (value != null && !value.toString().isEmpty())
-                        appendNormalQueryCondition(item, value, where);
+                field.setAccessible(true); // allow access to private fields
+                String fieldName = field.getName();
+                Object value = field.get(request); // If this Field object is enforcing Java language access control, and the underlying field is inaccessible, the method throws an IllegalAccessException.
+
+                if (!isExcludedField(fieldName, excludedFields) && value != null && !value.toString().isEmpty()) {
+                    Path<?> path = context.root().get(fieldName);
+                    if (value instanceof String) {
+                        context.predicates().add(context.criteriaBuilder().like(path.as(String.class), "%" + value + "%")); // the "like" method require String casting
+                    } else if (value instanceof Integer || value instanceof Float || value instanceof Long) {
+                        context.predicates().add(context.criteriaBuilder().equal(path, value));
+                    } else if (value.getClass().isEnum()) {
+                        context.predicates().add(context.criteriaBuilder().equal(path, ((Enum<?>) value).name()));
+                    }
                 }
 
             } catch (IllegalAccessException ex) {
-                System.err.println("Error accessing field value " + ex.getMessage());
+                System.err.println("Error accessing field value: " + ex.getMessage());
             }
         }
     }
 
-//    public static void querySpecial(PropertyCategorySearchRequest request, StringBuilder where) {
+//    private static void appendSpecialQueryConditions(PropertyCategorySearchRequest request, QueryConditionContextPropertyCategory context) {
+//        Root<PropertyCategoryEntity> root = context.root();
+//        List<Predicate> predicates = context.predicates();
+//        CriteriaBuilder cb = context.criteriaBuilder();
 //    }
 
     @Override
-    public List<PropertyCategory> getPropertyCategoryByCriterias(PropertyCategorySearchRequest request) {
-        StringBuilder sql = new StringBuilder(" SELECT pc.* from property_category pc ");
-        joinTable(request, sql);
-        StringBuilder where = new StringBuilder(" WHERE 1=1 ");
-        queryNormal(request, where);
-//        querySpecial(request where);
-        where.append(" GROUP BY p.id ");
-        sql.append(where);
+    public List<PropertyCategoryEntity> getPropertyCategoryByCriterias(PropertyCategorySearchRequest request) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<PropertyCategoryEntity> cq = cb.createQuery(PropertyCategoryEntity.class);
+        Root<PropertyCategoryEntity> root = cq.from(PropertyCategoryEntity.class);
+        List<Predicate> predicates = new ArrayList<>();
 
-        System.out.println("sql: " + sql);
+        if (request != null) {
+            QueryConditionContextPropertyCategory context = new QueryConditionContextPropertyCategory(cb, cq, root, predicates);
+            appendNormalQueryCondition(request, context);
+            // appendSpecialQueryConditions(request, context);
+        }
 
+        // Apply predicates if there are any, otherwise no filter (select all)
+        if (!predicates.isEmpty()) {
+            cq.where(predicates.toArray(new Predicate[0]));
+        }
 
-        return null;
+        TypedQuery<PropertyCategoryEntity> typedQuery = entityManager.createQuery(cq);
+        return typedQuery.getResultList();
     }
+
 }

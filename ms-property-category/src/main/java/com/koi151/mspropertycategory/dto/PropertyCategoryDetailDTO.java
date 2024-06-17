@@ -1,13 +1,11 @@
 package com.koi151.mspropertycategory.dto;
 
-import com.koi151.mspropertycategory.entity.PropertyCategory;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.*;
 
-import java.util.Collections;
 import java.util.List;
 
 @Getter

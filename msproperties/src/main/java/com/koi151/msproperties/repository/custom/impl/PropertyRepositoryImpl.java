@@ -108,7 +108,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         }
     }
 
-    private static void applySpecialFilters(PropertySearchRequest request, QueryConditionContextProperty context) {
+    private static void applySpecialQueryConditions(PropertySearchRequest request, QueryConditionContextProperty context) {
         List<Predicate> predicates = context.getPredicates();
         CriteriaBuilder cb = context.getCriteriaBuilder();
         Root<PropertyEntity> root = context.getRoot();
@@ -117,7 +117,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             predicates.add(cb.greaterThanOrEqualTo(root.get("area"), request.getAreaFrom()));
         if (request.getAreaTo() != null)
             predicates.add(cb.lessThanOrEqualTo(root.get("area"), request.getAreaFrom()));
-
 
         if (request.getPaymentSchedule() != null)
             predicates.add(cb.equal(root.get("propertyForRentEntity").get("paymentSchedule"), request.getPaymentSchedule()));
@@ -143,7 +142,8 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             predicates.add(cb.like(root.get("addressEntity").get("streetAddress"), "%" + request.getAddress() + "%"));
         }
 
-         addRoomConditions(request, context);
+        addRoomConditions(request, context);
+        applyPriceFilters(request, context);
     }
 
     @Override
@@ -157,8 +157,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         QueryConditionContextProperty context = new QueryConditionContextProperty(cb, cq, root, predicates);
 
         appendNormalQueryConditions(request, context);
-        applyPriceFilters(request, context);
-        applySpecialFilters(request, context);
+        applySpecialQueryConditions(request, context);
 
         cq.where(predicates.toArray(new Predicate[0]));
 

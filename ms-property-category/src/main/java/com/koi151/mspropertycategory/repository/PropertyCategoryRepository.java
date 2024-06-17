@@ -1,8 +1,8 @@
 package com.koi151.mspropertycategory.repository;
 
-import com.koi151.mspropertycategory.dto.PropertyCategoryTitleDTO;
-import com.koi151.mspropertycategory.entity.PropertyCategory;
+import com.koi151.mspropertycategory.entity.PropertyCategoryEntity;
 import com.koi151.mspropertycategory.entity.StatusEnum;
+import com.koi151.mspropertycategory.repository.custom.PropertyCategoryRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -12,8 +12,8 @@ import java.util.List;
 import java.util.Optional;
 
 @Repository
-public interface PropertyCategoryRepository extends JpaRepository<PropertyCategory, Integer> {
-    List<PropertyCategory> findByTitleContainingIgnoreCase(String title);
-    Optional<PropertyCategory> findByCategoryIdAndDeleted(Integer id, boolean deleted);
-    Page<PropertyCategory> findByStatus(StatusEnum statusEnum, PageRequest pageRequest);
+public interface PropertyCategoryRepository extends JpaRepository<PropertyCategoryEntity, Integer>, PropertyCategoryRepositoryCustom {
+    List<PropertyCategoryEntity> findByTitleContainingIgnoreCase(String title);
+    Optional<PropertyCategoryEntity> findByCategoryIdAndDeleted(Integer id, boolean deleted);
+    Page<PropertyCategoryEntity> findByStatus(StatusEnum statusEnum, PageRequest pageRequest);
 }
