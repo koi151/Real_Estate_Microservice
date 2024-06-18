@@ -33,7 +33,7 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
     }
 
     private static void appendNormalQueryCondition (PropertyCategorySearchRequest request, QueryConditionContextPropertyCategory context) {
-        Set<String> excludedFields = new HashSet<>();
+        Set<String> excludedFields = new HashSet<>(Set.of("sample"));
 
         Field[] fields = PropertyCategorySearchRequest.class.getDeclaredFields();
 
@@ -67,7 +67,7 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
 //    }
 
     @Override
-    public List<PropertyCategoryEntity> getPropertyCategoryByCriterias(PropertyCategorySearchRequest request) {
+    public List<PropertyCategoryEntity> getPropertyCategoryByCriteria(PropertyCategorySearchRequest request) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<PropertyCategoryEntity> cq = cb.createQuery(PropertyCategoryEntity.class);
         Root<PropertyCategoryEntity> root = cq.from(PropertyCategoryEntity.class);

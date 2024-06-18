@@ -10,6 +10,7 @@ import java.util.List;
 
 public record QueryConditionContextPropertyCategory( // record is immutable, replace lombok annotation - available since Java 14
         CriteriaBuilder criteriaBuilder,
-        CriteriaQuery<PropertyCategoryEntity> criteriaQuery,
-        Root<PropertyCategoryEntity> root, List<Predicate> predicates) {
-}
+        CriteriaQuery<?> criteriaQuery,
+        Root<PropertyCategoryEntity> root,
+        List<Predicate> predicates
+) {}

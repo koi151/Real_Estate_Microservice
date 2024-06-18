@@ -36,7 +36,7 @@ public class PropertyController {
     ObjectMapper objectMapper;
 
     @GetMapping("/property-list")
-    public ResponseEntity<ResponseData> propertyList (@RequestPart @Valid PropertySearchRequest request) {
+    public ResponseEntity<ResponseData> propertyList (@RequestBody @Valid PropertySearchRequest request) {
         List<PropertySearchResponse> properties = propertiesService.findAllProperties(request);
 
         ResponseData responseData = new ResponseData();

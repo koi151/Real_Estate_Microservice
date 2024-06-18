@@ -3,11 +3,13 @@ package com.koi151.mspropertycategory.model.request;
 import com.koi151.mspropertycategory.entity.StatusEnum;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Size;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
 public class PropertyCategorySearchRequest {
 
     private int categoryId;

@@ -121,7 +121,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategory {
 
     @Override
     public List<PropertyCategorySearchResponse> findAllPropertyCategories(PropertyCategorySearchRequest request) {
-        List<PropertyCategoryEntity> propertyCategories = propertyCategoryRepository.getPropertyCategoryByCriterias(request);
+        List<PropertyCategoryEntity> propertyCategories = propertyCategoryRepository.getPropertyCategoryByCriteria(request);
         List<PropertyCategorySearchResponse> result = new ArrayList<>();
 
         for (PropertyCategoryEntity item : propertyCategories) {

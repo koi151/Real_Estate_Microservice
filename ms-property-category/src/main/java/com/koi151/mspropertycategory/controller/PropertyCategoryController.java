@@ -37,7 +37,7 @@ public class PropertyCategoryController {
 
         ResponseData responseData = new ResponseData();
         responseData.setData(result);
-        responseData.setDesc(result.isEmpty() ? "No property category found" : "Success");
+        responseData.setDesc(result.isEmpty() ? "No property category found" : "Get properties succeed");
 
         return ResponseEntity.ok(responseData);
     }

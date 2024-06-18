@@ -10,6 +10,7 @@ import com.koi151.msproperties.utils.StringUtil;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.Query;
+import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
@@ -48,13 +49,13 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                 Object value = field.get(request);
 
                 if (!isExcludedField(fieldName, excludedFields) && value != null && !value.toString().isEmpty()) {
-                    Path<?> path = context.getRoot().get(fieldName); // represent for one specific attribute of entity
+                    Path<?> path = context.root().get(fieldName); // represent for one specific attribute of entity
                     if (value instanceof Integer || value instanceof  Float || value instanceof Long) {
-                        context.getPredicates().add(context.getCriteriaBuilder().equal(path, value));
+                        context.predicates().add(context.criteriaBuilder().equal(path, value));
                     } else if (value instanceof String) {
-                        context.getPredicates().add(context.getCriteriaBuilder().like(path.as(String.class), "%" + value + "%"));
+                        context.predicates().add(context.criteriaBuilder().like(path.as(String.class), "%" + value + "%"));
                     } else if (value.getClass().isEnum()) {
-                        context.getPredicates().add(context.getCriteriaBuilder().equal(path, ((Enum<?>) value).name()));
+                        context.predicates().add(context.criteriaBuilder().equal(path, ((Enum<?>) value).name()));
                     }
                 }
 
@@ -65,9 +66,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     }
 
     private static void applyPriceFilters(PropertySearchRequest request, QueryConditionContextProperty context) {
-        List<Predicate> predicates = context.getPredicates();
-        Root<PropertyEntity> root = context.getRoot();
-        CriteriaBuilder cb = context.getCriteriaBuilder();
+        List<Predicate> predicates = context.predicates();
+        Root<PropertyEntity> root = context.root();
+        CriteriaBuilder cb = context.criteriaBuilder();
 
         if (request.getType() != null) {
             if (request.getType() == PropertyTypeEnum.SALE) {
@@ -96,9 +97,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
     private static void addRoomCondition(String roomType, Integer quantity, QueryConditionContextProperty context) {
         if (quantity != null) {
-            CriteriaBuilder cb = context.getCriteriaBuilder();
-            Root<PropertyEntity> root = context.getRoot();
-            List<Predicate> predicates = context.getPredicates();
+            CriteriaBuilder cb = context.criteriaBuilder();
+            Root<PropertyEntity> root = context.root();
+            List<Predicate> predicates = context.predicates();
 
             Join<PropertyEntity, RoomEntity> roomJoin = root.join("roomEntities", JoinType.INNER);
             predicates.add(cb.and(
@@ -109,9 +110,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     }
 
     private static void applySpecialQueryConditions(PropertySearchRequest request, QueryConditionContextProperty context) {
-        List<Predicate> predicates = context.getPredicates();
-        CriteriaBuilder cb = context.getCriteriaBuilder();
-        Root<PropertyEntity> root = context.getRoot();
+        List<Predicate> predicates = context.predicates();
+        CriteriaBuilder cb = context.criteriaBuilder();
+        Root<PropertyEntity> root = context.root();
 
         if (request.getAreaFrom() != null)
             predicates.add(cb.greaterThanOrEqualTo(root.get("area"), request.getAreaFrom()));
@@ -156,14 +157,17 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
         QueryConditionContextProperty context = new QueryConditionContextProperty(cb, cq, root, predicates);
 
-        appendNormalQueryConditions(request, context);
-        applySpecialQueryConditions(request, context);
+        if (request != null) {
+            appendNormalQueryConditions(request, context);
+            applySpecialQueryConditions(request, context);
+        }
 
-        cq.where(predicates.toArray(new Predicate[0]));
+        if (!predicates.isEmpty()) {
+            cq.where(predicates.toArray(new Predicate[0]));
+        }
 
-        Query query = entityManager.createQuery(cq);
-
-        return query.getResultList();
+        TypedQuery<PropertyEntity> typedQuery = entityManager.createQuery(cq);
+        return typedQuery.getResultList();
     }
 }
 

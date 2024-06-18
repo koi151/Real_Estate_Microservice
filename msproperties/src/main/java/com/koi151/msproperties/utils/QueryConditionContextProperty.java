@@ -11,13 +11,16 @@ import lombok.Setter;
 
 import java.util.List;
 
-@Getter
-@Setter
-@AllArgsConstructor
-public class QueryConditionContextProperty {
-    // final prevent changing reference
-    private final CriteriaBuilder criteriaBuilder; // used to build predicates and other parts of queries
-    private final CriteriaQuery<?> criteriaQuery;
-    private final Root<PropertyEntity> root; // provide access to entity method, relationship,..
-    private final List<Predicate> predicates; // condition in Criteria query
-}
+/**
+ * @param criteriaBuilder final prevent changing reference used to build predicates and other parts of queries
+ * @param root            provide access to entity method, relationship,..
+ * @param predicates      condition in Criteria query
+ */
+
+public record QueryConditionContextProperty(
+        CriteriaBuilder criteriaBuilder,
+        CriteriaQuery<?> criteriaQuery,
+
+        Root<PropertyEntity> root,
+        List<Predicate> predicates
+) {}
