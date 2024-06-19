@@ -60,7 +60,7 @@ public class PropertySearchRequest {
     private String city;
     private String district;
     private String ward;
-    private String address;
+    private String street;
 
     @PositiveOrZero(message = "Number of bedrooms must be positive or zero")
     private Integer bedrooms;
