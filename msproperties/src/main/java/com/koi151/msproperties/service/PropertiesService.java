@@ -4,7 +4,7 @@ import com.koi151.msproperties.model.dto.FullPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.reponse.PropertySearchResponse;
+import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
@@ -16,7 +16,7 @@ import java.util.Map;
 
 public interface PropertiesService {
 
-    List<PropertySearchResponse> findAllProperties(PropertySearchRequest request);
+    List<PropertySearchDTO> findAllProperties(PropertySearchRequest request);
     List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
     PropertyEntity getPropertyById(Integer id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);

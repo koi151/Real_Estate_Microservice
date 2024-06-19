@@ -6,7 +6,7 @@ import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.reponse.PropertySearchResponse;
+import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.reponse.ResponseData;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
@@ -37,7 +37,7 @@ public class PropertyController {
 
     @GetMapping("/property-list")
     public ResponseEntity<ResponseData> propertyList (@RequestBody @Valid PropertySearchRequest request) {
-        List<PropertySearchResponse> properties = propertiesService.findAllProperties(request);
+        List<PropertySearchDTO> properties = propertiesService.findAllProperties(request);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);

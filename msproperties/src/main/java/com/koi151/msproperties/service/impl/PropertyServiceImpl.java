@@ -7,7 +7,7 @@ import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.RoomDTO;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.entity.PropertyEntity;
-import com.koi151.msproperties.model.reponse.PropertySearchResponse;
+import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
@@ -55,12 +55,12 @@ public class PropertyServiceImpl implements PropertiesService {
     AddressRepository addressRepository;
 
     @Override
-    public List<PropertySearchResponse> findAllProperties(PropertySearchRequest request) {
+    public List<PropertySearchDTO> findAllProperties(PropertySearchRequest request) {
         List<PropertyEntity> propertyEntities = propertyRepository.findPropertiesByCriteria(request);
-        List<PropertySearchResponse> result = new ArrayList<>();
+        List<PropertySearchDTO> result = new ArrayList<>();
 
         for (PropertyEntity item : propertyEntities) {
-            PropertySearchResponse property = propertyConverter.toPropertySearchResponse(item);
+            PropertySearchDTO property = propertyConverter.toPropertySearchResponse(item);
             result.add(property);
         }
 
