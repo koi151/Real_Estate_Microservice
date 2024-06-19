@@ -1,26 +1,19 @@
 package com.koi151.msproperties.utils;
 
 import com.koi151.msproperties.entity.PropertyEntity;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Predicate;
-import jakarta.persistence.criteria.Root;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.persistence.criteria.*;
 
 import java.util.List;
-
-/**
- * @param criteriaBuilder final prevent changing reference used to build predicates and other parts of queries
- * @param root            provide access to entity method, relationship,..
- * @param predicates      condition in Criteria query
- */
+import java.util.Map;
 
 public record QueryConditionContextProperty(
         CriteriaBuilder criteriaBuilder,
-        CriteriaQuery<?> criteriaQuery,
-
+        CriteriaQuery<PropertyEntity> criteriaQuery,
         Root<PropertyEntity> root,
-        List<Predicate> predicates
-) {}
+        List<Predicate> predicates,
+        Map<String, Join<PropertyEntity, ?>> joins
+) {
+    public void addJoin(String name, Join<PropertyEntity, ?> join) {
+        joins.put(name, join);
+    }
+}

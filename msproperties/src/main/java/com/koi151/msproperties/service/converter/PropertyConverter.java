@@ -66,14 +66,6 @@ public class PropertyConverter {
                         .collect(Collectors.toList()))
                 .orElse(null));
 
-        building.setCategoryId(item.getCategoryId());
-        building.setArea(item.getArea());
-        building.setDescription(item.getDescription());
-        building.setTotalFloor(item.getTotalFloor());
-        building.setHouseDirection(item.getHouseDirection());
-        building.setBalconyDirection(item.getBalconyDirection());
-        building.setAvailableFrom(item.getAvailableFrom());
-
         building.setStatus(item.getStatus().name());
         return building;
     }
