@@ -60,7 +60,7 @@ public class PropertyServiceImpl implements PropertiesService {
         List<PropertySearchDTO> result = new ArrayList<>();
 
         for (PropertyEntity item : propertyEntities) {
-            PropertySearchDTO property = propertyConverter.toPropertySearchResponse(item);
+            PropertySearchDTO property = propertyConverter.toPropertySearchDTO(item);
             result.add(property);
         }
 
@@ -105,99 +105,112 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Override
     public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
-        AddressEntity addressEntity = new AddressEntity(
-                request.getAddress().getCity(),
-                request.getAddress().getDistrict(),
-                request.getAddress().getWard(),
-                request.getAddress().getStreetAddress()
-        );
-
-        // Saved address first since its dependent ------------------------------------------------------------
+        AddressEntity addressEntity = propertyConverter.toAddressEntity(request.getAddress());
         addressRepository.save(addressEntity);
 
-        PropertyEntity propertyEntity = PropertyEntity.builder()
-                .title(request.getTitle())
-                .categoryId(request.getCategoryId())
-                .addressEntity(addressEntity)
-                .area(request.getArea())
-                .description(request.getDescription())
-                .totalFloor(request.getTotalFloor())
-                .houseDirection(request.getHouseDirection())
-                .balconyDirection(request.getBalconyDirection())
-                .status(request.getStatus())
-                .availableFrom(request.getAvailableFrom())
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
-                .build();
+        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles);
+        propertyEntity.setAddressEntity(addressEntity);
 
-        if (imageFiles != null) {
-            String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_properties");
-            if (imageUrls == null || imageUrls.isEmpty())
-                throw new RuntimeException("Failed to upload images to Cloudinary");
-
-            propertyEntity.setImageUrls(imageUrls);
-        }
-
-
-        // Save the properties entity second to ensure it is persistent --------------------------------
         propertyRepository.save(propertyEntity);
-
-        List<RoomEntity> roomEntities = request.getRooms().stream()
-                .map(roomCreateRequest -> {
-                    RoomEntity roomEntity = new RoomEntity();
-                    roomEntity.setPropertyEntity(propertyEntity);
-                    roomEntity.setRoomType(roomCreateRequest.getRoomType());
-                    roomEntity.setQuantity(roomCreateRequest.getQuantity());
-                    return roomEntity;
-                })
-                .toList();
-
-        // Save multiple room at once --------------------------------------------------
-        roomRepository.saveAll(roomEntities);
-
-        // Save PropertyForRent or PropertyForSale base on type, validated
-        if(request.getType() == PropertyTypeEnum.RENT) {
-            PropertyForRentEntity propertyForRentEntity = PropertyForRentEntity.builder()
-                    .property_id(propertyEntity.getId())
-                    .propertyEntity(propertyEntity)
-                    .rentalPrice(request.getPrice())
-                    .paymentSchedule(request.getPaymentSchedule())
-                    .rentTerm(request.getTerm())
-                    .build();
-
-            propertyForRentRepository.save(propertyForRentEntity);
-
-        } else {
-            PropertyForSaleEntity propertyForSaleEntity = PropertyForSaleEntity.builder()
-                    .propertyId(propertyEntity.getId())
-                    .salePrice(request.getPrice())
-                    .propertyEntity(propertyEntity)
-                    .saleTerm(request.getTerm())
-                    .build();
-
-            propertyForSaleRepository.save(propertyForSaleEntity);
-        }
-
-        return FullPropertyDTO.builder()
-                .title(propertyEntity.getTitle())
-                .categoryId(propertyEntity.getCategoryId())
-                .price(request.getPrice())
-                .area(propertyEntity.getArea())
-                .description(propertyEntity.getDescription())
-                .totalFloor(propertyEntity.getTotalFloor())
-                .houseDirection(propertyEntity.getHouseDirection())
-                .balconyDirection(propertyEntity.getBalconyDirection())
-                .status(propertyEntity.getStatus())
-                .availableFrom(propertyEntity.getAvailableFrom())
-                .imageUrls(propertyEntity.getImageUrls() != null && !propertyEntity.getImageUrls().isEmpty()
-                        ? Arrays.stream(propertyEntity.getImageUrls().split(","))
-                            .map(String::trim)
-                            .collect(Collectors.toList())
-                        : Collections.emptyList())
-                .rooms(roomEntities.stream()
-                        .map(roomEntity -> new RoomDTO(roomEntity.getRoomId(), propertyEntity.getId(), roomEntity.getRoomType(), roomEntity.getQuantity()))
-                        .collect(Collectors.toList()))
-                .build();
+        addressRepository.save(propertyEntity.getAddressEntity());
+        roomRepository.saveAll(propertyEntity.getRoomEntities());
+        return null;
     }
+
+//    @Override
+//    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+//        AddressEntity addressEntity = new AddressEntity(
+//                request.getAddress().getCity(),
+//                request.getAddress().getDistrict(),
+//                request.getAddress().getWard(),
+//                request.getAddress().getStreetAddress()
+//        );
+//
+//        // Saved address first since its dependent ------------------------------------------------------------
+//        addressRepository.save(addressEntity);
+//
+//        PropertyEntity propertyEntity = PropertyEntity.builder()
+//                .title(request.getTitle())
+//                .categoryId(request.getCategoryId())
+//                .addressEntity(addressEntity)
+//                .area(request.getArea())
+//                .description(request.getDescription())
+//                .totalFloor(request.getTotalFloor())
+//                .houseDirection(request.getHouseDirection())
+//                .balconyDirection(request.getBalconyDirection())
+//                .status(request.getStatus())
+//                .availableFrom(request.getAvailableFrom())
+//                .build();
+//
+//        if (imageFiles != null) {
+//            String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_properties");
+//            if (imageUrls == null || imageUrls.isEmpty())
+//                throw new RuntimeException("Failed to upload images to Cloudinary");
+//
+//            propertyEntity.setImageUrls(imageUrls);
+//        }
+//
+//
+//        // Save the properties entity second to ensure it is persistent --------------------------------
+//        propertyRepository.save(propertyEntity);
+//
+//        List<RoomEntity> roomEntities = request.getRooms().stream()
+//                .map(roomCreateRequest -> {
+//                    RoomEntity roomEntity = new RoomEntity();
+//                    roomEntity.setPropertyEntity(propertyEntity);
+//                    roomEntity.setRoomType(roomCreateRequest.getRoomType());
+//                    roomEntity.setQuantity(roomCreateRequest.getQuantity());
+//                    return roomEntity;
+//                })
+//                .toList();
+//
+//        // Save multiple room at once --------------------------------------------------
+//        roomRepository.saveAll(roomEntities);
+//
+//        // Save PropertyForRent or PropertyForSale base on type, validated
+//        if(request.getType() == PropertyTypeEnum.RENT) {
+//            PropertyForRentEntity propertyForRentEntity = PropertyForRentEntity.builder()
+//                    .property_id(propertyEntity.getId())
+//                    .propertyEntity(propertyEntity)
+//                    .rentalPrice(request.getPrice())
+//                    .paymentSchedule(request.getPaymentSchedule())
+//                    .rentTerm(request.getTerm())
+//                    .build();
+//
+//            propertyForRentRepository.save(propertyForRentEntity);
+//
+//        } else {
+//            PropertyForSaleEntity propertyForSaleEntity = PropertyForSaleEntity.builder()
+//                    .propertyId(propertyEntity.getId())
+//                    .salePrice(request.getPrice())
+//                    .propertyEntity(propertyEntity)
+//                    .saleTerm(request.getTerm())
+//                    .build();
+//
+//            propertyForSaleRepository.save(propertyForSaleEntity);
+//        }
+//
+//        return FullPropertyDTO.builder()
+//                .title(propertyEntity.getTitle())
+//                .categoryId(propertyEntity.getCategoryId())
+//                .price(request.getPrice())
+//                .area(propertyEntity.getArea())
+//                .description(propertyEntity.getDescription())
+//                .totalFloor(propertyEntity.getTotalFloor())
+//                .houseDirection(propertyEntity.getHouseDirection())
+//                .balconyDirection(propertyEntity.getBalconyDirection())
+//                .status(propertyEntity.getStatus())
+//                .availableFrom(propertyEntity.getAvailableFrom())
+//                .imageUrls(propertyEntity.getImageUrls() != null && !propertyEntity.getImageUrls().isEmpty()
+//                        ? Arrays.stream(propertyEntity.getImageUrls().split(","))
+//                            .map(String::trim)
+//                            .collect(Collectors.toList())
+//                        : Collections.emptyList())
+//                .rooms(roomEntities.stream()
+//                        .map(roomEntity -> new RoomDTO(roomEntity.getRoomId(), propertyEntity.getId(), roomEntity.getRoomType(), roomEntity.getQuantity()))
+//                        .collect(Collectors.toList()))
+//                .build();
+//    }
 
     @Override
     public FullPropertyDTO updateProperty(Integer id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
@@ -258,7 +271,7 @@ public class PropertyServiceImpl implements PropertiesService {
             Optional.ofNullable(request.getAvailableFrom()).ifPresent(existingProperty::setAvailableFrom);
             Optional.ofNullable(request.getStatus()).ifPresent(existingProperty::setStatus);
 
-            existingProperty.setUpdatedAt(LocalDateTime.now());
+//            existingProperty.setUpdatedAt(LocalDateTime.now());
         }
     }
 

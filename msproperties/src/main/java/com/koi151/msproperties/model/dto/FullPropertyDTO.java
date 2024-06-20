@@ -22,5 +22,6 @@ public class FullPropertyDTO {
     private StatusEnum status;
     private String availableFrom;
     private List<String> imageUrls;
-    List<RoomDTO> rooms;
+    private List<RoomDTO> rooms;
+    private AddressDTO address;
 }
