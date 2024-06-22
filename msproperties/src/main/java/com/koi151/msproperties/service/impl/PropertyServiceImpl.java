@@ -2,12 +2,9 @@ package com.koi151.msproperties.service.impl;
 
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.dto.FullPropertyDTO;
-import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
-import com.koi151.msproperties.model.dto.RoomDTO;
+import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.entity.PropertyEntity;
-import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
@@ -16,6 +13,7 @@ import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.service.converter.PropertyConverter;
 import customExceptions.MaxImagesExceededException;
 import customExceptions.PropertyNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -104,17 +102,15 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
-    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images) {
         AddressEntity addressEntity = propertyConverter.toAddressEntity(request.getAddress());
         addressRepository.save(addressEntity);
 
-        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles);
+        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, images);
         propertyEntity.setAddressEntity(addressEntity);
 
         propertyRepository.save(propertyEntity);
-        addressRepository.save(propertyEntity.getAddressEntity());
-        roomRepository.saveAll(propertyEntity.getRoomEntities());
-        return null;
+        return propertyConverter.toFullPropertyDTO(propertyEntity);
     }
 
 //    @Override
@@ -214,15 +210,17 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Override
     public FullPropertyDTO updateProperty(Integer id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
-        return propertyRepository.findByIdAndDeleted(id, false)
-                .map(existingProperty -> {
-                    updatePropertyDetails(existingProperty, request);
-                    updateImages(existingProperty, request, imageFiles);
+//        return propertyRepository.findByIdAndDeleted(id, false)
+//                .map(existingProperty -> {
+//                    updatePropertyDetails(existingProperty, request);
+//                    updateImages(existingProperty, request, imageFiles);
+//
+//                    return propertyRepository.save(existingProperty);
+//                })
+//                .map(savedProperty -> convertToPropertyDTO(savedProperty, request))
+//                .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
 
-                    return propertyRepository.save(existingProperty);
-                })
-                .map(savedProperty -> convertToPropertyDTO(savedProperty, request))
-                .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
+        return null;
     }
 
     private void updateImages(PropertyEntity existingProperty, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
@@ -275,34 +273,34 @@ public class PropertyServiceImpl implements PropertiesService {
         }
     }
 
-    private FullPropertyDTO convertToPropertyDTO(PropertyEntity savedProperty, PropertyUpdateRequest request) {
-
-        // check if new price update request exists, otherwise get the current price
-        Float price = (request != null && request.getPrice() != null) ? request.getPrice() :
-                (savedProperty.getPropertyForRentEntity() != null ? savedProperty.getPropertyForRentEntity().getRentalPrice() :
-                        savedProperty.getPropertyForSaleEntity() != null ? savedProperty.getPropertyForSaleEntity().getSalePrice() : null);
-
-        return FullPropertyDTO.builder()
-                .title(savedProperty.getTitle())
-                .categoryId(savedProperty.getCategoryId())
-                .price(price)
-                .area(savedProperty.getArea())
-                .description(savedProperty.getDescription())
-                .totalFloor(savedProperty.getTotalFloor())
-                .houseDirection(savedProperty.getHouseDirection())
-                .balconyDirection(savedProperty.getBalconyDirection())
-                .status(savedProperty.getStatus())
-                .availableFrom(savedProperty.getAvailableFrom())
-                .imageUrls(savedProperty.getImageUrls() != null && !savedProperty.getImageUrls().isEmpty()
-                        ? Arrays.stream(savedProperty.getImageUrls().split(","))
-                        .map(String::trim)
-                        .collect(Collectors.toList())
-                        : Collections.emptyList())
-                .rooms(savedProperty.getRoomEntities().stream()
-                        .map(roomEntity -> new RoomDTO(roomEntity.getRoomId(), savedProperty.getId(), roomEntity.getRoomType(), roomEntity.getQuantity()))
-                        .collect(Collectors.toList()))
-                .build();
-    }
+//    private FullPropertyDTO convertToPropertyDTO(PropertyEntity savedProperty, PropertyUpdateRequest request) {
+//
+//        // check if new price update request exists, otherwise get the current price
+//        Float price = (request != null && request.getPrice() != null) ? request.getPrice() :
+//                (savedProperty.getPropertyForRentEntity() != null ? savedProperty.getPropertyForRentEntity().getRentalPrice() :
+//                        savedProperty.getPropertyForSaleEntity() != null ? savedProperty.getPropertyForSaleEntity().getSalePrice() : null);
+//
+//        return FullPropertyDTO.builder()
+//                .title(savedProperty.getTitle())
+//                .categoryId(savedProperty.getCategoryId())
+//                .price(price)
+//                .area(savedProperty.getArea())
+//                .description(savedProperty.getDescription())
+//                .totalFloor(savedProperty.getTotalFloor())
+//                .houseDirection(savedProperty.getHouseDirection().getDirectionName())
+//                .balconyDirection(savedProperty.getBalconyDirection().getDirectionName())
+//                .status(savedProperty.getStatus().getStatusName())
+//                .availableFrom(savedProperty.getAvailableFrom())
+//                .imageUrls(savedProperty.getImageUrls() != null && !savedProperty.getImageUrls().isEmpty()
+//                        ? Arrays.stream(savedProperty.getImageUrls().split(","))
+//                        .map(String::trim)
+//                        .collect(Collectors.toList())
+//                        : Collections.emptyList())
+//                .rooms(savedProperty.getRoomEntities().stream()
+//                        .map(roomEntity -> new RoomNameQuantityDTO(roomEntity.getRoomType(), roomEntity.getQuantity()))
+//                        .collect(Collectors.toList()))
+//                .build();
+//    }
 
 
     @Override

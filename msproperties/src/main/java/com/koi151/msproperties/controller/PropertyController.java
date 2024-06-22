@@ -98,11 +98,10 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
-    @PostMapping("/create")
+    @PostMapping("/")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
-
     ) {
 
         if (property.getType() == PropertyTypeEnum.RENT && property.getPaymentSchedule() == null)

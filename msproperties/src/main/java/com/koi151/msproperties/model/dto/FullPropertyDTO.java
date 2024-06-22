@@ -17,11 +17,14 @@ public class FullPropertyDTO {
     private Float price;
     private String description;
     private Integer totalFloor;
-    private DirectionEnum houseDirection;
-    private DirectionEnum balconyDirection;
-    private StatusEnum status;
+    private String houseDirection;
+    private String balconyDirection;
+    private String status;
     private String availableFrom;
     private List<String> imageUrls;
-    private List<RoomDTO> rooms;
-    private AddressDTO address;
+    private List<RoomNameQuantityDTO> rooms;
+    private String address;
+    private String paymentSchedule;
+    private String term;
+    private String type;
 }

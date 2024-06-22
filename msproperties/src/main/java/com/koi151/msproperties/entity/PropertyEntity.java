@@ -23,10 +23,10 @@ public class PropertyEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
 
-    @OneToOne(mappedBy = "propertyEntity", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForSaleEntity propertyForSaleEntity;
 
-    @OneToOne(mappedBy = "propertyEntity", cascade = CascadeType.ALL)
+    @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForRentEntity propertyForRentEntity;
 
     @OneToOne
@@ -34,7 +34,8 @@ public class PropertyEntity {
     @NotNull(message = "Address id cannot be null")
     private AddressEntity addressEntity;
 
-    @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY)
+    @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}
+                                                                                            , orphanRemoval = true)
     private Set<RoomEntity> roomEntities;
 
     @Column(name = "category_id", nullable = false)

@@ -27,40 +27,43 @@ public class PropertyConverter {
     @Autowired
     private CloudinaryServiceImpl cloudinaryServiceImpl;
 
-    public PropertySearchDTO toPropertySearchDTO(PropertyEntity item) {
-        PropertySearchDTO property = modelMapper.map(item, PropertySearchDTO.class);
+    public String getAddressString(AddressEntity item) {
+        return String.join(", ",
+                item.getStreetAddress(),
+                item.getWard(),
+                item.getDistrict(),
+                item.getCity());
+    }
 
-        String address = String.join(", ",
-                item.getAddressEntity().getStreetAddress(),
-                item.getAddressEntity().getWard(),
-                item.getAddressEntity().getDistrict(),
-                item.getAddressEntity().getCity());
-        property.setAddress(address);
+    public PropertySearchDTO toPropertySearchDTO(PropertyEntity item) {
+        PropertySearchDTO propertyDTO = modelMapper.map(item, PropertySearchDTO.class);
+
+        propertyDTO.setAddress(getAddressString(item.getAddressEntity()));
 
         if (item.getBalconyDirection() != null) {
-            property.setBalconyDirection(item.getBalconyDirection().getDirectionName());
+            propertyDTO.setBalconyDirection(item.getBalconyDirection().getDirectionName());
         }
 
         if (item.getHouseDirection() != null) {
-            property.setHouseDirection(item.getHouseDirection().getDirectionName());
+            propertyDTO.setHouseDirection(item.getHouseDirection().getDirectionName());
         }
 
         PropertyForRentEntity rentEntity = item.getPropertyForRentEntity();
         PropertyForSaleEntity saleEntity = item.getPropertyForSaleEntity();
 
         if (rentEntity != null) {
-            property.setPrice(rentEntity.getRentalPrice());
-            property.setPaymentSchedule(rentEntity.getPaymentSchedule().getScheduleName());
-            property.setTerm(rentEntity.getRentTerm());
-            property.setType(PropertyTypeEnum.RENT.getPropertyType());
+            propertyDTO.setPrice(rentEntity.getRentalPrice());
+            propertyDTO.setPaymentSchedule(rentEntity.getPaymentSchedule().getScheduleName());
+            propertyDTO.setTerm(rentEntity.getRentTerm());
+            propertyDTO.setType(PropertyTypeEnum.RENT.getPropertyType());
         } else if (saleEntity != null) {
-            property.setPrice(saleEntity.getSalePrice());
-            property.setTerm(saleEntity.getSaleTerm());
-            property.setType(PropertyTypeEnum.SALE.getPropertyType());
+            propertyDTO.setPrice(saleEntity.getSalePrice());
+            propertyDTO.setTerm(saleEntity.getSaleTerm());
+            propertyDTO.setType(PropertyTypeEnum.SALE.getPropertyType());
         }
 
         if (item.getRoomEntities() != null) {
-            property.setRooms(item.getRoomEntities().stream()
+            propertyDTO.setRooms(item.getRoomEntities().stream()
                     .map(room -> RoomNameQuantityDTO.builder()
                             .roomType(room.getRoomType())
                             .quantity(room.getQuantity())
@@ -68,20 +71,47 @@ public class PropertyConverter {
                     .collect(Collectors.toList()));
         }
 
-        property.setStatus(item.getStatus().getStatusName());
-        return property;
+        propertyDTO.setStatus(item.getStatus().getStatusName());
+        return propertyDTO;
     }
 
     public FullPropertyDTO toFullPropertyDTO (PropertyEntity item) {
-        FullPropertyDTO property = modelMapper.map(item, FullPropertyDTO.class);
+        FullPropertyDTO propertyDTO = modelMapper.map(item, FullPropertyDTO.class);
 
-        return property;
+        propertyDTO.setAddress(getAddressString(item.getAddressEntity()));
+
+        PropertyForRentEntity rentEntity = item.getPropertyForRentEntity();
+        PropertyForSaleEntity saleEntity = item.getPropertyForSaleEntity();
+
+        if (rentEntity != null) {
+            propertyDTO.setPrice(rentEntity.getRentalPrice());
+            propertyDTO.setPaymentSchedule(rentEntity.getPaymentSchedule().getScheduleName());
+            propertyDTO.setTerm(rentEntity.getRentTerm());
+            propertyDTO.setType(PropertyTypeEnum.RENT.getPropertyType());
+        } else if (saleEntity != null) {
+            propertyDTO.setPrice(saleEntity.getSalePrice());
+            propertyDTO.setTerm(saleEntity.getSaleTerm());
+            propertyDTO.setType(PropertyTypeEnum.SALE.getPropertyType());
+        }
+
+        if (item.getRoomEntities() != null) {
+            propertyDTO.setRooms(item.getRoomEntities().stream()
+                    .map(room -> RoomNameQuantityDTO.builder()
+                            .roomType(room.getRoomType())
+                            .quantity(room.getQuantity())
+                            .build())
+                    .collect(Collectors.toList()));
+        }
+
+        propertyDTO.setStatus(item.getStatus().getStatusName());
+
+        return propertyDTO;
     }
 
     public PropertyEntity toPropertyEntity (PropertyCreateRequest request, List<MultipartFile> imageFiles) {
         PropertyEntity propertyEntity =  modelMapper.map(request, PropertyEntity.class);
 
-        if (imageFiles != null) {
+        if (imageFiles != null && !imageFiles.isEmpty()) {
             String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_properties");
             if (imageUrls == null || imageUrls.isEmpty())
                 throw new RuntimeException("Failed to upload images to Cloudinary");

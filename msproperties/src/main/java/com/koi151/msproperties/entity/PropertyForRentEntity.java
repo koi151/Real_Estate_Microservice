@@ -15,6 +15,7 @@ import lombok.*;
 public class PropertyForRentEntity {
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int property_id;
 
     @OneToOne
