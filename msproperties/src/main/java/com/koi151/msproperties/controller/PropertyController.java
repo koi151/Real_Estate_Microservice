@@ -62,7 +62,7 @@ public class PropertyController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<ResponseData> getPropertyById(@PathVariable(name = "id") Integer id) {
+    public ResponseEntity<ResponseData> getPropertyById(@PathVariable(name = "id") Long id) {
         PropertyEntity propertyEntity = propertiesService.getPropertyById(id);
 
         ResponseData responseData = new ResponseData();
@@ -117,7 +117,7 @@ public class PropertyController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseData> deleteProperty (@PathVariable(name = "id") Integer id) {
+    public ResponseEntity<ResponseData> deleteProperty (@PathVariable(name = "id") Long id) {
         ResponseData responseData = new ResponseData();
 
         propertiesService.deleteProperty(id);
@@ -129,7 +129,7 @@ public class PropertyController {
 
     @PatchMapping("/{id}")
     public  ResponseEntity<ResponseData> updateProperty(
-            @PathVariable(name = "id") Integer id,
+            @PathVariable(name = "id") Long id,
             @RequestPart(required = false) @Valid PropertyUpdateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
     ){

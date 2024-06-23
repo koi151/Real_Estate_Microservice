@@ -15,11 +15,11 @@ import lombok.*;
 public class PropertyForRentEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int property_id;
+    private Long propertyId;
 
     @OneToOne
     @MapsId
+    @JoinColumn(name = "property_id")
     private PropertyEntity propertyEntity;
 
     @Column(name = "rental_price", nullable = false)

@@ -18,10 +18,10 @@ public interface PropertiesService {
 
     List<PropertySearchDTO> findAllProperties(PropertySearchRequest request);
     List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
-    PropertyEntity getPropertyById(Integer id);
+    PropertyEntity getPropertyById(Long id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
     List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
     FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
-    FullPropertyDTO updateProperty(Integer id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
-    void deleteProperty(Integer id) throws PropertyNotFoundException;
+    FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
+    void deleteProperty(Long id) throws PropertyNotFoundException;
 }

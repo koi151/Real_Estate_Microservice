@@ -14,11 +14,11 @@ import lombok.*;
 public class PropertyForSaleEntity {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int propertyId;
+    private Long property_id;
 
     @OneToOne
     @MapsId
+    @JoinColumn(name = "property_id")
     private PropertyEntity propertyEntity;
 
     @Column(name = "sale_price")
