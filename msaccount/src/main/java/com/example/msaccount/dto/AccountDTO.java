@@ -1,6 +1,6 @@
 package com.example.msaccount.dto;
 
-import com.example.msaccount.entity.AccountStatusEnum;
+import com.example.msaccount.enums.AccountStatusEnum;
 import lombok.*;
 
 @Builder
@@ -10,7 +10,7 @@ import lombok.*;
 @NoArgsConstructor
 public class AccountDTO {
 
-    private int accountId;
+    private Long accountId;
     private String userName;
     private String phone;
     private AccountStatusEnum accountStatus;

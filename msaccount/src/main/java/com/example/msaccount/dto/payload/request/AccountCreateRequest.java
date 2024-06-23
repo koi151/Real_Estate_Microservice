@@ -1,11 +1,9 @@
 package com.example.msaccount.dto.payload.request;
 
-import com.example.msaccount.entity.AccountStatusEnum;
+import com.example.msaccount.enums.AccountStatusEnum;
+import com.example.msaccount.utils.StringUtil;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Pattern;
-import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -19,7 +17,10 @@ public class AccountCreateRequest {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int accountId;
+    private Long accountId;
+
+    @NotNull(message = "Role id cannot be null")
+    private Long roleId;
 
     @NotNull(message = "User name cannot be null")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
@@ -29,7 +30,6 @@ public class AccountCreateRequest {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Account status cannot be null")
     private AccountStatusEnum status;
 
     @Size(min = 1, max = 30, message = "First name length must be between {min} and {max} characters")
@@ -46,7 +46,21 @@ public class AccountCreateRequest {
             message = "Password must include at least one uppercase letter and one special character")
     private String password;
 
+    @NotNull(message = "Please retype password")
+    private String retypePassword;
+
     @Email(message = "Invalid email")
     @NotNull(message = "Email cannot be null")
     private String email;
+
+    @Column(name = "facebook_account_id")
+    private int facebookAccountId;
+
+    @Column(name = "google_account_id")
+    private int googleAccountId;
+
+    @AssertTrue(message = "Password retype does not match")
+    private boolean isPasswordMatch(String password) {
+        return StringUtil.checkString(password) && password.equals(retypePassword);
+    }
 }

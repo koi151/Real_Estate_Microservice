@@ -1,38 +1,55 @@
-package com.example.msaccount.controller;
+package com.example.msaccount.controller.admin;
 
 import com.example.msaccount.dto.AccountDTO;
 import com.example.msaccount.dto.payload.ResponseData;
 import com.example.msaccount.dto.payload.request.AccountCreateRequest;
 import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
-import com.example.msaccount.entity.AccountStatusEnum;
-import com.example.msaccount.service.imp.AccountService;
+import com.example.msaccount.enums.AccountStatusEnum;
+import com.example.msaccount.service.admin.AccountService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 @RestController
-@PropertySource("classpath:application.yml")
-@RequestMapping("/api/v1/account")
-public class AccountController {
+@RequestMapping(path = "api/v1/admin/account")
+public class AdminAccountController {
 
     @Autowired
     AccountService accountService;
 
     @PostMapping("/")
-    public ResponseEntity<ResponseData> createAccount(
-            @RequestPart AccountCreateRequest account,
-            @RequestPart(required = false) MultipartFile avatar
+    public ResponseEntity<?> createAccount(
+            @RequestPart @Valid AccountCreateRequest account, // recheck
+            @RequestPart(required = false) MultipartFile avatar,
+            BindingResult result
     ) {
-        ResponseData responseData = new ResponseData();
+        try {
+            if (result.hasErrors()) {
+                List<String> errorMessages = result.getFieldErrors()
+                        .stream()
+                        .map(FieldError::getDefaultMessage)
+                        .toList();
+                return ResponseEntity.badRequest().body(errorMessages);
+            }
 
-        responseData.setData(accountService.createAccount(account, avatar));
-        responseData.setDesc("Success");
+            AccountDTO accountCreated = accountService.createAccount(account, avatar);
 
-        return ResponseEntity.ok(responseData);
+            ResponseData responseData = new ResponseData();
+            responseData.setData(accountCreated);
+            responseData.setDesc("Success");
+
+            return ResponseEntity.ok(responseData);
+
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
     }
 
     @PatchMapping("/{id}")

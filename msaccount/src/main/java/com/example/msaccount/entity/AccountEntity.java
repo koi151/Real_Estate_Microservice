@@ -1,5 +1,7 @@
 package com.example.msaccount.entity;
 
+import com.example.msaccount.entity.admin.AdminAccountEntity;
+import com.example.msaccount.enums.AccountStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -12,22 +14,22 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Account {
+public class AccountEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int accountId;
+    private Long accountId;
 
-    @OneToOne(mappedBy = "account", cascade = CascadeType.ALL)
-    private AdminAccount adminAccount;
+    @OneToOne(mappedBy = "accountEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private AdminAccountEntity adminAccountEntity;
 
     @Column(name = "user_name", length = 50, nullable = false, unique = true)
-    @NotNull(message = "User name cannot be null")
+    @NotBlank(message = "User name cannot be blank")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
     private String userName;
 
     @Column(name = "phone", length = 20, nullable = false, unique = true)
-    @NotNull(message = "Phone number cannot be null")
+    @NotBlank(message = "Phone number cannot be blank")
     private String phone;
 
     @Column(name = "status", length = 20, nullable = false)
@@ -58,6 +60,12 @@ public class Account {
 
     @Column(name = "avatar_url")
     private String avatarUrl;
+
+    @Column(name = "facebook_account_id")
+    private int facebookAccountId;
+
+    @Column(name = "google_account_id")
+    private int googleAccountId;
 
     @Column(name = "deleted", length = 20, nullable = false)
     private boolean deleted = false;

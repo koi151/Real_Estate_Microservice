@@ -13,10 +13,10 @@
 	<version>0.0.1-SNAPSHOT</version>
 	<name>discovery</name>
 	<description>Demo project for Spring Boot</description>
-	<properties>
+	<property>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
-	</properties>
+	</property>
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>

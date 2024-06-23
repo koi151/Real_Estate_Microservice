@@ -1,4 +1,4 @@
-package com.example.msaccount.service.imp;
+package com.example.msaccount.service.admin;
 
 import org.springframework.web.multipart.MultipartFile;
 
