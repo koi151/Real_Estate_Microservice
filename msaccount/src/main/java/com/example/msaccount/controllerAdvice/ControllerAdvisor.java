@@ -2,7 +2,6 @@ package com.example.msaccount.controllerAdvice;
 
 import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.dto.ErrorResponseDTO;
-import customExceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
@@ -133,5 +132,17 @@ public class ControllerAdvisor {
         errorResponseDTO.setDetails(details);
 
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UnauthorizedActionException.class)
+    public ResponseEntity<Object> handleUnauthorizedActionException(UnauthorizedActionException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Current account do not have permission to create new account.");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return new ResponseEntity<>(errorResponseDTO, HttpStatus.FORBIDDEN);
     }
 }

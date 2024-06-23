@@ -2,12 +2,14 @@ package com.example.msaccount.entity.admin;
 
 import com.example.msaccount.entity.AccountEntity;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.*;
 
 @Entity(name = "admin_account")
 @Getter
 @Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class AdminAccountEntity {
 
     @Id
@@ -19,7 +21,7 @@ public class AdminAccountEntity {
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private RoleEntity role;
+    private AdminRoleEntity role;
 }
 
 

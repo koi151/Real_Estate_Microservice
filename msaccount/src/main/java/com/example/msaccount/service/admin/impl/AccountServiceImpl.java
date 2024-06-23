@@ -5,11 +5,14 @@ import com.example.msaccount.dto.AccountDTO;
 import com.example.msaccount.dto.payload.request.AccountCreateRequest;
 import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
 import com.example.msaccount.entity.AccountEntity;
-import com.example.msaccount.entity.admin.RoleEntity;
+import com.example.msaccount.entity.admin.AdminAccountEntity;
+import com.example.msaccount.entity.admin.AdminRoleEntity;
 import com.example.msaccount.enums.AccountStatusEnum;
+import com.example.msaccount.enums.AccountTypeEnum;
 import com.example.msaccount.repository.admin.AccountRepository;
 import com.example.msaccount.repository.admin.RoleRepository;
 import com.example.msaccount.service.admin.AccountService;
+import com.example.msaccount.utils.StringUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -18,7 +21,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -47,43 +49,58 @@ public class AccountServiceImpl implements AccountService {
         if(accountRepository.existsByUserName(request.getUserName()))
             throw new UserNameAlreadyExistsException("User name already exists");
 
-        RoleEntity role = roleRepository.findById(request.getRoleId())
-                .orElseThrow(() -> new RoleNotFoundException("Role not found with id:" + request.getRoleId()));
+        AccountEntity accountEntity;
 
-        // develop: in case of user who don't have permission to create account
+        if (request.getAccountType() == AccountTypeEnum.ADMIN) {
+            AdminRoleEntity role = roleRepository.findById(request.getAdminRoleId())
+                    .orElseThrow(() -> new RoleNotFoundException("Role not found with id:" + request.getAdminRoleId()));
+
+            String hashedPassword = passwordEncoder.encode(request.getPassword()); // length = 60
+
+            AdminAccountEntity adminAccountEntity = AdminAccountEntity.builder()
+                    .role(role)
+                    .build();
+
+            accountEntity = AccountEntity.builder() // DTO -> entity
+                    .phone(request.getPhone())
+                    .firstName(request.getFirstName())
+                    .lastName(request.getLastName())
+                    .password(hashedPassword)
+                    .email(request.getEmail())
+                    .adminAccountEntity(adminAccountEntity)
+                    .userName(request.getUserName())
+                    .build();
+        } else {
+//            String hashedPassword = passwordEncoder.encode(request.getPassword()); // length = 60
 
 
 
+        }
+
+        accountRepository.save(accountEntity);
 
 
-        // length = 60
-        String hashedPassword = passwordEncoder.encode(request.getPassword());
+        // develop: in case of current account do not have permission to create account
 
-        AccountEntity accountEntity = AccountEntity.builder()
-                .userName(request.getUserName())
-                .email(request.getEmail())
-                .firstName(request.getFirstName())
-                .lastName(request.getLastName())
-                .phone(request.getPhone())
-                .accountStatus(request.getStatus())
-                .password(hashedPassword)
-                .createdAt(LocalDateTime.now())
-                .updatedAt(LocalDateTime.now())
-                .build();
 
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUploadedUrl = cloudinaryServiceImpl.uploadFile(avatar, "real_estate_account");
 
-            if (avatarUploadedUrl == null || avatarUploadedUrl.isEmpty())
-                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary\"");
+            if (!StringUtil.checkString(avatarUploadedUrl))
+                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
 
-            accountEntity.setAvatarUrl(avatarUploadedUrl);
+            newAccount.setAvatarUrl(avatarUploadedUrl);
         }
 
-        AccountEntity savedAccountEntity = accountRepository.save(accountEntity);
+        accountRepository.save(newAccount);
 
-        return new AccountDTO(savedAccountEntity.getAccountId(), savedAccountEntity.getUserName(), savedAccountEntity.getPhone(), savedAccountEntity.getAccountStatus(),
-                              savedAccountEntity.getFirstName(), savedAccountEntity.getLastName(), savedAccountEntity.getEmail(), savedAccountEntity.getAvatarUrl());
+
+//        AccountEntity savedAccountEntity = accountRepository.save(accountEntity);
+//
+//        return new AccountDTO(savedAccountEntity.getAccountId(), savedAccountEntity.getUserName(), savedAccountEntity.getPhone(), savedAccountEntity.getAccountStatus(),
+//                              savedAccountEntity.getFirstName(), savedAccountEntity.getLastName(), savedAccountEntity.getEmail(), savedAccountEntity.getAvatarUrl());
+
+        return null;
     }
 
     @Override

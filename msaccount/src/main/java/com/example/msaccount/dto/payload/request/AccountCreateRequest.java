@@ -1,6 +1,7 @@
 package com.example.msaccount.dto.payload.request;
 
 import com.example.msaccount.enums.AccountStatusEnum;
+import com.example.msaccount.enums.AccountTypeEnum;
 import com.example.msaccount.utils.StringUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -19,10 +20,13 @@ public class AccountCreateRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
-    @NotNull(message = "Role id cannot be null")
-    private Long roleId;
+    @NotBlank(message = "Account type cannot be blank")
+    @Enumerated(EnumType.STRING)
+    private AccountTypeEnum accountType;
 
-    @NotNull(message = "User name cannot be null")
+    private Long adminRoleId;
+
+    @NotBlank(message = "User name cannot be blank")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
     private String userName;
 
@@ -30,7 +34,7 @@ public class AccountCreateRequest {
     private String phone;
 
     @Enumerated(EnumType.STRING)
-    private AccountStatusEnum status;
+    private AccountStatusEnum status = AccountStatusEnum.ACTIVE;
 
     @Size(min = 1, max = 30, message = "First name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "First name contains invalid characters")
@@ -40,17 +44,14 @@ public class AccountCreateRequest {
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "Last name contains invalid characters")
     private String lastName;
 
-    @NotNull(message = "Password cannot be null")
+    @NotBlank(message = "Password cannot be blank")
     @Size(min = 6, max = 100, message = "Password length must be between {min} and {max} characters")
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[!@#$%^&*]).*$",
             message = "Password must include at least one uppercase letter and one special character")
     private String password;
 
-    @NotNull(message = "Please retype password")
-    private String retypePassword;
-
     @Email(message = "Invalid email")
-    @NotNull(message = "Email cannot be null")
+    @NotBlank(message = "Email cannot be blank")
     private String email;
 
     @Column(name = "facebook_account_id")

@@ -14,7 +14,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class RoleEntity {
+public class AdminRoleEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +30,7 @@ public class RoleEntity {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<PermissionsEntity> permissionsEntities;
+    private Set<PermissionEntity> permissionsEntities;
 
     @Column(name = "name", nullable = false)
     @NotBlank(message = "Role name cannot be blank")

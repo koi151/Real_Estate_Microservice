@@ -1,7 +1,7 @@
 package com.example.msaccount.entity.admin;
 
+import com.example.msaccount.enums.admin.PermissionEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -12,14 +12,14 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PermissionsEntity {
+public class PermissionEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long permissionId;
 
+    @Enumerated(EnumType.STRING)
     @Column(name = "name")
-    @NotBlank(message = "Permission name cannot be blank")
-    @Size(min = 4, max = 100, message = "Permission name must between {min} and {max} characters")
-    private String name;
+    @NotBlank(message = "Permission name cannot be blank") // check
+    private PermissionEnum name;
 }
