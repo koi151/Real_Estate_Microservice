@@ -1,7 +1,7 @@
 package com.example.msaccount.controllerAdvice;
 
 import com.example.msaccount.customExceptions.*;
-import com.example.msaccount.dto.ErrorResponseDTO;
+import com.example.msaccount.model.response.ErrorResponseDTO;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;

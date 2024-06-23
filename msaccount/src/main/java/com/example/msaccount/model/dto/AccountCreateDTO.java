@@ -1,4 +1,4 @@
-package com.example.msaccount.dto;
+package com.example.msaccount.model.dto;
 
 import com.example.msaccount.enums.AccountStatusEnum;
 import lombok.*;
@@ -8,8 +8,9 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDTO {
+public class AccountCreateDTO {
 
+    private String accountType;
     private Long accountId;
     private String userName;
     private String phone;

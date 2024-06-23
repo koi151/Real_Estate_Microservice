@@ -1,4 +1,4 @@
-package com.example.msaccount.dto.payload.request;
+package com.example.msaccount.model.request;
 
 import com.example.msaccount.enums.AccountStatusEnum;
 import jakarta.persistence.*;

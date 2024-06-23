@@ -1,4 +1,4 @@
-package com.example.msaccount.dto.payload.request;
+package com.example.msaccount.model.request;
 
 import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.enums.AccountTypeEnum;
@@ -20,7 +20,6 @@ public class AccountCreateRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
-    @NotBlank(message = "Account type cannot be blank")
     @Enumerated(EnumType.STRING)
     private AccountTypeEnum accountType;
 
@@ -49,6 +48,9 @@ public class AccountCreateRequest {
     @Pattern(regexp = "^(?=.*[A-Z])(?=.*[!@#$%^&*]).*$",
             message = "Password must include at least one uppercase letter and one special character")
     private String password;
+
+    @NotBlank(message = "Please retype password")
+    private String retypePassword;
 
     @Email(message = "Invalid email")
     @NotBlank(message = "Email cannot be blank")

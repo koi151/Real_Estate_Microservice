@@ -1,18 +1,15 @@
 package com.example.msaccount.service.admin.impl;
 
 import com.example.msaccount.customExceptions.*;
-import com.example.msaccount.dto.AccountDTO;
-import com.example.msaccount.dto.payload.request.AccountCreateRequest;
-import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
-import com.example.msaccount.entity.AccountEntity;
-import com.example.msaccount.entity.admin.AdminAccountEntity;
-import com.example.msaccount.entity.admin.AdminRoleEntity;
+import com.example.msaccount.model.dto.AccountCreateDTO;
+import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.request.AccountCreateRequest;
+import com.example.msaccount.model.request.AccountUpdateRequest;
+import com.example.msaccount.entity.Account;
 import com.example.msaccount.enums.AccountStatusEnum;
-import com.example.msaccount.enums.AccountTypeEnum;
-import com.example.msaccount.repository.admin.AccountRepository;
-import com.example.msaccount.repository.admin.RoleRepository;
+import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.service.admin.AccountService;
-import com.example.msaccount.utils.StringUtil;
+import com.example.msaccount.service.converter.AccountConverter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -34,85 +31,37 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
-    @Autowired
-    private RoleRepository roleRepository;
 
     @Autowired
     CloudinaryServiceImpl cloudinaryServiceImpl;
 
-    public String avatarCloudinaryUpdate( MultipartFile avatar) {
-        if (avatar != null && !avatar.isEmpty()) {
-            String avatarUploadedUrl = cloudinaryServiceImpl.uploadFile(avatar, "real_estate_account");
+    @Autowired
+    AccountConverter accountConverter;
 
-            if (!StringUtil.checkString(avatarUploadedUrl))
-                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
 
-            return avatarUploadedUrl;
+    private void validateAccountCreateRequest(AccountCreateRequest request) {
+        if (accountRepository.existsByPhone(request.getPhone())) {
+            throw new PhoneAlreadyExistsException("Phone number already exists");
         }
-        return null;
+        if (accountRepository.existsByUserName(request.getUserName())) {
+            throw new UserNameAlreadyExistsException("User name already exists");
+        }
     }
 
     @Override
-    public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar) {
+    public AccountCreateDTO createAccount(AccountCreateRequest request, MultipartFile avatar) {
+        validateAccountCreateRequest(request);
 
-        if (accountRepository.existsByPhone(request.getPhone()))
-            throw new PhoneAlreadyExistsException("Phone number already exists");
-
-        if(accountRepository.existsByUserName(request.getUserName()))
-            throw new UserNameAlreadyExistsException("User name already exists");
-
-        AccountEntity newAccount;
-
-        if (request.getAccountType() == AccountTypeEnum.ADMIN) {
-            AdminRoleEntity role = roleRepository.findById(request.getAdminRoleId())
-                    .orElseThrow(() -> new RoleNotFoundException("Role not found with id:" + request.getAdminRoleId()));
-
-            String hashedPassword = passwordEncoder.encode(request.getPassword()); // length = 60
-
-            AdminAccountEntity adminAccountEntity = AdminAccountEntity.builder()
-                    .role(role)
-                    .build();
-
-            newAccount = AccountEntity.builder() // DTO -> entity
-                    .phone(request.getPhone())
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .password(hashedPassword)
-                    .email(request.getEmail())
-                    .adminAccountEntity(adminAccountEntity)
-                    .userName(request.getUserName())
-                    .build();
-        } else {
-//            String hashedPassword = passwordEncoder.encode(request.getPassword()); // length = 60
-
-
-
-        }
-
-        String avatarUrl = avatarCloudinaryUpdate(avatar);
-        if (avatarUrl != null)
-            newAccount.setAvatarUrl(avatarUrl);
-
-        accountRepository.save(accountEntity);
-
+        Account newAccount = accountConverter.toAccountEntity(request, avatar);
+        accountRepository.save(newAccount);
 
         // develop: in case of current account do not have permission to create account
 
-
-
-
-
-
-//        AccountEntity savedAccountEntity = accountRepository.save(accountEntity);
-//
-//        return new AccountDTO(savedAccountEntity.getAccountId(), savedAccountEntity.getUserName(), savedAccountEntity.getPhone(), savedAccountEntity.getAccountStatus(),
-//                              savedAccountEntity.getFirstName(), savedAccountEntity.getLastName(), savedAccountEntity.getEmail(), savedAccountEntity.getAvatarUrl());
-
-        return null;
+        return accountConverter.toAccountDTO(newAccount);
     }
 
     @Override
-    public AccountDTO updateAccount(Integer id, AccountUpdateRequest request, MultipartFile avatarFile) {
+    public AccountCreateDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatarFile) {
         return accountRepository.findByAccountIdAndDeleted(id, false)
                 .map(existingAccountEntity -> {
                     updateAccountDetails(existingAccountEntity, request);
@@ -125,36 +74,36 @@ public class AccountServiceImpl implements AccountService {
     }
 
 
-    public List<AccountDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
+    public List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by("accountId"));
-        Page<AccountEntity> accounts = accountRepository.findByAccountStatusAndDeleted(status, false, pageRequest);
+        Page<Account> accounts = accountRepository.findByAccountStatusAndDeleted(status, false, pageRequest);
 
         return accounts.stream()
-                .map(accountEntity -> new AccountDTO(accountEntity.getAccountId(), accountEntity.getUserName(), accountEntity.getPhone(), accountEntity.getAccountStatus(),
+                .map(accountEntity -> new AccountSearchDTO(accountEntity.getAccountId(), accountEntity.getUserName(), accountEntity.getPhone(), accountEntity.getAccountStatus(),
                         accountEntity.getFirstName(), accountEntity.getLastName(), accountEntity.getEmail(), accountEntity.getAvatarUrl()))
                 .collect(Collectors.toList());
     }
 
     @Override
-    public void deleteAccount(Integer id) {
-        AccountEntity accountEntity = accountRepository.findById(id)
+    public void deleteAccount(Long id) {
+        Account account = accountRepository.findById(id)
                 .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
 
-        accountEntity.setDeleted(true);
-        accountRepository.save(accountEntity);
+        account.setDeleted(true);
+        accountRepository.save(account);
     }
 
-    private void updateAvatar(AccountEntity existingAccountEntity, MultipartFile avatarFile) {
+    private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {
             String uploadedAvatarUrl = cloudinaryServiceImpl.uploadFile(avatarFile, "real_estate_account");
             if (uploadedAvatarUrl == null || uploadedAvatarUrl.isEmpty()) {
                 throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
             }
-            existingAccountEntity.setAvatarUrl(uploadedAvatarUrl);
+            existingAccount.setAvatarUrl(uploadedAvatarUrl);
         }
     }
 
-    private void updateAccountDetails(AccountEntity existingAccountEntity, AccountUpdateRequest request) {
+    private void updateAccountDetails(Account existingAccount, AccountUpdateRequest request) {
         if (request != null) {
             if (request.getPhone() != null && accountRepository.existsByPhone(request.getPhone()))
                 throw new PhoneAlreadyExistsException("Phone number already exists");
@@ -163,32 +112,32 @@ public class AccountServiceImpl implements AccountService {
                 throw new UserNameAlreadyExistsException("User name already exists");
 
             // Use Optional for Null check
-            Optional.ofNullable(request.getUserName()).ifPresent(existingAccountEntity::setUserName);
-            Optional.ofNullable(request.getFirstName()).ifPresent(existingAccountEntity::setFirstName);
-            Optional.ofNullable(request.getLastName()).ifPresent(existingAccountEntity::setLastName);
-            Optional.ofNullable(request.getPhone()).ifPresent(existingAccountEntity::setPhone);
-            Optional.ofNullable(request.getEmail()).ifPresent(existingAccountEntity::setEmail);
-            Optional.ofNullable(request.getStatus()).ifPresent(existingAccountEntity::setAccountStatus);
+            Optional.ofNullable(request.getUserName()).ifPresent(existingAccount::setUserName);
+            Optional.ofNullable(request.getFirstName()).ifPresent(existingAccount::setFirstName);
+            Optional.ofNullable(request.getLastName()).ifPresent(existingAccount::setLastName);
+            Optional.ofNullable(request.getPhone()).ifPresent(existingAccount::setPhone);
+            Optional.ofNullable(request.getEmail()).ifPresent(existingAccount::setEmail);
+            Optional.ofNullable(request.getStatus()).ifPresent(existingAccount::setAccountStatus);
             Optional.ofNullable(request.getPassword())
                     .map(passwordEncoder::encode)
-                    .ifPresent(existingAccountEntity::setPassword);
+                    .ifPresent(existingAccount::setPassword);
 
             if (request.getAvatarUrlRemove()) {
-                existingAccountEntity.setAvatarUrl(null);
+                existingAccount.setAvatarUrl(null);
             }
         }
     }
 
-    private AccountDTO convertToAccountDTO(AccountEntity savedAccountEntity) {
-        return AccountDTO.builder()
-                .accountId(savedAccountEntity.getAccountId())
-                .userName(savedAccountEntity.getUserName())
-                .firstName(savedAccountEntity.getFirstName())
-                .lastName(savedAccountEntity.getLastName())
-                .email(savedAccountEntity.getEmail())
-                .phone(savedAccountEntity.getPhone())
-                .accountStatus(savedAccountEntity.getAccountStatus())
-                .avatarUrl(savedAccountEntity.getAvatarUrl())
+    private AccountCreateDTO convertToAccountDTO(Account savedAccount) {
+        return AccountCreateDTO.builder()
+                .accountId(savedAccount.getAccountId())
+                .userName(savedAccount.getUserName())
+                .firstName(savedAccount.getFirstName())
+                .lastName(savedAccount.getLastName())
+                .email(savedAccount.getEmail())
+                .phone(savedAccount.getPhone())
+                .accountStatus(savedAccount.getAccountStatus())
+                .avatarUrl(savedAccount.getAvatarUrl())
                 .build();
     }
 

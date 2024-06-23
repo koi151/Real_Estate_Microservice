@@ -1,4 +1,4 @@
-package com.example.msaccount.dto.payload;
+package com.example.msaccount.model.response;
 
 import lombok.Getter;
 import lombok.Setter;

@@ -27,7 +27,7 @@ spring:
         - id: account
           uri: http://localhost:8083/
           predicates:
-            - Path=/api/v1/account/**
+            - Path=/api/v1/admin/account/**
 
 management:
   tracing:

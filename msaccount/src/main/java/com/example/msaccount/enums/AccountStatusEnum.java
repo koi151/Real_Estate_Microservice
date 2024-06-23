@@ -10,7 +10,7 @@ public enum AccountStatusEnum {
     INACTIVE("Inactive"),
     BANNED("Banned");
 
-    private final String directionName;
+    private final String status;
 
     public boolean isActive() {
         return this == ACTIVE;

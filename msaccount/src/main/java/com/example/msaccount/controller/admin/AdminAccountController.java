@@ -1,9 +1,10 @@
 package com.example.msaccount.controller.admin;
 
-import com.example.msaccount.dto.AccountDTO;
-import com.example.msaccount.dto.payload.ResponseData;
-import com.example.msaccount.dto.payload.request.AccountCreateRequest;
-import com.example.msaccount.dto.payload.request.AccountUpdateRequest;
+import com.example.msaccount.model.dto.AccountCreateDTO;
+import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.response.ResponseData;
+import com.example.msaccount.model.request.AccountCreateRequest;
+import com.example.msaccount.model.request.AccountUpdateRequest;
 import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.service.admin.AccountService;
 import jakarta.validation.Valid;
@@ -18,7 +19,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping(path = "api/v1/admin/account")
+@RequestMapping("/api/v1/admin/account")
 public class AdminAccountController {
 
     @Autowired
@@ -39,7 +40,7 @@ public class AdminAccountController {
                 return ResponseEntity.badRequest().body(errorMessages);
             }
 
-            AccountDTO accountCreated = accountService.createAccount(account, avatar);
+            AccountCreateDTO accountCreated = accountService.createAccount(account, avatar);
 
             ResponseData responseData = new ResponseData();
             responseData.setData(accountCreated);
@@ -54,7 +55,7 @@ public class AdminAccountController {
 
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseData> updateAccount(
-            @PathVariable(name = "id") Integer id,
+            @PathVariable(name = "id") Long id,
             @RequestPart(required = false) AccountUpdateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ){
@@ -72,7 +73,7 @@ public class AdminAccountController {
             @RequestParam(defaultValue = "4") Integer pageSize
     ) {
         AccountStatusEnum se = AccountStatusEnum.valueOf(status.toUpperCase());
-        List<AccountDTO> accountsData = accountService.getAccountsByStatus(se, pageSize);
+        List<AccountSearchDTO> accountsData = accountService.getAccountsByStatus(se, pageSize);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(accountsData);
@@ -82,7 +83,7 @@ public class AdminAccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseData> deleteAccount(@PathVariable(name = "id") Integer id) {
+    public ResponseEntity<ResponseData> deleteAccount(@PathVariable(name = "id") Long id) {
         accountService.deleteAccount(id);
 
         ResponseData responseData = new ResponseData();

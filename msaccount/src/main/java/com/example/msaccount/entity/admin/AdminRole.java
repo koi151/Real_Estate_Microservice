@@ -7,22 +7,21 @@ import lombok.*;
 
 import java.util.Set;
 
-@Entity
-@Table(name = "roles")
+@Entity(name = "roles")
 @Setter
 @Getter
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminRoleEntity {
+public class AdminRole {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleId;
 
-    @OneToMany(mappedBy = "roleEntity", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "adminRole", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private Set<AdminAccountEntity> adminAccountEntities;
+    private Set<AdminAccount> adminAccountEntities;
 
     @ManyToMany
     @JoinTable(
@@ -30,7 +29,7 @@ public class AdminRoleEntity {
             joinColumns = @JoinColumn(name = "role_id"),
             inverseJoinColumns = @JoinColumn(name = "permission_id")
     )
-    private Set<PermissionEntity> permissionsEntities;
+    private Set<Permission> permissionsEntities;
 
     @Column(name = "name", nullable = false)
     @NotBlank(message = "Role name cannot be blank")
@@ -41,3 +40,4 @@ public class AdminRoleEntity {
 
     private boolean deleted = false;
 }
+

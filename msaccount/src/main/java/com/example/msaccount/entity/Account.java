@@ -1,6 +1,7 @@
 package com.example.msaccount.entity;
 
-import com.example.msaccount.entity.admin.AdminAccountEntity;
+import com.example.msaccount.entity.admin.AdminAccount;
+import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.enums.AccountStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -14,14 +15,17 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AccountEntity {
+public class Account {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long accountId;
 
-    @OneToOne(mappedBy = "accountEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private AdminAccountEntity adminAccountEntity;
+    @OneToOne(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private AdminAccount adminAccount;
+
+    @OneToOne(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private ClientAccount clientAccount;
 
     @Column(name = "user_name", length = 50, nullable = false, unique = true)
     @NotBlank(message = "User name cannot be blank")

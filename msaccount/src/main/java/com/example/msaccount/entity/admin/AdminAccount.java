@@ -1,6 +1,6 @@
 package com.example.msaccount.entity.admin;
 
-import com.example.msaccount.entity.AccountEntity;
+import com.example.msaccount.entity.Account;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -10,18 +10,18 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminAccountEntity {
+public class AdminAccount {
 
     @Id
     private int account_id;
 
     @OneToOne
     @MapsId
-    private AccountEntity accountEntity;
+    private Account account;
 
     @ManyToOne
     @JoinColumn(name = "role_id")
-    private AdminRoleEntity role;
+    private AdminRole adminRole;
 }
 
 

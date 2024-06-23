@@ -1,9 +1,7 @@
 package com.example.msaccount.repository.admin;
 
-import com.example.msaccount.entity.admin.AdminRoleEntity;
+import com.example.msaccount.entity.admin.AdminRole;
 import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.stereotype.Repository;
 
-@Repository
-public interface RoleRepository extends JpaRepository<AdminRoleEntity, Long> {
+public interface RoleRepository extends JpaRepository<AdminRole, Long> {
 }

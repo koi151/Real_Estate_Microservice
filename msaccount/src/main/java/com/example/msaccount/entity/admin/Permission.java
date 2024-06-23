@@ -3,7 +3,6 @@ package com.example.msaccount.entity.admin;
 import com.example.msaccount.enums.admin.PermissionEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity(name = "permissions") // by default, table have the same name as entity name
@@ -12,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PermissionEntity {
+public class Permission {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
