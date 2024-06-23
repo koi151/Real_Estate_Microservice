@@ -40,6 +40,18 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     CloudinaryServiceImpl cloudinaryServiceImpl;
 
+    public String avatarCloudinaryUpdate( MultipartFile avatar) {
+        if (avatar != null && !avatar.isEmpty()) {
+            String avatarUploadedUrl = cloudinaryServiceImpl.uploadFile(avatar, "real_estate_account");
+
+            if (!StringUtil.checkString(avatarUploadedUrl))
+                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
+
+            return avatarUploadedUrl;
+        }
+        return null;
+    }
+
     @Override
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar) {
 
@@ -49,7 +61,7 @@ public class AccountServiceImpl implements AccountService {
         if(accountRepository.existsByUserName(request.getUserName()))
             throw new UserNameAlreadyExistsException("User name already exists");
 
-        AccountEntity accountEntity;
+        AccountEntity newAccount;
 
         if (request.getAccountType() == AccountTypeEnum.ADMIN) {
             AdminRoleEntity role = roleRepository.findById(request.getAdminRoleId())
@@ -61,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
                     .role(role)
                     .build();
 
-            accountEntity = AccountEntity.builder() // DTO -> entity
+            newAccount = AccountEntity.builder() // DTO -> entity
                     .phone(request.getPhone())
                     .firstName(request.getFirstName())
                     .lastName(request.getLastName())
@@ -77,22 +89,18 @@ public class AccountServiceImpl implements AccountService {
 
         }
 
+        String avatarUrl = avatarCloudinaryUpdate(avatar);
+        if (avatarUrl != null)
+            newAccount.setAvatarUrl(avatarUrl);
+
         accountRepository.save(accountEntity);
 
 
         // develop: in case of current account do not have permission to create account
 
 
-        if (avatar != null && !avatar.isEmpty()) {
-            String avatarUploadedUrl = cloudinaryServiceImpl.uploadFile(avatar, "real_estate_account");
 
-            if (!StringUtil.checkString(avatarUploadedUrl))
-                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
 
-            newAccount.setAvatarUrl(avatarUploadedUrl);
-        }
-
-        accountRepository.save(newAccount);
 
 
 //        AccountEntity savedAccountEntity = accountRepository.save(accountEntity);

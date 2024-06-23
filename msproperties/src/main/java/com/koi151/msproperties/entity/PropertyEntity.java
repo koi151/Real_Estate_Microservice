@@ -21,7 +21,7 @@ public class PropertyEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private int property_id;
 
     @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForSaleEntity propertyForSaleEntity;
