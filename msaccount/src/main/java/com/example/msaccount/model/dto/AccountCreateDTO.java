@@ -12,6 +12,7 @@ public class AccountCreateDTO {
 
     private String accountType;
     private Long accountId;
+    private String adminRole;
     private String userName;
     private String phone;
     private AccountStatusEnum accountStatus;

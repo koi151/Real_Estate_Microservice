@@ -29,7 +29,7 @@ public class AccountConverter {
     @Autowired
     private CloudinaryServiceImpl cloudinaryServiceImpl;
 
-    public String avatarCloudinaryUpdate( MultipartFile avatar) {
+    public String avatarCloudinaryUpdate(MultipartFile avatar) {
         if (avatar != null && !avatar.isEmpty()) {
             String avatarUploadedUrl = cloudinaryServiceImpl.uploadFile(avatar, "real_estate_account");
 
@@ -46,41 +46,38 @@ public class AccountConverter {
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         String avatarUrl = avatarCloudinaryUpdate(avatar);
 
+        Account account = Account.builder()
+                .phone(request.getPhone())
+                .firstName(request.getFirstName())
+                .lastName(request.getLastName())
+                .password(hashedPassword)
+                .email(request.getEmail())
+                .userName(request.getUserName())
+                .accountStatus(request.getStatus())
+                .avatarUrl(avatarUrl)
+                .build();
+
         if (request.getAccountType() == AccountTypeEnum.ADMIN) {
             AdminRole role = roleRepository.findById(request.getAdminRoleId())
                     .orElseThrow(() -> new RoleNotFoundException("Role not found with id:" + request.getAdminRoleId()));
 
             AdminAccount adminAccount = AdminAccount.builder()
                     .adminRole(role)
+                    .account(account)
                     .build();
 
-            return Account.builder()
-                    .phone(request.getPhone())
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .password(hashedPassword)
-                    .email(request.getEmail())
-                    .adminAccount(adminAccount)
-                    .userName(request.getUserName())
-                    .avatarUrl(avatarUrl)
-                    .build();
+            account.setAdminAccount(adminAccount);
         } else {
             ClientAccount clientAccount = ClientAccount.builder()
                     .balance(0.0)
+                    .account(account)
                     .build();
-
-            return Account.builder()
-                    .phone(request.getPhone())
-                    .firstName(request.getFirstName())
-                    .lastName(request.getLastName())
-                    .password(hashedPassword)
-                    .email(request.getEmail())
-                    .clientAccount(clientAccount)
-                    .userName(request.getUserName())
-                    .build();
+            account.setClientAccount(clientAccount);
         }
 
+        return account;
     }
+
 
     public AccountCreateDTO toAccountDTO(Account account) {
         return AccountCreateDTO.builder()
@@ -88,13 +85,14 @@ public class AccountConverter {
                 .userName(account.getUserName())
                 .phone(account.getPhone())
                 .accountStatus(account.getAccountStatus())
-                .firstName(account.getAccountStatus().getStatus())
+                .firstName(account.getFirstName())
                 .lastName(account.getLastName())
                 .email(account.getEmail())
                 .avatarUrl(account.getAvatarUrl())
                 .accountType(account.getAdminAccount() != null
                         ? AccountTypeEnum.ADMIN.getAccountType()
                         : AccountTypeEnum.CLIENT.getAccountType())
+                .adminRole(account.getAdminAccount() != null ? account.getAdminAccount().getAdminRole().getName() : null)
                 .build();
     }
 }

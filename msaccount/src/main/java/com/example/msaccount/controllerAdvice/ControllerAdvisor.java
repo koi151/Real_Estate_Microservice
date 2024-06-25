@@ -1,5 +1,6 @@
 package com.example.msaccount.controllerAdvice;
 
+
 import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.model.response.ErrorResponseDTO;
 import jakarta.validation.ConstraintViolation;
@@ -7,6 +8,8 @@ import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.FieldError;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
@@ -144,5 +147,19 @@ public class ControllerAdvisor {
         errorResponseDTO.setDetails(details);
 
         return new ResponseEntity<>(errorResponseDTO, HttpStatus.FORBIDDEN);
+    }
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+
+        List<String> errors = ex.getBindingResult().getFieldErrors()
+                .stream() // create new stream
+                .map(FieldError::getDefaultMessage)
+                .collect(Collectors.toList()); // convert to list
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError("Validation failed");
+        errorResponseDTO.setDetails(errors);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
     }
 }

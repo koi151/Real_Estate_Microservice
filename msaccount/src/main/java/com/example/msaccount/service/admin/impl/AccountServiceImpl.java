@@ -1,6 +1,8 @@
 package com.example.msaccount.service.admin.impl;
 
-import com.example.msaccount.customExceptions.*;
+import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
+import com.example.msaccount.customExceptions.PhoneAlreadyExistsException;
+import com.example.msaccount.customExceptions.UserNameAlreadyExistsException;
 import com.example.msaccount.model.dto.AccountCreateDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
@@ -10,6 +12,8 @@ import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.service.admin.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
+import com.example.msaccount.customExceptions.AccountNotFoundException;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -23,6 +27,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@Transactional
 public class AccountServiceImpl implements AccountService {
 
     @Autowired
@@ -31,15 +36,13 @@ public class AccountServiceImpl implements AccountService {
     @Autowired
     private AccountRepository accountRepository;
 
+    @Autowired
+    private CloudinaryServiceImpl cloudinaryServiceImpl;
 
     @Autowired
-    CloudinaryServiceImpl cloudinaryServiceImpl;
+    private AccountConverter accountConverter;
 
-    @Autowired
-    AccountConverter accountConverter;
-
-
-    private void validateAccountCreateRequest(AccountCreateRequest request) {
+    private void validateAccountCreateRequest(AccountCreateRequest request)  {
         if (accountRepository.existsByPhone(request.getPhone())) {
             throw new PhoneAlreadyExistsException("Phone number already exists");
         }
@@ -49,7 +52,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountCreateDTO createAccount(AccountCreateRequest request, MultipartFile avatar) {
+    public AccountCreateDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         validateAccountCreateRequest(request);
 
         Account newAccount = accountConverter.toAccountEntity(request, avatar);

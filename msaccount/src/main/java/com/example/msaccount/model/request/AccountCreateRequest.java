@@ -21,7 +21,7 @@ public class AccountCreateRequest {
     private Long accountId;
 
     @Enumerated(EnumType.STRING)
-    private AccountTypeEnum accountType;
+    private AccountTypeEnum accountType = AccountTypeEnum.CLIENT;
 
     private Long adminRoleId;
 

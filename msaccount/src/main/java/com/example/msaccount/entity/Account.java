@@ -27,12 +27,12 @@ public class Account {
     @OneToOne(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private ClientAccount clientAccount;
 
-    @Column(name = "user_name", length = 50, nullable = false, unique = true)
+    @Column(name = "user_name", length = 50, nullable = false)
     @NotBlank(message = "User name cannot be blank")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
     private String userName;
 
-    @Column(name = "phone", length = 20, nullable = false, unique = true)
+    @Column(name = "phone", length = 20, nullable = false)
     @NotBlank(message = "Phone number cannot be blank")
     private String phone;
 

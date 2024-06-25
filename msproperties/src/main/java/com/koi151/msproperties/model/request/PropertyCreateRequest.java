@@ -18,7 +18,7 @@ import java.util.List;
 @NoArgsConstructor
 public class PropertyCreateRequest {
 
-    @NotEmpty(message = "Title cannot be empty")
+    @NotBlank(message = "Title cannot be empty")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 

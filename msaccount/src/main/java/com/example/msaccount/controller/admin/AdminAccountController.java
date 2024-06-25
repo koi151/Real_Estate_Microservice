@@ -32,6 +32,8 @@ public class AdminAccountController {
             BindingResult result
     ) {
         try {
+            ResponseData responseData = new ResponseData();
+
             if (result.hasErrors()) {
                 List<String> errorMessages = result.getFieldErrors()
                         .stream()
@@ -42,11 +44,10 @@ public class AdminAccountController {
 
             AccountCreateDTO accountCreated = accountService.createAccount(account, avatar);
 
-            ResponseData responseData = new ResponseData();
             responseData.setData(accountCreated);
             responseData.setDesc("Success");
 
-            return ResponseEntity.ok(responseData);
+            return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
 
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());

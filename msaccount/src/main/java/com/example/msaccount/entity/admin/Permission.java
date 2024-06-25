@@ -19,6 +19,5 @@ public class Permission {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "name")
-    @NotBlank(message = "Permission name cannot be blank") // check
     private PermissionEnum name;
 }

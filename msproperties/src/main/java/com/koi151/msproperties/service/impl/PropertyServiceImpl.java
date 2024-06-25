@@ -1,6 +1,5 @@
 package com.koi151.msproperties.service.impl;
 
-import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.entity.*;
@@ -13,7 +12,6 @@ import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.service.converter.PropertyConverter;
 import customExceptions.MaxImagesExceededException;
 import customExceptions.PropertyNotFoundException;
-import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -22,8 +20,6 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 

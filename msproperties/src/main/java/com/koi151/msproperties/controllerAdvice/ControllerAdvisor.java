@@ -1,7 +1,10 @@
 package com.koi151.msproperties.controllerAdvice;
 
+import customExceptions.EmptyFileException;
+import customExceptions.MaxImagesExceededException;
+import customExceptions.PaymentScheduleNotFoundException;
+import customExceptions.PropertyNotFoundException;
 import com.koi151.msproperties.model.dto.ErrorResponseDTO;
-import customExceptions.*;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
@@ -54,7 +57,7 @@ public class ControllerAdvisor {
                 .collect(Collectors.toList()); // convert to list
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setError("Validation failed");
         errorResponseDTO.setDetails(errors);
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);

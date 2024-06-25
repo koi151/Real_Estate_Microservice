@@ -13,10 +13,11 @@ import lombok.*;
 public class AdminAccount {
 
     @Id
-    private int account_id;
+    private Long account_id;
 
     @OneToOne
     @MapsId
+    @JoinColumn(name = "account_id")
     private Account account;
 
     @ManyToOne

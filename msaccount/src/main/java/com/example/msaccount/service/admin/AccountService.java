@@ -10,7 +10,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface AccountService {
-    AccountCreateDTO createAccount(AccountCreateRequest request, MultipartFile avatar) throws Exception;
+    AccountCreateDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
     AccountCreateDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatar);
     List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize);
     void deleteAccount(Long id);
