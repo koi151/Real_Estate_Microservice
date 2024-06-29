@@ -2,6 +2,7 @@ package com.example.msaccount.filters;
 
 import com.example.msaccount.component.JwtTokenUtil;
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.utils.ResponseUtil;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -26,17 +27,32 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Value("${API_PREFIX}")
-    private String apiPrefix;
+    private static String apiPrefix;
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
+
+    private static final List<Pair<String, String>> BYPASS_TOKENS = List.of(
+            Pair.of(String.format("%s/property", apiPrefix), "GET"),
+            Pair.of(String.format("%s/property-category", apiPrefix), "GET"),
+            Pair.of(String.format("%s/account/register", apiPrefix), "POST"),
+            Pair.of(String.format("%s/admin/account/login", apiPrefix), "POST")
+    );
+
+    // Bypass the filter if the request matches bypass criteria
+    private boolean isBypassToken(@NonNull HttpServletRequest request) { // stream api
+        return BYPASS_TOKENS.stream().anyMatch(
+                pair -> request.getServletPath().contains(pair.getFirst()) && // if satisfied -> return true
+                        request.getMethod().equals(pair.getSecond())
+        );
+    }
 
     //  The method intercepts each HTTP request to apply security checks or transformations.
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
                                     @NonNull HttpServletResponse response,
                                     @NonNull FilterChain filterChain)
-            throws IOException {
+            throws IOException, ServletException {
         try {
 
             if (isBypassToken(request)) {
@@ -46,7 +62,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
 
             final String authHeader = request.getHeader("Authorization");
             if (authHeader == null || !authHeader.startsWith("Bearer ")) { // header check
-                response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
+                ResponseUtil.sendUnauthorizedResponse(response, "Authorization header is missing or invalid");
                 return;
             }
 
@@ -67,27 +83,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response); // enable bypass
 
         } catch (Exception e) {
-            response.sendError(HttpServletResponse.SC_UNAUTHORIZED, "Unauthorized");
-            System.out.println("Error in doFilterInternal: " + e.getMessage());
+            ResponseUtil.sendUnauthorizedResponse(response,"Invalid or expired JWT token");
         }
-    }
-
-    // Bypass the filter if the request matches bypass criteria
-    private boolean isBypassToken(@NonNull  HttpServletRequest request) {
-        final List<Pair<String, String>> bypassTokens = Arrays.asList(
-                Pair.of(String.format("%s/property", apiPrefix), "GET"),
-                Pair.of(String.format("%s/property-category", apiPrefix), "GET"),
-                Pair.of(String.format("%s/account/register", apiPrefix), "POST"),
-                Pair.of(String.format("%s/admin/account/login", apiPrefix), "POST")
-        );
-
-        for (Pair<String, String> bypassToken: bypassTokens) {
-            if (request.getServletPath().contains(bypassToken.getFirst()) &&
-                    request.getMethod().equals(bypassToken.getSecond())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 }
