@@ -1,7 +1,5 @@
 package com.example.msaccount.entity;
 
-import com.example.msaccount.entity.admin.AdminAccount;
-import com.example.msaccount.entity.admin.Permission;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -25,7 +23,7 @@ public class Role {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Set<Account> accounts;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER) // load the permissions along with the role entity for validation
     @JoinTable(
             name="role_permissions",
             joinColumns = @JoinColumn(name = "role_id"),

@@ -45,9 +45,9 @@ public class JwtTokenUtil {
     private Claims extractAllClaims(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSignInKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+                .build() // Build the JwtParser
+                .parseClaimsJws(token) // Parse the token
+                .getBody(); // Get the claims from the parsed token
     }
 
     public boolean isTokenExpired(String token) {
@@ -61,15 +61,15 @@ public class JwtTokenUtil {
                 && !isTokenExpired(token); // check token expire time
     }
 
-    public String generateToken(Account account) throws Exception{
+    public String generateToken(Account account) {
         // properties => claims
         Map<String, Object> claims = new HashMap<>();
-        claims.put("userName", account.getUsername());
+        claims.put("userName", account.getAccountName());
         try {
             // token
             return Jwts.builder()
                     .setClaims(claims) // extract claims from this by Payload
-                    .setSubject(account.getUsername())
+                    .setSubject(account.getAccountName())
                     .setExpiration(new Date(System.currentTimeMillis() + expiration * 1000L)) // 30d
                     .signWith(getSignInKey(), SignatureAlgorithm.HS256)
                     .compact();
@@ -77,5 +77,6 @@ public class JwtTokenUtil {
         }catch (Exception e) {
             throw new InvalidParameterException("Error occurred while creating JWT token: "+ e.getMessage());
         }
+
     }
 }

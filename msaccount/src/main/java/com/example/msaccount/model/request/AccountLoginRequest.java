@@ -1,13 +1,17 @@
 package com.example.msaccount.model.request;
 
 import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
+import lombok.*;
 
 @Data
+@Setter
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
 public class AccountLoginRequest {
 
-    @NotBlank(message = "User name cannot be blank")
-    private String userName;
+    @NotBlank(message = "Account name cannot be blank")
+    private String accountName;
 
     @NotBlank(message = "Password cannot be blank")
     private String password;

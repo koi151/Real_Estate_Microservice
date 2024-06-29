@@ -61,25 +61,27 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public String login(String accountName, String password) throws Exception {
-        Optional<Account> optionalAccount = accountRepository.findByAccountNameAndDeleted(accountName, false);
+        try {
+            Account existingAccount = accountRepository.findByAccountNameAndDeleted(accountName, false)
+                    .orElseThrow(() -> new AccountNotFoundException("Wrong account name or password"));
 
-        if (optionalAccount.isPresent()) // included null and empty check
-            throw new AccountNotFoundException("Wrong phone number or password");
+            if (existingAccount.getFacebookAccountId() == 0 && existingAccount.getGoogleAccountId() == 0) {
+                if (!passwordEncoder.matches(password, existingAccount.getPassword()))
+                    throw new BadCredentialsException("Wrong phone number or password");
+            }
 
-        Account existingAccount = optionalAccount.get();
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                    accountName, password, existingAccount.getAuthorities()
+            );
 
-        if (existingAccount.getFacebookAccountId() == 0 && existingAccount.getGoogleAccountId() == 0) {
-            if (!passwordEncoder.matches(password, existingAccount.getPassword()))
-                throw new BadCredentialsException("Wrong phone number or password");
+            // authentication with Java Spring security
+            authenticationManager.authenticate(authenticationToken);
+            return jwtTokenUtil.generateToken(existingAccount);
+
+        } catch (Exception ex) {
+            System.out.println("Error occurred in service: " + ex.getMessage());
+            return null;  // tempo
         }
-
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                accountName, password, existingAccount.getAuthorities()
-        );
-
-        // authentication with Java Spring security
-        authenticationManager.authenticate(authenticationToken);
-        return jwtTokenUtil.generateToken(existingAccount);
     }
 
     @Override

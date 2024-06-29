@@ -1,4 +1,4 @@
-package com.example.msaccount.entity.admin;
+package com.example.msaccount.entity;
 
 import com.example.msaccount.enums.PermissionEnum;
 import jakarta.persistence.*;

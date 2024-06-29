@@ -1,7 +1,7 @@
 package com.example.msaccount.service;
 
 import com.example.msaccount.entity.Account;
-import com.example.msaccount.entity.admin.Permission;
+import com.example.msaccount.entity.Permission;
 import com.example.msaccount.repository.AccountRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.GrantedAuthority;

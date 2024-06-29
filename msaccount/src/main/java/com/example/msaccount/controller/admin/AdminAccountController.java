@@ -27,10 +27,11 @@ public class AdminAccountController {
     AccountService accountService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@Valid AccountLoginRequest request) {
+    public ResponseEntity<?> login(@Valid @RequestBody AccountLoginRequest request) {
         try {
             ResponseData responseData = new ResponseData();
-            responseData.setData(accountService.login(request.getUserName(), request.getPassword()));
+            responseData.setData(accountService.login(request.getAccountName(), request.getPassword()));
+            responseData.setDesc("Account login successful");
 
             return new ResponseEntity<>(responseData, HttpStatus.ACCEPTED);
         } catch (Exception ex) {

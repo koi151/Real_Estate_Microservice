@@ -90,18 +90,25 @@ public class Account implements UserDetails {
     @Column(name = "updated_at",columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedAt;
 
+//    public Collection<? extends GrantedAuthority> getAuthorities() {
+//        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+//        authorityList.add(new SimpleGrantedAuthority("ROLE_" + getRole().getName().toUpperCase()));
+////        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+//        return authorityList;
+//    }
+
+    @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
-        authorityList.add(new SimpleGrantedAuthority("ROLE_" + getRole().getName().toUpperCase()));
-//        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+        role.getPermissionsEntities().forEach(permission ->
+                authorityList.add(new SimpleGrantedAuthority(permission.getName().name())));
         return authorityList;
     }
 
     @Override
     public String getUsername() {
-        return getUsername();
+        return accountName;
     }
-
 
     @Override
     public boolean isAccountNonExpired() {

@@ -34,7 +34,7 @@ public class WebSecurityConfig {
                     requests
                             .requestMatchers(
                                     String.format("%s/account/register", apiPrefix),
-                                    String.format("%s/account/login", apiPrefix)
+                                    String.format("%s/admin/account/login", apiPrefix)
                             )
                             .permitAll()
                             .requestMatchers(HttpMethod.GET,
@@ -57,8 +57,8 @@ public class WebSecurityConfig {
 
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
-//                            .requestMatchers(HttpMethod.POST,
-//                                    String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
+                            .requestMatchers(HttpMethod.POST,
+                                    String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
                             .requestMatchers(HttpMethod.PATCH,
                                     String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_EDIT")
                             .requestMatchers(HttpMethod.DELETE,
