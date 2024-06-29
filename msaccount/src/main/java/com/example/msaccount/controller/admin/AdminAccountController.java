@@ -2,6 +2,7 @@ package com.example.msaccount.controller.admin;
 
 import com.example.msaccount.model.dto.AccountCreateDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.request.AccountLoginRequest;
 import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.model.request.AccountUpdateRequest;
@@ -24,6 +25,18 @@ public class AdminAccountController {
 
     @Autowired
     AccountService accountService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@Valid AccountLoginRequest request) {
+        try {
+            ResponseData responseData = new ResponseData();
+            responseData.setData(accountService.login(request.getUserName(), request.getPassword()));
+
+            return new ResponseEntity<>(responseData, HttpStatus.ACCEPTED);
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
 
     @PostMapping("/")
     public ResponseEntity<?> createAccount(

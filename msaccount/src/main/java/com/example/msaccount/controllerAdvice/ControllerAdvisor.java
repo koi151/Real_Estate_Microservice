@@ -101,8 +101,8 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
     }
 
-    @ExceptionHandler(UserNameAlreadyExistsException.class)
-    public ResponseEntity<Object> handleUserNameAlreadyExistsException(UserNameAlreadyExistsException ex) {
+    @ExceptionHandler(AccountAlreadyExistsException.class)
+    public ResponseEntity<Object> handleUserNameAlreadyExistsException(AccountAlreadyExistsException ex) {
         List<String> details = new ArrayList<>();
         details.add("User name already existed, please choose another one");
 
@@ -161,5 +161,17 @@ public class ControllerAdvisor {
         errorResponseDTO.setDetails(errors);
 
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Wrong login information, recheck phone number or password");
+
+        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponseDTO);
     }
 }

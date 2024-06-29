@@ -1,8 +1,15 @@
 package com.example.msaccount.entity.admin;
 
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.entity.Role;
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity(name = "admin_account")
 @Getter
@@ -19,10 +26,6 @@ public class AdminAccount {
     @MapsId
     @JoinColumn(name = "account_id")
     private Account account;
-
-    @ManyToOne
-    @JoinColumn(name = "role_id")
-    private AdminRole adminRole;
 }
 
 

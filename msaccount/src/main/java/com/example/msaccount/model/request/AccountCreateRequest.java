@@ -23,11 +23,11 @@ public class AccountCreateRequest {
     @Enumerated(EnumType.STRING)
     private AccountTypeEnum accountType = AccountTypeEnum.CLIENT;
 
-    private Long adminRoleId;
+    private Long roleId;
 
     @NotBlank(message = "User name cannot be blank")
-    @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
-    private String userName;
+    @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Account name contains invalid characters")
+    private String accountName;
 
     @NotNull(message = "Phone number cannot be null")
     private String phone;

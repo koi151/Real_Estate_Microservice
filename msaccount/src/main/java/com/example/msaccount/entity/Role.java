@@ -1,5 +1,7 @@
-package com.example.msaccount.entity.admin;
+package com.example.msaccount.entity;
 
+import com.example.msaccount.entity.admin.AdminAccount;
+import com.example.msaccount.entity.admin.Permission;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,15 +15,15 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminRole {
+public class Role {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long roleId;
 
-    @OneToMany(mappedBy = "adminRole", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "role", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private Set<AdminAccount> adminAccountEntities;
+    private Set<Account> accounts;
 
     @ManyToMany
     @JoinTable(

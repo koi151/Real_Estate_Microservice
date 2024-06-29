@@ -6,8 +6,14 @@ import com.example.msaccount.enums.AccountStatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 @Entity(name = "account")
 @Getter
@@ -15,7 +21,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Account {
+public class Account implements UserDetails {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -27,10 +33,14 @@ public class Account {
     @OneToOne(mappedBy = "account", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private ClientAccount clientAccount;
 
-    @Column(name = "user_name", length = 50, nullable = false)
-    @NotBlank(message = "User name cannot be blank")
-    @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
-    private String userName;
+    @ManyToOne
+    @JoinColumn(name = "role_id")
+    private Role role;
+
+    @Column(name = "account_name", length = 50, nullable = false)
+    @NotBlank(message = "Account name cannot be blank")
+    @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Account name contains invalid characters")
+    private String accountName;
 
     @Column(name = "phone", length = 20, nullable = false)
     @NotBlank(message = "Phone number cannot be blank")
@@ -79,4 +89,38 @@ public class Account {
 
     @Column(name = "updated_at",columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
+        authorityList.add(new SimpleGrantedAuthority("ROLE_" + getRole().getName().toUpperCase()));
+//        authorityList.add(new SimpleGrantedAuthority("ROLE_USER"));
+        return authorityList;
+    }
+
+    @Override
+    public String getUsername() {
+        return getUsername();
+    }
+
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return UserDetails.super.isAccountNonExpired();
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return UserDetails.super.isAccountNonLocked();
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return UserDetails.super.isCredentialsNonExpired();
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return UserDetails.super.isEnabled();
+    }
 }
+

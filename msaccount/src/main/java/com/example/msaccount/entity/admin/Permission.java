@@ -1,8 +1,7 @@
 package com.example.msaccount.entity.admin;
 
-import com.example.msaccount.enums.admin.PermissionEnum;
+import com.example.msaccount.enums.PermissionEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.*;
 
 @Entity(name = "permissions") // by default, table have the same name as entity name

@@ -4,7 +4,7 @@ import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
 import com.example.msaccount.customExceptions.RoleNotFoundException;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.entity.admin.AdminAccount;
-import com.example.msaccount.entity.admin.AdminRole;
+import com.example.msaccount.entity.Role;
 import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.enums.AccountTypeEnum;
 import com.example.msaccount.model.dto.AccountCreateDTO;
@@ -45,24 +45,24 @@ public class AccountConverter {
     public Account toAccountEntity(AccountCreateRequest request, MultipartFile avatar) {
         String hashedPassword = passwordEncoder.encode(request.getPassword());
         String avatarUrl = avatarCloudinaryUpdate(avatar);
+        Role role = roleRepository.findById(request.getRoleId())
+                .orElseThrow(() -> new RoleNotFoundException("Role not found with id:" + request.getRoleId()));
 
         Account account = Account.builder()
+                .role(role)
                 .phone(request.getPhone())
                 .firstName(request.getFirstName())
                 .lastName(request.getLastName())
                 .password(hashedPassword)
                 .email(request.getEmail())
-                .userName(request.getUserName())
+                .accountName(request.getAccountName())
                 .accountStatus(request.getStatus())
                 .avatarUrl(avatarUrl)
                 .build();
 
         if (request.getAccountType() == AccountTypeEnum.ADMIN) {
-            AdminRole role = roleRepository.findById(request.getAdminRoleId())
-                    .orElseThrow(() -> new RoleNotFoundException("Role not found with id:" + request.getAdminRoleId()));
 
             AdminAccount adminAccount = AdminAccount.builder()
-                    .adminRole(role)
                     .account(account)
                     .build();
 
@@ -82,7 +82,7 @@ public class AccountConverter {
     public AccountCreateDTO toAccountDTO(Account account) {
         return AccountCreateDTO.builder()
                 .accountId(account.getAccountId())
-                .userName(account.getUserName())
+                .accountName(account.getAccountName())
                 .phone(account.getPhone())
                 .accountStatus(account.getAccountStatus())
                 .firstName(account.getFirstName())
@@ -92,7 +92,7 @@ public class AccountConverter {
                 .accountType(account.getAdminAccount() != null
                         ? AccountTypeEnum.ADMIN.getAccountType()
                         : AccountTypeEnum.CLIENT.getAccountType())
-                .adminRole(account.getAdminAccount() != null ? account.getAdminAccount().getAdminRole().getName() : null)
+                .role(account.getRole().getName())
                 .build();
     }
 }

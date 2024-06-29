@@ -17,7 +17,7 @@ import lombok.Setter;
 public class AccountUpdateRequest {
 
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Username contains invalid characters")
-    private String userName;
+    private String accountName;
 
     private String phone;
 

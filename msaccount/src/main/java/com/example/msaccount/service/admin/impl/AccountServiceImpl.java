@@ -1,8 +1,7 @@
 package com.example.msaccount.service.admin.impl;
 
-import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
-import com.example.msaccount.customExceptions.PhoneAlreadyExistsException;
-import com.example.msaccount.customExceptions.UserNameAlreadyExistsException;
+import com.example.msaccount.component.JwtTokenUtil;
+import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.model.dto.AccountCreateDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
@@ -12,12 +11,13 @@ import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.service.admin.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
-import com.example.msaccount.customExceptions.AccountNotFoundException;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -27,27 +27,23 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
+@RequiredArgsConstructor
 @Transactional
 public class AccountServiceImpl implements AccountService {
 
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @Autowired
-    private AccountRepository accountRepository;
-
-    @Autowired
-    private CloudinaryServiceImpl cloudinaryServiceImpl;
-
-    @Autowired
-    private AccountConverter accountConverter;
+    private final PasswordEncoder passwordEncoder;
+    private final AccountRepository accountRepository;
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
+    private final AccountConverter accountConverter;
+    private final AuthenticationManager authenticationManager;
+    private final JwtTokenUtil jwtTokenUtil;
 
     private void validateAccountCreateRequest(AccountCreateRequest request)  {
         if (accountRepository.existsByPhone(request.getPhone())) {
             throw new PhoneAlreadyExistsException("Phone number already exists");
         }
-        if (accountRepository.existsByUserName(request.getUserName())) {
-            throw new UserNameAlreadyExistsException("User name already exists");
+        if (accountRepository.existsByAccountName(request.getAccountName())) {
+            throw new AccountAlreadyExistsException("Account name already exists");
         }
     }
 
@@ -61,6 +57,29 @@ public class AccountServiceImpl implements AccountService {
         // develop: in case of current account do not have permission to create account
 
         return accountConverter.toAccountDTO(newAccount);
+    }
+
+    @Override
+    public String login(String accountName, String password) throws Exception {
+        Optional<Account> optionalAccount = accountRepository.findByAccountNameAndDeleted(accountName, false);
+
+        if (optionalAccount.isPresent()) // included null and empty check
+            throw new AccountNotFoundException("Wrong phone number or password");
+
+        Account existingAccount = optionalAccount.get();
+
+        if (existingAccount.getFacebookAccountId() == 0 && existingAccount.getGoogleAccountId() == 0) {
+            if (!passwordEncoder.matches(password, existingAccount.getPassword()))
+                throw new BadCredentialsException("Wrong phone number or password");
+        }
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                accountName, password, existingAccount.getAuthorities()
+        );
+
+        // authentication with Java Spring security
+        authenticationManager.authenticate(authenticationToken);
+        return jwtTokenUtil.generateToken(existingAccount);
     }
 
     @Override
@@ -82,7 +101,7 @@ public class AccountServiceImpl implements AccountService {
         Page<Account> accounts = accountRepository.findByAccountStatusAndDeleted(status, false, pageRequest);
 
         return accounts.stream()
-                .map(accountEntity -> new AccountSearchDTO(accountEntity.getAccountId(), accountEntity.getUserName(), accountEntity.getPhone(), accountEntity.getAccountStatus(),
+                .map(accountEntity -> new AccountSearchDTO(accountEntity.getAccountId(), accountEntity.getAccountName(), accountEntity.getPhone(), accountEntity.getAccountStatus(),
                         accountEntity.getFirstName(), accountEntity.getLastName(), accountEntity.getEmail(), accountEntity.getAvatarUrl()))
                 .collect(Collectors.toList());
     }
@@ -111,11 +130,11 @@ public class AccountServiceImpl implements AccountService {
             if (request.getPhone() != null && accountRepository.existsByPhone(request.getPhone()))
                 throw new PhoneAlreadyExistsException("Phone number already exists");
 
-            if (request.getUserName() != null && accountRepository.existsByUserName(request.getUserName()))
-                throw new UserNameAlreadyExistsException("User name already exists");
+            if (request.getAccountName() != null && accountRepository.existsByAccountName(request.getAccountName()))
+                throw new AccountAlreadyExistsException("Account name already exists");
 
             // Use Optional for Null check
-            Optional.ofNullable(request.getUserName()).ifPresent(existingAccount::setUserName);
+            Optional.ofNullable(request.getAccountName()).ifPresent(existingAccount::setAccountName);
             Optional.ofNullable(request.getFirstName()).ifPresent(existingAccount::setFirstName);
             Optional.ofNullable(request.getLastName()).ifPresent(existingAccount::setLastName);
             Optional.ofNullable(request.getPhone()).ifPresent(existingAccount::setPhone);
@@ -134,7 +153,7 @@ public class AccountServiceImpl implements AccountService {
     private AccountCreateDTO convertToAccountDTO(Account savedAccount) {
         return AccountCreateDTO.builder()
                 .accountId(savedAccount.getAccountId())
-                .userName(savedAccount.getUserName())
+                .accountName(savedAccount.getAccountName())
                 .firstName(savedAccount.getFirstName())
                 .lastName(savedAccount.getLastName())
                 .email(savedAccount.getEmail())

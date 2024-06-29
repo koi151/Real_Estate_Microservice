@@ -30,3 +30,9 @@ management:
   tracing:
     sampling:
       probability: 1.0
+
+api:
+  prefix: api/v1
+jwt:
+  expiration: 2592000 #30 days = 30 * 24 * 60 * 60
+#  secretKey:
