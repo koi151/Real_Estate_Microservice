@@ -1,12 +1,11 @@
 services:
-
   mysql:
     container_name: mysql
     image: mysql
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: real_estate
-      MYSQL_USER: koi151
+      MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
@@ -16,16 +15,16 @@ services:
       - mysql_network
     restart: unless-stopped
 
-  adminer:
-    container_name: adminer
-    image: adminer
-    environment:
-      ADMINER_DEFAULT_SERVER: mysql
-    ports:
-      - "9091:9091"
-    networks:
-      - mysql_network
-    restart: unless-stopped
+#  adminer:
+#    container_name: adminer
+#    image: adminer
+#    environment:
+#      ADMINER_DEFAULT_SERVER: mysql
+#    ports:
+#      - "9091:9091"
+#    networks:
+#      - mysql_network
+#    restart: unless-stopped
 
   zipkin:
     container_name: zipkin
@@ -35,6 +34,13 @@ services:
     networks:
       - zipkin_network
     restart: unless-stopped
+
+  mail-dev:
+    container_name: ms-mail-dev
+    image: maildev/maildev
+    ports:
+      - 1080:1080
+      - 1025:1025
 
 networks:
   mysql_network:

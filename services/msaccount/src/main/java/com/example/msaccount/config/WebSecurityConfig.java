@@ -25,14 +25,15 @@ public class WebSecurityConfig {
     @Value("${API_PREFIX}")
     private String apiPrefix;
 
+    // Manage security filters, define security rules, configure authentication and authorization:
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable)
+                .csrf(AbstractHttpConfigurer::disable) // disable CSRF (Cross-Site Request Forgery)
                 .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
                 .authorizeHttpRequests(requests -> {
                     requests
-                            .requestMatchers(
+                            .requestMatchers( // allow access without authentication
                                     String.format("%s/account/register", apiPrefix),
                                     String.format("%s/admin/account/login", apiPrefix)
                             )
@@ -64,7 +65,7 @@ public class WebSecurityConfig {
                             .requestMatchers(HttpMethod.DELETE,
                                     String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_DEL")
 
-                            .anyRequest().authenticated();
+                            .anyRequest().authenticated(); // require authentication for other requests
                 });
 
         return http.build();

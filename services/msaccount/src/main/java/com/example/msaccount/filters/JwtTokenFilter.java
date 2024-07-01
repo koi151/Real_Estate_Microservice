@@ -69,9 +69,10 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             final String token = authHeader.substring(7);
             final String userName = jwtTokenUtil.extractUserName(token);
 
-            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+            if (userName != null && SecurityContextHolder.getContext().getAuthentication() == null) { // check if user exists and no user authenticated in SecurityContextHolder
                 Account userDetails = (Account) userDetailsService.loadUserByUsername(userName); // service from java.security lib
 
+                // check the validity of the token, check if it's the right person and token not expired
                 if (jwtTokenUtil.validateToken(token, userDetails)) {
                     UsernamePasswordAuthenticationToken authenticationToken =
                             new UsernamePasswordAuthenticationToken(userDetails, null,
