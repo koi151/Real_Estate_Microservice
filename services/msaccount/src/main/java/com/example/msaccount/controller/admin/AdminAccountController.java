@@ -1,7 +1,8 @@
 package com.example.msaccount.controller.admin;
 
-import com.example.msaccount.model.dto.AccountCreateDTO;
+import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountLoginRequest;
 import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.model.request.AccountCreateRequest;
@@ -20,7 +21,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/v1/admin/account")
+@RequestMapping("/api/v1/admin/accounts")
 public class AdminAccountController {
 
     @Autowired
@@ -37,6 +38,17 @@ public class AdminAccountController {
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
+    }
+
+    @GetMapping("/")
+    public ResponseEntity<ResponseData> findAllAdminAccounts() {
+        var accounts = accountService.findAllAdminAccounts();
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(accounts);
+        responseData.setDesc(!accounts.isEmpty() ? "Success" : "No admin account found");
+
+        return ResponseEntity.ok(responseData);
     }
 
     @PostMapping("/")
@@ -56,7 +68,7 @@ public class AdminAccountController {
                 return ResponseEntity.badRequest().body(errorMessages);
             }
 
-            AccountCreateDTO accountCreated = accountService.createAccount(account, avatar);
+            AccountDTO accountCreated = accountService.createAccount(account, avatar);
 
             responseData.setData(accountCreated);
             responseData.setDesc("Success");
@@ -98,8 +110,8 @@ public class AdminAccountController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ResponseData> deleteAccount(@PathVariable(name = "id") Long id) {
-        accountService.deleteAccount(id);
+    public ResponseEntity<ResponseData> deleteAdminAccount(@PathVariable(name = "id") Long id) {
+        accountService.deleteAdminAccount(id);
 
         ResponseData responseData = new ResponseData();
         responseData.setDesc("Account deleted successful");

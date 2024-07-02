@@ -1,5 +1,6 @@
 package com.example.msaccount.entity;
 
+import com.example.msaccount.enums.AccountTypeEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -37,6 +38,9 @@ public class Role {
     private String name;
 
     private String description;
+
+    @Enumerated(EnumType.STRING)
+    private AccountTypeEnum accountType = AccountTypeEnum.CLIENT;
 
     private boolean deleted = false;
 }

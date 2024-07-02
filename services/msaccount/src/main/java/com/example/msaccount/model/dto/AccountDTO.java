@@ -8,7 +8,7 @@ import lombok.*;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountCreateDTO {
+public class AccountDTO {
 
     private String accountType;
     private Long accountId;

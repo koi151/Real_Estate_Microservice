@@ -2,15 +2,19 @@ package com.example.msaccount.service.admin.impl;
 
 import com.example.msaccount.component.JwtTokenUtil;
 import com.example.msaccount.customExceptions.*;
-import com.example.msaccount.model.dto.AccountCreateDTO;
+import com.example.msaccount.entity.admin.AdminAccount;
+import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.model.request.AccountUpdateRequest;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.repository.AccountRepository;
+import com.example.msaccount.repository.admin.AdminAccountRepository;
 import com.example.msaccount.service.admin.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
+import com.example.msaccount.service.converter.admin.AdminAccountConverter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -33,8 +37,10 @@ public class AccountServiceImpl implements AccountService {
 
     private final PasswordEncoder passwordEncoder;
     private final AccountRepository accountRepository;
+    private final AdminAccountRepository adminAccountRepository;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final AccountConverter accountConverter;
+    private final AdminAccountConverter adminAccountConverter;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
 
@@ -48,45 +54,44 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountCreateDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
+    public List<AdminAccountDTO> findAllAdminAccounts() {
+        return adminAccountRepository.findAllByAccountDeleted(false, Sort.by("accountId")).stream()
+                .map(adminAccountConverter::toAdminAccountDTO)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         validateAccountCreateRequest(request);
 
         Account newAccount = accountConverter.toAccountEntity(request, avatar);
         accountRepository.save(newAccount);
 
-        // develop: in case of current account do not have permission to create account
-
         return accountConverter.toAccountDTO(newAccount);
     }
 
     @Override
-    public String login(String accountName, String password) throws Exception {
-        try {
-            Account existingAccount = accountRepository.findByAccountNameAndDeleted(accountName, false)
-                    .orElseThrow(() -> new AccountNotFoundException("Wrong account name or password"));
+    public String login(String accountName, String password) {
+        Account existingAccount = accountRepository.findByAccountName(accountName) // del
+                .orElseThrow(() -> new AccountNotFoundException("Wrong account name or password"));
 
-            if (existingAccount.getFacebookAccountId() == 0 && existingAccount.getGoogleAccountId() == 0) {
-                if (!passwordEncoder.matches(password, existingAccount.getPassword()))
-                    throw new BadCredentialsException("Wrong phone number or password");
-            }
-
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                    accountName, password, existingAccount.getAuthorities()
-            );
-
-            // authentication with Java Spring security
-            authenticationManager.authenticate(authenticationToken);
-            return jwtTokenUtil.generateToken(existingAccount);
-
-        } catch (Exception ex) {
-            System.out.println("Error occurred in service: " + ex.getMessage());
-            return null;  // tempo
+        if (existingAccount.getFacebookAccountId() == 0 && existingAccount.getGoogleAccountId() == 0) {
+            if (!passwordEncoder.matches(password, existingAccount.getPassword()))
+                throw new BadCredentialsException("Wrong phone number or password");
         }
+
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
+                accountName, password, existingAccount.getAuthorities()
+        );
+
+        // authentication with Java Spring security
+        authenticationManager.authenticate(authenticationToken);
+        return jwtTokenUtil.generateToken(existingAccount);
     }
 
     @Override
-    public AccountCreateDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatarFile) {
-        return accountRepository.findByAccountIdAndDeleted(id, false)
+    public AccountDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatarFile) {
+        return accountRepository.findByAccountId(id) // del
                 .map(existingAccountEntity -> {
                     updateAccountDetails(existingAccountEntity, request);
                     updateAvatar(existingAccountEntity, avatarFile);
@@ -100,7 +105,7 @@ public class AccountServiceImpl implements AccountService {
 
     public List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
         PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by("accountId"));
-        Page<Account> accounts = accountRepository.findByAccountStatusAndDeleted(status, false, pageRequest);
+        Page<Account> accounts = accountRepository.findByAccountStatus(status, pageRequest); // del
 
         return accounts.stream()
                 .map(accountEntity -> new AccountSearchDTO(accountEntity.getAccountId(), accountEntity.getAccountName(), accountEntity.getPhone(), accountEntity.getAccountStatus(),
@@ -109,9 +114,9 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public void deleteAccount(Long id) {
+    public void deleteAdminAccount(Long id) {
         Account account = accountRepository.findById(id)
-                .orElseThrow(() -> new AccountNotFoundException("Account with id " + id + " not found"));
+                .orElseThrow(() -> new AccountNotFoundException("Admin account with id " + id + " not found"));
 
         account.setDeleted(true);
         accountRepository.save(account);
@@ -152,8 +157,8 @@ public class AccountServiceImpl implements AccountService {
         }
     }
 
-    private AccountCreateDTO convertToAccountDTO(Account savedAccount) {
-        return AccountCreateDTO.builder()
+    private AccountDTO convertToAccountDTO(Account savedAccount) {
+        return AccountDTO.builder()
                 .accountId(savedAccount.getAccountId())
                 .accountName(savedAccount.getAccountName())
                 .firstName(savedAccount.getFirstName())
@@ -164,5 +169,4 @@ public class AccountServiceImpl implements AccountService {
                 .avatarUrl(savedAccount.getAvatarUrl())
                 .build();
     }
-
 }

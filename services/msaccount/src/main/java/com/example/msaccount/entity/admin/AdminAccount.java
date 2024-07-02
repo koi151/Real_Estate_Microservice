@@ -20,7 +20,7 @@ import java.util.List;
 public class AdminAccount {
 
     @Id
-    private Long account_id;
+    private Long accountId;
 
     @OneToOne
     @MapsId

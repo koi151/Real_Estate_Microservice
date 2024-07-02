@@ -7,7 +7,8 @@ import com.example.msaccount.entity.admin.AdminAccount;
 import com.example.msaccount.entity.Role;
 import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.enums.AccountTypeEnum;
-import com.example.msaccount.model.dto.AccountCreateDTO;
+import com.example.msaccount.model.dto.AccountDTO;
+import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.repository.admin.RoleRepository;
 import com.example.msaccount.service.admin.impl.CloudinaryServiceImpl;
@@ -79,8 +80,8 @@ public class AccountConverter {
     }
 
 
-    public AccountCreateDTO toAccountDTO(Account account) {
-        return AccountCreateDTO.builder()
+    public AccountDTO toAccountDTO(Account account) {
+        return AccountDTO.builder()
                 .accountId(account.getAccountId())
                 .accountName(account.getAccountName())
                 .phone(account.getPhone())
@@ -92,6 +93,20 @@ public class AccountConverter {
                 .accountType(account.getAdminAccount() != null
                         ? AccountTypeEnum.ADMIN.getAccountType()
                         : AccountTypeEnum.CLIENT.getAccountType())
+                .role(account.getRole().getName())
+                .build();
+    }
+
+    public AdminAccountDTO toAdminAccountDTO(Account account) {
+        return AdminAccountDTO.builder()
+                .accountId(account.getAccountId())
+                .accountName(account.getAccountName())
+                .phone(account.getPhone())
+                .status(account.getAccountStatus().getStatus())
+                .firstName(account.getFirstName())
+                .lastName(account.getLastName())
+                .email(account.getEmail())
+                .avatarUrl(account.getAvatarUrl())
                 .role(account.getRole().getName())
                 .build();
     }

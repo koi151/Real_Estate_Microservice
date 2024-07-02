@@ -50,6 +50,13 @@ public class Account implements UserDetails {
     @Enumerated(EnumType.STRING)
     private AccountStatusEnum accountStatus = AccountStatusEnum.ACTIVE;
 
+    @Column(name = "password", length = 100, nullable = false)
+    @NotNull(message = "Password cannot be null")
+    @Size(min = 6, max = 100, message = "Password length must be between {min} and {max} characters")
+    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[!@#$%^&*]).*$",
+            message = "Password must include at least one uppercase letter and one special character")
+    private String password;
+
     @Column(name = "first_name", length = 30)
     @Size(min = 1, max = 30, message = "First name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "First name contains invalid characters")
@@ -59,13 +66,6 @@ public class Account implements UserDetails {
     @Size(min = 1, max = 70, message = "Last name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "Last name contains invalid characters")
     private String lastName;
-
-    @Column(name = "password", length = 100, nullable = false)
-    @NotNull(message = "Password cannot be null")
-    @Size(min = 6, max = 100, message = "Password length must be between {min} and {max} characters")
-    @Pattern(regexp = "^(?=.*[A-Z])(?=.*[!@#$%^&*]).*$",
-            message = "Password must include at least one uppercase letter and one special character")
-    private String password;
 
     @Column(name = "email", length = 100, nullable = false)
     @Email(message = "Invalid email")
@@ -81,14 +81,14 @@ public class Account implements UserDetails {
     @Column(name = "google_account_id")
     private int googleAccountId;
 
-    @Column(name = "deleted", length = 20, nullable = false)
-    private boolean deleted = false;
-
     @Column(name = "created_at",columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
     private LocalDateTime createdAt;
 
     @Column(name = "updated_at",columnDefinition = "TIMESTAMP")
     private LocalDateTime updatedAt;
+
+    @Column(name = "deleted", length = 20, nullable = false)
+    private boolean deleted = false;
 
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
 //        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();

@@ -3,6 +3,7 @@ package com.example.msaccount.filters;
 import com.example.msaccount.component.JwtTokenUtil;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.utils.ResponseUtil;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -19,7 +20,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.List;
 
 @Component
@@ -27,17 +27,21 @@ import java.util.List;
 public class JwtTokenFilter extends OncePerRequestFilter {
 
     @Value("${API_PREFIX}")
-    private static String apiPrefix;
+    private String apiPrefix;
 
     private final UserDetailsService userDetailsService;
     private final JwtTokenUtil jwtTokenUtil;
+    private List<Pair<String, String>> BYPASS_TOKENS;
+    @PostConstruct
+    public void init() {
+        BYPASS_TOKENS = List.of(
+                Pair.of(String.format("%s/property", apiPrefix), "GET"),
+                Pair.of(String.format("%s/property-category", apiPrefix), "GET"),
+                Pair.of(String.format("%s/accounts/register", apiPrefix), "POST"),
+                Pair.of(String.format("%s/admin/accounts/login", apiPrefix), "POST")
+        );
+    }
 
-    private static final List<Pair<String, String>> BYPASS_TOKENS = List.of(
-            Pair.of(String.format("%s/property", apiPrefix), "GET"),
-            Pair.of(String.format("%s/property-category", apiPrefix), "GET"),
-            Pair.of(String.format("%s/account/register", apiPrefix), "POST"),
-            Pair.of(String.format("%s/admin/account/login", apiPrefix), "POST")
-    );
 
     // Bypass the filter if the request matches bypass criteria
     private boolean isBypassToken(@NonNull HttpServletRequest request) { // stream api

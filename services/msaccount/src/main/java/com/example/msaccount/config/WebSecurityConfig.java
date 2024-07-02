@@ -34,8 +34,11 @@ public class WebSecurityConfig {
                 .authorizeHttpRequests(requests -> {
                     requests
                             .requestMatchers( // allow access without authentication
-                                    String.format("%s/account/register", apiPrefix),
-                                    String.format("%s/admin/account/login", apiPrefix)
+                                    String.format("%s/accounts/register", apiPrefix),
+                                    String.format("%s/admin/accounts/login", apiPrefix),
+
+                                    String.format("%s/admin/accounts", apiPrefix)
+
                             )
                             .permitAll()
                             .requestMatchers(HttpMethod.GET,
@@ -57,13 +60,13 @@ public class WebSecurityConfig {
                                     String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_DEL")
 
                             .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
+                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
                             .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
+                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
                             .requestMatchers(HttpMethod.PATCH,
-                                    String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_EDIT")
+                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_EDIT")
                             .requestMatchers(HttpMethod.DELETE,
-                                    String.format("%s/account**", apiPrefix)).hasAnyAuthority("ACCOUNT_DEL")
+                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_DEL")
 
                             .anyRequest().authenticated(); // require authentication for other requests
                 });
