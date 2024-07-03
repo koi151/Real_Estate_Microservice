@@ -10,6 +10,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -21,7 +22,10 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Account implements UserDetails {
+public class Account extends BaseEntity implements UserDetails {
+
+    @Serial
+    private static final long serialVersionUID = -896035267760632084L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -80,15 +84,6 @@ public class Account implements UserDetails {
 
     @Column(name = "google_account_id")
     private int googleAccountId;
-
-    @Column(name = "created_at",columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at",columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedAt;
-
-    @Column(name = "deleted", length = 20, nullable = false)
-    private boolean deleted = false;
 
 //    public Collection<? extends GrantedAuthority> getAuthorities() {
 //        List<SimpleGrantedAuthority> authorityList = new ArrayList<>();
