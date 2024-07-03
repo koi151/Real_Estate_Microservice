@@ -104,12 +104,11 @@ public class AccountServiceImpl implements AccountService {
 
 
     public List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
-        PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by("accountId"));
-        Page<Account> accounts = accountRepository.findByAccountStatus(status, pageRequest); // del
+//        PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by("accountId")); tempo cmt
+        List<AdminAccount> accounts = adminAccountRepository.findByAccountStatusDeleted(status, false, Sort.by("accountId"));
 
         return accounts.stream()
-                .map(accountEntity -> new AccountSearchDTO(accountEntity.getAccountId(), accountEntity.getAccountName(), accountEntity.getPhone(), accountEntity.getAccountStatus(),
-                        accountEntity.getFirstName(), accountEntity.getLastName(), accountEntity.getEmail(), accountEntity.getAvatarUrl()))
+                .map(adminAccountConverter::toAccountSearchDTO)
                 .collect(Collectors.toList());
     }
 
