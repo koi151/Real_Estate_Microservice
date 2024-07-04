@@ -3,4 +3,3 @@ spring:
     name: account
   config:
     import: optional:configserver:http://localhost:8888
-
