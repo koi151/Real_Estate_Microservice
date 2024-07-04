@@ -2,7 +2,6 @@ package com.example.msaccount.controller.admin;
 
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
-import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountLoginRequest;
 import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.model.request.AccountCreateRequest;
@@ -13,8 +12,6 @@ import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -53,20 +50,19 @@ public class AdminAccountController {
 
     @PostMapping("/")
     public ResponseEntity<?> createAccount(
-            @RequestPart @Valid AccountCreateRequest account, // recheck
-            @RequestPart(required = false) MultipartFile avatar,
-            BindingResult result
+            @RequestPart @Valid AccountCreateRequest account,
+            @RequestPart(required = false) MultipartFile avatar
+//            BindingResult result
     ) {
-        try {
             ResponseData responseData = new ResponseData();
 
-            if (result.hasErrors()) {
-                List<String> errorMessages = result.getFieldErrors()
-                        .stream()
-                        .map(FieldError::getDefaultMessage)
-                        .toList();
-                return ResponseEntity.badRequest().body(errorMessages);
-            }
+//            if (result.hasErrors()) {
+//                List<String> errorMessages = result.getFieldErrors()
+//                        .stream()
+//                        .map(FieldError::getDefaultMessage)
+//                        .toList();
+//                return ResponseEntity.badRequest().body(errorMessages);
+//            }
 
             AccountDTO accountCreated = accountService.createAccount(account, avatar);
 
@@ -74,10 +70,6 @@ public class AdminAccountController {
             responseData.setDesc("Success");
 
             return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
-
-        } catch (Exception ex) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
-        }
     }
 
     @PatchMapping("/{id}")

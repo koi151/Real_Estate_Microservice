@@ -1,5 +1,6 @@
 package com.example.msaccount.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -10,4 +11,9 @@ public enum AccountTypeEnum {
     CLIENT("Client account");
 
     private final String accountType;
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static AccountTypeEnum fromString(String status) {
+        return status == null ? null : AccountTypeEnum.valueOf(status.toUpperCase());
+    }
 }

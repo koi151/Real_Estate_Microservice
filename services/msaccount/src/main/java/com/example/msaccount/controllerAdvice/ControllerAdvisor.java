@@ -2,7 +2,7 @@ package com.example.msaccount.controllerAdvice;
 
 
 import com.example.msaccount.customExceptions.*;
-import com.example.msaccount.model.response.ErrorResponseDTO;
+import com.example.msaccount.model.response.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
@@ -10,29 +10,29 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
-import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@ControllerAdvice
+@RestControllerAdvice
 public class ControllerAdvisor {
 
 //    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
+//    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
+//        var errors = new HashMap<>();
+//        exp.getBindingResult().getAllErrors()
+//                .forEach(error -> {
+//                    var fieldName = ((FieldError) error).getField();
+//                    var errorMessage = error.getDefaultMessage();
+//                    errors.put(fieldName, errorMessage);
+//                });
 //
-//        List<String> errors = ex.getBindingResult().getFieldErrors()
-//                .stream() // create new stream
-//                .map(FieldError::getDefaultMessage)
-//                .collect(Collectors.toList()); // convert to list
-//
-//        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-//        errorResponseDTO.setError("Invalid request");
-//        errorResponseDTO.setDetails(errors);
-//
-//        return ResponseEntity.badRequest().body(errorResponseDTO);
+//        return ResponseEntity
+//                .status(HttpStatus.BAD_REQUEST)
+//                .body(new ErrorResponse(errors));
 //    }
 
     //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
@@ -46,11 +46,11 @@ public class ControllerAdvisor {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Failed");
-        errorResponseDTO.setDetails(constraintViolations);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("Validation Failed");
+        errorResponse.setDetails(constraintViolations);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
@@ -58,11 +58,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(EmptyFileException.class)
@@ -70,11 +70,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Images file is empty, recheck file value again");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation Error");
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("Validation Error");
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest().body(errorResponse);
     }
 
     @ExceptionHandler(CloudinaryUploadFailedException.class)
@@ -82,47 +82,47 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Unexpected error appeared in Cloudinary API, cannot upload image Cloudinary");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
     }
 
     @ExceptionHandler(PhoneAlreadyExistsException.class)
-    public ResponseEntity<Object> handlePhoneAlreadyExistsException(PhoneAlreadyExistsException ex) {
+    public ResponseEntity<ErrorResponse> handlePhoneAlreadyExistsException(PhoneAlreadyExistsException ex) {
         List<String> details = new ArrayList<>();
         details.add("Phone number already existed, please choose another one");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(AccountAlreadyExistsException.class)
-    public ResponseEntity<Object> handleUserNameAlreadyExistsException(AccountAlreadyExistsException ex) {
+    public ResponseEntity<ErrorResponse> handleUserNameAlreadyExistsException(AccountAlreadyExistsException ex) {
         List<String> details = new ArrayList<>();
         details.add("User name already existed, please choose another one");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
     @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<Object> handleAccountNotFoundException(AccountNotFoundException ex) {
+    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException ex) {
         List<String> details = new ArrayList<>();
         details.add("Account not existed or might be deleted");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(RoleNotFoundException.class)
@@ -130,11 +130,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Role not existed, recheck role id again");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnauthorizedActionException.class)
@@ -142,11 +142,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Current account do not have permission to create new account.");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
@@ -156,11 +156,11 @@ public class ControllerAdvisor {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList()); // convert to list
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError("Validation failed");
-        errorResponseDTO.setDetails(errors);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("Validation failed");
+        errorResponse.setDetails(errors);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -168,10 +168,36 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Wrong login information, recheck phone number or password");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
 
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidEnumValueException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Recheck status value");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(PasswordMismatchException.class)
+    public ResponseEntity<ErrorResponse> handlePasswordMismatchException(InvalidEnumValueException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Retype password does not match, please try again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

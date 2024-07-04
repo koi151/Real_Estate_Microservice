@@ -8,7 +8,7 @@ import java.util.List;
 
 @Getter
 @Setter
-public class ErrorResponseDTO {
+public class ErrorResponse {
 
     private String error;
     private List<String> details = new ArrayList<>();

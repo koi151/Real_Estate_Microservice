@@ -45,12 +45,12 @@ public class AccountServiceImpl implements AccountService {
     private final JwtTokenUtil jwtTokenUtil;
 
     private void validateAccountCreateRequest(AccountCreateRequest request)  {
-        if (accountRepository.existsByPhone(request.getPhone())) {
+//        if (!request.getRetypePassword().equals(request.getPassword()))
+//            throw new PasswordMismatchException("Retype password does not match");
+        if (accountRepository.existsByPhone(request.getPhone()))
             throw new PhoneAlreadyExistsException("Phone number already exists");
-        }
-        if (accountRepository.existsByAccountName(request.getAccountName())) {
+        if (accountRepository.existsByAccountName(request.getAccountName()))
             throw new AccountAlreadyExistsException("Account name already exists");
-        }
     }
 
     @Override

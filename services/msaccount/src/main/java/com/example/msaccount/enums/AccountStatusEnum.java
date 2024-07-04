@@ -1,5 +1,9 @@
 package com.example.msaccount.enums;
 
+import com.example.msaccount.customExceptions.InvalidEnumValueException;
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -12,15 +16,13 @@ public enum AccountStatusEnum {
 
     private final String status;
 
-    public boolean isActive() {
-        return this == ACTIVE;
-    }
-
-    public boolean isInactive() {
-        return this == INACTIVE;
-    }
-
-    public boolean isBanned() {
-        return this == BANNED;
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static AccountStatusEnum fromString(String status) {
+       try {
+           return status == null ? null : AccountStatusEnum.valueOf(status.toUpperCase());
+       } catch (Exception e) {
+           throw new InvalidEnumValueException("Invalid status value");
+       }
     }
 }
+

@@ -2,7 +2,6 @@ package com.example.msaccount.model.request;
 
 import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.enums.AccountTypeEnum;
-import com.example.msaccount.utils.StringUtil;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.AllArgsConstructor;
@@ -26,6 +25,7 @@ public class AccountCreateRequest {
     private Long roleId;
 
     @NotBlank(message = "User name cannot be blank")
+    @Size(min = 5, max = 30, message = "User name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Account name contains invalid characters")
     private String accountName;
 
@@ -61,9 +61,4 @@ public class AccountCreateRequest {
 
     @Column(name = "google_account_id")
     private int googleAccountId;
-
-    @AssertTrue(message = "Password retype does not match")
-    private boolean isPasswordMatch(String password) {
-        return StringUtil.checkString(password) && password.equals(retypePassword);
-    }
 }
