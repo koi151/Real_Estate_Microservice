@@ -1,15 +1,6 @@
-eureka:
-  instance:
-    hostname: localhost
-  client:
-    service-url:
-      defaultZone: http://localhost:8761/eureka
-
 server:
   port: 8083
 spring:
-  application:
-    name: account
   datasource:
     url: ${DATABASE_URL}
     username: ${DB_USERNAME}
@@ -22,14 +13,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-  servlet:
-    multipart:
-      max-file-size: 10MB
-
-management:
-  tracing:
-    sampling:
-      probability: 1.0
 
 api:
   prefix: api/v1
