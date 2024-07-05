@@ -31,7 +31,11 @@ public class PropertyCreateRequest {
 
     @NotNull(message = "Category id cannot be null")
     @Positive(message = "Category id must be positive")
-    private Integer categoryId;
+    private Long categoryId;
+
+    @NotNull(message = "Account id cannot be null")
+    @Positive(message = "Account id must be positive")
+    private Long accountId;
 
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")

@@ -5,6 +5,7 @@ import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.entity.admin.AdminAccount;
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
 import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.model.request.AccountUpdateRequest;
@@ -58,6 +59,14 @@ public class AccountServiceImpl implements AccountService {
         return adminAccountRepository.findAllByAccountDeleted(false, Sort.by("accountId")).stream()
                 .map(adminAccountConverter::toAdminAccountDTO)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<AccountWithPropertiesDTO> findAccountWithProperties(Long id) {
+        Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountId(id)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + id)));
+
+        return null;
     }
 
     @Override

@@ -88,6 +88,13 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
+    public List<PropertiesHomeDTO> findAllAccountByCategory(Long accountId) {
+//        List<PropertyEntity> properties = propertyRepository.find
+
+        return null;
+    }
+
+    @Override
     public List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
         Page<PropertyEntity> properties = propertyRepository.findByStatus(status, pageRequest);

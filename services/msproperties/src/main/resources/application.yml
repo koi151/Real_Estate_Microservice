@@ -1,11 +1,10 @@
 spring:
   application:
-    name: properties
+    name: properties-service
   config:
     import: optional:configserver:http://localhost:8888
-  profiles:
-    active: dev
-
+#  profiles:
+#    active: dev
 
   jpa:
     show-sql: true

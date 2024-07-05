@@ -14,7 +14,7 @@ public class AddressEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     @Column(name = "city", nullable = false, length = 50)
     @NotEmpty(message = "City cannot be empty")
@@ -30,11 +30,4 @@ public class AddressEntity {
 
     @Column(name = "street_address", length = 150)
     private String streetAddress;
-
-    public AddressEntity(String city, String district, String ward, String streetAddress) {
-        this.city = city;
-        this.district = district;
-        this.ward = ward;
-        this.streetAddress = streetAddress;
-    }
 }

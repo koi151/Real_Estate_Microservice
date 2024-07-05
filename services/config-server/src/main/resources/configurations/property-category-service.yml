@@ -1,8 +1,6 @@
 server:
   port: 8082
 spring:
-  application:
-    name: property-category
   datasource:
     url: ${DATABASE_URL}
     username: ${DB_USERNAME}
@@ -14,9 +12,6 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
-  servlet:
-    multipart:
-      max-file-size: 10MB
 
 application:
   config:

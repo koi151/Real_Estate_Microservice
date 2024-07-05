@@ -25,7 +25,7 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/v1/property")
+@RequestMapping("/api/v1/properties")
 @PropertySource("classpath:application.yml")
 public class PropertyController {
 
@@ -35,8 +35,8 @@ public class PropertyController {
     @Autowired
     ObjectMapper objectMapper;
 
-    @GetMapping("/property-list")
-    public ResponseEntity<ResponseData> propertyList (@RequestBody @Valid PropertySearchRequest request) {
+    @GetMapping("/")
+    public ResponseEntity<ResponseData> findAllProperties (@RequestBody @Valid PropertySearchRequest request) {
         List<PropertySearchDTO> properties = propertiesService.findAllProperties(request);
 
         ResponseData responseData = new ResponseData();
@@ -48,8 +48,10 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
-    @GetMapping("/home-properties")
-    public ResponseEntity<?> getHomeProperties(@RequestParam Map<String, Object> params) {
+//    @GetMapping("/")
+
+    @GetMapping("/home")
+    public ResponseEntity<?> findHomeProperties(@RequestParam Map<String, Object> params) {
         List<PropertiesHomeDTO> properties = propertiesService.getHomeProperties(params);
 
         ResponseData responseData = new ResponseData();
@@ -62,7 +64,7 @@ public class PropertyController {
     }
 
     @GetMapping("/detail/{id}")
-    public ResponseEntity<ResponseData> getPropertyById(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<ResponseData> findPropertyById(@PathVariable(name = "id") Long id) {
         PropertyEntity propertyEntity = propertiesService.getPropertyById(id);
 
         ResponseData responseData = new ResponseData();
@@ -84,8 +86,14 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
+//    @GetMapping("/account/{account-id}")
+//    public ResponseEntity<ResponseData> getPropertiesByAccount(@PathVariable(name = "account-id") Long accountId) {
+//        var properties = propertiesService.
+//
+//    }
+
     @GetMapping("/status/{status}")
-    public ResponseEntity<ResponseData> getPropertiesWithStatus(@PathVariable(name = "status") String status) {
+    public ResponseEntity<ResponseData> findPropertiesWithStatus(@PathVariable(name = "status") String status) {
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
         List<PropertiesHomeDTO> properties = propertiesService.getPropertiesWithStatus(se);
 

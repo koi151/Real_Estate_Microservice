@@ -2,12 +2,14 @@ package com.koi151.msproperties.service.converter;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
+import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.model.request.AddressRequest;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.RoomCreateRequest;
 import com.koi151.msproperties.service.impl.CloudinaryServiceImpl;
 import com.koi151.msproperties.utils.StringUtil;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.modelmapper.ModelMapper;
@@ -19,13 +21,16 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Component
+@RequiredArgsConstructor
 public class PropertyConverter {
 
     @Autowired
     private ModelMapper modelMapper;
 
     @Autowired
-    private CloudinaryServiceImpl cloudinaryServiceImpl;
+    private PropertyMapper propertyMapper;
+
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
 
     public String getAddressString(AddressEntity item) {
         return String.join(", ",
@@ -109,7 +114,8 @@ public class PropertyConverter {
     }
 
     public PropertyEntity toPropertyEntity (PropertyCreateRequest request, List<MultipartFile> imageFiles) {
-        PropertyEntity propertyEntity =  modelMapper.map(request, PropertyEntity.class);
+//        PropertyEntity propertyEntity =  modelMapper.map(request, PropertyEntity.class);
+        PropertyEntity propertyEntity = propertyMapper.toPropertyEntity(request);
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
             String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_properties");

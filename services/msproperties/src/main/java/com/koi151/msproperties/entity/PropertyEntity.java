@@ -41,8 +41,13 @@ public class PropertyEntity {
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id cannot be null")
-    @Positive(message = "Category id must be positive")
+    @Positive(message = "Category id must be positive value")
     private int categoryId;
+
+    @Column(name = "account_id", nullable = false)
+    @NotNull(message = "Account id cannot be null")
+    @Positive(message = "Account id must be positive value")
+    private int accountId;
 
     @Column(name = "available_from", nullable = false, length = 30)
     @NotEmpty(message = "Available time cannot be empty")

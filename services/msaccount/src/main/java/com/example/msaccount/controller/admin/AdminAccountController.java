@@ -48,24 +48,24 @@ public class AdminAccountController {
         return ResponseEntity.ok(responseData);
     }
 
+    @GetMapping("/{id}/properties")
+    public ResponseEntity<ResponseData> findAccountWithProperties(@PathVariable(name = "id") Long id) {
+        var account = accountService.findAccountWithProperties(id);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(account);
+
+        return ResponseEntity.ok(responseData);
+    }
+
     @PostMapping("/")
     public ResponseEntity<?> createAccount(
             @RequestPart @Valid AccountCreateRequest account,
             @RequestPart(required = false) MultipartFile avatar
-//            BindingResult result
     ) {
-            ResponseData responseData = new ResponseData();
-
-//            if (result.hasErrors()) {
-//                List<String> errorMessages = result.getFieldErrors()
-//                        .stream()
-//                        .map(FieldError::getDefaultMessage)
-//                        .toList();
-//                return ResponseEntity.badRequest().body(errorMessages);
-//            }
-
             AccountDTO accountCreated = accountService.createAccount(account, avatar);
 
+            ResponseData responseData = new ResponseData();
             responseData.setData(accountCreated);
             responseData.setDesc("Success");
 

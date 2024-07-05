@@ -1,8 +1,6 @@
 server:
   port: 8080
 spring:
-  application:
-    name: login
   datasource:
     url: ${DATABASE_URL}
     username: ${DB_USERNAME}

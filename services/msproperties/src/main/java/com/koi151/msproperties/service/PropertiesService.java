@@ -20,6 +20,7 @@ public interface PropertiesService {
     List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
     PropertyEntity getPropertyById(Long id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
+    List<PropertiesHomeDTO> findAllAccountByCategory(Long accountId);
     List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
     FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
     FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
