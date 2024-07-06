@@ -1,5 +1,8 @@
 package com.koi151.msproperties.model.dto;
 
+import com.koi151.msproperties.entity.AddressEntity;
+import com.koi151.msproperties.entity.PropertyForRentEntity;
+import com.koi151.msproperties.entity.PropertyForSaleEntity;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import lombok.*;
@@ -11,6 +14,7 @@ import java.util.List;
 @AllArgsConstructor
 @NoArgsConstructor
 public class FullPropertyDTO {
+
     private String title;
     private Integer categoryId;
     private Float area;
@@ -23,8 +27,6 @@ public class FullPropertyDTO {
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
     private String address;
-    //    private String paymentSchedule;
-    //    private String term;
-    //    private Float price;
-//    private String type;
+    private PropertyForSaleCreateDTO propertyForSale;
+    private PropertyForRentCreateDTO propertyForRent;
 }

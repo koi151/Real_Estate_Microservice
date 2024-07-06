@@ -13,6 +13,7 @@ import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.service.converter.PropertyConverter;
 import customExceptions.MaxImagesExceededException;
 import customExceptions.PropertyNotFoundException;
+import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -106,8 +107,9 @@ public class PropertyServiceImpl implements PropertiesService {
                 .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatus(), property.getView()))
                 .collect(Collectors.toList());
     }
+
+    @Transactional
     @Override
-//    @Transactional
     public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
 
         // Convert and save the address entity
@@ -120,14 +122,10 @@ public class PropertyServiceImpl implements PropertiesService {
         // Save the property entity again to update the relationships
         propertyRepository.save(propertyEntity);
 
-        return propertyMapper.toFullPropertyDTO(propertyEntity);
+        return propertyConverter.toFullPropertyDTO(propertyEntity);
     }
 
-
-
-
-
-
+    @Transactional
     @Override
     public FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
 //        return propertyRepository.findByIdAndDeleted(id, false)

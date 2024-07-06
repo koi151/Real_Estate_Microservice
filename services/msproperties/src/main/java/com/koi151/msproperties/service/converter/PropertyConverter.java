@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -71,37 +72,14 @@ public class PropertyConverter {
     }
 
     public FullPropertyDTO toFullPropertyDTO (PropertyEntity entity) {
-//        FullPropertyDTO propertyDTO = modelMapper.map(item, FullPropertyDTO.class);
         FullPropertyDTO propertyDTO = propertyMapper.toFullPropertyDTO(entity);
+        propertyDTO.setAddress(getAddressString(entity.getAddress()));
 
-        propertyDTO.setAddress(getAddressString(entity.getAddress())); // temp
-//        propertyDTO.setImageUrls(entity.getImageUrls().split(";"));
-//
-//        PropertyForRentEntity rentEntity = item.getPropertyForRent();
-//        PropertyForSaleEntity saleEntity = item.getPropertyForSale();
-
-//        if (rentEntity != null) {
-//            propertyDTO.setPrice(rentEntity.getRentalPrice());
-//            propertyDTO.setPaymentSchedule(rentEntity.getPaymentSchedule().getScheduleName());
-//            propertyDTO.setTerm(rentEntity.getRentTerm());
-//            propertyDTO.setType(PropertyTypeEnum.RENT.getPropertyType());
-//        } else if (saleEntity != null) {
-//            propertyDTO.setPrice(saleEntity.getSalePrice());
-//            propertyDTO.setTerm(saleEntity.getSaleTerm());
-//            propertyDTO.setType(PropertyTypeEnum.SALE.getPropertyType());
-//        }
-
-//        if (entity.getRooms() != null) { // temp
-//            propertyDTO.setRooms(entity.getRooms().stream()
-//                    .map(room -> RoomNameQuantityDTO.builder()
-//                            .roomType(room.getRoomType())
-//                            .quantity(room.getQuantity())
-//                            .build())
-//                    .collect(Collectors.toList()));
-//        }
+        propertyDTO.setImageUrls(
+                List.of(entity.getImageUrls().split(";"))
+        );
 
         propertyDTO.setStatus(entity.getStatus().getStatusName());
-
         return propertyDTO;
     }
 
