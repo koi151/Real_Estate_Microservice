@@ -3,6 +3,7 @@ package com.koi151.msproperties.entity;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
@@ -25,19 +26,18 @@ public class PropertyEntity {
     private Long propertyId;
 
     @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private PropertyForSaleEntity propertyForSaleEntity;
+    private PropertyForSaleEntity propertyForSale;
 
     @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private PropertyForRentEntity propertyForRentEntity;
+    private PropertyForRentEntity propertyForRent;
 
-    @OneToOne
+    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinColumn(name = "address_id", nullable = false)
-    @NotNull(message = "Address id cannot be null")
-    private AddressEntity addressEntity;
+    private AddressEntity address;
 
     @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}
                                                                                             , orphanRemoval = true)
-    private Set<RoomEntity> roomEntities;
+    private Set<RoomEntity> rooms;
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id cannot be null")

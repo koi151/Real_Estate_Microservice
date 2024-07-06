@@ -1,9 +1,7 @@
 package com.koi151.msproperties.controllerAdvice;
 
-import customExceptions.EmptyFileException;
-import customExceptions.MaxImagesExceededException;
-import customExceptions.PaymentScheduleNotFoundException;
-import customExceptions.PropertyNotFoundException;
+import com.koi151.msproperties.model.reponse.ErrorResponse;
+import customExceptions.*;
 import com.koi151.msproperties.model.dto.ErrorResponseDTO;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
@@ -60,7 +58,7 @@ public class ControllerAdvisor {
         errorResponseDTO.setError("Validation failed");
         errorResponseDTO.setDetails(errors);
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
     }
 
     //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
@@ -75,7 +73,7 @@ public class ControllerAdvisor {
                 .collect(Collectors.toList());
 
         ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
-        errorResponseDTO.setError(ex.getMessage());
+        errorResponseDTO.setError("Validation errors occurred");
         errorResponseDTO.setDetails(constraintViolations);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
@@ -127,5 +125,18 @@ public class ControllerAdvisor {
         errorResponseDTO.setDetails(details);
 
         return ResponseEntity.badRequest().body(errorResponseDTO);
+    }
+
+    @ExceptionHandler(InvalidEnumValueException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Recheck status value");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

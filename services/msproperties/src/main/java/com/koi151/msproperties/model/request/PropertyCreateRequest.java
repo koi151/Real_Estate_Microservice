@@ -22,12 +22,9 @@ public class PropertyCreateRequest {
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
-    @Enumerated(EnumType.STRING) // enum cannot use @NotEmpty
-    @NotNull(message = "Property type cannot be null")
-    private PropertyTypeEnum type;
-
-    @Enumerated(EnumType.STRING)
-    private PaymentScheduleEnum paymentSchedule;
+//    @Enumerated(EnumType.STRING) // enum cannot use @NotEmpty
+//    @NotNull(message = "Property type cannot be null")
+//    private PropertyTypeEnum type;
 
     @NotNull(message = "Category id cannot be null")
     @Positive(message = "Category id must be positive")
@@ -37,13 +34,21 @@ public class PropertyCreateRequest {
     @Positive(message = "Account id must be positive")
     private Long accountId;
 
+    @Valid
+    private PropertyForSaleCreateRequest propertyForSale;
+
+    @Valid
+    private PropertyForRentCreateRequest propertyForRent;
+
+    @Valid
+    private List<RoomCreateRequest> rooms;
+
+    @Valid
+    private AddressRequest address;
+
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")
     private Float area;
-
-    @NotNull(message = "Price cannot be empty")
-    @PositiveOrZero(message = "Price must be positive or zero")
-    private Float price;
 
     private String description;
 
@@ -61,13 +66,5 @@ public class PropertyCreateRequest {
 
     @NotEmpty(message = "Available time cannot be empty")
     private String availableFrom;
-
-    private String term;
-
-    @Valid
-    private List<RoomCreateRequest> rooms;
-
-    @Valid
-    private AddressRequest address;
 }
 

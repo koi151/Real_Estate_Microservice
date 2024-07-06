@@ -14,7 +14,7 @@ import lombok.*;
 public class PropertyForSaleEntity {
 
     @Id
-    private Long property_id;
+    private Long propertyId;
 
     @OneToOne
     @MapsId
@@ -24,7 +24,7 @@ public class PropertyForSaleEntity {
     @Column(name = "sale_price")
     @NotNull(message = "Price cannot be empty")
     @PositiveOrZero(message = "Price must be positive or zero")
-    private float salePrice;
+    private double salePrice;
 
     @Column(name = "sale_term", columnDefinition = "TEXT")
     private String saleTerm;

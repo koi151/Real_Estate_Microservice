@@ -14,7 +14,6 @@ public class FullPropertyDTO {
     private String title;
     private Integer categoryId;
     private Float area;
-    private Float price;
     private String description;
     private Integer totalFloor;
     private String houseDirection;
@@ -24,7 +23,8 @@ public class FullPropertyDTO {
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
     private String address;
-    private String paymentSchedule;
-    private String term;
-    private String type;
+    //    private String paymentSchedule;
+    //    private String term;
+    //    private Float price;
+//    private String type;
 }

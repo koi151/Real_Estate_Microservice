@@ -112,8 +112,8 @@ public class PropertyController {
             @RequestPart(required = false) List<MultipartFile> images
     ) {
 
-        if (property.getType() == PropertyTypeEnum.RENT && property.getPaymentSchedule() == null)
-            throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
+//        if (property.getPropertyForRent() && property.getPropertyForRent().getRentalPrice() == )
+//            throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
 
         FullPropertyDTO propertyRes = propertiesService.createProperty(property, images);
 

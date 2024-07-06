@@ -1,9 +1,10 @@
 package com.koi151.msproperties.service.impl;
 
-import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.entity.*;
-import com.koi151.msproperties.entity.PropertyEntity;
+import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.mapper.AddressEntityMapper;
+import com.koi151.msproperties.mapper.PropertyMapper;
+import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
@@ -47,6 +48,8 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Autowired
     AddressRepository addressRepository;
+
+    private final PropertyMapper propertyMapper;
 
     @Override
     public List<PropertySearchDTO> findAllProperties(PropertySearchRequest request) {
@@ -103,18 +106,27 @@ public class PropertyServiceImpl implements PropertiesService {
                 .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatus(), property.getView()))
                 .collect(Collectors.toList());
     }
-
     @Override
-    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images) {
-        AddressEntity addressEntity = propertyConverter.toAddressEntity(request.getAddress());
-        addressRepository.save(addressEntity);
+//    @Transactional
+    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
 
-        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, images);
-        propertyEntity.setAddressEntity(addressEntity);
+        // Convert and save the address entity
+        AddressEntity addressEntity = addressRepository.save(
+                AddressEntityMapper.INSTANCE.toAddressEntity(request.getAddress())
+        );
 
+        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles, addressEntity);
+
+        // Save the property entity again to update the relationships
         propertyRepository.save(propertyEntity);
-        return propertyConverter.toFullPropertyDTO(propertyEntity);
+
+        return propertyMapper.toFullPropertyDTO(propertyEntity);
     }
+
+
+
+
+
 
     @Override
     public FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {

@@ -25,7 +25,7 @@ public class PropertyForRentEntity {
     @Column(name = "rental_price", nullable = false)
     @NotNull(message = "Rental price cannot be null")
     @PositiveOrZero(message = "Rental price must be positive or zero")
-    private float rentalPrice;
+    private double rentalPrice;
 
     @Column(name = "payment_schedule", nullable = false)
     @Enumerated(EnumType.STRING)
