@@ -75,9 +75,10 @@ public class PropertyConverter {
         FullPropertyDTO propertyDTO = propertyMapper.toFullPropertyDTO(entity);
         propertyDTO.setAddress(getAddressString(entity.getAddress()));
 
-        propertyDTO.setImageUrls(
-                List.of(entity.getImageUrls().split(";"))
-        );
+        if (propertyDTO.getImageUrls() != null && !propertyDTO.getImageUrls().isEmpty())
+            propertyDTO.setImageUrls(
+                    List.of(entity.getImageUrls().split(";"))
+            );
 
         propertyDTO.setStatus(entity.getStatus().getStatusName());
         return propertyDTO;

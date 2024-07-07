@@ -9,6 +9,7 @@ import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 import java.util.Set;
 
@@ -18,7 +19,10 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyEntity {
+public class PropertyEntity extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = 58116615802509522L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -88,23 +92,4 @@ public class PropertyEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
     private DirectionEnum balconyDirection;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
-
-//    @Column(nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    @Column(name = "created_at", updatable = false)
-    @CreatedDate
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at")
-    @LastModifiedDate
-    private LocalDateTime updatedAt;
-
-//    @PrePersist
-//    protected void onCreate() {
-//        if (createdAt == null) {
-//            createdAt = LocalDateTime.now();
-//        }
-//    }
 }

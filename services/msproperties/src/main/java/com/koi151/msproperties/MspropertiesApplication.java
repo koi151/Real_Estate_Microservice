@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 @EnableFeignClients
 @SpringBootApplication
 @EnableJpaRepositories
+@EnableJpaAuditing
 public class MspropertiesApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(MspropertiesApplication.class, args);
