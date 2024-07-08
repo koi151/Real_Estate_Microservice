@@ -31,6 +31,9 @@ public interface PropertyMapper {
 
     @Mapping(target = "imageUrls", ignore = true)
     @Mapping(target = "address", ignore = true)
+    @Mapping(target = "balconyDirection", source = "balconyDirection.directionName") // Mapping directionName instead of enum
+    @Mapping(target = "houseDirection", source = "houseDirection.directionName")
+    @Mapping(target = "propertyForRent.paymentSchedule", source = "propertyForRent.paymentSchedule.scheduleName")
     FullPropertyDTO toFullPropertyDTO(PropertyEntity entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,

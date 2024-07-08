@@ -7,7 +7,7 @@ import com.koi151.msproperties.model.request.RoomCreateUpdateRequest;
 import com.koi151.msproperties.repository.PropertyRepository;
 import com.koi151.msproperties.repository.RoomRepository;
 import com.koi151.msproperties.service.RoomService;
-import customExceptions.PropertyNotFoundException;
+import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

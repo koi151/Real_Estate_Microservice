@@ -2,7 +2,7 @@ package com.koi151.msproperties.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.koi151.msproperties.service.CloudinaryService;
-import customExceptions.EmptyFileException;
+import com.koi151.msproperties.customExceptions.EmptyFileException;
 import jakarta.annotation.Resource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;

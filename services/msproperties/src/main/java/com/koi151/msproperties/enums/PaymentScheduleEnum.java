@@ -1,8 +1,7 @@
 package com.koi151.msproperties.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import customExceptions.InvalidEnumValueException;
-import lombok.AllArgsConstructor;
+import com.koi151.msproperties.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 

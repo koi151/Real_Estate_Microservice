@@ -8,7 +8,7 @@ import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
-import customExceptions.PropertyNotFoundException;
+import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
