@@ -11,6 +11,8 @@ import org.springframework.stereotype.Component;
 import org.modelmapper.ModelMapper;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,7 +36,7 @@ public class PropertyConverter {
         if (StringUtil.checkString(item.getCity()))
             fullAddress.append(item.getCity()).append(", ");
 
-        return fullAddress.toString();
+        return fullAddress.substring(0, fullAddress.length() - 2);
     }
 
     public PropertySearchDTO toPropertySearchDTO(PropertyEntity item) {
@@ -81,10 +83,10 @@ public class PropertyConverter {
         FullPropertyDTO propertyDTO = propertyMapper.toFullPropertyDTO(entity);
         propertyDTO.setAddress(getFullAddressString(entity.getAddress()));
 
-        if (propertyDTO.getImageUrls() != null && !propertyDTO.getImageUrls().isEmpty())
-            propertyDTO.setImageUrls(
-                    List.of(entity.getImageUrls().split(";"))
-            );
+        if (entity.getImageUrls() != null && !entity.getImageUrls().isEmpty()) {
+            List<String> imageUrls = Arrays.stream(entity.getImageUrls().split(",")).toList();
+            propertyDTO.setImageUrls(imageUrls);
+        }
 
         propertyDTO.setStatus(entity.getStatus().getStatusName());
         return propertyDTO;

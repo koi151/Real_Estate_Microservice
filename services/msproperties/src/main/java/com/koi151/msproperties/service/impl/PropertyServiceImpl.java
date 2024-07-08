@@ -4,7 +4,6 @@ import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.AddressMapper;
 import com.koi151.msproperties.mapper.PropertyMapper;
-import com.koi151.msproperties.mapper.RoomMapper;
 import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
@@ -53,7 +52,6 @@ public class PropertyServiceImpl implements PropertiesService {
     AddressRepository addressRepository;
 
     private final PropertyMapper propertyMapper;
-    private final RoomMapper roomMapper;
 
     @Override
     public List<PropertySearchDTO> findAllProperties(PropertySearchRequest request) {
@@ -149,10 +147,10 @@ public class PropertyServiceImpl implements PropertiesService {
             existingImagesUrlSet = new HashSet<>(Arrays.asList(existingProperty.getImageUrls().split(",")));
         }
 
-//        // Handle image removal
-//        if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
-//            existingImagesUrlSet.removeAll(request.getImageUrlsRemove());
-//        }
+        // Handle image removal
+        if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
+            existingImagesUrlSet.removeAll(request.getImageUrlsRemove());
+        }
 
         // Handle image addition
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -180,24 +178,10 @@ public class PropertyServiceImpl implements PropertiesService {
                 AddressEntity updatedAddress = AddressMapper.INSTANCE.updateAddressEntity(request.getAddress());
                 updatedAddress.setId(existingProperty.getAddress().getId()); // Keep the existing ID
                 addressRepository.save(updatedAddress);
-
-//                existingProperty.getAddress().setId(updatedAddress.getId());
             }
 
-            updateRooms(existingProperty, request.getRooms());
+            updateRooms(existingProperty, request.getRooms()); // update existing property info with request
             propertyMapper.updatePropertyFromDto(request, existingProperty);
-
-//            for (RoomEntity roomEntity : existingProperty.getRooms()) {
-//                if (roomEntity.)
-//            }
-
-//            if (request.getRooms() != null) {
-//                updateRoomEntities(existingProperty, request.getRooms());
-//            }
-
-
-//            propertyMapper.updateRoomFromDto(request, existingProperty.getRooms().stream().map(room))
-            System.out.println(".");
         }
     }
 

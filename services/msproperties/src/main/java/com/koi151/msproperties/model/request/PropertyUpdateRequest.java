@@ -8,6 +8,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -53,4 +54,6 @@ public class PropertyUpdateRequest {
     private StatusEnum status = StatusEnum.ACTIVE;
 
     private String availableFrom;
+
+    private List<String> imageUrlsRemove;
 }
