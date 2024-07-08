@@ -1,16 +1,18 @@
 package com.koi151.msproperties.model.request;
 
+import com.koi151.msproperties.entity.PropertyEntity;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.Setter;
 
 @Getter
 @Setter
-public class RoomCreateRequest {
+public class RoomCreateUpdateRequest {
+
+    private Long roomId;
 
     @NotEmpty(message = "Room type cannot be empty")
     @Size(max = 50, message = "Room type cannot be longer than 50 characters")

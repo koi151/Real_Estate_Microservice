@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.model.dto.FullPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
-import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.reponse.ResponseData;
@@ -12,7 +11,6 @@ import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
 import com.koi151.msproperties.service.PropertiesService;
-import customExceptions.PaymentScheduleNotFoundException;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
@@ -133,7 +131,6 @@ public class PropertyController {
 
         return ResponseEntity.ok(responseData);
     }
-
 
     @PatchMapping("/{id}")
     public  ResponseEntity<ResponseData> updateProperty(

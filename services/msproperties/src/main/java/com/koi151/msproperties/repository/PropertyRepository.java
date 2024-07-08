@@ -18,7 +18,6 @@ public interface PropertyRepository extends JpaRepository<PropertyEntity, Intege
     Page<PropertyEntity> findByDeleted(boolean deleted, PageRequest request);
     Page<PropertyEntity> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, PageRequest request);
     List<PropertyEntity> findByAccountIdAndDeleted(Integer categoryId, boolean deleted, PageRequest request);
-
     Page<PropertyEntity> findByStatus(StatusEnum status, PageRequest pageRequest);
     Optional<PropertyEntity> findByPropertyIdAndDeleted(Long propertyId, boolean deleted);
 }

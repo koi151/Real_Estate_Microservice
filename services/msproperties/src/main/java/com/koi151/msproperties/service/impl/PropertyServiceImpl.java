@@ -2,12 +2,14 @@ package com.koi151.msproperties.service.impl;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.mapper.AddressEntityMapper;
+import com.koi151.msproperties.mapper.AddressMapper;
 import com.koi151.msproperties.mapper.PropertyMapper;
+import com.koi151.msproperties.mapper.RoomMapper;
 import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
+import com.koi151.msproperties.model.request.RoomCreateUpdateRequest;
 import com.koi151.msproperties.repository.*;
 import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.service.converter.PropertyConverter;
@@ -51,6 +53,7 @@ public class PropertyServiceImpl implements PropertiesService {
     AddressRepository addressRepository;
 
     private final PropertyMapper propertyMapper;
+    private final RoomMapper roomMapper;
 
     @Override
     public List<PropertySearchDTO> findAllProperties(PropertySearchRequest request) {
@@ -111,34 +114,31 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional
     @Override
     public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
-
         // Convert and save the address entity
         AddressEntity addressEntity = addressRepository.save(
-                AddressEntityMapper.INSTANCE.toAddressEntity(request.getAddress())
+                AddressMapper.INSTANCE.toAddressEntity(request.getAddress())
         );
 
         PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles, addressEntity);
 
         // Save the property entity again to update the relationships
         propertyRepository.save(propertyEntity);
-
         return propertyConverter.toFullPropertyDTO(propertyEntity);
     }
 
     @Transactional
     @Override
     public FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
-//        return propertyRepository.findByIdAndDeleted(id, false)
-//                .map(existingProperty -> {
-//                    updatePropertyDetails(existingProperty, request);
-//                    updateImages(existingProperty, request, imageFiles);
-//
-//                    return propertyRepository.save(existingProperty);
-//                })
-//                .map(savedProperty -> convertToPropertyDTO(savedProperty, request))
-//                .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
+        return propertyRepository.findByPropertyIdAndDeleted(id, false)
+                .map(existingProperty -> {
+                    updatePropertyDetails(existingProperty, request);
+                    updateImages(existingProperty, request, imageFiles);
 
-        return null;
+                    return propertyRepository.save(existingProperty);
+                })
+                .map(savedProperty -> propertyConverter.toFullPropertyDTO(savedProperty))
+                .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
+
     }
 
     private void updateImages(PropertyEntity existingProperty, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
@@ -149,10 +149,10 @@ public class PropertyServiceImpl implements PropertiesService {
             existingImagesUrlSet = new HashSet<>(Arrays.asList(existingProperty.getImageUrls().split(",")));
         }
 
-        // Handle image removal
-        if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
-            existingImagesUrlSet.removeAll(request.getImageUrlsRemove());
-        }
+//        // Handle image removal
+//        if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
+//            existingImagesUrlSet.removeAll(request.getImageUrlsRemove());
+//        }
 
         // Handle image addition
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -176,20 +176,100 @@ public class PropertyServiceImpl implements PropertiesService {
     private void updatePropertyDetails(PropertyEntity existingProperty, PropertyUpdateRequest request) {
         if (request != null) {
 
-            // Use Optional for Null check
-            Optional.ofNullable(request.getTitle()).ifPresent(existingProperty::setTitle);
-            Optional.ofNullable(request.getDescription()).ifPresent(existingProperty::setDescription);
-            Optional.ofNullable(request.getCategoryId()).ifPresent(existingProperty::setCategoryId);
-            Optional.ofNullable(request.getArea()).ifPresent(existingProperty::setArea);
+            if (request.getAddress() != null) {
+                AddressEntity updatedAddress = AddressMapper.INSTANCE.updateAddressEntity(request.getAddress());
+                updatedAddress.setId(existingProperty.getAddress().getId()); // Keep the existing ID
+                addressRepository.save(updatedAddress);
 
-            Optional.ofNullable(request.getBalconyDirection()).ifPresent(existingProperty::setBalconyDirection);
-            Optional.ofNullable(request.getHouseDirection()).ifPresent(existingProperty::setHouseDirection);
-            Optional.ofNullable(request.getAvailableFrom()).ifPresent(existingProperty::setAvailableFrom);
-            Optional.ofNullable(request.getStatus()).ifPresent(existingProperty::setStatus);
+//                existingProperty.getAddress().setId(updatedAddress.getId());
+            }
 
-//            existingProperty.setUpdatedAt(LocalDateTime.now());
+            updateRooms(existingProperty, request.getRooms());
+            propertyMapper.updatePropertyFromDto(request, existingProperty);
+
+//            for (RoomEntity roomEntity : existingProperty.getRooms()) {
+//                if (roomEntity.)
+//            }
+
+//            if (request.getRooms() != null) {
+//                updateRoomEntities(existingProperty, request.getRooms());
+//            }
+
+
+//            propertyMapper.updateRoomFromDto(request, existingProperty.getRooms().stream().map(room))
+            System.out.println(".");
         }
     }
+
+    private void updateRooms(PropertyEntity existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
+        List<RoomEntity> currentRooms = existingProperty.getRooms();
+
+        for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
+            String roomType = updatedRoom.getRoomType();
+            int quantity = updatedRoom.getQuantity();
+
+            RoomEntity existingRoom = currentRooms.stream()
+                    .filter(room -> room.getRoomType().equals(roomType))
+                    .findFirst()
+                    .orElse(null);
+
+            if (existingRoom != null) {
+                // Room type exists in the property
+                if (existingRoom.getQuantity() != quantity) {
+                    // Quantity is different, update it
+                    existingRoom.setQuantity(quantity);
+                } else {
+                    // Quantity is the same, do nothing
+                    continue; // Skip to the next room request
+                }
+            } else {
+                // Room type doesn't exist, create a new room
+                RoomEntity newRoom = RoomEntity.builder()
+                        .roomType(roomType)
+                        .quantity(quantity)
+                        .propertyEntity(existingProperty)
+                        .build();
+
+                roomRepository.save(newRoom);
+                currentRooms.add(newRoom);
+            }
+        }
+
+        existingProperty.setRooms(currentRooms);
+    }
+
+
+//    private void updateRoomEntities(PropertyEntity propertyEntity, List<RoomCreateUpdateRequest> updatedRooms) {
+//        Set<RoomEntity> existingRooms = propertyEntity.getRooms();
+//
+//        // Map to RoomEntity and add or update
+//        for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
+//            // find the existing room to update (if it's not new)
+//            RoomEntity existingRoom = existingRooms.stream()
+//                    .filter(r -> updatedRoom.getRoomId() != null && r.getRoomId().equals(r.getRoomId()))
+//                    .findFirst()
+//                    .orElse(null);
+//
+//            // Room doesn't exist, create new one
+//            if (existingRoom == null) {
+//                existingRoom = roomMapper.toRoomEntity(updatedRoom); // Convert and create a new RoomEntity
+//                existingRoom.setPropertyEntity(propertyEntity); // Link it to the parent PropertyEntity
+//                roomRepository.save(existingRoom);
+//                existingRooms.add(existingRoom);
+//            } else { // update the existing room
+//                roomMapper.updateRoomFromDto(updatedRoom, existingRoom);
+//            }
+//        }
+//
+//        // Delete rooms not present in updatedRooms based on room type
+//        Set<String> roomTypesToDelete = existingRooms.stream()
+//                .map(RoomEntity::getRoomType)
+//                .filter(roomType -> updatedRooms.stream().noneMatch(r -> r.getRoomType().equals(roomType)))
+//                .collect(Collectors.toSet());
+//
+//        roomRepository.deleteByRoomTypeInAndPropertyEntity(roomTypesToDelete, propertyEntity);
+//    }
+
 
 //    private FullPropertyDTO convertToPropertyDTO(PropertyEntity savedProperty, PropertyUpdateRequest request) {
 //

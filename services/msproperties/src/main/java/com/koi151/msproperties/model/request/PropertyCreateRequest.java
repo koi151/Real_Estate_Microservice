@@ -1,9 +1,7 @@
 package com.koi151.msproperties.model.request;
 
 import com.koi151.msproperties.enums.DirectionEnum;
-import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
@@ -22,10 +20,6 @@ public class PropertyCreateRequest {
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
-//    @Enumerated(EnumType.STRING) // enum cannot use @NotEmpty
-//    @NotNull(message = "Property type cannot be null")
-//    private PropertyTypeEnum type;
-
     @NotNull(message = "Category id cannot be null")
     @Positive(message = "Category id must be positive")
     private Long categoryId;
@@ -41,10 +35,10 @@ public class PropertyCreateRequest {
     private PropertyForRentCreateRequest propertyForRent;
 
     @Valid
-    private List<RoomCreateRequest> rooms;
+    private List<RoomCreateUpdateRequest> rooms;
 
     @Valid
-    private AddressRequest address;
+    private AddressCreateRequest address;
 
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")

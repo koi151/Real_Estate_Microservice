@@ -26,6 +26,6 @@ public class PropertyForSaleEntity {
     @PositiveOrZero(message = "Price must be positive or zero")
     private double salePrice;
 
-    @Column(name = "sale_term", columnDefinition = "TEXT")
-    private String saleTerm;
+    @Column(name = "sale_terms", columnDefinition = "TEXT")
+    private String saleTerms;
 }

@@ -11,6 +11,7 @@ import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serial;
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Entity(name = "property")
@@ -41,7 +42,7 @@ public class PropertyEntity extends BaseEntity {
 
     @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}
                                                                                             , orphanRemoval = true)
-    private Set<RoomEntity> rooms;
+    private List<RoomEntity> rooms;
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id cannot be null")

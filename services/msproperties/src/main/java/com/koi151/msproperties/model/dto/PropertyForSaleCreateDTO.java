@@ -8,5 +8,5 @@ import lombok.Setter;
 public class PropertyForSaleCreateDTO {
     private Long propertyId;
     private double salePrice;
-    private String saleTerm;
+    private String saleTerms;
 }

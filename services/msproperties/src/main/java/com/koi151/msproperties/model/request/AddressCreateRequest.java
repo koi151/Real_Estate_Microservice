@@ -11,7 +11,8 @@ import lombok.Setter;
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
-public class AddressRequest {
+public class AddressCreateRequest {
+
     @Column(name = "city", nullable = false, length = 50)
     @NotEmpty(message = "City cannot be empty")
     private String city;

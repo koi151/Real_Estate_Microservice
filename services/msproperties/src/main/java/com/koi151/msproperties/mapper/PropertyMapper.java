@@ -2,10 +2,7 @@ package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.model.dto.FullPropertyDTO;
-import com.koi151.msproperties.model.request.PropertyCreateRequest;
-import com.koi151.msproperties.model.request.PropertyForRentCreateRequest;
-import com.koi151.msproperties.model.request.PropertyForSaleCreateRequest;
-import com.koi151.msproperties.model.request.RoomCreateRequest;
+import com.koi151.msproperties.model.request.*;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
 
@@ -30,11 +27,24 @@ public interface PropertyMapper {
     PropertyForSaleEntity toPropertyForSaleEntity(PropertyForSaleCreateRequest request);
 
     @Mapping(target = "propertyEntity", ignore = true)
-    RoomEntity toRoomEntity(RoomCreateRequest request);
+    RoomEntity toRoomEntity(RoomCreateUpdateRequest request);
 
     @Mapping(target = "imageUrls", ignore = true)
     @Mapping(target = "address", ignore = true)
     FullPropertyDTO toFullPropertyDTO(PropertyEntity entity);
+
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+            nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS) // fields in the target object will retain their existing values if the corresponding fields in the source object are null
+    @Mapping(target = "propertyForRent.rentalPrice", // get price existed in db when request price = 0.0, due to double type not accept null value
+            expression = "java(propertyForRentUpdateRequest.getRentalPrice() != 0.0 " +
+                    "? propertyForRentUpdateRequest.getRentalPrice() " +
+                    ": mappingTarget.getRentalPrice())")
+    @Mapping(target = "propertyForSale.salePrice",
+            expression = "java(propertyForSaleUpdateRequest.getSalePrice() != 0.0 " +
+                    "? propertyForSaleUpdateRequest.getSalePrice() " +
+                    ": mappingTarget.getSalePrice())")
+    @Mapping(target = "rooms", ignore = true)
+    void updatePropertyFromDto(PropertyUpdateRequest request, @MappingTarget PropertyEntity entity);
 }
 
 

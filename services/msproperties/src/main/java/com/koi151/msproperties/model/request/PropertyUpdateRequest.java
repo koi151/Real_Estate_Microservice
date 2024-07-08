@@ -4,27 +4,39 @@ import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
+import java.util.List;
 import java.util.Set;
 
-@Getter
-@Setter
+@Data
 public class PropertyUpdateRequest {
-
+    @NotBlank(message = "Title cannot be empty")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
     @Positive(message = "Category id must be positive")
-    private Integer categoryId;
+    private Long categoryId;
+
+    @Positive(message = "Account id must be positive")
+    private Long accountId;
+
+    @Valid
+    private PropertyForSaleUpdateRequest propertyForSale;
+
+    @Valid
+    private PropertyForRentUpdateRequest propertyForRent;
+
+    @Valid
+    private List<RoomCreateUpdateRequest> rooms;
+
+    @Valid
+    private AddressUpdateRequest address;
 
     @PositiveOrZero(message = "Area must be positive or zero")
     private Float area;
-
-    @PositiveOrZero(message = "Price must be positive or zero")
-    private Float price;
 
     private String description;
 
@@ -38,9 +50,7 @@ public class PropertyUpdateRequest {
     private DirectionEnum balconyDirection;
 
     @Enumerated(EnumType.STRING)
-    private StatusEnum status;
+    private StatusEnum status = StatusEnum.ACTIVE;
 
     private String availableFrom;
-
-    Set<String> imageUrlsRemove;
 }

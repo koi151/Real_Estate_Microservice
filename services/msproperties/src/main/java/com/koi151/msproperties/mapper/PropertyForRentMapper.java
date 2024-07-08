@@ -6,7 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 @Mapper(componentModel = "spring")
-public interface PropertyForRentEntityMapper {
+public interface PropertyForRentMapper {
     @Mapping(target = "propertyId", ignore = true)  // Since propertyId will be set in PropertyEntity
     @Mapping(target = "propertyEntity", ignore = true)
     PropertyForRentEntity toPropertyForRentEntity(PropertyForRentCreateRequest propertyForRentCreateRequest);

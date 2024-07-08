@@ -32,6 +32,6 @@ public class PropertyForRentEntity {
     @NotNull(message = "Payment schedule cannot be null")
     private PaymentScheduleEnum paymentSchedule;
 
-    @Column(name = "rental_term", columnDefinition = "TEXT")
-    private String rentTerm;
+    @Column(name = "rental_terms", columnDefinition = "TEXT")
+    private String rentalTerms;
 }
