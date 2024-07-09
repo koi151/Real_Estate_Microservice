@@ -1,9 +1,18 @@
 package com.koi151.msproperties.utils;
 
+import java.util.List;
+import java.util.stream.Collectors;
+
 public class StringUtil {
 
     public static boolean checkString(String s) { //  .isBlank (JAVA 11) included empty check
         return s != null && !s.isBlank();
+    }
+
+    public static String toStringSeparateByRegex(List<String> list, String regex) {
+        return list.stream()
+                .filter(StringUtil::checkString)
+                .collect(Collectors.joining(regex));
     }
 
 //    public static String camelCaseToUnderScore(String camelCaseString) {

@@ -7,6 +7,5 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 public interface PropertyRepositoryCustom {
-
     List<PropertyEntity> findPropertiesByCriteria(PropertySearchRequest request);
 }

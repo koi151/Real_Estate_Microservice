@@ -30,27 +30,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PropertyServiceImpl implements PropertiesService {
 
-    @Autowired
-    PropertyRepository propertyRepository;
-
-    @Autowired
-    CloudinaryServiceImpl cloudinaryServiceImpl;
-
-    @Autowired
-    RoomRepository roomRepository;
-
-    @Autowired
-    PropertyConverter propertyConverter;
-
-    @Autowired
-    PropertyForSaleRepository propertyForSaleRepository;
-
-    @Autowired
-    PropertyForRentRepository propertyForRentRepository;
-
-    @Autowired
-    AddressRepository addressRepository;
-
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
+    private final RoomRepository roomRepository;
+    private final PropertyConverter propertyConverter;
+    private final PropertyRepository propertyRepository;
+    private final AddressRepository addressRepository;
     private final PropertyMapper propertyMapper;
 
     @Override
@@ -59,7 +43,7 @@ public class PropertyServiceImpl implements PropertiesService {
         List<PropertySearchDTO> result = new ArrayList<>();
 
         for (PropertyEntity item : propertyEntities) {
-            PropertySearchDTO property = propertyConverter.toPropertySearchDTO(item);
+            PropertySearchDTO property = propertyMapper.toPropertySearchDTO(item);
             result.add(property);
         }
 
@@ -68,7 +52,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Override
     public List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params) {
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("id"));
+        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("propertyId"));
         Page<PropertyEntity> properties = propertyRepository.findByDeleted(false, pageRequest);
 
         return properties.stream()
@@ -121,7 +105,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
         // Save the property entity again to update the relationships
         propertyRepository.save(propertyEntity);
-        return propertyConverter.toFullPropertyDTO(propertyEntity);
+        return propertyMapper.toFullPropertyDTO(propertyEntity);
     }
 
     @Transactional
@@ -134,7 +118,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
                     return propertyRepository.save(existingProperty);
                 })
-                .map(savedProperty -> propertyConverter.toFullPropertyDTO(savedProperty))
+                .map(propertyMapper::toFullPropertyDTO)
                 .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
 
     }
@@ -149,7 +133,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
         // Handle image removal
         if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
-            existingImagesUrlSet.removeAll(request.getImageUrlsRemove());
+            request.getImageUrlsRemove().forEach(existingImagesUrlSet::remove); // faster than using removeALl
         }
 
         // Handle image addition
@@ -199,13 +183,9 @@ public class PropertyServiceImpl implements PropertiesService {
 
             if (existingRoom != null) {
                 // Room type exists in the property
-                if (existingRoom.getQuantity() != quantity) {
-                    // Quantity is different, update it
+                if (existingRoom.getQuantity() != quantity) // Quantity is different, update it
                     existingRoom.setQuantity(quantity);
-                } else {
-                    // Quantity is the same, do nothing
-                    continue; // Skip to the next room request
-                }
+                // if quantity is the same, do nothing
             } else {
                 // Room type doesn't exist, create a new room
                 RoomEntity newRoom = RoomEntity.builder()
@@ -218,72 +198,8 @@ public class PropertyServiceImpl implements PropertiesService {
                 currentRooms.add(newRoom);
             }
         }
-
         existingProperty.setRooms(currentRooms);
     }
-
-
-//    private void updateRoomEntities(PropertyEntity propertyEntity, List<RoomCreateUpdateRequest> updatedRooms) {
-//        Set<RoomEntity> existingRooms = propertyEntity.getRooms();
-//
-//        // Map to RoomEntity and add or update
-//        for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
-//            // find the existing room to update (if it's not new)
-//            RoomEntity existingRoom = existingRooms.stream()
-//                    .filter(r -> updatedRoom.getRoomId() != null && r.getRoomId().equals(r.getRoomId()))
-//                    .findFirst()
-//                    .orElse(null);
-//
-//            // Room doesn't exist, create new one
-//            if (existingRoom == null) {
-//                existingRoom = roomMapper.toRoomEntity(updatedRoom); // Convert and create a new RoomEntity
-//                existingRoom.setPropertyEntity(propertyEntity); // Link it to the parent PropertyEntity
-//                roomRepository.save(existingRoom);
-//                existingRooms.add(existingRoom);
-//            } else { // update the existing room
-//                roomMapper.updateRoomFromDto(updatedRoom, existingRoom);
-//            }
-//        }
-//
-//        // Delete rooms not present in updatedRooms based on room type
-//        Set<String> roomTypesToDelete = existingRooms.stream()
-//                .map(RoomEntity::getRoomType)
-//                .filter(roomType -> updatedRooms.stream().noneMatch(r -> r.getRoomType().equals(roomType)))
-//                .collect(Collectors.toSet());
-//
-//        roomRepository.deleteByRoomTypeInAndPropertyEntity(roomTypesToDelete, propertyEntity);
-//    }
-
-
-//    private FullPropertyDTO convertToPropertyDTO(PropertyEntity savedProperty, PropertyUpdateRequest request) {
-//
-//        // check if new price update request exists, otherwise get the current price
-//        Float price = (request != null && request.getPrice() != null) ? request.getPrice() :
-//                (savedProperty.getPropertyForRentEntity() != null ? savedProperty.getPropertyForRentEntity().getRentalPrice() :
-//                        savedProperty.getPropertyForSaleEntity() != null ? savedProperty.getPropertyForSaleEntity().getSalePrice() : null);
-//
-//        return FullPropertyDTO.builder()
-//                .title(savedProperty.getTitle())
-//                .categoryId(savedProperty.getCategoryId())
-//                .price(price)
-//                .area(savedProperty.getArea())
-//                .description(savedProperty.getDescription())
-//                .totalFloor(savedProperty.getTotalFloor())
-//                .houseDirection(savedProperty.getHouseDirection().getDirectionName())
-//                .balconyDirection(savedProperty.getBalconyDirection().getDirectionName())
-//                .status(savedProperty.getStatus().getStatusName())
-//                .availableFrom(savedProperty.getAvailableFrom())
-//                .imageUrls(savedProperty.getImageUrls() != null && !savedProperty.getImageUrls().isEmpty()
-//                        ? Arrays.stream(savedProperty.getImageUrls().split(","))
-//                        .map(String::trim)
-//                        .collect(Collectors.toList())
-//                        : Collections.emptyList())
-//                .rooms(savedProperty.getRoomEntities().stream()
-//                        .map(roomEntity -> new RoomNameQuantityDTO(roomEntity.getRoomType(), roomEntity.getQuantity()))
-//                        .collect(Collectors.toList()))
-//                .build();
-//    }
-
 
     @Override
     public void deleteProperty(Long id) throws PropertyNotFoundException {

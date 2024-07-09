@@ -16,10 +16,10 @@ public class PropertySearchDTO {
 
     private String title;
     private String type;
-    private String paymentSchedule;
     private Integer categoryId;
     private Float area;
-    private Float price;
+    private Double rentalPrice;
+    private Double salePrice;
     private String description;
     private Integer totalFloor;
     private String houseDirection;
@@ -27,6 +27,6 @@ public class PropertySearchDTO {
     private String status;
     private String availableFrom;
     private String address;
-    private String term;
+    private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
 }

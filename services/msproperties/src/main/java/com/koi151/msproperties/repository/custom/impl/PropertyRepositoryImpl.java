@@ -64,8 +64,8 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         List<Predicate> predicates = context.predicates();
         CriteriaBuilder cb = context.criteriaBuilder();
 
-        Join<PropertyEntity, ?> saleJoin = context.joins().get("propertyForSaleEntity");
-        Join<PropertyEntity, ?> rentJoin = context.joins().get("propertyForRentEntity");
+        Join<PropertyEntity, ?> saleJoin = context.joins().get("propertyForSale");
+        Join<PropertyEntity, ?> rentJoin = context.joins().get("propertyForRent");
 
         if (request.getType() != null) {
             if (request.getType() == PropertyTypeEnum.SALE) {
@@ -192,12 +192,12 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         // Using LEFT JOIN ensures that all properties are included in the search results, even if they do not have associated sale, rental, ..etc records
 
         if (request.getType() == null) {
-            context.addJoin("propertyForSaleEntity", context.root().join("propertyForSaleEntity", JoinType.LEFT));
-            context.addJoin("propertyForRentEntity", context.root().join("propertyForRentEntity", JoinType.LEFT));
+            context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
+            context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
         } else if (request.getType().isPropertyForRent()) {
-            context.addJoin("propertyForRentEntity", context.root().join("propertyForRentEntity", JoinType.LEFT));
+            context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
         } else if (request.getType().isPropertyForSale()) {
-            context.addJoin("propertyForSaleEntity", context.root().join("propertyForSaleEntity", JoinType.LEFT));
+            context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
         }
 
         if (RequestUtil.locationRequested(request)) {
