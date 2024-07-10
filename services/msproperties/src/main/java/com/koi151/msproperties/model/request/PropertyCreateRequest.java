@@ -10,10 +10,10 @@ import lombok.*;
 
 import java.util.List;
 
-@Getter
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
+@Data
 public class PropertyCreateRequest {
 
     @NotBlank(message = "Title cannot be empty")

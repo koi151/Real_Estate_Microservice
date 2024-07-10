@@ -2,15 +2,13 @@ package com.koi151.msproperties.model.request;
 
 import jakarta.persistence.Column;
 import jakarta.validation.constraints.NotEmpty;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 @Getter
 @Setter
 @AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class AddressCreateRequest {
 
     @Column(name = "city", nullable = false, length = 50)
