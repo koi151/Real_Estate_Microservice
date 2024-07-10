@@ -5,10 +5,7 @@ import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.AddressMapper;
 import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
-import com.koi151.msproperties.model.request.PropertyCreateRequest;
-import com.koi151.msproperties.model.request.PropertySearchRequest;
-import com.koi151.msproperties.model.request.PropertyUpdateRequest;
-import com.koi151.msproperties.model.request.RoomCreateUpdateRequest;
+import com.koi151.msproperties.model.request.*;
 import com.koi151.msproperties.repository.*;
 import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.service.converter.PropertyConverter;
@@ -24,7 +21,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -71,8 +73,9 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
-    public List<PropertiesHomeDTO> findAllAccountByCategory(Long accountId) {
-//        List<PropertyEntity> properties = propertyRepository.find
+    public List<PropertiesHomeDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
+        Page<PropertyEntity> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
+
 
         return null;
     }
@@ -101,6 +104,54 @@ public class PropertyServiceImpl implements PropertiesService {
         propertyRepository.save(propertyEntity);
         return propertyMapper.toFullPropertyDTO(propertyEntity);
     }
+
+    @Transactional
+    public void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties) {
+
+        // Batch save addresses to optimize database interactions
+        List<AddressEntity> addressEntities = addressRepository.saveAllAndFlush(
+                fakeProperties.stream()
+                        .map(FakePropertyCreateRequest::getAddress)
+                        .map(AddressMapper.INSTANCE::toAddressEntity)
+                        .toList()
+        );
+
+        // Create property entities in parallel
+        List<PropertyEntity> propertyEntities = fakeProperties.parallelStream()
+                .map(fakeProperty -> {
+                    AddressEntity correspondingAddress = addressEntities.get(fakeProperties.indexOf(fakeProperty));
+                    return propertyConverter.toPropertyEntity(fakeProperty, null, correspondingAddress);
+                })
+                .toList();
+
+        // Bulk save all property entities
+        propertyRepository.saveAllAndFlush(propertyEntities);
+    }
+
+
+//    @Transactional
+//    public void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties) {
+//        // Batch save addresses to optimize database interactions
+//        List<AddressEntity> addressEntities = fakeProperties.stream()
+//                .map(FakePropertyCreateRequest::getAddress)
+//                .map(AddressMapper.INSTANCE::toAddressEntity)
+//                .toList();
+//
+//        addressEntities = addressRepository.saveAllAndFlush(addressEntities);
+//
+//        // Create property entities in a single stream
+//        List<AddressEntity> finalAddressEntities = addressEntities;
+//        List<PropertyEntity> propertyEntities = IntStream.range(0, fakeProperties.size())
+//                .mapToObj(i -> {
+//                    FakePropertyCreateRequest fakeProperty = fakeProperties.get(i);
+//                    AddressEntity correspondingAddress = finalAddressEntities.get(i);
+//                    return propertyConverter.toPropertyEntity(fakeProperty, null, correspondingAddress);
+//                })
+//                .toList();
+//
+//        // Bulk save all property entities
+//        propertyRepository.saveAllAndFlush(propertyEntities);
+//    }
 
     @Transactional
     @Override

@@ -1,7 +1,5 @@
 package com.example.msaccount.entity;
 
-import com.example.msaccount.service.converter.LocalDateTimeConverter;
-import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;

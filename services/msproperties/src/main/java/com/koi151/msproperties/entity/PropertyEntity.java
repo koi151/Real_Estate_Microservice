@@ -52,7 +52,7 @@ public class PropertyEntity extends BaseEntity {
     @Column(name = "account_id", nullable = false)
     @NotNull(message = "Account id cannot be null")
     @Positive(message = "Account id must be positive value")
-    private int accountId;
+    private long accountId;
 
     @Column(name = "available_from", nullable = false, length = 30)
     @NotEmpty(message = "Available time cannot be empty")

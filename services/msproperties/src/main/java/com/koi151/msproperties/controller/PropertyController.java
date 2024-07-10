@@ -25,6 +25,8 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("/api/v1/properties")
@@ -54,84 +56,154 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
+//    @PostMapping("/generateFakeProperties")
+//    private ResponseEntity<ResponseData> generateFakeProperties() {
+//        Faker faker = new Faker();
+//
+//        for (int i = 0; i < 2000; i++) {
+//
+//            // Generate fake address
+//            AddressCreateRequest address = AddressCreateRequest.builder()
+//                    .city(faker.address().city())
+//                    .district(faker.address().cityName())
+//                    .ward(faker.address().streetName())
+//                    .streetAddress(faker.address().streetAddress())
+//                    .build();
+//
+//            String adjective = faker.commerce().material();
+//            String realEstateType = faker.commerce().department();
+//            String realEstateTitle = adjective + " " + realEstateType;
+//
+//            // Ensure at least one of propertyForSale or propertyForRent is present
+//            boolean createForSale = faker.bool().bool();
+//            boolean createForRent = faker.bool().bool() || !createForSale; // Ensure at least one is true
+//
+//            PropertyForSaleCreateRequest propertyForSale = null;
+//            if (createForSale) {
+//                propertyForSale = PropertyForSaleCreateRequest.builder()
+//                        .salePrice(faker.number().randomDouble(2, 5000, 20_000_000))
+//                        .saleTerm(faker.lorem().sentence())
+//                        .build();
+//            }
+//
+//            PropertyForRentCreateRequest propertyForRent = null;
+//            PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
+//            int randomPaymentScheduleIndex = faker.number().numberBetween(0, paymentSchedules.length);
+//
+//            if (createForRent) {
+//                propertyForRent = PropertyForRentCreateRequest.builder()
+//                        .rentalPrice(faker.number().randomDouble(2, 500, 300000))
+//                        .rentalTerm(faker.lorem().sentence())
+//                        .paymentSchedule(paymentSchedules[randomPaymentScheduleIndex])
+//                        .build();
+//            }
+//
+//            DirectionEnum[] directions = DirectionEnum.values();
+//            StatusEnum[] statuses = StatusEnum.values();
+//
+//            int randomDir1Index = faker.number().numberBetween(0, directions.length);
+//            int randomDir2Index = faker.number().numberBetween(0, directions.length);
+//            int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
+//
+//            // Generate fake availableFrom date
+//            String availableFrom = String.format("%02d/%02d",
+//                    faker.number().numberBetween(1, 12),
+//                    faker.number().numberBetween(1, 28));
+//
+//            var fakePropertyDTO = FakePropertyCreateRequest.builder()
+//                    .title(realEstateTitle)
+//                    .propertyForSale(propertyForSale)
+//                    .propertyForRent(propertyForRent)
+//                    .accountId((long) faker.number().numberBetween(1, 7))
+//                    .address(address)
+//                    .area((float) faker.number().randomDouble(2, 10, 1200))
+//                    .description(faker.lorem().paragraph())
+//                    .totalFloor(faker.number().numberBetween(0, 20))
+//                    .categoryId((long) faker.number().numberBetween(1, 5))
+//                    .houseDirection(directions[randomDir1Index])
+//                    .balconyDirection(directions[randomDir2Index])
+//                    .status(statuses[randomStatusIndex])
+//                    .availableFrom(availableFrom)
+//                    .view(faker.number().numberBetween(0, 20000))
+//                    .build();
+//
+//
+//                propertiesService.createFakeProperties(fakePropertyDTO, null);
+//        }
+//
+//        ResponseData responseData = new ResponseData();
+//        responseData.setDesc("Fake Properties created successfully");
+//
+//        return ResponseEntity.ok(responseData);
+//    }
+
     @PostMapping("/generateFakeProperties")
     private ResponseEntity<ResponseData> generateFakeProperties() {
         Faker faker = new Faker();
 
-        for (int i = 0; i < 2000; i++) {
+        DirectionEnum[] directions = DirectionEnum.values();
+        StatusEnum[] statuses = StatusEnum.values();
+        PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
 
-            // Generate fake address
-            AddressCreateRequest address = AddressCreateRequest.builder()
-                    .city(faker.address().city())
-                    .district(faker.address().cityName())
-                    .ward(faker.address().streetName())
-                    .streetAddress(faker.address().streetAddress())
-                    .build();
+        propertiesService.createFakeProperties(IntStream.range(0, 2000)
+                .mapToObj(i -> {
+                    // Generate fake data directly in the stream
+                    AddressCreateRequest address = AddressCreateRequest.builder()
+                            .city(faker.address().city())
+                            .district(faker.address().cityName())
+                            .ward(faker.address().streetName())
+                            .streetAddress(faker.address().streetAddress())
+                            .build();
 
-            String adjective = faker.commerce().material();
-            String realEstateType = faker.commerce().department();
-            String realEstateTitle = adjective + " " + realEstateType;
+                    String realEstateTitle = faker.commerce().material() + " " + faker.commerce().department();
 
-            // Ensure at least one of propertyForSale or propertyForRent is present
-            boolean createForSale = faker.bool().bool();
-            boolean createForRent = faker.bool().bool() || !createForSale; // Ensure at least one is true
+                    // Ensure at least one property type is present
+                    boolean createForSale = faker.bool().bool();
+                    boolean createForRent = faker.bool().bool() || !createForSale;
 
-            PropertyForSaleCreateRequest propertyForSale = null;
-            if (createForSale) {
-                propertyForSale = PropertyForSaleCreateRequest.builder()
-                        .salePrice(faker.number().randomDouble(2, 5000, 20_000_000))
-                        .saleTerm(faker.lorem().sentence())
-                        .build();
-            }
+                    PropertyForSaleCreateRequest propertyForSale = createForSale ? PropertyForSaleCreateRequest.builder()
+                            .salePrice(faker.number().randomDouble(2, 5000, 20_000_000))
+                            .saleTerm(faker.lorem().sentence())
+                            .build() : null;
 
-            PropertyForRentCreateRequest propertyForRent = null;
-            PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
-            int randomPaymentScheduleIndex = faker.number().numberBetween(0, paymentSchedules.length);
+                    PropertyForRentCreateRequest propertyForRent = createForRent ? PropertyForRentCreateRequest.builder()
+                            .rentalPrice(faker.number().randomDouble(2, 500, 300000))
+                            .rentalTerm(faker.lorem().sentence())
+                            .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
+                            .build() : null;
 
-            if (createForRent) {
-                propertyForRent = PropertyForRentCreateRequest.builder()
-                        .rentalPrice(faker.number().randomDouble(2, 500, 300000))
-                        .rentalTerm(faker.lorem().sentence())
-                        .paymentSchedule(paymentSchedules[randomPaymentScheduleIndex])
-                        .build();
-            }
+                    int randomDir1Index = faker.number().numberBetween(0, directions.length);
+                    int randomDir2Index = faker.number().numberBetween(0, directions.length);
+                    int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
 
-            DirectionEnum[] directions = DirectionEnum.values();
-            StatusEnum[] statuses = StatusEnum.values();
+                    String availableFrom = String.format("%02d/%02d", faker.number().numberBetween(1, 12), faker.number().numberBetween(1, 28));
 
-            int randomDir1Index = faker.number().numberBetween(0, directions.length);
-            int randomDir2Index = faker.number().numberBetween(0, directions.length);
-            int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
-
-            // Generate fake availableFrom date
-            String availableFrom = String.format("%02d/%02d",
-                    faker.number().numberBetween(1, 12),
-                    faker.number().numberBetween(1, 28));
-
-            var propertyDTO = PropertyCreateRequest.builder()
-                    .title(realEstateTitle)
-                    .propertyForSale(propertyForSale)
-                    .propertyForRent(propertyForRent)
-                    .accountId((long) faker.number().numberBetween(1, 7))
-                    .address(address)
-                    .area((float) faker.number().randomDouble(2, 10, 1200))
-                    .description(faker.lorem().paragraph())
-                    .totalFloor(faker.number().numberBetween(0, 20))
-                    .categoryId((long) faker.number().numberBetween(1, 5))
-                    .houseDirection(directions[randomDir1Index])
-                    .balconyDirection(directions[randomDir2Index])
-                    .status(statuses[randomStatusIndex])
-                    .availableFrom(availableFrom)
-                    .build();
-
-                propertiesService.createProperty(propertyDTO, null);
-        }
+                    return FakePropertyCreateRequest.builder()
+                            .title(realEstateTitle)
+                            .propertyForSale(propertyForSale)
+                            .propertyForRent(propertyForRent)
+                            .accountId((long) faker.number().numberBetween(1, 7))
+                            .address(address)
+                            .area((float) faker.number().randomDouble(2, 10, 1200))
+                            .description(faker.lorem().paragraph())
+                            .totalFloor(faker.number().numberBetween(0, 20))
+                            .categoryId((long) faker.number().numberBetween(1, 5))
+                            .houseDirection(directions[randomDir1Index])
+                            .balconyDirection(directions[randomDir2Index])
+                            .status(statuses[randomStatusIndex])
+                            .availableFrom(availableFrom)
+                            .view(faker.number().numberBetween(0, 20000))
+                            .build();
+                })
+                .collect(Collectors.toList())); // Collect the stream into a list
 
         ResponseData responseData = new ResponseData();
         responseData.setDesc("Fake Properties created successfully");
-
         return ResponseEntity.ok(responseData);
     }
+
+
+
 
 
     @GetMapping("/home")
@@ -160,7 +232,7 @@ public class PropertyController {
 
     @GetMapping("/category/{category-id}")
     public ResponseEntity<ResponseData> getPropertiesByCategory(@PathVariable(name="category-id") Integer categoryId) {
-        List<PropertiesHomeDTO> properties = propertiesService.findAllPropertiesByCategory(categoryId);
+        var properties = propertiesService.findAllPropertiesByCategory(categoryId);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(properties);
@@ -170,11 +242,22 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
-//    @GetMapping("/account/{account-id}")
-//    public ResponseEntity<ResponseData> getPropertiesByAccount(@PathVariable(name = "account-id") Long accountId) {
-//        var properties = propertiesService.
-//
-//    }
+    @GetMapping("/account/{account-id}")
+    public ResponseEntity<ResponseData> getPropertiesByAccount(
+            @PathVariable(name = "account-id") Long accountId,
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int limit
+    ) {
+        Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate").descending());
+        var properties = propertiesService.findAllPropertiesByAccount(accountId, pageable);
+
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(properties);
+        responseData.setDesc("Success");
+
+        return ResponseEntity.ok(responseData);
+    }
 
     @GetMapping("/status/{status}")
     public ResponseEntity<ResponseData> findPropertiesWithStatus(@PathVariable(name = "status") String status) {
@@ -195,9 +278,6 @@ public class PropertyController {
             @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
     ) {
-
-//        if (property.getPropertyForRent() && property.getPropertyForRent().getRentalPrice() == )
-//            throw new PaymentScheduleNotFoundException("Payment schedule required in property for sale");
 
         FullPropertyDTO propertyRes = propertiesService.createProperty(property, images);
 
