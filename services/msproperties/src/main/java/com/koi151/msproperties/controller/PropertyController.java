@@ -134,8 +134,6 @@ public class PropertyController {
     }
 
 
-
-
     @GetMapping("/home")
     public ResponseEntity<?> findHomeProperties(@RequestParam Map<String, Object> params) {
         List<PropertiesHomeDTO> properties = propertiesService.getHomeProperties(params);

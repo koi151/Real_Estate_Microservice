@@ -22,18 +22,16 @@ public class BaseEntity implements Serializable {
     @Serial
     private static final long serialVersionUID = 4746498586807182115L;
 
-    @Column(name = "created_date")
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP(0)")
     @CreatedDate
-    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime createdDate;
 
     @Column(name = "created_by")
     @CreatedBy
     private String createdBy;
 
-    @Column(name = "modified_date")
+    @Column(name = "modified_date", columnDefinition = "TIMESTAMP(0)")
     @LastModifiedDate
-    @Convert(converter = LocalDateTimeConverter.class)
     private LocalDateTime modifiedDate;
 
     @Column(name = "modified_by")
