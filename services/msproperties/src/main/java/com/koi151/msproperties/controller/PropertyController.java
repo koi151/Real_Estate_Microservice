@@ -14,6 +14,9 @@ import com.koi151.msproperties.service.PropertiesService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,19 +37,21 @@ public class PropertyController {
     ObjectMapper objectMapper;
 
     @GetMapping("/")
-    public ResponseEntity<ResponseData> findAllProperties (@RequestBody @Valid PropertySearchRequest request) {
-        List<PropertySearchDTO> properties = propertiesService.findAllProperties(request);
+    public ResponseEntity<ResponseData> findAllProperties (
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int limit,
+            @RequestBody @Valid PropertySearchRequest request) {
+
+        Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate"));
+        var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty()
+        responseData.setData(propertiesPage.getContent());
+        responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
-                : "Get properties succeed");
-
+                : String.format("Get properties succeed. Page: %d. Total %d properties", propertiesPage.getNumber() + 1, propertiesPage.getTotalElements()));
         return ResponseEntity.ok(responseData);
     }
-
-//    @GetMapping("/")
 
     @GetMapping("/home")
     public ResponseEntity<?> findHomeProperties(@RequestParam Map<String, Object> params) {

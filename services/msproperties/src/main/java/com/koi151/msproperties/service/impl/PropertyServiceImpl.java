@@ -16,9 +16,9 @@ import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import jakarta.transaction.Transactional;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -38,17 +38,11 @@ public class PropertyServiceImpl implements PropertiesService {
     private final PropertyMapper propertyMapper;
 
     @Override
-    public List<PropertySearchDTO> findAllProperties(PropertySearchRequest request) {
-        List<PropertyEntity> propertyEntities = propertyRepository.findPropertiesByCriteria(request);
-        List<PropertySearchDTO> result = new ArrayList<>();
-
-        for (PropertyEntity item : propertyEntities) {
-            PropertySearchDTO property = propertyMapper.toPropertySearchDTO(item);
-            result.add(property);
-        }
-
-        return result;
+    public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
+        Page<PropertyEntity> propertyEntities = propertyRepository.findPropertiesByCriteria(request, pageable);
+        return propertyEntities.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
     }
+
 
     @Override
     public List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params) {

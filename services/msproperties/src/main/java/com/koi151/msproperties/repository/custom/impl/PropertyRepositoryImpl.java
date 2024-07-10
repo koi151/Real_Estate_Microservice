@@ -12,6 +12,10 @@ import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.context.annotation.Primary;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Repository;
 
 import java.lang.reflect.Field;
@@ -212,7 +216,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
 
     @Override
-    public List<PropertyEntity> findPropertiesByCriteria(PropertySearchRequest request) {
+    public Page<PropertyEntity> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder(); // API in JPA create dynamic query
         CriteriaQuery<PropertyEntity> cq = cb.createQuery(PropertyEntity.class); // call method from EntityManager to get CriteriaQuery for building queries
         Root<PropertyEntity> root = cq.from(PropertyEntity.class); // define PropertyEntity as root entity for queries
@@ -232,8 +236,26 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             cq.where(predicates.toArray(new Predicate[0]));
         }
 
+        // Apply Sorting
+        if (pageable.getSort().isSorted()) {
+            cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb)); // Use QueryUtils for converting Pageable sort to Order
+        }
+
         TypedQuery<PropertyEntity> typedQuery = entityManager.createQuery(cq);
-        return typedQuery.getResultList();
+
+        // Apply Pagination
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+
+        // Get Total Count
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        countQuery.select(cb.count(countQuery.from(PropertyEntity.class)));
+        Long total = entityManager.createQuery(countQuery).getSingleResult();
+
+        List<PropertyEntity> results = typedQuery.getResultList();
+
+        // Return Page
+        return new PageImpl<>(results, pageable, total);
     }
 }
 

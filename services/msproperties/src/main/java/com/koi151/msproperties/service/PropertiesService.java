@@ -9,6 +9,8 @@ import com.koi151.msproperties.model.request.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
@@ -16,7 +18,7 @@ import java.util.Map;
 
 public interface PropertiesService {
 
-    List<PropertySearchDTO> findAllProperties(PropertySearchRequest request);
+    Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable);
     List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
     PropertyEntity getPropertyById(Long id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
