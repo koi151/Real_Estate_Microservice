@@ -36,7 +36,6 @@ public class WebSecurityConfig {
                             .requestMatchers( // allow access without authentication
                                     String.format("%s/accounts/register", apiPrefix),
                                     String.format("%s/admin/accounts/login", apiPrefix),
-
                                     String.format("%s/admin/accounts", apiPrefix)
 
                             )
@@ -61,6 +60,10 @@ public class WebSecurityConfig {
 
                             .requestMatchers(HttpMethod.GET,
                                     String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
+
+                            .requestMatchers(HttpMethod.GET,
+                                    String.format("%s/admin/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
+
                             .requestMatchers(HttpMethod.POST,
                                     String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
                             .requestMatchers(HttpMethod.PATCH,

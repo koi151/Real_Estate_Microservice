@@ -8,7 +8,6 @@ import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.model.request.*;
 import com.koi151.msproperties.repository.*;
 import com.koi151.msproperties.service.PropertiesService;
-import com.koi151.msproperties.service.converter.PropertyConverter;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import jakarta.transaction.Transactional;
@@ -21,12 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -73,11 +67,9 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
-    public List<PropertiesHomeDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
+    public Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
         Page<PropertyEntity> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
-
-
-        return null;
+        return properties.map(propertyMapper::toPropertySearchDTO);
     }
 
     @Override
@@ -127,31 +119,6 @@ public class PropertyServiceImpl implements PropertiesService {
         // Bulk save all property entities
         propertyRepository.saveAllAndFlush(propertyEntities);
     }
-
-
-//    @Transactional
-//    public void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties) {
-//        // Batch save addresses to optimize database interactions
-//        List<AddressEntity> addressEntities = fakeProperties.stream()
-//                .map(FakePropertyCreateRequest::getAddress)
-//                .map(AddressMapper.INSTANCE::toAddressEntity)
-//                .toList();
-//
-//        addressEntities = addressRepository.saveAllAndFlush(addressEntities);
-//
-//        // Create property entities in a single stream
-//        List<AddressEntity> finalAddressEntities = addressEntities;
-//        List<PropertyEntity> propertyEntities = IntStream.range(0, fakeProperties.size())
-//                .mapToObj(i -> {
-//                    FakePropertyCreateRequest fakeProperty = fakeProperties.get(i);
-//                    AddressEntity correspondingAddress = finalAddressEntities.get(i);
-//                    return propertyConverter.toPropertyEntity(fakeProperty, null, correspondingAddress);
-//                })
-//                .toList();
-//
-//        // Bulk save all property entities
-//        propertyRepository.saveAllAndFlush(propertyEntities);
-//    }
 
     @Transactional
     @Override

@@ -88,7 +88,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategory {
 
         List<PropertyEntity> properties;
         try { // convert object to List<Properties>
-            properties = objectMapper.convertValue(responseData.getData(), new TypeReference<List<PropertyEntity>>() {});
+            properties = objectMapper.convertValue(responseData.getData(), new TypeReference<>() {});
         } catch (Exception e) {
             throw new RuntimeException("Failed to deserialize properties data", e);
         }

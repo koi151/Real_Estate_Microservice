@@ -8,6 +8,7 @@ import com.example.msaccount.entity.Role;
 import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.enums.AccountTypeEnum;
 import com.example.msaccount.model.dto.AccountDTO;
+import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
 import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.repository.admin.RoleRepository;
@@ -79,6 +80,7 @@ public class AccountConverter {
         return account;
     }
 
+//    public toAccountWithPropertiesDTO toAccountWithPropertiesDTO(Account)
 
     public AccountDTO toAccountDTO(Account account) {
         return AccountDTO.builder()

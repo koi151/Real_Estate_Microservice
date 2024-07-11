@@ -1,20 +1,19 @@
-package com.koi151.mspropertycategory.entity;
+package com.example.msaccount.model.dto;
 
-import lombok.*;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.Setter;
 
 @Getter
 @Setter
-@AllArgsConstructor
-@NoArgsConstructor
 @Builder
-public class PropertyEntity {
+public class PropertyDTO {
     // used to get data from Properties application -> No validation needed
 
     private String title;
     private String imageUrls;
     private String description;
-    private StatusEnum status;
+    private String status;
     private int view;
-
     private boolean deleted;
 }

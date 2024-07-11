@@ -10,6 +10,8 @@ import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.service.admin.AccountService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -49,8 +51,13 @@ public class AdminAccountController {
     }
 
     @GetMapping("/{id}/properties")
-    public ResponseEntity<ResponseData> findAccountWithProperties(@PathVariable(name = "id") Long id) {
-        var account = accountService.findAccountWithProperties(id);
+    public ResponseEntity<ResponseData> findAccountWithProperties(
+            @PathVariable(name = "id") Long id,
+            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "limit", defaultValue = "10") Integer limit)
+    {
+        Pageable pageable = PageRequest.of(page, limit);
+        var account = accountService.findAccountWithProperties(id, pageable);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(account);

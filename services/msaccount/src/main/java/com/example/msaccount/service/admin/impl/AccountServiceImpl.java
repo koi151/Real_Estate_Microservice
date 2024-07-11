@@ -1,33 +1,43 @@
 package com.example.msaccount.service.admin.impl;
 
+import com.example.msaccount.client.PropertiesClient;
 import com.example.msaccount.component.JwtTokenUtil;
 import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.entity.admin.AdminAccount;
+import com.example.msaccount.mapper.PropertyMapper;
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
 import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
+import com.example.msaccount.model.dto.PropertyDTO;
 import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.model.request.AccountUpdateRequest;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.enums.AccountStatusEnum;
+import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.repository.admin.AdminAccountRepository;
 import com.example.msaccount.service.admin.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
+import com.example.msaccount.service.converter.PropertyConverter;
 import com.example.msaccount.service.converter.admin.AdminAccountConverter;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.*;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Array;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -40,10 +50,14 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AdminAccountRepository adminAccountRepository;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
-    private final AccountConverter accountConverter;
     private final AdminAccountConverter adminAccountConverter;
     private final AuthenticationManager authenticationManager;
     private final JwtTokenUtil jwtTokenUtil;
+    private final PropertiesClient propertiesClient;
+
+    private final AccountConverter accountConverter;
+    private final PropertyMapper propertyMapper;
+
 
     private void validateAccountCreateRequest(AccountCreateRequest request)  {
         if (!request.getRetypePassword().equals(request.getPassword()))
@@ -62,12 +76,41 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public List<AccountWithPropertiesDTO> findAccountWithProperties(Long id) {
-        Optional<Account> account = Optional.ofNullable(accountRepository.findByAccountId(id)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + id)));
+    public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
+        // 1. Fetch Account
+        Account account = accountRepository.findByAccountId(accountId)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
 
-        return null;
+        // 2. Fetch Properties using Feign Client
+        ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId);
+
+        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+            try {
+                Object dataObject = response.getBody().getData();
+
+                if (dataObject instanceof List<?> dataList) {
+
+                    // Convert to List<PropertyDTO> using MapStruct
+                    List<PropertyDTO> properties = propertyMapper.toPropertyDTO(dataList);
+
+//                    // Construct Page<AccountWithPropertiesDTO> using MapStruct
+//                    return new PageImpl<>(properties.stream()
+//                            .map(property -> accountConverter.toAccountWithPropertiesDTO(account, property))
+//                            .toList(), pageable, properties.size());
+                    return null;
+                } else {
+                    throw new RuntimeException("Unexpected data format (not a list) received from properties service");
+                }
+            } catch (Exception ex) {
+                throw new RuntimeException("Error parsing property data: " + ex.getMessage(), ex);
+            }
+        } else {
+            throw new RuntimeException("Failed to fetch properties from properties service");
+        }
     }
+
+
+
 
     @Override
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {

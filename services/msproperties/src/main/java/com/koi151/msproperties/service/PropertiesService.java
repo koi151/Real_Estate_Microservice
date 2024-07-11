@@ -24,7 +24,7 @@ public interface PropertiesService {
     List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
     PropertyEntity getPropertyById(Long id);
     List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
-    List<PropertiesHomeDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable);
+    Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable);
     List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
     FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
     void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties);

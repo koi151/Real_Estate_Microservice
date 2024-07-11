@@ -88,6 +88,7 @@ public class JwtTokenFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response); // enable bypass
 
         } catch (Exception e) {
+            System.out.println("Error occurred in doFilterInternal method: " + e.getMessage());
             ResponseUtil.sendUnauthorizedResponse(response,"Invalid or expired JWT token");
         }
     }
