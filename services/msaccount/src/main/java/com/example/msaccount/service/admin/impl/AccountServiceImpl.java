@@ -4,7 +4,7 @@ import com.example.msaccount.client.PropertiesClient;
 import com.example.msaccount.component.JwtTokenUtil;
 import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.entity.admin.AdminAccount;
-import com.example.msaccount.mapper.PropertyMapper;
+import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
 import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
@@ -19,11 +19,7 @@ import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.repository.admin.AdminAccountRepository;
 import com.example.msaccount.service.admin.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
-import com.example.msaccount.service.converter.PropertyConverter;
 import com.example.msaccount.service.converter.admin.AdminAccountConverter;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.core.type.TypeReference;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -35,9 +31,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.lang.reflect.Array;
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -56,7 +50,8 @@ public class AccountServiceImpl implements AccountService {
     private final PropertiesClient propertiesClient;
 
     private final AccountConverter accountConverter;
-    private final PropertyMapper propertyMapper;
+    private final AccountMapper accountMapper;
+    private final ObjectMapper objectMapper;
 
 
     private void validateAccountCreateRequest(AccountCreateRequest request)  {
@@ -75,29 +70,62 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
+//    @Override
+//    public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
+//
+//        Account account = accountRepository.findByAccountId(accountId)
+//                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
+//
+//        // Fetch Properties using Feign Client
+//        ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId);
+//
+//        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+//
+//            ResponseEntity<ResponseData> responseEntity = propertiesClient.findAllPropertiesByAccount(accountId);
+//            ResponseData responseData = Objects.requireNonNull(responseEntity.getBody());
+//
+//            List<PropertyDTO> properties;
+//            try { // convert object to List<Properties>
+////                properties = objectMapper.convertValue(responseData.getData(), new TypeReference<>() {});
+//                Object dataObject = responseData.getData();
+//
+//
+//
+//            } catch (Exception e) {
+//                throw new RuntimeException("Failed to deserialize properties data", e);
+//            }
+//
+//            return null;
+//        } else {
+//            throw new RuntimeException("Failed to fetch properties from properties service");
+//        }
+//    }
+
     @Override
     public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
-        // 1. Fetch Account
+        // Fetch Account (only if you need account details)
         Account account = accountRepository.findByAccountId(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
 
-        // 2. Fetch Properties using Feign Client
+        // Fetch Properties using Feign Client
         ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId);
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             try {
-                Object dataObject = response.getBody().getData();
+                ResponseData responseData = response.getBody();
+                Object dataObject = responseData.getData();
 
                 if (dataObject instanceof List<?> dataList) {
+                    // Convert to List<PropertyDTO> using ObjectMapper
+                    List<PropertyDTO> properties = dataList.stream()
+                            .map(item -> objectMapper.convertValue(item, PropertyDTO.class))
+                            .toList();
 
-                    // Convert to List<PropertyDTO> using MapStruct
-                    List<PropertyDTO> properties = propertyMapper.toPropertyDTO(dataList);
+                    // Construct AccountWithPropertiesDTO using MapStruct
+                    AccountWithPropertiesDTO accountWithPropertiesDTO = accountMapper.toAccountWithPropertiesDTO(account, properties);
 
-//                    // Construct Page<AccountWithPropertiesDTO> using MapStruct
-//                    return new PageImpl<>(properties.stream()
-//                            .map(property -> accountConverter.toAccountWithPropertiesDTO(account, property))
-//                            .toList(), pageable, properties.size());
-                    return null;
+                    // Wrap the result in a Page object
+                    return new PageImpl<>(List.of(accountWithPropertiesDTO), pageable, 1);
                 } else {
                     throw new RuntimeException("Unexpected data format (not a list) received from properties service");
                 }
@@ -108,8 +136,6 @@ public class AccountServiceImpl implements AccountService {
             throw new RuntimeException("Failed to fetch properties from properties service");
         }
     }
-
-
 
 
     @Override

@@ -1,12 +1,12 @@
 package com.example.msaccount.model.dto;
 
 import lombok.Builder;
+import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
 @Builder
+@Data
 public class PropertyDTO {
     // used to get data from Properties application -> No validation needed
 

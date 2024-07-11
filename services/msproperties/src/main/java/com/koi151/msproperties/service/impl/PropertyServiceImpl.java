@@ -10,6 +10,7 @@ import com.koi151.msproperties.repository.*;
 import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
+import com.koi151.msproperties.service.converter.PropertyConverter;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.data.domain.Page;
@@ -28,10 +29,10 @@ public class PropertyServiceImpl implements PropertiesService {
 
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final RoomRepository roomRepository;
-    private final PropertyConverter propertyConverter;
     private final PropertyRepository propertyRepository;
     private final AddressRepository addressRepository;
     private final PropertyMapper propertyMapper;
+    private final PropertyConverter propertyConverter;
 
     @Override
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {

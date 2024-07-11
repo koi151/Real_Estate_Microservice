@@ -57,10 +57,16 @@ public class AdminAccountController {
             @RequestParam(name = "limit", defaultValue = "10") Integer limit)
     {
         Pageable pageable = PageRequest.of(page, limit);
-        var account = accountService.findAccountWithProperties(id, pageable);
+        var accountPage = accountService.findAccountWithProperties(id, pageable);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(account);
+        responseData.setData(accountPage.getContent());
+
+        var accountProperties = accountPage.getContent().get(0).getProperties();
+        if (accountPage.hasContent() && accountProperties != null && !accountProperties.isEmpty())
+            responseData.setDesc("Account with properties found. Total: " + accountProperties.size() + " properties");
+        else
+            responseData.setDesc("Account has no property post.");
 
         return ResponseEntity.ok(responseData);
     }

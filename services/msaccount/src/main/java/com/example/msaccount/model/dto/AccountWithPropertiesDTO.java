@@ -13,6 +13,4 @@ public class AccountWithPropertiesDTO {
     private String accountName;
     private String avatarUrl;
     List<PropertyDTO> properties;
-
-    private String title;
 }
