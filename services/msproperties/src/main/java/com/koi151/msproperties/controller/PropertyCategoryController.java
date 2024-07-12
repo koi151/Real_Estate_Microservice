@@ -9,7 +9,6 @@ import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUp
 import com.koi151.msproperties.service.PropertyCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -19,23 +18,22 @@ import java.util.List;
 
 
 @RestController
-@PropertySource("classpath:application.yml")
-@RequestMapping("/api/v1/property-category")
+@RequestMapping("/api/v1/properties/categories")
 public class PropertyCategoryController {
 
     @Autowired
     PropertyCategoryService propertyCategoryService;
 
-    @GetMapping("/")
-    public ResponseEntity<ResponseData> propertyCategoriesList(@RequestBody(required = false) @Valid PropertyCategorySearchRequest request) {
-        List<PropertyCategorySearchResponse> result = propertyCategoryService.findAllPropertyCategories(request);
-
-        ResponseData responseData = new ResponseData();
-        responseData.setData(result);
-        responseData.setDesc(result.isEmpty() ? "No property category found" : "Get properties succeed");
-
-        return ResponseEntity.ok(responseData);
-    }
+//    @GetMapping("/")
+//    public ResponseEntity<ResponseData> propertyCategoriesList(@RequestBody(required = false) @Valid PropertyCategorySearchRequest request) {
+//        List<PropertyCategorySearchResponse> result = propertyCategoryService.findAllPropertyCategories(request);
+//
+//        ResponseData responseData = new ResponseData();
+//        responseData.setData(result);
+//        responseData.setDesc(result.isEmpty() ? "No property category found" : "Get properties succeed");
+//
+//        return ResponseEntity.ok(responseData);
+//    }
 
     @GetMapping("/{title}")
     public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {

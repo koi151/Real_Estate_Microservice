@@ -1,6 +1,6 @@
 package com.koi151.msproperties.model.dto.PropertyCategory;
 
-import com.koi151.mspropertycategory.entity.StatusEnum;
+import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotEmpty;

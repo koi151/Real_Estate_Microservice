@@ -18,7 +18,6 @@ public interface PropertyCategoryService {
 
     List<PropertyCategoryHomeDTO> getCategoriesHomePage();
     List<PropertyCategoryHomeDTO> getCategoriesByTitle(String title);
-    List<PropertyCategorySearchResponse> findAllPropertyCategories(PropertyCategorySearchRequest request);
     List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum);
     PropertyCategoryEntity getCategoryById(Integer id);
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
