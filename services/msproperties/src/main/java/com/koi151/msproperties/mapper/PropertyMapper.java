@@ -1,7 +1,7 @@
 package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.entity.*;
-import com.koi151.msproperties.model.dto.FullPropertyDTO;
+import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.*;
@@ -44,7 +44,7 @@ public interface PropertyMapper {
     @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     @Mapping(target = "status", source = "status.statusName")
-    FullPropertyDTO toFullPropertyDTO(PropertyEntity entity);
+    DetailedPropertyDTO toDetailedPropertyDTO(PropertyEntity entity);
 
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName") // Mapping directionName instead of enum
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
@@ -93,5 +93,3 @@ public interface PropertyMapper {
         return "Unknown";
     }
 }
-
-

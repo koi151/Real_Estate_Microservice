@@ -16,8 +16,8 @@ import java.util.Optional;
 @Repository
 public interface PropertyRepository extends JpaRepository<PropertyEntity, Integer>, PropertyRepositoryCustom {
 
-    Page<PropertyEntity> findByDeleted(boolean deleted, PageRequest request);
-    Page<PropertyEntity> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, PageRequest request);
+    Page<PropertyEntity> findByDeleted(boolean deleted, Pageable pageable);
+    Page<PropertyEntity> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, Pageable pageable);
     Page<PropertyEntity> findByAccountIdAndDeleted(Long accountId, boolean deleted, Pageable pageable);
     Page<PropertyEntity> findByStatus(StatusEnum status, Pageable pageRequest);
     Optional<PropertyEntity> findByPropertyIdAndDeleted(Long propertyId, boolean deleted);

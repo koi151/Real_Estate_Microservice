@@ -14,14 +14,11 @@ import com.koi151.msproperties.service.converter.PropertyConverter;
 import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -42,23 +39,21 @@ public class PropertyServiceImpl implements PropertiesService {
 
 
     @Override
-    public Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params) {
-        PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("propertyId"));
-        Page<PropertyEntity> properties = propertyRepository.findByDeleted(false, pageRequest);
-
+    public Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params, Pageable pageable) {
+        Page<PropertyEntity> properties = propertyRepository.findByDeleted(false, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
-    public PropertyEntity getPropertyById(Long id) {
-        return propertyRepository.findByPropertyIdAndDeleted(id, false)
+    public DetailedPropertyDTO getPropertyById(Long id) {
+        PropertyEntity property = propertyRepository.findByPropertyIdAndDeleted(id, false)
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
+        return propertyMapper.toDetailedPropertyDTO(property);
     }
 
     @Override
-    public Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId) {
-        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
-        Page<PropertyEntity> properties = propertyRepository.findByCategoryIdAndDeleted(categoryId, false, pageRequest);
+    public Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId, Pageable pageable) {
+        Page<PropertyEntity> properties = propertyRepository.findByCategoryIdAndDeleted(categoryId, false, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
@@ -76,7 +71,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Transactional
     @Override
-    public FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+    public DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
         // Convert and save the address entity
         AddressEntity addressEntity = addressRepository.save(
                 AddressMapper.INSTANCE.toAddressEntity(request.getAddress())
@@ -86,7 +81,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
         // Save the property entity again to update the relationships
         propertyRepository.save(propertyEntity);
-        return propertyMapper.toFullPropertyDTO(propertyEntity);
+        return propertyMapper.toDetailedPropertyDTO(propertyEntity);
     }
 
     @Transactional
@@ -114,7 +109,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Transactional
     @Override
-    public FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
+    public DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
         return propertyRepository.findByPropertyIdAndDeleted(id, false)
                 .map(existingProperty -> {
                     updatePropertyDetails(existingProperty, request);
@@ -122,7 +117,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
                     return propertyRepository.save(existingProperty);
                 })
-                .map(propertyMapper::toFullPropertyDTO)
+                .map(propertyMapper::toDetailedPropertyDTO)
                 .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
 
     }

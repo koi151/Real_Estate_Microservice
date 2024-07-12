@@ -4,11 +4,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
-import com.koi151.msproperties.model.dto.FullPropertyDTO;
-import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
+import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.reponse.ResponseData;
 import com.koi151.msproperties.model.request.*;
 import com.koi151.msproperties.service.PropertiesService;
@@ -134,7 +132,9 @@ public class PropertyController {
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
-        var propertiesPage = propertiesService.getHomeProperties(params);
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+
+        var propertiesPage = propertiesService.getHomeProperties(params, pageable);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertiesPage);
@@ -151,22 +151,32 @@ public class PropertyController {
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<ResponseData> findPropertyById(@PathVariable(name = "id") Long id) {
-        PropertyEntity propertyEntity = propertiesService.getPropertyById(id);
+        var property = propertiesService.getPropertyById(id);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(propertyEntity);
+        responseData.setData(property);
         responseData.setDesc("Success");
 
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/category/{category-id}")
-    public ResponseEntity<ResponseData> getPropertiesByCategory(@PathVariable(name="category-id") Integer categoryId) {
-        var properties = propertiesService.findAllPropertiesByCategory(categoryId);
+    public ResponseEntity<ResponseData> getPropertiesByCategory(
+            @PathVariable(name="category-id") Integer categoryId,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int limit
+    ) {
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+        var propertiesPage = propertiesService.findAllPropertiesByCategory(categoryId, pageable);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty() ?
+        responseData.setData(propertiesPage);
+        responseData.setCurrentPage(page);
+        responseData.setTotalPages(propertiesPage.getTotalPages());
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalItems(propertiesPage.getTotalElements());
+
+        responseData.setDesc(propertiesPage.isEmpty() ?
                 "No properties found with id: " + categoryId : "Success");
 
         return ResponseEntity.ok(responseData);
@@ -224,7 +234,7 @@ public class PropertyController {
             @RequestPart(required = false) List<MultipartFile> images
     ) {
 
-        FullPropertyDTO propertyRes = propertiesService.createProperty(property, images);
+        DetailedPropertyDTO propertyRes = propertiesService.createProperty(property, images);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyRes);

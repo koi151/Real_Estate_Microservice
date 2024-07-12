@@ -1,6 +1,6 @@
 package com.koi151.msproperties.service;
 
-import com.koi151.msproperties.model.dto.FullPropertyDTO;
+import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.enums.StatusEnum;
@@ -11,7 +11,6 @@ import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.PropertyUpdateRequest;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -21,13 +20,13 @@ import java.util.Map;
 public interface PropertiesService {
 
     Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable);
-    Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
-    PropertyEntity getPropertyById(Long id);
-    Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
+    Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params, Pageable pageable);
+    DetailedPropertyDTO getPropertyById(Long id);
+    Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId, Pageable pageable);
     Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable);
     Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable);
-    FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
+    DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
     void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties);
-    FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
+    DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;
 }
