@@ -4,7 +4,7 @@ import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.repository.custom.PropertyRepositoryCustom;
-import com.koi151.msproperties.utils.QueryConditionContextProperty;
+import com.koi151.msproperties.utils.QueryContext.QueryConditionContextProperty;
 import com.koi151.msproperties.utils.RequestUtil;
 import com.koi151.msproperties.utils.StringUtil;
 import jakarta.persistence.EntityManager;

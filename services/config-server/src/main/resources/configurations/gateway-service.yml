@@ -20,10 +20,6 @@ spring:
           uri: http://localhost:8081/
           predicates:
             - Path=/api/v1/properties/**
-        - id: property-category
-          uri: http://localhost:8082/
-          predicates:
-            - Path=/api/v1/property-category/**
         - id: account
           uri: http://localhost:8083/
           predicates:

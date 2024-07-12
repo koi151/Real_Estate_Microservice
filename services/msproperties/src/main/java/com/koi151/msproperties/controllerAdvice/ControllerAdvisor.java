@@ -79,6 +79,19 @@ public class ControllerAdvisor {
         return ResponseEntity.badRequest().body(errorResponseDTO);
     }
 
+    @ExceptionHandler(CategoryNotFoundException.class)
+    public ResponseEntity<Object> handleCategoryNotFoundException
+            (CategoryNotFoundException ex, WebRequest request) {
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        List<String> details = new ArrayList<>();
+        details.add("Property category not existed or might be deleted");
+        errorResponse.setDetails(details);
+
+        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
+    }
+
     @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
     public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
         List<String> details = new ArrayList<>();
