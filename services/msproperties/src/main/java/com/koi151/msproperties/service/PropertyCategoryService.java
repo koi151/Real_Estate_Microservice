@@ -10,13 +10,15 @@ import com.koi151.msproperties.model.reponse.PropertyCategorySearchResponse;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUpdateRequest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
 public interface PropertyCategoryService {
 
-    List<PropertyCategoryHomeDTO> getCategoriesHomePage();
+    Page<PropertyCategoryHomeDTO> getCategoriesHomePage(Pageable pageable);
     List<PropertyCategoryHomeDTO> getCategoriesByTitle(String title);
     List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum);
     PropertyCategoryEntity getCategoryById(Integer id);

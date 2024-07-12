@@ -5,6 +5,8 @@ import com.koi151.msproperties.customExceptions.CategoryNotFoundException;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.entity.PropertyCategoryEntity;
 import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.mapper.PropertyCategoryMapper;
+import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertyCategory.PropertyCategoryDetailDTO;
 import com.koi151.msproperties.model.dto.PropertyCategory.PropertyCategoryHomeDTO;
 import com.koi151.msproperties.model.dto.PropertyCategory.PropertyCategoryTitleDTO;
@@ -18,6 +20,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -32,17 +35,15 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class PropertyCategoryServiceImpl implements PropertyCategoryService {
 
-    @Autowired
-    PropertyCategoryRepository propertyCategoryRepository;
+    private final PropertyCategoryRepository propertyCategoryRepository;
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
+    private final PropertyCategoryMapper propertyCategoryMapper;
 
-    @Autowired
-    CloudinaryServiceImpl cloudinaryServiceImpl;
-
-    @Autowired
-    ObjectMapper objectMapper;
-
-//    @Autowired
-//    PropertyCategoryConverter propertyCategoryConverter;
+    @Override
+    public Page<PropertyCategoryHomeDTO> getCategoriesHomePage(Pageable pageable) {
+        Page<PropertyCategoryEntity> categoryEntities = propertyCategoryRepository.findAll(pageable);
+        return categoryEntities.map(propertyCategoryMapper::toPropertyCategoryHomeDTO);
+    }
 
     @Override
     public List<PropertyCategoryHomeDTO> getCategoriesByTitle(String title) {
@@ -100,16 +101,6 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     }
 
 
-    @Override
-    public List<PropertyCategoryHomeDTO> getCategoriesHomePage() {
-        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
-        Page<PropertyCategoryEntity> categories = propertyCategoryRepository.findAll(pageRequest);
-
-        return categories.stream()
-                .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
-                .collect(Collectors.toList());
-    }
-
 //    @Override
 //    public List<PropertyCategorySearchResponse> findAllPropertyCategories(PropertyCategorySearchRequest request) {
 //        List<PropertyCategoryEntity> propertyCategories = propertyCategoryRepository.getPropertyCategoryByCriteria(request);
@@ -129,7 +120,6 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .status(request.getStatus())
-                .updatedAt(LocalDateTime.now().truncatedTo(ChronoUnit.SECONDS))
                 .build();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -197,8 +187,6 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
             Optional.ofNullable(request.getTitle()).ifPresent(existingCategory::setTitle);
             Optional.ofNullable(request.getDescription()).ifPresent(existingCategory::setDescription);
             Optional.ofNullable(request.getStatus()).ifPresent(existingCategory::setStatus);
-
-            existingCategory.setUpdatedAt(LocalDateTime.now());
         }
     }
 

@@ -13,5 +13,5 @@ public class PropertyCategoryHomeDTO {
 
     private String title;
     private String description;
-    private String images;
+    private String imageUrls;
 }

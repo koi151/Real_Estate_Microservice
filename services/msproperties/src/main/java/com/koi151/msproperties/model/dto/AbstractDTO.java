@@ -1,5 +1,6 @@
 package com.koi151.msproperties.model.dto;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
 
 import java.io.Serial;
@@ -9,27 +10,30 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class AbstractDTO<T> implements Serializable {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public abstract class AbstractDTO<T> implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -4013430427543366540L;
+    private static final long serialVersionUID = -699889113463942885L;
 
     private LocalDateTime createdDate;
-//    private String createdBy;
+    //    private String createdBy;
     private LocalDateTime modifiedDate;
-//    private String modifiedBy;
-    private int maxPageItems = 2;
-    private int page = 1;
-    private List<T> listResult = new ArrayList<>();
-    private int totalItems = 0;
-    private String tableId = "tableList";
+    //    private String modifiedBy;
+    private Integer maxPageItems;
+    private Integer currentPage = 1;
+    private String tableId;
     private Integer limit;
-    private Integer totalPage;
-    private Integer totalItem;
+    private Integer totalPages;
+    private Long totalItems;
+    private Integer totalSubItems;
     private String searchValue;
 
-    public int getTotalPages() {
-        return (int) Math.ceil((double) this.getTotalItems() / this.getMaxPageItems());
+    public Integer getTotalPages() {
+        if (maxPageItems == null) return null;
+        if (totalItems == 0 || maxPageItems == 0)
+            return 0;
+        return Math.toIntExact((totalItems + maxPageItems - 1) / maxPageItems);
     }
 
 }

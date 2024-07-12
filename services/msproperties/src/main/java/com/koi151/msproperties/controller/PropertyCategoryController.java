@@ -9,6 +9,10 @@ import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUp
 import com.koi151.msproperties.service.PropertyCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -24,16 +28,27 @@ public class PropertyCategoryController {
     @Autowired
     PropertyCategoryService propertyCategoryService;
 
-//    @GetMapping("/")
-//    public ResponseEntity<ResponseData> propertyCategoriesList(@RequestBody(required = false) @Valid PropertyCategorySearchRequest request) {
-//        List<PropertyCategorySearchResponse> result = propertyCategoryService.findAllPropertyCategories(request);
-//
-//        ResponseData responseData = new ResponseData();
-//        responseData.setData(result);
-//        responseData.setDesc(result.isEmpty() ? "No property category found" : "Get properties succeed");
-//
-//        return ResponseEntity.ok(responseData);
-//    }
+    @GetMapping("/home-categories")
+    public ResponseEntity<ResponseData> getCategoriesHomePage(
+            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "10") int limit
+    ) {
+        Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate").descending());
+
+        var categoriesPage = propertyCategoryService.getCategoriesHomePage(pageable);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(categoriesPage.getContent());
+        responseData.setCurrentPage(page + 1);
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalItems(categoriesPage.getTotalElements());
+        responseData.setTotalPages(categoriesPage.getTotalPages());
+
+        responseData.setDesc(categoriesPage.isEmpty() ?
+                "No property category found" : "Get home properties succeed");
+
+        return ResponseEntity.ok(responseData);
+    }
 
     @GetMapping("/{title}")
     public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
@@ -50,18 +65,6 @@ public class PropertyCategoryController {
         ResponseData responseData = new ResponseData();
         responseData.setData(category);
         responseData.setDesc("Success");
-
-        return ResponseEntity.ok(responseData);
-    }
-
-    @GetMapping("/home-categories")
-    public ResponseEntity<ResponseData> getCategoriesHomePage() {
-        var properties = propertyCategoryService.getCategoriesHomePage();
-
-        ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty() ?
-                "No property category found" : "Success");
 
         return ResponseEntity.ok(responseData);
     }

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serial;
 import java.time.LocalDateTime;
 
 @Entity(name="property_category")
@@ -14,7 +15,10 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyCategoryEntity {
+public class PropertyCategoryEntity extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = -1682566055866886258L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,20 +42,4 @@ public class PropertyCategoryEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
     private StatusEnum status = StatusEnum.ACTIVE;
-
-    @Column(name = "deleted", nullable = false)
-    private boolean deleted = false;
-
-    @Column(name = "created_at", nullable = false, columnDefinition = "TIMESTAMP DEFAULT CURRENT_TIMESTAMP")
-    private LocalDateTime createdAt;
-
-    @Column(name = "updated_at", nullable = false, columnDefinition = "TIMESTAMP")
-    private LocalDateTime updatedAt;
-
-    @PrePersist
-    protected void onCreate() {
-        if (createdAt == null) {
-            createdAt = LocalDateTime.now();
-        }
-    }
 }
