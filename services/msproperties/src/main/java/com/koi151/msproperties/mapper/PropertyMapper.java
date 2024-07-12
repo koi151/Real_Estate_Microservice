@@ -2,6 +2,7 @@ package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.model.dto.FullPropertyDTO;
+import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.*;
 import com.koi151.msproperties.utils.ListUtil;
@@ -54,6 +55,9 @@ public interface PropertyMapper {
     @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     PropertySearchDTO toPropertySearchDTO(PropertyEntity entity);
+
+    @Mapping(target = "status", source = "status.statusName")
+    PropertiesHomeDTO toPropertiesHomeDTO(PropertyEntity entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
             nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS) // fields in the target object will retain their existing values if the corresponding fields in the source object are null

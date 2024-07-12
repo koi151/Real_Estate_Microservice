@@ -1,5 +1,7 @@
 package com.koi151.msproperties.enums;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.koi151.msproperties.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -16,4 +18,13 @@ public enum DirectionEnum {
     SOUTH_WEST("South West");
 
     private final String directionName;
+
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static PaymentScheduleEnum fromString(String status) {
+        try {
+            return status == null ? null : PaymentScheduleEnum.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidEnumValueException("Invalid status value");
+        }
+    }
 }

@@ -21,11 +21,11 @@ import java.util.Map;
 public interface PropertiesService {
 
     Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable);
-    List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
+    Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params);
     PropertyEntity getPropertyById(Long id);
-    List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
+    Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId);
     Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable);
-    List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status);
+    Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable);
     FullPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
     void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties);
     FullPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);

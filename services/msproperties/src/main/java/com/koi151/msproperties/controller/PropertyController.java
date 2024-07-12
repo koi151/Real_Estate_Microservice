@@ -50,7 +50,7 @@ public class PropertyController {
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertiesPage.getContent());
-        responseData.setCurrentPage(page + 1);
+        responseData.setCurrentPage(page);
         responseData.setMaxPageItems(limit);
         responseData.setTotalItems(propertiesPage.getTotalElements());
         responseData.setTotalPages(propertiesPage.getTotalPages());
@@ -129,12 +129,20 @@ public class PropertyController {
 
 
     @GetMapping("/home")
-    public ResponseEntity<?> findHomeProperties(@RequestParam Map<String, Object> params) {
-        List<PropertiesHomeDTO> properties = propertiesService.getHomeProperties(params);
+    public ResponseEntity<?> findHomeProperties(
+            @RequestParam Map<String, Object> params,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int limit
+    ) {
+        var propertiesPage = propertiesService.getHomeProperties(params);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty()
+        responseData.setData(propertiesPage);
+        responseData.setCurrentPage(page);
+        responseData.setTotalPages(propertiesPage.getTotalPages());
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalItems(propertiesPage.getTotalElements());
+        responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties succeed");
 
@@ -175,7 +183,7 @@ public class PropertyController {
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertiesPage.getContent());
-        responseData.setCurrentPage(page + 1);
+        responseData.setCurrentPage(page);
         responseData.setMaxPageItems(limit);
         responseData.setTotalItems(propertiesPage.getTotalElements());
         responseData.setTotalPages(propertiesPage.getTotalPages());
@@ -187,13 +195,23 @@ public class PropertyController {
     }
 
     @GetMapping("/status/{status}")
-    public ResponseEntity<ResponseData> findPropertiesWithStatus(@PathVariable(name = "status") String status) {
+    public ResponseEntity<ResponseData> findPropertiesByStatus(
+            @PathVariable(name = "status") String status,
+            @RequestParam(required = false, defaultValue = "1") int page,
+            @RequestParam(required = false, defaultValue = "10") int limit
+    ) {
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
-        List<PropertiesHomeDTO> properties = propertiesService.getPropertiesWithStatus(se);
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+
+        var propertiesPage = propertiesService.findPropertiesByStatus(se, pageable);
 
         ResponseData responseData = new ResponseData();
-        responseData.setData(properties);
-        responseData.setDesc(properties.isEmpty()
+        responseData.setData(propertiesPage);
+        responseData.setCurrentPage(page);
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalPages(propertiesPage.getTotalPages());
+        responseData.setTotalItems(propertiesPage.getTotalElements());
+        responseData.setDesc(propertiesPage.isEmpty()
                 ? "No properties found with status " + status
                 : "Success");
 
@@ -238,5 +256,4 @@ public class PropertyController {
 
         return ResponseEntity.ok(responseData);
     }
-
 }

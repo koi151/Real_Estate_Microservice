@@ -42,13 +42,11 @@ public class PropertyServiceImpl implements PropertiesService {
 
 
     @Override
-    public List<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params) {
+    public Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params) {
         PageRequest pageRequest = PageRequest.of(0, 10, Sort.by("propertyId"));
         Page<PropertyEntity> properties = propertyRepository.findByDeleted(false, pageRequest);
 
-        return properties.stream()
-                .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatus(), property.getView()))
-                .collect(Collectors.toList());
+        return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
@@ -58,13 +56,10 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
-    public List<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId) {
+    public Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
         Page<PropertyEntity> properties = propertyRepository.findByCategoryIdAndDeleted(categoryId, false, pageRequest);
-
-        return properties.stream()
-                .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatus(), property.getView()))
-                .collect(Collectors.toList());
+        return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
@@ -74,13 +69,9 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
-    public List<PropertiesHomeDTO> getPropertiesWithStatus(StatusEnum status) {
-        PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("id"));
-        Page<PropertyEntity> properties = propertyRepository.findByStatus(status, pageRequest);
-
-        return properties.stream()
-                .map(property -> new PropertiesHomeDTO(property.getTitle(), property.getImageUrls(), property.getDescription(), property.getStatus(), property.getView()))
-                .collect(Collectors.toList());
+    public Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable) {
+        Page<PropertyEntity> properties = propertyRepository.findByStatus(status, pageable);
+        return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Transactional

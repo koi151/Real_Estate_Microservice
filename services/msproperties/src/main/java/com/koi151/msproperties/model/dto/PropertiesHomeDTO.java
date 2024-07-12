@@ -13,11 +13,8 @@ import lombok.*;
 public class PropertiesHomeDTO {
 
     private String title;
-    private String images;
+    private String imageUrls;
     private String description;
-
-    @Enumerated(EnumType.STRING)
-    private StatusEnum statusEnum;
-
     private int view;
+    private String status;
 }

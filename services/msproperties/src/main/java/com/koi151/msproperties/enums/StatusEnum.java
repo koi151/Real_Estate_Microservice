@@ -1,6 +1,8 @@
 package com.koi151.msproperties.enums;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.koi151.msproperties.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -17,12 +19,12 @@ public enum StatusEnum {
 
     private final String statusName;
 
-    public static Map<String, String> type() {
-        Map<String, String> listType = new TreeMap<>();
-        for (StatusEnum item : StatusEnum.values()) {
-            listType.put(item.toString(), item.getStatusName());
+    @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
+    public static PaymentScheduleEnum fromString(String status) {
+        try {
+            return status == null ? null : PaymentScheduleEnum.valueOf(status.toUpperCase());
+        } catch (Exception e) {
+            throw new InvalidEnumValueException("Invalid status value");
         }
-
-        return listType;
     }
 }
