@@ -53,16 +53,16 @@ public class AdminAccountController {
     @GetMapping("/{id}/properties")
     public ResponseEntity<ResponseData> findAccountWithProperties(
             @PathVariable(name = "id") Long id,
-            @RequestParam(name = "page", defaultValue = "0") Integer page,
+            @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "limit", defaultValue = "10") Integer limit)
     {
-        Pageable pageable = PageRequest.of(page, limit);
+        Pageable pageable = PageRequest.of(page - 1, limit);
         var accountPage = accountService.findAccountWithProperties(id, pageable);
         var accountProperties = accountPage.getContent().get(0).getProperties();
 
         ResponseData responseData = new ResponseData();
         responseData.setData(accountPage.getContent());
-        responseData.setTotalItems(accountPage.getSize());
+        responseData.setTotalItems(accountPage.getTotalElements());
 
         responseData.setMaxPageItems(limit);
         responseData.setTotalPages(accountPage.getTotalPages());

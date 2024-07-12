@@ -41,18 +41,24 @@ public class PropertyController {
 
     @GetMapping("/")
     public ResponseEntity<ResponseData> findAllProperties (
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit,
             @RequestBody @Valid PropertySearchRequest request) {
 
-        Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate"));
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate"));
         var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertiesPage.getContent());
+        responseData.setCurrentPage(page + 1);
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalItems(propertiesPage.getTotalElements());
+        responseData.setTotalPages(propertiesPage.getTotalPages());
+
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
-                : String.format("Get properties succeed. Page: %d. Total %d properties", propertiesPage.getNumber() + 1, propertiesPage.getTotalElements()));
+                : "Get properties succeed");
+
         return ResponseEntity.ok(responseData);
     }
 
@@ -159,7 +165,7 @@ public class PropertyController {
     }
 
     @GetMapping("/account/{account-id}")
-    public ResponseEntity<ResponseData> getPropertiesByAccount(
+    public ResponseEntity<ResponseData> findPropertiesByAccount(
             @PathVariable(name = "account-id") Long accountId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
@@ -169,6 +175,10 @@ public class PropertyController {
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertiesPage.getContent());
+        responseData.setCurrentPage(page + 1);
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalItems(propertiesPage.getTotalElements());
+        responseData.setTotalPages(propertiesPage.getTotalPages());
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : String.format("Get properties by account id succeed. Page: %d. Total %d properties", propertiesPage.getNumber() + 1, propertiesPage.getTotalElements()));

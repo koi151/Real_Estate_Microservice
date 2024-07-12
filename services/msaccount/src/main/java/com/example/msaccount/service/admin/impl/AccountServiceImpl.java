@@ -103,17 +103,17 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
-        // Fetch Account (only if you need account details)
+
         Account account = accountRepository.findByAccountId(accountId)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
 
         // Fetch Properties using Feign Client
-        ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId, pageable.getPageNumber(), pageable.getPageSize());
+        ResponseEntity<ResponseData> responseData = propertiesClient.findAllPropertiesByAccount(accountId, pageable.getPageNumber(), pageable.getPageSize());
 
-        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
+        if (responseData.getStatusCode().is2xxSuccessful() && responseData.getBody() != null) {
             try {
-                ResponseData responseData = response.getBody();
-                Object dataObject = responseData.getData();
+                ResponseData responseBody = responseData.getBody();
+                Object dataObject = responseBody.getData();
 
                 if (dataObject instanceof List<?> dataList) {
                     // Convert to List<PropertyDTO> using ObjectMapper
@@ -121,11 +121,10 @@ public class AccountServiceImpl implements AccountService {
                             .map(item -> objectMapper.convertValue(item, PropertyDTO.class))
                             .toList();
 
-                    // Construct AccountWithPropertiesDTO using MapStruct
                     AccountWithPropertiesDTO accountWithPropertiesDTO = accountMapper.toAccountWithPropertiesDTO(account, properties);
 
                     // Wrap the result in a Page object
-                    return new PageImpl<>(List.of(accountWithPropertiesDTO), pageable, 1);
+                    return new PageImpl<>(List.of(accountWithPropertiesDTO), pageable, responseBody.getTotalItems()); // total properties count
                 } else {
                     throw new RuntimeException("Unexpected data format (not a list) received from properties service");
                 }

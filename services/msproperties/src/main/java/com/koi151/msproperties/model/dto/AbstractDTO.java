@@ -26,7 +26,6 @@ public abstract class AbstractDTO<T> implements Serializable {
     private Integer limit;
     private Integer totalPages;
     private Long totalItems;
-    private Integer totalSubItems;
     private String searchValue;
 
     public Integer getTotalPages() {

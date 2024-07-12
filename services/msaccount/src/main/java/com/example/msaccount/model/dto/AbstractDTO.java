@@ -25,7 +25,7 @@ public abstract class AbstractDTO<T> implements Serializable {
     private String tableId;
     private Integer limit;
     private Integer totalPages;
-    private Integer totalItems;
+    private Long totalItems;
     private Integer totalSubItems;
     private String searchValue;
 
@@ -33,7 +33,7 @@ public abstract class AbstractDTO<T> implements Serializable {
         if (maxPageItems == null) return null;
         if (totalItems == 0 || maxPageItems == 0)
             return 0;
-        return (totalItems + maxPageItems - 1) / maxPageItems;
+        return Math.toIntExact((totalItems + maxPageItems - 1) / maxPageItems);
     }
 
 }

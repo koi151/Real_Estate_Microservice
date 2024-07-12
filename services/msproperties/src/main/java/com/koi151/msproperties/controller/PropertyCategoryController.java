@@ -30,10 +30,10 @@ public class PropertyCategoryController {
 
     @GetMapping("/home-categories")
     public ResponseEntity<ResponseData> getCategoriesHomePage(
-            @RequestParam(required = false, defaultValue = "0") int page,
+            @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
-        Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate").descending());
+        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
 
         var categoriesPage = propertyCategoryService.getCategoriesHomePage(pageable);
 
