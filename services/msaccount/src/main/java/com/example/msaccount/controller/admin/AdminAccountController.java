@@ -58,13 +58,18 @@ public class AdminAccountController {
     {
         Pageable pageable = PageRequest.of(page, limit);
         var accountPage = accountService.findAccountWithProperties(id, pageable);
+        var accountProperties = accountPage.getContent().get(0).getProperties();
 
         ResponseData responseData = new ResponseData();
         responseData.setData(accountPage.getContent());
+        responseData.setTotalItems(accountPage.getSize());
 
-        var accountProperties = accountPage.getContent().get(0).getProperties();
-        if (accountPage.hasContent() && accountProperties != null && !accountProperties.isEmpty())
-            responseData.setDesc("Account with properties found. Total: " + accountProperties.size() + " properties");
+        responseData.setMaxPageItems(limit);
+        responseData.setTotalPages(accountPage.getTotalPages());
+        responseData.setCurrentPage(accountPage.getNumber() + 1);
+
+        if (accountPage.hasContent() && !accountProperties.isEmpty())
+            responseData.setDesc("Account with properties found.");
         else
             responseData.setDesc("Account has no property post.");
 

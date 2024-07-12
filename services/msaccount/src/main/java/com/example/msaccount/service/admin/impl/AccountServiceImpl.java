@@ -108,7 +108,7 @@ public class AccountServiceImpl implements AccountService {
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
 
         // Fetch Properties using Feign Client
-        ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId);
+        ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId, pageable.getPageNumber(), pageable.getPageSize());
 
         if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
             try {
