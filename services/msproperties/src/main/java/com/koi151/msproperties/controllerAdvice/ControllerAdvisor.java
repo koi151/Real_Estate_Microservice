@@ -2,7 +2,6 @@ package com.koi151.msproperties.controllerAdvice;
 
 import com.koi151.msproperties.customExceptions.*;
 import com.koi151.msproperties.model.reponse.ErrorResponse;
-import com.koi151.msproperties.model.dto.ErrorResponseDTO;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;
@@ -24,7 +23,7 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(PropertyNotFoundException.class)
     public ResponseEntity<Object> handlePropertyNotFoundException(PropertyNotFoundException ex, WebRequest request) {
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
 
         List<String> details = new ArrayList<>();
@@ -36,7 +35,7 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(PaymentScheduleNotFoundException.class)
     public ResponseEntity<Object> handlePaymentScheduleNotFoundException(PaymentScheduleNotFoundException ex) {
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
 
         List<String> details = new ArrayList<>();
@@ -54,7 +53,7 @@ public class ControllerAdvisor {
                 .map(FieldError::getDefaultMessage)
                 .collect(Collectors.toList()); // convert to list
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError("Validation failed");
         errorResponseDTO.setDetails(errors);
 
@@ -72,7 +71,7 @@ public class ControllerAdvisor {
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError("Validation errors occurred");
         errorResponseDTO.setDetails(constraintViolations);
 
@@ -97,7 +96,7 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
@@ -109,7 +108,7 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Images file is empty, recheck file value again");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
@@ -121,7 +120,7 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Maximum 8 images allow reached, cannot add more images");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 
@@ -133,7 +132,7 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Invalid Content-Type value, recheck again.");
 
-        ErrorResponseDTO errorResponseDTO = new ErrorResponseDTO();
+        ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
         errorResponseDTO.setDetails(details);
 

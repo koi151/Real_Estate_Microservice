@@ -17,10 +17,14 @@ spring:
           predicates:
             - Path=/api/v1/login
         - id: properties
-          uri: http://localhost:8081/
+          uri: http://localhost:8050/
           predicates:
             - Path=/api/v1/properties/**
         - id: account
-          uri: http://localhost:8083/
+          uri: http://localhost:8060/
           predicates:
             - Path=/api/v1/account/**, /api/v1/admin/accounts/**
+        - id: property-submissions
+          uri: http://localhost:8070/
+          predicates:
+            - Path=/api/v1/property-submissions/**

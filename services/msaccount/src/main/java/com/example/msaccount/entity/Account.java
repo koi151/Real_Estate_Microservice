@@ -41,7 +41,7 @@ public class Account extends BaseEntity implements UserDetails {
     @JoinColumn(name = "role_id")
     private Role role;
 
-    @Column(name = "account_name", length = 50, nullable = false)
+    @Column(name = "account_name", length = 50, nullable = false, unique = true)
     @NotBlank(message = "Account name cannot be blank")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Account name contains invalid characters")
     private String accountName;
@@ -71,7 +71,7 @@ public class Account extends BaseEntity implements UserDetails {
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "Last name contains invalid characters")
     private String lastName;
 
-    @Column(name = "email", length = 100, nullable = false)
+    @Column(name = "email", length = 100, nullable = false, unique = true)
     @Email(message = "Invalid email")
     @NotNull(message = "Email cannot be null")
     private String email;

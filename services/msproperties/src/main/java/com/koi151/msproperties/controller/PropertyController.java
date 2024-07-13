@@ -28,7 +28,6 @@ import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping("/api/v1/properties")
-@PropertySource("classpath:application.yml")
 public class PropertyController {
 
     @Autowired

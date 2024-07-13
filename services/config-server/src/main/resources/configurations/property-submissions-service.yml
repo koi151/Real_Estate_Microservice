@@ -1,5 +1,5 @@
 server:
-  port: 8060
+  port: 8070
 spring:
   datasource:
     url: ${DATABASE_URL}
@@ -14,12 +14,11 @@ spring:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
 
-application:
-  config:
-    properties-url: http://localhost:9090/api/v1/properties
-
 api:
   prefix: api/v1
-jwt:
-  expiration: 2592000 #30 days = 30 * 24 * 60 * 60
-#  secretKey:
+
+application:
+  config:
+    customer-url: http://localhost:9090/api/v1/properties
+#    payment-url: http://localhost:9090/api/v1/payment
+    product-url: http://localhost:9090/api/v1/accounts

@@ -34,5 +34,4 @@ public abstract class AbstractDTO<T> implements Serializable {
             return 0;
         return Math.toIntExact((totalItems + maxPageItems - 1) / maxPageItems);
     }
-
 }
