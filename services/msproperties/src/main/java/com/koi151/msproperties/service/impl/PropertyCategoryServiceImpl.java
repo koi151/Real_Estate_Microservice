@@ -40,18 +40,9 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     private final PropertyCategoryMapper propertyCategoryMapper;
 
     @Override
-    public Page<PropertyCategoryHomeDTO> getCategoriesHomePage(Pageable pageable) {
-        Page<PropertyCategoryEntity> categoryEntities = propertyCategoryRepository.findAll(pageable);
+    public Page<PropertyCategoryHomeDTO> getCategoriesHomePage(PropertyCategorySearchRequest request,Pageable pageable) {
+        Page<PropertyCategoryEntity> categoryEntities = propertyCategoryRepository.getPropertyCategoryByCriteria(request, pageable);
         return categoryEntities.map(propertyCategoryMapper::toPropertyCategoryHomeDTO);
-    }
-
-    @Override
-    public List<PropertyCategoryHomeDTO> getCategoriesByTitle(String title) {
-        List<PropertyCategoryEntity> propertyCategories = propertyCategoryRepository.findByTitleContainingIgnoreCase(title);
-
-        return propertyCategories.stream()
-                .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
-                .collect(Collectors.toList());
     }
 
     @Override
@@ -70,49 +61,12 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
 
-//    @Override
-//    public FullCategoryResponse findCategoryWithProperties(Integer categoryId) {
-//        var category = propertyCategoryRepository.findById(categoryId)
-//                .orElseThrow(() -> new CategoryNotFoundException("No category found with id " + categoryId));
-//
-//        ResponseEntity<ResponseData> responseEntity = propertiesClient.findAllPropertiesByCategory(categoryId);
-//        ResponseData responseData = Objects.requireNonNull(responseEntity.getBody());
-//
-//        List<PropertyEntity> properties;
-//        try { // convert object to List<Properties>
-//            properties = objectMapper.convertValue(responseData.getData(), new TypeReference<>() {});
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to deserialize properties data", e);
-//        }
-//
-//        return FullCategoryResponse.builder()
-//                .title(category.getTitle())
-//                .description(category.getDescription())
-//                .statusEnum(category.getStatus())
-//                .properties(properties)
-//                .build();
-//    }
-
     @Override
     public PropertyCategoryTitleDTO getCategoryTitleById(Integer id){
         PropertyCategoryEntity category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
         return new PropertyCategoryTitleDTO(category.getTitle());
     }
-
-
-//    @Override
-//    public List<PropertyCategorySearchResponse> findAllPropertyCategories(PropertyCategorySearchRequest request) {
-//        List<PropertyCategoryEntity> propertyCategories = propertyCategoryRepository.getPropertyCategoryByCriteria(request);
-//        List<PropertyCategorySearchResponse> result = new ArrayList<>();
-//
-//        for (PropertyCategoryEntity item : propertyCategories) {
-//            PropertyCategorySearchResponse category =  propertyCategoryConverter.toPropertyCategorySearchResponse(item);
-//            result.add(category);
-//        }
-//
-//        return result;
-//    }
 
     public PropertyCategoryEntity createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
 

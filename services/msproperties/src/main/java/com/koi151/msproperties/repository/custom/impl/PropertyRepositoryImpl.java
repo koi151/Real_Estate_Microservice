@@ -4,6 +4,7 @@ import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.repository.custom.PropertyRepositoryCustom;
+import com.koi151.msproperties.utils.CustomRepositoryUtils;
 import com.koi151.msproperties.utils.QueryContext.QueryConditionContextProperty;
 import com.koi151.msproperties.utils.RequestUtil;
 import com.koi151.msproperties.utils.StringUtil;
@@ -27,42 +28,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
     @PersistenceContext // used to inject an EntityManager into a class
     private EntityManager entityManager;
-
-    private static boolean isExcludedField(String fieldName, Set<String> excludedFields) {
-        return excludedFields.contains(fieldName) ||
-                excludedFields.stream().anyMatch(fieldName::startsWith);
-    }
-
-    private static void appendNormalQueryConditions(PropertySearchRequest request, QueryConditionContextProperty context) {
-        Set<String> excludedFields = new HashSet<>(Set.of(
-                "propertyType", "type", "area", "price", "paymentSchedule", "term",
-                "city", "district", "ward", "address", "kitchens", "bedrooms", "bathrooms"
-        ));
-
-        Field[] fields = PropertySearchRequest.class.getDeclaredFields();
-
-        for (Field field : fields) {
-            try {
-                field.setAccessible(true);
-                String fieldName = field.getName();
-                Object value = field.get(request);
-
-                if (!isExcludedField(fieldName, excludedFields) && value != null && !value.toString().isEmpty()) {
-                    Path<?> path = context.root().get(fieldName); // represent for one specific attribute of entity
-                    if (value instanceof Integer || value instanceof Float || value instanceof Long) {
-                        context.predicates().add(context.criteriaBuilder().equal(path, value));
-                    } else if (value instanceof String) {
-                        context.predicates().add(context.criteriaBuilder().like(path.as(String.class), "%" + value + "%"));
-                    } else if (value.getClass().isEnum()) {
-                        context.predicates().add(context.criteriaBuilder().equal(path, ((Enum<?>) value).name()));
-                    }
-                }
-
-            } catch (IllegalAccessException ex) {
-                System.err.println("Error accessing field value: " + ex.getMessage());
-            }
-        }
-    }
 
     private static void applyPriceFilters(PropertySearchRequest request, QueryConditionContextProperty context) {
         List<Predicate> predicates = context.predicates();
@@ -213,11 +178,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         }
     }
 
-
-
     @Override
     public Page<PropertyEntity> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder(); // API in JPA create dynamic query
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder(); // API in JPA for creating dynamic query
         CriteriaQuery<PropertyEntity> cq = cb.createQuery(PropertyEntity.class); // call method from EntityManager to get CriteriaQuery for building queries
         Root<PropertyEntity> root = cq.from(PropertyEntity.class); // define PropertyEntity as root entity for queries
 
@@ -228,7 +191,14 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
         if (request != null) {
             joinColumns(request, context);
-            appendNormalQueryConditions(request, context);
+
+            // Apply normal query condition
+            Set<String> excludedFields = new HashSet<>(Set.of(
+                    "propertyType", "type", "area", "price", "paymentSchedule", "term",
+                    "city", "district", "ward", "address", "kitchens", "bedrooms", "bathrooms"
+            ));
+            CustomRepositoryUtils.appendNormalQueryConditions(request, root, cb, predicates, excludedFields);
+
             applySpecialQueryConditions(request, context);
         }
 
@@ -242,20 +212,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         }
 
         TypedQuery<PropertyEntity> typedQuery = entityManager.createQuery(cq);
-
-        // Apply Pagination
-        typedQuery.setFirstResult((int) pageable.getOffset());
-        typedQuery.setMaxResults(pageable.getPageSize());
-
-        // Get Total Count
-        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
-        countQuery.select(cb.count(countQuery.from(PropertyEntity.class)));
-        Long total = entityManager.createQuery(countQuery).getSingleResult();
-
-        List<PropertyEntity> results = typedQuery.getResultList();
-
-        // Return Page
-        return new PageImpl<>(results, pageable, total);
+        return CustomRepositoryUtils.applyPagination(typedQuery, pageable);
     }
 }
 

@@ -3,6 +3,7 @@ package com.koi151.msproperties.controller;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.reponse.PropertyCategorySearchResponse;
 import com.koi151.msproperties.model.reponse.ResponseData;
+import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUpdateRequest;
@@ -28,32 +29,25 @@ public class PropertyCategoryController {
     @Autowired
     PropertyCategoryService propertyCategoryService;
 
-    @GetMapping("/home-categories")
+    @GetMapping("/home")
     public ResponseEntity<ResponseData> getCategoriesHomePage(
+            @RequestBody @Valid PropertyCategorySearchRequest request,
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
         Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
 
-        var categoriesPage = propertyCategoryService.getCategoriesHomePage(pageable);
+        var categoriesPage = propertyCategoryService.getCategoriesHomePage(request, pageable);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(categoriesPage.getContent());
-        responseData.setCurrentPage(page + 1);
+        responseData.setCurrentPage(page);
         responseData.setMaxPageItems(limit);
         responseData.setTotalItems(categoriesPage.getTotalElements());
         responseData.setTotalPages(categoriesPage.getTotalPages());
 
         responseData.setDesc(categoriesPage.isEmpty() ?
-                "No property category found" : "Get home properties succeed");
-
-        return ResponseEntity.ok(responseData);
-    }
-
-    @GetMapping("/{title}")
-    public ResponseEntity<ResponseData> getCategories(@PathVariable(name = "title") String title) {
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertyCategoryService.getCategoriesByTitle(title));
+                "No property category found" : "Get home property categories succeed");
 
         return ResponseEntity.ok(responseData);
     }
@@ -64,7 +58,7 @@ public class PropertyCategoryController {
 
         ResponseData responseData = new ResponseData();
         responseData.setData(category);
-        responseData.setDesc("Success");
+        responseData.setDesc("Get property category title by id succeed");
 
         return ResponseEntity.ok(responseData);
     }

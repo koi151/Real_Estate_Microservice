@@ -20,11 +20,7 @@ public enum DirectionEnum {
     private final String directionName;
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static PaymentScheduleEnum fromString(String status) {
-        try {
-            return status == null ? null : PaymentScheduleEnum.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new InvalidEnumValueException("Invalid status value");
-        }
+    public static DirectionEnum fromString(String status) {
+        return status == null ? null : DirectionEnum.valueOf(status.toUpperCase());
     }
 }

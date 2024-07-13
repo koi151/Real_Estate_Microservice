@@ -22,11 +22,7 @@ public enum PropertyTypeEnum {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static PaymentScheduleEnum fromString(String status) {
-        try {
-            return status == null ? null : PaymentScheduleEnum.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new InvalidEnumValueException("Invalid status value");
-        }
+    public static PropertyTypeEnum fromString(String status) {
+        return status == null ? null : PropertyTypeEnum.valueOf(status.toUpperCase());
     }
 }

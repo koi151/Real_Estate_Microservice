@@ -18,8 +18,7 @@ import java.util.List;
 
 public interface PropertyCategoryService {
 
-    Page<PropertyCategoryHomeDTO> getCategoriesHomePage(Pageable pageable);
-    List<PropertyCategoryHomeDTO> getCategoriesByTitle(String title);
+    Page<PropertyCategoryHomeDTO> getCategoriesHomePage(PropertyCategorySearchRequest request, Pageable pageable);
     List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum);
     PropertyCategoryEntity getCategoryById(Integer id);
     PropertyCategoryTitleDTO getCategoryTitleById(Integer id);

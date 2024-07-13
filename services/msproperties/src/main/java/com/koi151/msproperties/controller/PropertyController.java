@@ -199,7 +199,7 @@ public class PropertyController {
         responseData.setTotalPages(propertiesPage.getTotalPages());
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
-                : String.format("Get properties by account id succeed. Page: %d. Total %d properties", propertiesPage.getNumber() + 1, propertiesPage.getTotalElements()));
+                : "Get properties by account id succeed");
 
         return ResponseEntity.ok(responseData);
     }

@@ -18,10 +18,6 @@ public enum PaymentScheduleEnum {
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PaymentScheduleEnum fromString(String status) {
-        try {
-            return status == null ? null : PaymentScheduleEnum.valueOf(status.toUpperCase());
-        } catch (Exception e) {
-            throw new InvalidEnumValueException("Invalid status value");
-        }
+        return status == null ? null : PaymentScheduleEnum.valueOf(status.toUpperCase());
     }
 }
