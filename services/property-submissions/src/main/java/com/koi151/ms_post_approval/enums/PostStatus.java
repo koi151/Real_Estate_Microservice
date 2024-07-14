@@ -15,7 +15,7 @@ public enum PostStatus {
     INACTIVE("Inactive"),
     REJECTED("Rejected");
 
-    private final String status;
+    private final String statusName;
 
     private static final PostStatus[] VALUES = values(); // Cache enum values for performance
 
@@ -23,7 +23,7 @@ public enum PostStatus {
     public static PostStatus fromString(String status) {
         return status == null ? null
             : Arrays.stream(VALUES)
-                .filter(value -> value.status.equalsIgnoreCase(status))
+                .filter(value -> value.statusName.equalsIgnoreCase(status))
                 .findFirst()
                 .orElseThrow(() -> new InvalidEnumValueException("Invalid status enum value: " + status));
     }

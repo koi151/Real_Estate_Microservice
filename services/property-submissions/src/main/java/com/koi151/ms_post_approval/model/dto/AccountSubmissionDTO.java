@@ -13,6 +13,6 @@ public class AccountSubmissionDTO {
     private Long propertyId;
     private String referenceCode;
     private Long reviewerId;
-    private PostStatus status;
+    private String status;
     private String reviewMessage;
 }

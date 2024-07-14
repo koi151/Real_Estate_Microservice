@@ -10,7 +10,7 @@ import lombok.*;
 
 import java.io.Serial;
 
-@Entity
+@Entity(name = "property_submission")
 @Setter
 @Getter
 @NoArgsConstructor
