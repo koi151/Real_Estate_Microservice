@@ -15,9 +15,9 @@ public class PropertySubmissionCreate {
     @Positive(message = "Property id must be positive value")
     private Long propertyId;
 
-    @NotNull(message = "Client id cannot be null")
-    @Positive(message = "Client id must be positive value")
-    private Long clientId;
+    @NotNull(message = "Account id cannot be null")
+    @Positive(message = "Account id must be positive value")
+    private Long accountId;
 
     private Long reviewerId;
 

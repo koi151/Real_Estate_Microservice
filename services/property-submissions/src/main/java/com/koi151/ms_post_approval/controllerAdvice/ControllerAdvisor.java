@@ -1,15 +1,21 @@
 package com.koi151.ms_post_approval.controllerAdvice;
 
+import com.koi151.ms_post_approval.customExceptions.AccountNotFoundException;
 import com.koi151.ms_post_approval.customExceptions.DuplicatePropertySubmissionException;
+import com.koi151.ms_post_approval.customExceptions.DuplicateReferenceCodeException;
 import com.koi151.ms_post_approval.customExceptions.InvalidEnumValueException;
 import com.koi151.ms_post_approval.model.response.ErrorResponse;
+import org.hibernate.exception.ConstraintViolationException;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -54,6 +60,51 @@ public class ControllerAdvisor {
         errorResponse.setError(ex.getMessage());
         errorResponse.setDetails(details);
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(AccountNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Account do not have any property submission, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicateReferenceCodeException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicateReferenceCodeException(DuplicateReferenceCodeException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Reference code of property submission existed, please create a new one");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+
+    @ExceptionHandler(ConstraintViolationException.class) // using for common case
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+        Throwable cause = ex.getCause();
+        ErrorResponse errorResponse = new ErrorResponse();
+
+        if (cause instanceof SQLIntegrityConstraintViolationException sqlEx) {
+                String message = cause.getMessage();
+
+                List<String> details = new ArrayList<>();
+                details.add(message);
+
+                errorResponse.setError("Duplicate entry: ");
+                errorResponse.setDetails(details);
+        }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 }

@@ -30,10 +30,10 @@ public class PropertySubmission extends BaseEntity{
     @Positive(message = "Property id must be positive value")
     private Long propertyId;
 
-    @Column(name = "client_id", nullable = false)
-    @NotNull(message = "Client id cannot be null")
-    @Positive(message = "Client id must be positive value")
-    private Long clientId;
+    @Column(name = "account_id", nullable = false)
+    @NotNull(message = "Account id cannot be null")
+    @Positive(message = "Account id must be positive value")
+    private Long accountId;
 
     @Column(name = "reference_code", length = 100, nullable = false, unique = true)
     @NotBlank(message = "Reference code cannot be blank")

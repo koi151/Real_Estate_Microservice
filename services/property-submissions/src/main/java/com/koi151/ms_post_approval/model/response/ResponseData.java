@@ -1,13 +1,16 @@
 package com.koi151.ms_post_approval.model.response;
 
 import com.koi151.ms_post_approval.model.dto.AbstractDTO;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 
 @Getter
 @Setter
+@SuperBuilder
 public class ResponseData extends AbstractDTO<Object> {
 
     @Serial

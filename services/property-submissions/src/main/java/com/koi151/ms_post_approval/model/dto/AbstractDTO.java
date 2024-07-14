@@ -2,12 +2,14 @@ package com.koi151.ms_post_approval.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractDTO<T> implements Serializable {
 
@@ -17,7 +19,7 @@ public abstract class AbstractDTO<T> implements Serializable {
     private LocalDateTime createdDate;
     private LocalDateTime modifiedDate;
     private Long totalItems;
-    private Integer limit;
+//    private Integer limit;
     private Integer maxPageItems;
     private Integer currentPage;
     private Integer totalPages;
