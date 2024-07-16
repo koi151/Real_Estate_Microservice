@@ -39,16 +39,18 @@ public class JwtTokenFilter extends OncePerRequestFilter {
                 Pair.of(String.format("%s/property-category", apiPrefix), "GET"),
                 Pair.of(String.format("%s/accounts/register", apiPrefix), "POST"),
                 Pair.of(String.format("%s/admin/accounts/login", apiPrefix), "POST")
+
         );
     }
 
 
     // Bypass the filter if the request matches bypass criteria
     private boolean isBypassToken(@NonNull HttpServletRequest request) { // stream api
-        return BYPASS_TOKENS.stream().anyMatch(
-                pair -> request.getServletPath().contains(pair.getFirst()) && // if satisfied -> return true
-                        request.getMethod().equals(pair.getSecond())
-        );
+//        return BYPASS_TOKENS.stream().anyMatch(
+//                pair -> request.getServletPath().contains(pair.getFirst()) && // if satisfied -> return true
+//                        request.getMethod().equals(pair.getSecond())
+//        );
+        return true; // testing
     }
 
     //  The method intercepts each HTTP request to apply security checks or transformations.

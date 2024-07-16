@@ -1,9 +1,6 @@
 package com.koi151.ms_post_approval.controllerAdvice;
 
-import com.koi151.ms_post_approval.customExceptions.AccountNotFoundException;
-import com.koi151.ms_post_approval.customExceptions.DuplicatePropertySubmissionException;
-import com.koi151.ms_post_approval.customExceptions.DuplicateReferenceCodeException;
-import com.koi151.ms_post_approval.customExceptions.InvalidEnumValueException;
+import com.koi151.ms_post_approval.customExceptions.*;
 import com.koi151.ms_post_approval.model.response.ErrorResponse;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -89,7 +86,21 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+    // FEIGN CLIENT SERVICE //
+    @ExceptionHandler(AccountServiceResponseException.class)
+    public ResponseEntity<ErrorResponse> handleAccountServiceResponseException(AccountServiceResponseException ex) {
 
+        List<String> details = new ArrayList<>();
+        details.add("Failed to get properly response from Account service or invalid data response, recheck Account service again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+    // CONSTRAIN VIOLATION //
     @ExceptionHandler(ConstraintViolationException.class) // using for common case
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         Throwable cause = ex.getCause();

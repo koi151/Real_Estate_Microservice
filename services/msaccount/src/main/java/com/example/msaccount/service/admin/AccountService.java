@@ -2,6 +2,7 @@ package com.example.msaccount.service.admin;
 
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
+import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
 import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
 import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
@@ -15,6 +16,7 @@ import java.util.List;
 
 public interface AccountService {
     List<AdminAccountDTO> findAllAdminAccounts();
+    AccountWithNameAndRoleDTO getAccountNameAndRole(Long id);
     Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
     AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
     String login(String userName, String password) throws Exception;

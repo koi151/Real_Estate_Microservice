@@ -29,50 +29,50 @@ public class WebSecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .csrf(AbstractHttpConfigurer::disable) // disable CSRF (Cross-Site Request Forgery)
-                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
-                .authorizeHttpRequests(requests -> {
-                    requests
-                            .requestMatchers( // allow access without authentication
-                                    String.format("%s/accounts/register", apiPrefix),
-                                    String.format("%s/admin/accounts/login", apiPrefix),
-                                    String.format("%s/admin/accounts", apiPrefix)
-
-                            )
-                            .permitAll()
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_VIEW")
-                            .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_CREATE")
-                            .requestMatchers(HttpMethod.PATCH,
-                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_EDIT")
-                            .requestMatchers(HttpMethod.DELETE,
-                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_DEL")
-
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_VIEW")
-                            .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_CREATE")
-                            .requestMatchers(HttpMethod.PATCH,
-                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_EDIT")
-                            .requestMatchers(HttpMethod.DELETE,
-                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_DEL")
-
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
-
-                            .requestMatchers(HttpMethod.GET,
-                                    String.format("%s/admin/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
-
-                            .requestMatchers(HttpMethod.POST,
-                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
-                            .requestMatchers(HttpMethod.PATCH,
-                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_EDIT")
-                            .requestMatchers(HttpMethod.DELETE,
-                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_DEL")
-
-                            .anyRequest().authenticated(); // require authentication for other requests
-                });
+                .csrf(AbstractHttpConfigurer::disable); // disable CSRF (Cross-Site Request Forgery)
+//                .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
+//                .authorizeHttpRequests(requests -> {
+//                    requests
+//                            .requestMatchers( // allow access without authentication
+//                                    String.format("%s/accounts/register", apiPrefix),
+//                                    String.format("%s/admin/accounts/login", apiPrefix),
+//                                    String.format("%s/admin/accounts**", apiPrefix)
+//
+//                            )
+//                            .permitAll()
+//                            .requestMatchers(HttpMethod.GET,
+//                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_VIEW")
+//                            .requestMatchers(HttpMethod.POST,
+//                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_CREATE")
+//                            .requestMatchers(HttpMethod.PATCH,
+//                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_EDIT")
+//                            .requestMatchers(HttpMethod.DELETE,
+//                                    String.format("%s/property**", apiPrefix)).hasAnyAuthority("PROPERTY_DEL")
+//
+//                            .requestMatchers(HttpMethod.GET,
+//                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_VIEW")
+//                            .requestMatchers(HttpMethod.POST,
+//                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_CREATE")
+//                            .requestMatchers(HttpMethod.PATCH,
+//                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_EDIT")
+//                            .requestMatchers(HttpMethod.DELETE,
+//                                    String.format("%s/property-category**", apiPrefix)).hasAnyAuthority("PROPERTY_CATE_DEL")
+//
+////                            .requestMatchers(HttpMethod.GET,
+////                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
+//
+////                            .requestMatchers(HttpMethod.GET,
+////                                    String.format("%s/admin/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_VIEW")
+////
+////                            .requestMatchers(HttpMethod.POST,
+////                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_CREATE")
+////                            .requestMatchers(HttpMethod.PATCH,
+////                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_EDIT")
+////                            .requestMatchers(HttpMethod.DELETE,
+////                                    String.format("%s/accounts**", apiPrefix)).hasAnyAuthority("ACCOUNT_DEL")
+//
+//                            .anyRequest().authenticated(); // require authentication for other requests
+//                });
 
         return http.build();
     }

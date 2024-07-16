@@ -11,8 +11,9 @@ import java.util.Optional;
 
 public interface AccountRepository extends JpaRepository<Account, Long> {
     Optional<Account> findByAccountName(String accountName);
+    boolean existsByAccountIdAndDeleted(Long id, boolean deleted);
     boolean existsByAccountName(String accountName);
     boolean existsByPhone(String phone);
-    Optional<Account> findByAccountId(Long id);
+    Optional<Account> findByAccountIdAndDeleted(Long id, boolean deleted);
     Page<Account> findByAccountStatus(AccountStatusEnum se, PageRequest pageRequest);
 }

@@ -52,17 +52,3 @@ public class PropertySubmission extends BaseEntity{
     @Size(max = 3000, message = "Review message cannot exceed 3000 characters")
     private String reviewMessage;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-

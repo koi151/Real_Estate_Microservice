@@ -5,10 +5,7 @@ import com.example.msaccount.component.JwtTokenUtil;
 import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.entity.admin.AdminAccount;
 import com.example.msaccount.mapper.AccountMapper;
-import com.example.msaccount.model.dto.AccountDTO;
-import com.example.msaccount.model.dto.AccountSearchDTO;
-import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
-import com.example.msaccount.model.dto.PropertyDTO;
+import com.example.msaccount.model.dto.*;
 import com.example.msaccount.model.dto.admin.AdminAccountDTO;
 import com.example.msaccount.model.request.AccountCreateRequest;
 import com.example.msaccount.model.request.AccountUpdateRequest;
@@ -63,6 +60,11 @@ public class AccountServiceImpl implements AccountService {
             throw new AccountAlreadyExistsException("Account name already exists");
     }
 
+//    public void checkAccountExisted(Long accountId) {
+//        if (!accountRepository.existsByAccountIdAndDeleted(accountId, false))
+//            throw new AccountNotFoundException("Account not found with id: " + accountId);
+//    }
+
     @Override
     public List<AdminAccountDTO> findAllAdminAccounts() {
         return adminAccountRepository.findAllByAccountDeleted(false, Sort.by("accountId")).stream()
@@ -70,41 +72,17 @@ public class AccountServiceImpl implements AccountService {
                 .collect(Collectors.toList());
     }
 
-//    @Override
-//    public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
-//
-//        Account account = accountRepository.findByAccountId(accountId)
-//                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
-//
-//        // Fetch Properties using Feign Client
-//        ResponseEntity<ResponseData> response = propertiesClient.findAllPropertiesByAccount(accountId);
-//
-//        if (response.getStatusCode().is2xxSuccessful() && response.getBody() != null) {
-//
-//            ResponseEntity<ResponseData> responseEntity = propertiesClient.findAllPropertiesByAccount(accountId);
-//            ResponseData responseData = Objects.requireNonNull(responseEntity.getBody());
-//
-//            List<PropertyDTO> properties;
-//            try { // convert object to List<Properties>
-////                properties = objectMapper.convertValue(responseData.getData(), new TypeReference<>() {});
-//                Object dataObject = responseData.getData();
-//
-//
-//
-//            } catch (Exception e) {
-//                throw new RuntimeException("Failed to deserialize properties data", e);
-//            }
-//
-//            return null;
-//        } else {
-//            throw new RuntimeException("Failed to fetch properties from properties service");
-//        }
-//    }
+    @Override
+    public AccountWithNameAndRoleDTO getAccountNameAndRole(Long id) {
+        return accountRepository.findByAccountIdAndDeleted(id, false)
+                .map(accountMapper::toAccountWithNameAndRoleDTO)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with id:" + id));
+    }
 
     @Override
     public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
 
-        Account account = accountRepository.findByAccountId(accountId)
+        Account account = accountRepository.findByAccountIdAndDeleted(accountId, false)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
 
         // Fetch Properties using Feign Client
@@ -140,10 +118,8 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         validateAccountCreateRequest(request);
-
         Account newAccount = accountConverter.toAccountEntity(request, avatar);
         accountRepository.save(newAccount);
-
         return accountConverter.toAccountDTO(newAccount);
     }
 
@@ -168,7 +144,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatarFile) {
-        return accountRepository.findByAccountId(id) // del
+        return accountRepository.findByAccountIdAndDeleted(id, false) // del
                 .map(existingAccountEntity -> {
                     updateAccountDetails(existingAccountEntity, request);
                     updateAvatar(existingAccountEntity, avatarFile);

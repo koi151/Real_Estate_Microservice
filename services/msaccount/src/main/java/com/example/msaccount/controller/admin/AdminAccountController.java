@@ -9,6 +9,7 @@ import com.example.msaccount.model.request.AccountUpdateRequest;
 import com.example.msaccount.enums.AccountStatusEnum;
 import com.example.msaccount.service.admin.AccountService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -21,10 +22,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/v1/admin/accounts")
+@RequiredArgsConstructor
 public class AdminAccountController {
 
-    @Autowired
-    AccountService accountService;
+    private final AccountService accountService;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AccountLoginRequest request) {
@@ -76,12 +77,23 @@ public class AdminAccountController {
         return ResponseEntity.ok(responseData);
     }
 
+    @GetMapping("/{account-id}/name-and-role")
+    public ResponseEntity<ResponseData> getAccountNameAndRole(@PathVariable(name = "account-id") Long accountId) {
+        var account = accountService.getAccountNameAndRole(accountId);
+
+        ResponseData responseData = new ResponseData();
+        responseData.setData(account);
+        responseData.setDesc("Get account with name and role succeed");
+
+        return ResponseEntity.ok(responseData);
+    }
+
     @PostMapping("/")
-    public ResponseEntity<?> createAccount(
+    public ResponseEntity<ResponseData> createAccount(
             @RequestPart @Valid AccountCreateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ) {
-            AccountDTO accountCreated = accountService.createAccount(account, avatar);
+            var accountCreated = accountService.createAccount(account, avatar);
 
             ResponseData responseData = new ResponseData();
             responseData.setData(accountCreated);
