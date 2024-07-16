@@ -16,16 +16,17 @@ import java.time.LocalDateTime;
 @Data
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-public class BaseEntity  implements Serializable {
+public class BaseEntity implements Serializable {
 
     @Serial
     private static final long serialVersionUID = 6227106329687882483L;
 
-    @Column(name = "created_date", columnDefinition = "TIMESTAMP(0)")
     @CreatedDate
+    @Column(name = "created_date", columnDefinition = "TIMESTAMP(0)",
+            updatable = false, nullable = false)
     private LocalDateTime createdDate;
 
-    @Column(name = "modified_date", columnDefinition = "TIMESTAMP(0)")
+    @Column(name = "modified_date", columnDefinition = "TIMESTAMP(0)", insertable = false)
     @LastModifiedDate
     private LocalDateTime modifiedDate;
 
