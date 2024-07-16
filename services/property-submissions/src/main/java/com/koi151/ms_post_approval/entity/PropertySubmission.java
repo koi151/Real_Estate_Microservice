@@ -1,5 +1,6 @@
 package com.koi151.ms_post_approval.entity;
 
+import com.koi151.ms_post_approval.enums.PaymentMethod;
 import com.koi151.ms_post_approval.enums.PostStatus;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
@@ -39,6 +40,9 @@ public class PropertySubmission extends BaseEntity{
     @NotBlank(message = "Reference code cannot be blank")
     @Size(max = 100, message = "Reference code cannot exceed 100 characters")
     private String referenceCode;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentMethod paymentMethod;
 
     @Column(name = "reviewer_id")
     @Positive(message = "Reviewer id must be positive value")
