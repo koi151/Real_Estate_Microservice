@@ -21,11 +21,11 @@ public enum PaymentMethod {
     private static final PaymentMethod[] VALUES = values(); // Cache enum values for performance
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static PaymentMethod fromString(String status) {
-        return status == null ? null
+    public static PaymentMethod fromString(String s) {
+        return s == null ? null
                 : Arrays.stream(VALUES)
-                .filter(value -> value.typeName.equalsIgnoreCase(status))
+                .filter(value -> value.name().equals(s.toUpperCase()))
                 .findFirst()
-                .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentMethod enum value: " + status));
+                .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentMethod enum value: " + s));
     }
 }

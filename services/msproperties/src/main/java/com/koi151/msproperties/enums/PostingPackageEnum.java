@@ -21,7 +21,7 @@ public enum PostingPackageEnum {
     public static PostingPackageEnum fromString(String s) {
         return s == null ? null
                 : Arrays.stream(VALUES)
-                .filter(value -> value.name().equals(s.toUpperCase())) // case-sensitive comparison
+                .filter(value -> value.name().equals(s.toUpperCase()))
                 .findFirst()
                 .orElseThrow(() -> new InvalidEnumValueException("Invalid PostingPackageEnum enum value: " + s));
     }

@@ -13,11 +13,11 @@ public class PropertySubmissionValidator {
 
     private final PropertySubmissionRepository propertySubmissionRepository;
     public void validatePropertySubmissionCreateRequest(PropertySubmissionCreate request) {
-        if (propertySubmissionRepository.existsByPropertyIdAndDeleted(request.getPropertyId(), false)) {
+        if (propertySubmissionRepository.existsByPropertyIdAndDeleted(request.propertyId(), false)) {
             throw new DuplicatePropertySubmissionException("Duplicate property submission");
         }
 
-        if (propertySubmissionRepository.existsByReferenceCode(request.getReferenceCode())) {
+        if (propertySubmissionRepository.existsByReferenceCode(request.referenceCode())) {
             throw new DuplicateReferenceCodeException("Duplicate reference code");
         }
     }
