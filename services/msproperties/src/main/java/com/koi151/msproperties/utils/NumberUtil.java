@@ -1,13 +1,10 @@
 package com.koi151.msproperties.utils;
 
-public class NumberUtil {
-    public static boolean isInteger(String s) {
-        try {
-            Integer number = Integer.parseInt(s);
-        } catch (NumberFormatException ex) {
-            return false;
-        }
+import com.github.javafaker.Faker;
 
-        return true;
+public class NumberUtil {
+    public static int generateRandomInteger(int min, int max) {
+        Faker faker = new Faker();
+        return faker.number().numberBetween(min, max);
     }
 }

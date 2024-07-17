@@ -72,14 +72,7 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional
     @Override
     public DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
-        // Convert and save the address entity
-        AddressEntity addressEntity = addressRepository.save(
-                AddressMapper.INSTANCE.toAddressEntity(request.getAddress())
-        );
-
-        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles, addressEntity);
-
-        // Save the property entity again to update the relationships
+        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles, false);
         propertyRepository.save(propertyEntity);
         return propertyMapper.toDetailedPropertyDTO(propertyEntity);
     }
@@ -87,20 +80,9 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional
     public void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties) {
 
-        // Batch save addresses to optimize database interactions
-        List<AddressEntity> addressEntities = addressRepository.saveAllAndFlush(
-                fakeProperties.stream()
-                        .map(FakePropertyCreateRequest::getAddress)
-                        .map(AddressMapper.INSTANCE::toAddressEntity)
-                        .toList()
-        );
-
         // Create property entities in parallel
         List<PropertyEntity> propertyEntities = fakeProperties.parallelStream()
-                .map(fakeProperty -> {
-                    AddressEntity correspondingAddress = addressEntities.get(fakeProperties.indexOf(fakeProperty));
-                    return propertyConverter.toPropertyEntity(fakeProperty, null, correspondingAddress);
-                })
+                .map(fakeProperty -> propertyConverter.toPropertyEntity(fakeProperty,null, true))
                 .toList();
 
         // Bulk save all property entities

@@ -1,11 +1,14 @@
 package com.koi151.msproperties.mapper;
 
+import com.github.javafaker.Faker;
+import com.github.javafaker.Number;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.*;
 import com.koi151.msproperties.utils.ListUtil;
+import com.koi151.msproperties.utils.NumberUtil;
 import com.koi151.msproperties.utils.StringUtil;
 import org.mapstruct.*;
 import org.mapstruct.factory.Mappers;
@@ -15,17 +18,14 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        imports = {StringUtil.class, ListUtil.class})
+        imports = {StringUtil.class, ListUtil.class, NumberUtil.class})
 public interface PropertyMapper {
 
-    PropertyMapper INSTANCE = Mappers.getMapper( PropertyMapper.class );
-
-    @Mapping(target = "propertyId", ignore = true)
-    @Mapping(target = "rooms", ignore = true)
-    @Mapping(target = "address", ignore = true)
-    @Mapping(target = "propertyForRent", ignore = true)
-    @Mapping(target = "propertyForSale", ignore = true)
+    // included rooms, propertyForRent, propertyForSale, propertyPostService, address entities
     PropertyEntity toPropertyEntity(PropertyCreateRequest request);
+
+    @Mapping(target = "view", expression = "java(NumberUtil.generateRandomInteger(0, 20000))")
+    PropertyEntity toFakePropertyEntity(PropertyCreateRequest request);
 
     @Mapping(target = "propertyId", ignore = true)
     @Mapping(target = "propertyEntity", ignore = true)

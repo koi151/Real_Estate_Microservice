@@ -1,8 +1,11 @@
 package com.koi151.ms_post_approval.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
+import com.koi151.ms_post_approval.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
@@ -13,10 +16,16 @@ public enum PaymentMethod {
     VISA("Visa"),
     MASTER_CARD("Master Card");
 
-    private final String type;
+    private final String typeName;
+
+    private static final PaymentMethod[] VALUES = values(); // Cache enum values for performance
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    private PaymentMethod fromString(String s) {
-        return s == null ? null : PaymentMethod.valueOf(s.toUpperCase());
+    public static PaymentMethod fromString(String status) {
+        return status == null ? null
+                : Arrays.stream(VALUES)
+                .filter(value -> value.typeName.equalsIgnoreCase(status))
+                .findFirst()
+                .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentMethod enum value: " + status));
     }
 }

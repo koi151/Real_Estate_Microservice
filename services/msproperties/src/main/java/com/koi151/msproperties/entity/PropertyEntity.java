@@ -3,16 +3,11 @@ package com.koi151.msproperties.entity;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.springframework.data.annotation.CreatedDate;
-import org.springframework.data.annotation.LastModifiedDate;
 
 import java.io.Serial;
-import java.time.LocalDateTime;
 import java.util.List;
-import java.util.Set;
 
 @Entity(name = "property")
 @Getter
@@ -30,18 +25,25 @@ public class PropertyEntity extends BaseEntity {
     @Column(name = "property_id")
     private Long propertyId;
 
-    @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToOne(mappedBy = "propertyEntity",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForSaleEntity propertyForSale;
 
-    @OneToOne(mappedBy = "propertyEntity", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToOne(mappedBy = "propertyEntity",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForRentEntity propertyForRent;
 
-    @OneToOne(cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    @OneToOne(mappedBy = "propertyEntity",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity address;
 
-    @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY, cascade = {CascadeType.PERSIST, CascadeType.MERGE}
-                                                                                            , orphanRemoval = true)
+    @OneToOne(mappedBy = "propertyEntity",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private PropertyPostServiceEntity propertyPostService;
+
+    @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<RoomEntity> rooms;
 
     @Column(name = "category_id", nullable = false)
@@ -76,7 +78,7 @@ public class PropertyEntity extends BaseEntity {
     @Column(name = "view", nullable = false)
     @NotNull(message = "Number of view cannot be null")
     @PositiveOrZero(message = "View number must be positive or zero")
-    private int view = 0;
+    private int view;
 
     @Column(name = "total_floor")
     @PositiveOrZero(message = "Total floor must be positive or zero")
@@ -84,7 +86,7 @@ public class PropertyEntity extends BaseEntity {
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)
-    private StatusEnum status = StatusEnum.ACTIVE;
+    private StatusEnum status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "house_direction", length = 20)

@@ -19,36 +19,24 @@ public class PropertyConverter {
     private final PropertyMapper propertyMapper;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
 
-    public PropertyEntity toPropertyEntity (PropertyCreateRequest request, List<MultipartFile> imageFiles, AddressEntity addressEntity) {
-        PropertyEntity propertyEntity = propertyMapper.toPropertyEntity(request);
-        propertyEntity.setAddress(addressEntity);
+    public PropertyEntity toPropertyEntity (PropertyCreateRequest request, List<MultipartFile> imageFiles, boolean generateFakeProperties) {
+        PropertyEntity propertyEntity;
+        if (generateFakeProperties)
+            propertyEntity = propertyMapper.toFakePropertyEntity(request);
+        else
+            propertyEntity = propertyMapper.toPropertyEntity(request);
 
-        // Handle PropertyForRentEntity if it exists
-        if (request.getPropertyForRent() != null) {
-            PropertyForRentEntity propertyForRentEntity = propertyMapper.toPropertyForRentEntity(request.getPropertyForRent());
-            propertyForRentEntity.setPropertyEntity(propertyEntity); // Associate with propertyEntity
-            propertyEntity.setPropertyForRent(propertyForRentEntity);
-        }
+        propertyEntity.getPropertyPostService().setPropertyEntity(propertyEntity);
+        propertyEntity.getAddress().setPropertyEntity(propertyEntity);
 
-        // Handle PropertyForSaleEntity if it exists
-        if (request.getPropertyForSale() != null) {
-            PropertyForSaleEntity propertyForSaleEntity = propertyMapper.toPropertyForSaleEntity(request.getPropertyForSale());
-            propertyForSaleEntity.setPropertyEntity(propertyEntity);
-            propertyEntity.setPropertyForSale(propertyForSaleEntity);
-        }
+        if (request.getPropertyForSale() != null)
+            propertyEntity.getPropertyForSale().setPropertyEntity(propertyEntity);
+        if (request.getPropertyForRent() != null)
+            propertyEntity.getPropertyForRent().setPropertyEntity(propertyEntity);
 
-        // Handle RoomEntity if it exists
-        if (request.getRooms() != null && !request.getRooms().isEmpty()) {
-            List<RoomEntity> roomEntities = request.getRooms().stream()
-                    .map(roomRequest -> {
-                        RoomEntity roomEntity = propertyMapper.toRoomEntity(roomRequest);
-                        roomEntity.setPropertyEntity(propertyEntity);
-                        return roomEntity;
-                    })
-                    .collect(Collectors.toList());
-
-            propertyEntity.setRooms(roomEntities);
-        }
+        if (request.getRooms() != null)
+            propertyEntity.getRooms()
+                    .forEach(roomEntity -> roomEntity.setPropertyEntity(propertyEntity));
 
         // add image to cloudinary and save to db as url strings
         if (imageFiles != null && !imageFiles.isEmpty()) {

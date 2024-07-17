@@ -9,23 +9,20 @@ import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
-public enum PaymentScheduleEnum {
-    WEEKLY("Pay weekly"),
-    MONTHLY("Pay monthly"),
-    QUARTERLY("Pay quarterly"),
-    YEARLY("Pay yearly"),
-    OTHER("According to agreement");
+public enum PostingPackageEnum {
+    STANDARD("Standard package"),
+    PREMIUM("Premium package"),
+    EXCLUSIVE("Exclusive package");
 
-    private final String scheduleName;
-
-    private static final PaymentScheduleEnum[] VALUES = values(); // Cache enum values for performance
+    private final String packageName;
+    private static final PostingPackageEnum[] VALUES = values(); // Cache enum values for performance
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static PaymentScheduleEnum fromString(String s) {
+    public static PostingPackageEnum fromString(String s) {
         return s == null ? null
                 : Arrays.stream(VALUES)
                 .filter(value -> value.name().equals(s.toUpperCase())) // case-sensitive comparison
                 .findFirst()
-                .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentSchedule enum value: " + s));
+                .orElseThrow(() -> new InvalidEnumValueException("Invalid PostingPackageEnum enum value: " + s));
     }
 }

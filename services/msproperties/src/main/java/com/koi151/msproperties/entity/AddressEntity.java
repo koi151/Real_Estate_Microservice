@@ -16,6 +16,11 @@ public class AddressEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @OneToOne
+    @MapsId
+    @JoinColumn(name = "property_id")
+    private PropertyEntity propertyEntity;
+
     @Column(name = "city", nullable = false, length = 50)
     @NotEmpty(message = "City cannot be empty")
     private String city;

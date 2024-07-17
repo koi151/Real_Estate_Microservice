@@ -1,5 +1,6 @@
 package com.koi151.msproperties.model.request;
 
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.EnumType;
@@ -41,22 +42,19 @@ public class PropertyCreateRequest {
     @Valid
     private AddressCreateRequest address;
 
+    @Valid
+    private PropertyPostServiceCreateRequest propertyPostService;
+
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")
     private Float area;
 
-    private String description;
-
     @PositiveOrZero(message = "Total floor must be positive or zero")
     private Integer totalFloor;
 
-    @Enumerated(EnumType.STRING)
+    private String description;
     private DirectionEnum houseDirection;
-
-    @Enumerated(EnumType.STRING)
     private DirectionEnum balconyDirection;
-
-    @Enumerated(EnumType.STRING)
     private StatusEnum status = StatusEnum.ACTIVE;
 
     @NotEmpty(message = "Available time cannot be empty")
