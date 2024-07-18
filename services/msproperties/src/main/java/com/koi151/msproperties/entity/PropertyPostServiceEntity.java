@@ -1,5 +1,6 @@
 package com.koi151.msproperties.entity;
 
+import com.koi151.msproperties.enums.DaysPostedEnum;
 import com.koi151.msproperties.enums.PostingPackageEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
@@ -27,10 +28,9 @@ public class PropertyPostServiceEntity {
     @JoinColumn(name = "property_id")
     private PropertyEntity propertyEntity;
 
-    @Column(name = "expireDate", columnDefinition = "TIMESTAMP(0)", nullable = false)
-    @NotNull(message = "Expire date of post cannot be null")
-    @Future(message = "Expire date must be in the future")
-    private LocalDateTime expireDate;
+    @Enumerated(EnumType.STRING)
+    @Column(name = "days_posted", nullable = false)
+    private DaysPostedEnum daysPosted;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "posting_package", nullable = false)
@@ -38,6 +38,10 @@ public class PropertyPostServiceEntity {
 
     @Column(name = "priority_pushes")
     @PositiveOrZero(message = "Priority pushes time must be positive or zero")
-    @Max(value = 32000, message = "Priority pushes cannot exceed 32000")
+    @Max(value = 32000, message = "Priority pushes cannot exceed 32000 times")
     private short priorityPushes;
+
+    @Column(name = "posting_date", columnDefinition = "TIMESTAMP(0)", nullable = false)
+    @Future(message = "Posting date must be after current date")
+    private LocalDateTime postingDate;
 }

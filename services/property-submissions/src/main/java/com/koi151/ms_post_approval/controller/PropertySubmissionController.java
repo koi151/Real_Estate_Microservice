@@ -24,17 +24,18 @@ import org.springframework.web.bind.annotation.*;
 public class PropertySubmissionController {
 
     private final PropertySubmissionService propertySubmissionService;
-    private final ResponseDataMapper responseDataMapper;
+//    private final ResponseDataMapper responseDataMapper;
 
     @PostMapping("/")
     public ResponseEntity<ResponseData> createPropertySubmission(@RequestBody @Valid PropertySubmissionCreate request) {
         var submissions = propertySubmissionService.createPropertySubmission(request);
 
-        return ResponseEntity.ok(ResponseData.builder()
+        ResponseData responseData = ResponseData.builder()
                 .data(submissions)
-                .description("Property submission created successfully")
-                .build()
-        );
+                .description("Property submission created successfully, will be censored by admin as soon as possible")
+                .build();
+
+        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
     }
 
     @GetMapping("/accountId/{account-id}")

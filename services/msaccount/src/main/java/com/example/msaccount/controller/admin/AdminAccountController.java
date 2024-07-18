@@ -79,7 +79,7 @@ public class AdminAccountController {
 
     @GetMapping("/{account-id}/name-and-role")
     public ResponseEntity<ResponseData> getAccountNameAndRole(@PathVariable(name = "account-id") Long accountId) {
-        var account = accountService.getAccountNameAndRole(accountId);
+        var account = accountService.findAccountNameAndRoleById(accountId);
 
         ResponseData responseData = new ResponseData();
         responseData.setData(account);

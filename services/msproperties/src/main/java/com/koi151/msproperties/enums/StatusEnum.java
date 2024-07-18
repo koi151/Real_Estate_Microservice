@@ -11,7 +11,8 @@ public enum StatusEnum {
 
     ACTIVE ("Active"),
     INACTIVE ("Inactive"),
-    PENDING ("Pending");
+    PENDING ("Pending"),
+    EXPIRED("Expired");
 
     private final String statusName;
 

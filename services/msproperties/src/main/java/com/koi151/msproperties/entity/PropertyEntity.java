@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.io.Serial;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Entity(name = "property")
@@ -38,7 +39,7 @@ public class PropertyEntity extends BaseEntity {
     @JoinColumn(name = "address_id", nullable = false)
     private AddressEntity address;
 
-    @OneToOne(mappedBy = "propertyEntity",
+    @OneToOne(mappedBy = "propertyEntity",  fetch = FetchType.LAZY, // querying for properties without needing their payment details.
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyPostServiceEntity propertyPostService;
 

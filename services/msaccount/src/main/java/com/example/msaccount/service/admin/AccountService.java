@@ -16,7 +16,7 @@ import java.util.List;
 
 public interface AccountService {
     List<AdminAccountDTO> findAllAdminAccounts();
-    AccountWithNameAndRoleDTO getAccountNameAndRole(Long id);
+    AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id);
     Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
     AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
     String login(String userName, String password) throws Exception;

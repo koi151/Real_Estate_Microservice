@@ -73,7 +73,7 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public AccountWithNameAndRoleDTO getAccountNameAndRole(Long id) {
+    public AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id) {
         return accountRepository.findByAccountIdAndDeleted(id, false)
                 .map(accountMapper::toAccountWithNameAndRoleDTO)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id:" + id));
