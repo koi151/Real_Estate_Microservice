@@ -1,16 +1,13 @@
 package com.koi151.msproperties.controller;
 
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.reponse.PropertyCategorySearchResponse;
 import com.koi151.msproperties.model.reponse.ResponseData;
-import com.koi151.msproperties.model.request.PropertySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUpdateRequest;
 import com.koi151.msproperties.service.PropertyCategoryService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;

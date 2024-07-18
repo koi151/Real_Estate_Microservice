@@ -24,11 +24,11 @@ public class RoomEntity {
     private PropertyEntity propertyEntity;
 
     @Column(name = "room_type", nullable = false, length = 50)
-    @NotEmpty(message = "Room type cannot be empty")
-    @Size(max = 50, message = "Room type cannot be longer than 50 characters")
+    @NotEmpty(message = "Room type is mandatory")
+    @Size(max = 50, message = "Room type cannot exceed 50 characters")
     private String roomType;
 
-    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT")
-    @NotNull(message = "Room quantity cannot be empty")
+    @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
+    @NotNull(message = "Room quantity is mandatory")
     private int quantity;
 }

@@ -1,17 +1,18 @@
 package com.koi151.msproperties.mapper;
 
-import com.github.javafaker.Faker;
-import com.github.javafaker.Number;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
-import com.koi151.msproperties.model.request.*;
+import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
+import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
+import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
+import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
+import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperties.utils.ListUtil;
 import com.koi151.msproperties.utils.NumberUtil;
 import com.koi151.msproperties.utils.StringUtil;
 import org.mapstruct.*;
-import org.mapstruct.factory.Mappers;
 
 import java.util.List;
 import java.util.Objects;
@@ -38,15 +39,17 @@ public interface PropertyMapper {
     @Mapping(target = "propertyEntity", ignore = true)
     RoomEntity toRoomEntity(RoomCreateUpdateRequest request);
 
-    @Mapping(target = "balconyDirection", source = "balconyDirection.directionName") // Mapping directionName instead of enum
+    @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
     @Mapping(target = "propertyForRent.paymentSchedule", source = "propertyForRent.paymentSchedule.scheduleName")
     @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     @Mapping(target = "status", source = "status.statusName")
+    @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
+    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     DetailedPropertyDTO toDetailedPropertyDTO(PropertyEntity entity);
 
-    @Mapping(target = "balconyDirection", source = "balconyDirection.directionName") // Mapping directionName instead of enum
+    @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
     @Mapping(target = "type", expression = "java(getPropertyType(entity))")
     @Mapping(target = "rentalPrice", source = "propertyForRent.rentalPrice")

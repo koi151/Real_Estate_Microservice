@@ -2,18 +2,20 @@ package com.koi151.msproperties.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
-import com.koi151.msproperties.enums.DirectionEnum;
-import com.koi151.msproperties.enums.PaymentScheduleEnum;
-import com.koi151.msproperties.enums.PostingPackageEnum;
+import com.koi151.msproperties.enums.*;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
-import com.koi151.msproperties.entity.PropertyEntity;
-import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.reponse.ResponseData;
-import com.koi151.msproperties.model.request.*;
+import com.koi151.msproperties.model.request.address.AddressCreateRequest;
+import com.koi151.msproperties.model.request.property.FakePropertyCreateRequest;
+import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
+import com.koi151.msproperties.model.request.property.PropertySearchRequest;
+import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
+import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
+import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
+import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateRequest;
 import com.koi151.msproperties.service.PropertiesService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -65,10 +67,23 @@ public class PropertyController {
     private ResponseEntity<ResponseData> generateFakeProperties() {
         Faker faker = new Faker();
 
+        // property
         DirectionEnum[] directions = DirectionEnum.values();
-        PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
+        int randomDir1Index = faker.number().numberBetween(0, directions.length);
+        int randomDir2Index = faker.number().numberBetween(0, directions.length);
+
         StatusEnum[] statuses = StatusEnum.values();
+        int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
+
+        // propertyForRent
         PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
+
+        // propertyPostService
+        PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
+        int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
+
+        DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
+        int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
 
         propertiesService.createFakeProperties(IntStream.range(0, 2000)
                 .mapToObj(i -> {
@@ -97,18 +112,14 @@ public class PropertyController {
                             .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
                             .build() : null;
 
-                    int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
-                    LocalDateTime expireDate = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 365));
+                    LocalDateTime postingDate = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 30));
 
                     PropertyPostServiceCreateRequest postServiceCreate = PropertyPostServiceCreateRequest.builder()
                             .postingPackage(postingPackages[randomPostPackageIndex])
                             .priorityPushes((short) faker.number().numberBetween(0, 30))
-                            .expireDate(expireDate)
+                            .postingDate(postingDate)
+                            .daysPosted(daysPostedEnums[randomDaysPostedIndex])
                             .build();
-
-                    int randomDir1Index = faker.number().numberBetween(0, directions.length);
-                    int randomDir2Index = faker.number().numberBetween(0, directions.length);
-                    int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
 
                     String availableFrom = String.format("%02d/%02d", faker.number().numberBetween(1, 12), faker.number().numberBetween(1, 28));
 
@@ -249,7 +260,7 @@ public class PropertyController {
 
         ResponseData responseData = new ResponseData();
         responseData.setData(propertyRes);
-        responseData.setDesc("Property created successfully");
+        responseData.setDesc("Property post created successfully");
 
         return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
     }

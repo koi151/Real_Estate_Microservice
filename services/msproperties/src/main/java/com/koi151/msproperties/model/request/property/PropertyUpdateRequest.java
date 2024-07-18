@@ -1,16 +1,18 @@
-package com.koi151.msproperties.model.request;
+package com.koi151.msproperties.model.request.property;
 
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentUpdateRequest;
+import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleUpdateRequest;
+import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
+import com.koi151.msproperties.model.request.address.AddressUpdateRequest;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 
 @Data
 public class PropertyUpdateRequest {

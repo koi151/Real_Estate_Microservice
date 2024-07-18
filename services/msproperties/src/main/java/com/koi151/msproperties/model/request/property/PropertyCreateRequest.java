@@ -1,10 +1,12 @@
-package com.koi151.msproperties.model.request;
+package com.koi151.msproperties.model.request.property;
 
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
+import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
+import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateRequest;
+import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
+import com.koi151.msproperties.model.request.address.AddressCreateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;

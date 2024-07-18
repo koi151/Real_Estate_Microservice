@@ -2,13 +2,12 @@ package com.koi151.msproperties.service;
 
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
-import com.koi151.msproperties.entity.PropertyEntity;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
-import com.koi151.msproperties.model.request.FakePropertyCreateRequest;
-import com.koi151.msproperties.model.request.PropertyCreateRequest;
-import com.koi151.msproperties.model.request.PropertySearchRequest;
-import com.koi151.msproperties.model.request.PropertyUpdateRequest;
+import com.koi151.msproperties.model.request.property.FakePropertyCreateRequest;
+import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
+import com.koi151.msproperties.model.request.property.PropertySearchRequest;
+import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

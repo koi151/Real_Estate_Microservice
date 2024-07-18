@@ -1,7 +1,5 @@
 package com.koi151.msproperties.utils;
 
-import com.koi151.msproperties.model.request.PropertySearchRequest;
-import com.koi151.msproperties.utils.QueryContext.QueryConditionContextProperty;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.Path;
@@ -12,7 +10,6 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import java.lang.reflect.Field;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 

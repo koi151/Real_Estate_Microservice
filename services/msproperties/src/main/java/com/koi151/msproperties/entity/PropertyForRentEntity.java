@@ -2,9 +2,13 @@ package com.koi151.msproperties.entity;
 
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity(name = "property_for_rent")
 @Getter
@@ -22,14 +26,15 @@ public class PropertyForRentEntity {
     @JoinColumn(name = "property_id")
     private PropertyEntity propertyEntity;
 
-    @Column(name = "rental_price", nullable = false)
-    @NotNull(message = "Rental price cannot be null")
-    @PositiveOrZero(message = "Rental price must be positive or zero")
-    private double rentalPrice;
+    @Column(name = "rental_price", precision = 12, scale = 2, nullable = false)
+    @NotNull(message = "Rental price is mandatory")
+    @PositiveOrZero(message = "Rental price must be non-negative value")
+    @DecimalMax(value = "99_999_999_999", message = "Rental price cannot exceed 99,999,999,999")
+    private BigDecimal rentalPrice;
 
     @Column(name = "payment_schedule", nullable = false)
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Payment schedule cannot be null")
+    @NotNull(message = "Payment schedule is mandatory")
     private PaymentScheduleEnum paymentSchedule;
 
     @Column(name = "rental_terms", columnDefinition = "TEXT")

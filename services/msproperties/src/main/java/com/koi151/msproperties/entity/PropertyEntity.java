@@ -7,6 +7,7 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.io.Serial;
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -48,27 +49,28 @@ public class PropertyEntity extends BaseEntity {
     private List<RoomEntity> rooms;
 
     @Column(name = "category_id", nullable = false)
-    @NotNull(message = "Category id cannot be null")
+    @NotNull(message = "Category id is mandatory")
     @Positive(message = "Category id must be positive value")
     private int categoryId;
 
     @Column(name = "account_id", nullable = false)
-    @NotNull(message = "Account id cannot be null")
+    @NotNull(message = "Account id is mandatory")
     @Positive(message = "Account id must be positive value")
     private long accountId;
 
     @Column(name = "available_from", nullable = false, length = 30)
     @NotEmpty(message = "Available time cannot be empty")
-    @Size(max = 30, message = "Available time cannot longer than 30 characters")
+    @Size(max = 30, message = "Available time cannot exceed 30 characters")
     private String availableFrom;
 
+    @Column(name = "title", nullable = false, length = 100)
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
-    @Column(name = "area", nullable = false)
+    @Column(name = "area", precision = 10, scale = 2, nullable = false)
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")
-    private float area;
+    private BigDecimal area;
 
     @Column(name = "description", columnDefinition = "TEXT")
     private String description;
@@ -77,13 +79,13 @@ public class PropertyEntity extends BaseEntity {
     private String imageUrls;
 
     @Column(name = "view", nullable = false)
-    @NotNull(message = "Number of view cannot be null")
-    @PositiveOrZero(message = "View number must be positive or zero")
+    @NotNull(message = "Number of views are mandatory")
+    @PositiveOrZero(message = "View number must be non-negative value")
     private int view;
 
-    @Column(name = "total_floor")
-    @PositiveOrZero(message = "Total floor must be positive or zero")
-    private int totalFloor;
+    @Column(name = "total_floor", columnDefinition = "SMALLINT UNSIGNED")
+    @PositiveOrZero(message = "Total floor must be non-negative value")
+    private short totalFloor;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "status", nullable = false, length = 20)

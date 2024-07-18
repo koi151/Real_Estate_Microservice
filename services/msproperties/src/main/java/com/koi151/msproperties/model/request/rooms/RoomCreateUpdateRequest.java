@@ -1,4 +1,4 @@
-package com.koi151.msproperties.model.request;
+package com.koi151.msproperties.model.request.rooms;
 
 import com.koi151.msproperties.entity.PropertyEntity;
 import jakarta.validation.constraints.NotEmpty;

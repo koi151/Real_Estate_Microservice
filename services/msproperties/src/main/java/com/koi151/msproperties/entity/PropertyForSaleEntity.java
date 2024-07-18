@@ -1,9 +1,12 @@
 package com.koi151.msproperties.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+
+import java.math.BigDecimal;
 
 @Entity(name = "property_for_sale")
 @Getter
@@ -22,9 +25,10 @@ public class PropertyForSaleEntity {
     private PropertyEntity propertyEntity;
 
     @Column(name = "sale_price")
-    @NotNull(message = "Price cannot be empty")
-    @PositiveOrZero(message = "Price must be positive or zero")
-    private double salePrice;
+    @NotNull(message = "Sale price is mandatory")
+    @PositiveOrZero(message = "Price must be non-negative value")
+    @DecimalMax(value = "99_999_999_999", message = "Rental price cannot exceed 99,999,999,999")
+    private BigDecimal salePrice;
 
     @Column(name = "sale_terms", columnDefinition = "TEXT")
     private String saleTerms;

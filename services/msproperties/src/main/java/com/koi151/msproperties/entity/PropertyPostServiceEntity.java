@@ -36,12 +36,12 @@ public class PropertyPostServiceEntity {
     @Column(name = "posting_package", nullable = false)
     private PostingPackageEnum postingPackage;
 
-    @Column(name = "priority_pushes")
-    @PositiveOrZero(message = "Priority pushes time must be positive or zero")
-    @Max(value = 32000, message = "Priority pushes cannot exceed 32000 times")
+    @Column(name = "priority_pushes", columnDefinition = "SMALLINT UNSIGNED")
+    @PositiveOrZero(message = "Priority pushes time must be non-negative value")
+    @Max(value = 10000, message = "Priority pushes cannot exceed 10000 times")
     private short priorityPushes;
 
     @Column(name = "posting_date", columnDefinition = "TIMESTAMP(0)", nullable = false)
-    @Future(message = "Posting date must be after current date")
+    @Future(message = "Posting date must be in the future")
     private LocalDateTime postingDate;
 }

@@ -1,7 +1,7 @@
 package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.entity.PropertyForSaleEntity;
-import com.koi151.msproperties.model.request.PropertyForSaleCreateRequest;
+import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

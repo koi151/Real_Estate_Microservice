@@ -1,4 +1,4 @@
-package com.koi151.msproperties.model.request;
+package com.koi151.msproperties.model.request.property;
 
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;

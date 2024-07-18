@@ -2,14 +2,13 @@ package com.koi151.msproperties.service.converter;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.mapper.PropertyMapper;
-import com.koi151.msproperties.model.request.PropertyCreateRequest;
+import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.service.impl.CloudinaryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor

@@ -4,12 +4,8 @@ import lombok.*;
 import java.util.List;
 
 @Builder
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
+@Data
 public class DetailedPropertyDTO {
-
     private String title;
     private Integer categoryId;
     private Float area;
@@ -22,6 +18,7 @@ public class DetailedPropertyDTO {
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
     private String address;
+    private PropertyPostServiceDTO propertyPostService;
     private PropertyForSaleCreateDTO propertyForSale;
     private PropertyForRentCreateDTO propertyForRent;
 }

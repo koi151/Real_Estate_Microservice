@@ -2,7 +2,7 @@ package com.koi151.msproperties.repository.custom.impl;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
-import com.koi151.msproperties.model.request.PropertySearchRequest;
+import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.repository.custom.PropertyRepositoryCustom;
 import com.koi151.msproperties.utils.CustomRepositoryUtils;
 import com.koi151.msproperties.utils.QueryContext.QueryConditionContextProperty;
@@ -14,12 +14,10 @@ import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Repository;
 
-import java.lang.reflect.Field;
 import java.util.*;
 
 @Repository
