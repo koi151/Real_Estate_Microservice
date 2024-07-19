@@ -2,6 +2,7 @@ package com.koi151.msproperties.entity;
 
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
@@ -25,11 +26,12 @@ public class PropertyCategoryEntity extends BaseEntity {
     private int categoryId;
 
     @Column(name = "title", nullable = false, length = 100)
-    @NotEmpty(message = "Title cannot be empty")
+    @NotBlank(message = "Property category title is mandatory")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
     @Column(name = "description", columnDefinition = "TEXT")
+    @Size(max = 2000, message = "Property category description cannot exceed 2000 characters")
     private String description;
 
     @Column(name = "images", columnDefinition = "TEXT")

@@ -24,21 +24,23 @@ public class AccountCreateRequest {
 
     private Long roleId;
 
-    @NotBlank(message = "User name cannot be blank")
+    @NotBlank(message = "User name is mandatory")
     @Size(min = 5, max = 30, message = "User name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Account name contains invalid characters")
     private String accountName;
 
-    @NotNull(message = "Phone number cannot be null")
+    @NotBlank(message = "Phone number is mandatory")
     private String phone;
 
     @Enumerated(EnumType.STRING)
     private AccountStatusEnum status = AccountStatusEnum.ACTIVE;
 
+    @NotBlank(message = "First name is mandatory")
     @Size(min = 1, max = 30, message = "First name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "First name contains invalid characters")
     private String firstName;
 
+    @NotBlank(message = "Last name is mandatory")
     @Size(min = 1, max = 70, message = "Last name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z.\\s]+", message = "Last name contains invalid characters")
     private String lastName;
@@ -49,7 +51,7 @@ public class AccountCreateRequest {
             message = "Password must include at least one uppercase letter and one special character")
     private String password;
 
-    @NotBlank(message = "Please retype password")
+    @NotBlank(message = "Password retype is mandatory")
     private String retypePassword;
 
     @Email(message = "Invalid email")
@@ -57,8 +59,8 @@ public class AccountCreateRequest {
     private String email;
 
     @Column(name = "facebook_account_id")
-    private int facebookAccountId;
+    private long facebookAccountId;
 
     @Column(name = "google_account_id")
-    private int googleAccountId;
+    private long googleAccountId;
 }

@@ -4,6 +4,7 @@ import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.util.List;
@@ -15,13 +16,8 @@ import java.util.List;
 @NoArgsConstructor
 public class PropertyCategoryDetailDTO {
 
-    @NotEmpty(message = "Cannot get property category title")
     private String title;
-
     private String description;
-
-    @Enumerated(EnumType.STRING)
     private StatusEnum status;
-
     private List<String> imageUrls;
 }

@@ -8,17 +8,15 @@ import jakarta.validation.constraints.Size;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-public class RoomCreateUpdateRequest {
+public record RoomCreateUpdateRequest(
 
-    private Long roomId;
+    Long roomId,
 
-    @NotEmpty(message = "Room type cannot be empty")
-    @Size(max = 50, message = "Room type cannot be longer than 50 characters")
-    private String roomType;
+    @NotEmpty(message = "Room type is mandatory")
+    @Size(max = 50, message = "Room type cannot exceed 50 characters")
+    String roomType,
 
-    @NotNull(message = "Room quantity cannot be null")
-    @PositiveOrZero(message = "Room quantity must be positive or zero")
-    private Integer quantity;
-}
+    @NotNull(message = "Room quantity is mandatory")
+    @PositiveOrZero(message = "Room quantity must be non-negative value")
+    Integer quantity
+) {}

@@ -1,5 +1,6 @@
 package com.koi151.msproperties.model.request.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
@@ -12,54 +13,50 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
+import java.math.BigDecimal;
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@SuperBuilder
-@Data
-public class PropertyCreateRequest {
+
+public record PropertyCreateRequest(
 
     @NotBlank(message = "Title cannot be empty")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
-    private String title;
+    String title,
 
-    @NotNull(message = "Category id cannot be null")
-    @Positive(message = "Category id must be positive")
-    private Long categoryId;
+    @NotNull(message = "Category id is mandatory")
+    Long categoryId,
 
-    @NotNull(message = "Account id cannot be null")
-    @Positive(message = "Account id must be positive")
-    private Long accountId;
+    @NotNull(message = "Account id is mandatory")
+    Long accountId,
 
     @Valid
-    private PropertyForSaleCreateRequest propertyForSale;
-
+    PropertyForSaleCreateRequest propertyForSale,
     @Valid
-    private PropertyForRentCreateRequest propertyForRent;
-
+    PropertyForRentCreateRequest propertyForRent,
     @Valid
-    private List<RoomCreateUpdateRequest> rooms;
-
+    List<RoomCreateUpdateRequest> rooms,
     @Valid
-    private AddressCreateRequest address;
-
+    AddressCreateRequest address,
     @Valid
-    private PropertyPostServiceCreateRequest propertyPostService;
+    PropertyPostServiceCreateRequest propertyPostService,
 
-    @NotNull(message = "Area cannot be empty")
-    @PositiveOrZero(message = "Area must be positive or zero")
-    private Float area;
+    @NotNull(message = "Area value is mandatory")
+    @PositiveOrZero(message = "Area must be non-negative value")
+    @DecimalMax(value = "99_999_999.99", message = "Area cannot exceed 99,999,999.99")
+    BigDecimal area,
 
-    @PositiveOrZero(message = "Total floor must be positive or zero")
-    private Integer totalFloor;
+    @PositiveOrZero(message = "Total floor must be non-negative value")
+    @Max(value = 999, message = "Total floors cannot exceed 999")
+    Short totalFloor,
 
-    private String description;
-    private DirectionEnum houseDirection;
-    private DirectionEnum balconyDirection;
-    private StatusEnum status = StatusEnum.ACTIVE;
-
-    @NotEmpty(message = "Available time cannot be empty")
-    private String availableFrom;
-}
+    @Size(max = 5000, message = "Property description cannot exceed 5000 characters")
+    String description,
+    DirectionEnum houseDirection,
+    DirectionEnum balconyDirection,
+    StatusEnum status,
+    @NotBlank(message = "Property available date is mandatory")
+    @Size(max = 5, message = "Property available date must be in 'MM-dd' format")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd")
+    String availableFrom
+) {}
 

@@ -10,6 +10,7 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum PaymentScheduleEnum {
+    DAILY("Pay daily"),
     WEEKLY("Pay weekly"),
     MONTHLY("Pay monthly"),
     QUARTERLY("Pay quarterly"),

@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -31,5 +32,6 @@ public class PropertyForSaleEntity {
     private BigDecimal salePrice;
 
     @Column(name = "sale_terms", columnDefinition = "TEXT")
+    @Size(max = 5000, message = "Sale terms cannot exceed {max} characters")
     private String saleTerms;
 }

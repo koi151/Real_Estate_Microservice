@@ -1,7 +1,6 @@
 package com.koi151.msproperties.model.request.propertyPostService;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.koi151.msproperties.enums.DaysPostedEnum;
 import com.koi151.msproperties.enums.PostingPackageEnum;
 import jakarta.validation.constraints.Future;
@@ -28,7 +27,7 @@ public class PropertyPostServiceCreateRequest {
     private DaysPostedEnum daysPosted;
 
     @PositiveOrZero(message = "Priority pushes time must be positive or zero")
-    @Max(value = 32000, message = "Priority pushes cannot exceed 32000")
+    @Max(value = 10000, message = "Priority pushes cannot exceed 10000")
     private short priorityPushes;
 }
 

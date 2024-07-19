@@ -3,24 +3,23 @@ package com.koi151.msproperties.model.request.propertyForRent;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
-@Getter
-@Setter
-@Builder
-public class PropertyForRentCreateRequest {
+import java.math.BigDecimal;
 
-    @NotNull(message = "Property rental price cannot be null")
-    @PositiveOrZero(message = "Property rental price must be positive or zero")
-    private double rentalPrice;
+public record PropertyForRentCreateRequest (
 
-    @Enumerated(EnumType.STRING)
-    @NotNull(message = "Payment schedule cannot be null")
-    private PaymentScheduleEnum paymentSchedule;
+    @NotNull(message = "Property rental price is mandatory")
+    @PositiveOrZero(message = "Property rental price must be non-negative value")
+    @DecimalMax(value = "99_999_999_999", message = "Rental price cannot exceed 99,999,999,999")
+    BigDecimal rentalPrice,
 
-    private String rentalTerm;
-}
+    @NotBlank(message = "Payment schedule is mandatory")
+    PaymentScheduleEnum paymentSchedule,
+
+    @Size(max = 5000, message = "Rental terms cannot exceed {max} characters")
+    String rentalTerm
+) {}

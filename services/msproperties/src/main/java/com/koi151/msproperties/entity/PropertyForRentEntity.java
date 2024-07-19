@@ -2,10 +2,7 @@ package com.koi151.msproperties.entity;
 
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
+import jakarta.validation.constraints.*;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -38,5 +35,6 @@ public class PropertyForRentEntity {
     private PaymentScheduleEnum paymentSchedule;
 
     @Column(name = "rental_terms", columnDefinition = "TEXT")
+    @Size(max = 5000, message = "Rental terms cannot exceed {max} characters")
     private String rentalTerms;
 }

@@ -50,41 +50,41 @@ public class PropertyEntity extends BaseEntity {
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id is mandatory")
-    @Positive(message = "Category id must be positive value")
     private int categoryId;
 
     @Column(name = "account_id", nullable = false)
     @NotNull(message = "Account id is mandatory")
-    @Positive(message = "Account id must be positive value")
     private long accountId;
 
-    @Column(name = "available_from", nullable = false, length = 30)
-    @NotEmpty(message = "Available time cannot be empty")
-    @Size(max = 30, message = "Available time cannot exceed 30 characters")
-    private String availableFrom;
+    @Column(name = "available_from", nullable = false)
+    @NotEmpty(message = "Property available date is mandatory")
+    @Size(max = 5, message = "Property available date must be in 'MM-dd' format")
+    private LocalDateTime availableFrom;
 
     @Column(name = "title", nullable = false, length = 100)
+    @NotBlank(message = "Property post title is mandatory")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
     private String title;
 
     @Column(name = "area", precision = 10, scale = 2, nullable = false)
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")
+    @DecimalMax(value = "99_999_999.99", message = "Area cannot exceed 99,999,999.99")
     private BigDecimal area;
 
-    @Column(name = "description", columnDefinition = "TEXT")
+    @Column(name = "description", columnDefinition = "TEXT", length = 5000)
+    @Size(max = 5000, message = "Property description cannot exceed 5000 characters")
     private String description;
 
     @Column(name = "images", columnDefinition = "TEXT")
     private String imageUrls;
 
-    @Column(name = "view", nullable = false)
-    @NotNull(message = "Number of views are mandatory")
-    @PositiveOrZero(message = "View number must be non-negative value")
-    private int view;
+    @Column(name = "view", columnDefinition = "INT UNSIGNED", nullable = false)
+    private int view = 0;
 
     @Column(name = "total_floor", columnDefinition = "SMALLINT UNSIGNED")
     @PositiveOrZero(message = "Total floor must be non-negative value")
+    @Max(value = 999, message = "Total floors cannot exceed 999")
     private short totalFloor;
 
     @Enumerated(EnumType.STRING)

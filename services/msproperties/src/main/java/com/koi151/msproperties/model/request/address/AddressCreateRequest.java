@@ -1,28 +1,27 @@
 package com.koi151.msproperties.model.request.address;
 
 import jakarta.persistence.Column;
+import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Size;
 import lombok.*;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-@Builder
-public class AddressCreateRequest {
 
-    @Column(name = "city", nullable = false, length = 50)
-    @NotEmpty(message = "City cannot be empty")
-    private String city;
+public record AddressCreateRequest (
 
-    @Column(name = "district", nullable = false, length = 50)
-    @NotEmpty(message = "District cannot be empty")
-    private String district;
+    @NotBlank(message = "City name is mandatory")
+    @Size(max = 50, message = "City name cannot exceed {max} characters length")
+    String city,
 
-    @Column(name = "ward", nullable = false, length = 50)
-    @NotEmpty(message = "Ward cannot be empty")
-    private String ward;
+    @NotBlank(message = "District name is mandatory")
+    @Size(max = 50, message = "District name cannot exceed {max} characters length")
+    String district,
+
+    @NotBlank(message = "Ward name is mandatory")
+    @Size(max = 50, message = "Ward name cannot exceed {max} characters length")
+    String ward,
 
     @Column(name = "street_address", length = 150)
-    private String streetAddress;
-}
+    @Size(max = 150, message = "Street address cannot exceed {max} characters length")
+    String streetAddress
+){}

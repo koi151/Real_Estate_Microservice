@@ -1,6 +1,7 @@
 package com.koi151.msproperties.entity;
 
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -20,7 +21,7 @@ public class RoomEntity {
 
     @ManyToOne
     @JoinColumn(name = "property_id")
-    @NotNull(message = "Property id cannot be null")
+    @NotNull(message = "Property id is mandatory")
     private PropertyEntity propertyEntity;
 
     @Column(name = "room_type", nullable = false, length = 50)
@@ -30,5 +31,6 @@ public class RoomEntity {
 
     @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
     @NotNull(message = "Room quantity is mandatory")
-    private int quantity;
+    @Max(value = 999, message = "Room quantity cannot exceed 999")
+    private short quantity;
 }

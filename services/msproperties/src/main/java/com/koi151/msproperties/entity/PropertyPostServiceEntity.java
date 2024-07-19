@@ -38,7 +38,7 @@ public class PropertyPostServiceEntity {
 
     @Column(name = "priority_pushes", columnDefinition = "SMALLINT UNSIGNED")
     @PositiveOrZero(message = "Priority pushes time must be non-negative value")
-    @Max(value = 10000, message = "Priority pushes cannot exceed 10000 times")
+    @Max(value = 10000, message = "Priority pushes time cannot exceed 10000")
     private short priorityPushes;
 
     @Column(name = "posting_date", columnDefinition = "TIMESTAMP(0)", nullable = false)

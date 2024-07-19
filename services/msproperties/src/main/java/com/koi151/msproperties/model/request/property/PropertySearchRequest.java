@@ -1,73 +1,67 @@
 package com.koi151.msproperties.model.request.property;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
+import com.koi151.msproperties.model.request.address.AddressSearchRequest;
+import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.*;
 
-@Getter
-@Setter
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class PropertySearchRequest {
+import java.math.BigDecimal;
 
-    private String title;
+public record PropertySearchRequest (
 
-    @Enumerated(EnumType.STRING)
-    private PropertyTypeEnum type;
+    @Size(max = 100, message = "Title search must at most {max} characters")
+    String title,
+    PropertyTypeEnum type,
+    PaymentScheduleEnum paymentSchedule,
+    DirectionEnum houseDirection,
+    DirectionEnum balconyDirection,
+    StatusEnum status,
 
-    @Enumerated(EnumType.STRING)
-    private PaymentScheduleEnum paymentSchedule;
+    Integer categoryId,
+    @PositiveOrZero(message = "Min area must be non-negative value")
+    BigDecimal areaFrom,
 
-    @Positive(message = "Category id search request must be positive")
-    private Integer categoryId;
+    @PositiveOrZero(message = "Max area must be non-negative value")
+    @DecimalMax(value = "99_999_999.99", message = "Area search value cannot exceed 99,999,999.99")
+    BigDecimal areaTo,
 
-    @PositiveOrZero(message = "Min area must be positive or zero")
-    private Float areaFrom;
+    @PositiveOrZero(message = "Min price must be non-negative value")
+    Long priceFrom,
 
-    @PositiveOrZero(message = "Max area must be positive or zero")
-    private Float areaTo;
+    @PositiveOrZero(message = "Max price must be non-negative value")
+    @DecimalMax(value = "99_999_999_999", message = "Max price search cannot exceed 99,999,999,999")
+    Long priceTo,
 
-    @PositiveOrZero(message = "Min price must be positive or zero")
-    private Double priceFrom;
+    @Size(max = 1000, message = "Description search must be at most {max} characters long")
+    String description,
 
-    @PositiveOrZero(message = "Max price must be positive or zero")
-    private Double priceTo;
+    @PositiveOrZero(message = "Total floor search request must be non-negative value")
+    @Max(value = 999, message = "Total floor search value cannot exceed 999")
+    Short totalFloor,
 
-    private String description;
+    @Size(max = 5, message = "Property available time is invalid")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd")
+    String availableFrom, //
 
-    @PositiveOrZero(message = "Total floor search request must be positive or zero")
-    private Integer totalFloor;
+    @Size(max = 1000, message = "Term search cannot exceed 1000 characters long")
+    String term,
 
-    @Enumerated(EnumType.STRING)
-    private DirectionEnum houseDirection;
+    @Valid // need update
+    AddressSearchRequest addressSearchRequest,
 
-    @Enumerated(EnumType.STRING)
-    private DirectionEnum balconyDirection;
+    @PositiveOrZero(message = "Number of bedrooms must be non-negative value")
+    @Max(value = 999, message = "Number of bedroom search cannot exceed {max}")
+    Short bedrooms,
 
-    @Enumerated(EnumType.STRING)
-    private StatusEnum status;
+    @PositiveOrZero(message = "Number of bathrooms must be non-negative value")
+    @Max(value = 999, message = "Number of bathrooms search cannot exceed {max}")
+    Short bathrooms,
 
-    private String availableFrom; ////
-
-    private String term;
-
-    private String city;
-    private String district;
-    private String ward;
-    private String street;
-
-    @PositiveOrZero(message = "Number of bedrooms must be positive or zero")
-    private Integer bedrooms;
-
-    @PositiveOrZero(message = "Number of bathrooms must be positive or zero")
-    private Integer bathrooms;
-
-    @PositiveOrZero(message = "Number of kitchens must be positive or zero")
-    private Integer kitchens;
-}
+    @PositiveOrZero(message = "Number of kitchens must be non-negative value")
+    @Max(value = 999, message = "Number of kitchens search cannot exceed {max}")
+    Short kitchens
+){}
