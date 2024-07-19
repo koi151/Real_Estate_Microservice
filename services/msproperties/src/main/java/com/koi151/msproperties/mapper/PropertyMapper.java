@@ -65,12 +65,12 @@ public interface PropertyMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
             nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS) // fields in the target object will retain their existing values if the corresponding fields in the source object are null
     @Mapping(target = "propertyForRent.rentalPrice", // get price existed in db when request price = 0.0, due to double type not accept null value
-            expression = "java(propertyForRentUpdateRequest.getRentalPrice() != 0.0 " +
-                    "? propertyForRentUpdateRequest.getRentalPrice() " +
+            expression = "java(propertyForRentUpdateRequest.rentalPrice().compareTo(BigDecimal.ZERO) != 0 " +
+                    "? propertyForRentUpdateRequest.rentalPrice() " +
                     ": mappingTarget.getRentalPrice())")
     @Mapping(target = "propertyForSale.salePrice",
-            expression = "java(propertyForSaleUpdateRequest.getSalePrice() != 0.0 " +
-                    "? propertyForSaleUpdateRequest.getSalePrice() " +
+            expression = "java(propertyForSaleUpdateRequest.salePrice().compareTo(BigDecimal.ZERO) != 0 " +
+                    "? propertyForSaleUpdateRequest.salePrice() " +
                     ": mappingTarget.getSalePrice())")
     @Mapping(target = "rooms", ignore = true)
     void updatePropertyFromDto(PropertyUpdateRequest request, @MappingTarget PropertyEntity entity);

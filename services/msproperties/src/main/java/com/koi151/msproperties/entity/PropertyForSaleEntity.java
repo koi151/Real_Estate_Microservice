@@ -28,7 +28,7 @@ public class PropertyForSaleEntity {
     @Column(name = "sale_price")
     @NotNull(message = "Sale price is mandatory")
     @PositiveOrZero(message = "Price must be non-negative value")
-    @DecimalMax(value = "99_999_999_999", message = "Rental price cannot exceed 99,999,999,999")
+    @DecimalMax(value = "99999999999", message = "Rental price cannot exceed 99,999,999,999")
     private BigDecimal salePrice;
 
     @Column(name = "sale_terms", columnDefinition = "TEXT")

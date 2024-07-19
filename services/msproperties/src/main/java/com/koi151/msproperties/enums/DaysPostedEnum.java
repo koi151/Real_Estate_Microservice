@@ -13,7 +13,7 @@ public enum DaysPostedEnum {
     SEVEN_DAY("7"),
     TEN_DAY("10"),
     FIFTEEN_DAY("15"),
-    THIRTY("30");
+    THIRTY_DAY("30");
 
     private final String day;
 

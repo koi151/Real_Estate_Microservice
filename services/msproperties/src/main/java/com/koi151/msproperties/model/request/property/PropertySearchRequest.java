@@ -1,6 +1,7 @@
 package com.koi151.msproperties.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
@@ -26,14 +27,14 @@ public record PropertySearchRequest (
     BigDecimal areaFrom,
 
     @PositiveOrZero(message = "Max area must be non-negative value")
-    @DecimalMax(value = "99_999_999.99", message = "Area search value cannot exceed 99,999,999.99")
+    @DecimalMax(value = "99999999.99", message = "Area search value cannot exceed 99,999,999.99")
     BigDecimal areaTo,
 
     @PositiveOrZero(message = "Min price must be non-negative value")
     Long priceFrom,
 
     @PositiveOrZero(message = "Max price must be non-negative value")
-    @DecimalMax(value = "99_999_999_999", message = "Max price search cannot exceed 99,999,999,999")
+    @DecimalMax(value = "99999999999", message = "Max price search cannot exceed 99,999,999,999")
     Long priceTo,
 
     @Size(max = 1000, message = "Description search must be at most {max} characters long")
@@ -43,8 +44,8 @@ public record PropertySearchRequest (
     @Max(value = 999, message = "Total floor search value cannot exceed 999")
     Short totalFloor,
 
-    @Size(max = 5, message = "Property available time is invalid")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd")
+    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     String availableFrom, //
 
     @Size(max = 1000, message = "Term search cannot exceed 1000 characters long")

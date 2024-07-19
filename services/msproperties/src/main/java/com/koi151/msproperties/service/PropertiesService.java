@@ -4,7 +4,6 @@ import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
-import com.koi151.msproperties.model.request.property.FakePropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
@@ -25,7 +24,7 @@ public interface PropertiesService {
     Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable);
     Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable);
     DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
-    void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties);
+    void createFakeProperties(List<PropertyCreateRequest> fakeProperties);
     DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;
 }

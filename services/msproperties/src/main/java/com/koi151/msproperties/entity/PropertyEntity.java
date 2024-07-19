@@ -1,5 +1,6 @@
 package com.koi151.msproperties.entity;
 
+import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
@@ -8,7 +9,7 @@ import lombok.*;
 
 import java.io.Serial;
 import java.math.BigDecimal;
-import java.time.LocalDateTime;
+import java.time.LocalDate;
 import java.util.List;
 
 @Entity(name = "property")
@@ -56,10 +57,10 @@ public class PropertyEntity extends BaseEntity {
     @NotNull(message = "Account id is mandatory")
     private long accountId;
 
-    @Column(name = "available_from", nullable = false)
-    @NotEmpty(message = "Property available date is mandatory")
-    @Size(max = 5, message = "Property available date must be in 'MM-dd' format")
-    private LocalDateTime availableFrom;
+    @Column(name = "available_from", nullable = false, columnDefinition = "DATE")
+    @NotNull(message = "Property available date is mandatory")
+    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
+    private LocalDate availableFrom;
 
     @Column(name = "title", nullable = false, length = 100)
     @NotBlank(message = "Property post title is mandatory")
@@ -69,7 +70,7 @@ public class PropertyEntity extends BaseEntity {
     @Column(name = "area", precision = 10, scale = 2, nullable = false)
     @NotNull(message = "Area cannot be empty")
     @PositiveOrZero(message = "Area must be positive or zero")
-    @DecimalMax(value = "99_999_999.99", message = "Area cannot exceed 99,999,999.99")
+    @DecimalMax(value = "99999999.99", message = "Area cannot exceed 99,999,999.99")
     private BigDecimal area;
 
     @Column(name = "description", columnDefinition = "TEXT", length = 5000)
@@ -88,8 +89,8 @@ public class PropertyEntity extends BaseEntity {
     private short totalFloor;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", nullable = false, length = 20)
-    private StatusEnum status;
+    @Column(name = "status", length = 20)
+    private StatusEnum status = StatusEnum.DRAFT;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "house_direction", length = 20)

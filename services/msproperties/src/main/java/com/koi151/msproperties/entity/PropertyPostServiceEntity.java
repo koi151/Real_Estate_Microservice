@@ -41,7 +41,7 @@ public class PropertyPostServiceEntity {
     @Max(value = 10000, message = "Priority pushes time cannot exceed 10000")
     private short priorityPushes;
 
-    @Column(name = "posting_date", columnDefinition = "TIMESTAMP(0)", nullable = false)
+    @Column(name = "posting_date", columnDefinition = "TIMESTAMP(0)")
     @Future(message = "Posting date must be in the future")
     private LocalDateTime postingDate;
 }

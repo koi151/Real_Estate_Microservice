@@ -5,13 +5,14 @@ import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 public class RequestUtil {
 
     public static boolean roomRequested(PropertySearchRequest request) {
-        return request.getBedrooms() != null || request.getBathrooms() != null || request.getKitchens() != null;
+        return request.bedrooms() != null || request.bathrooms() != null || request.kitchens() != null;
     }
 
     public static boolean locationRequested(PropertySearchRequest request) {
-        return StringUtil.checkString(request.getCity())
-                || StringUtil.checkString(request.getDistrict())
-                || StringUtil.checkString(request.getWard())
-                || StringUtil.checkString(request.getStreet());
+        var addressRequest = request.addressSearchRequest();
+        return StringUtil.checkString(addressRequest.city())
+                || StringUtil.checkString(addressRequest.district())
+                || StringUtil.checkString(addressRequest.ward())
+                || StringUtil.checkString(addressRequest.streetAddress());
     }
 }

@@ -111,8 +111,8 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
         }
 
         // Handle image removal
-        if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
-            existingImagesUrlSet.removeAll(request.getImageUrlsRemove());
+        if (request != null && request.imageUrlsRemove() != null && !request.imageUrlsRemove().isEmpty()) {
+            existingImagesUrlSet.removeAll(request.imageUrlsRemove());
         }
 
         // Handle image addition
@@ -138,9 +138,9 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
         if (request != null) {
 
             // Use Optional for Null check
-            Optional.ofNullable(request.getTitle()).ifPresent(existingCategory::setTitle);
-            Optional.ofNullable(request.getDescription()).ifPresent(existingCategory::setDescription);
-            Optional.ofNullable(request.getStatus()).ifPresent(existingCategory::setStatus);
+            Optional.ofNullable(request.title()).ifPresent(existingCategory::setTitle);
+            Optional.ofNullable(request.description()).ifPresent(existingCategory::setDescription);
+            Optional.ofNullable(request.status()).ifPresent(existingCategory::setStatus);
         }
     }
 

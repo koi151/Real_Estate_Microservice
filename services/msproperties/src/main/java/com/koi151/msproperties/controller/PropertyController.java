@@ -6,7 +6,6 @@ import com.koi151.msproperties.enums.*;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.reponse.ResponseData;
 import com.koi151.msproperties.model.request.address.AddressCreateRequest;
-import com.koi151.msproperties.model.request.property.FakePropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
@@ -24,6 +23,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
@@ -66,6 +67,7 @@ public class PropertyController {
     @PostMapping("/generateFakeProperties")
     private ResponseEntity<ResponseData> generateFakeProperties() {
         Faker faker = new Faker();
+        int numberOfFakeProperties = 2000;
 
         // property
         DirectionEnum[] directions = DirectionEnum.values();
@@ -85,7 +87,7 @@ public class PropertyController {
         DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
         int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
 
-        propertiesService.createFakeProperties(IntStream.range(0, 2000)
+        propertiesService.createFakeProperties(IntStream.range(0, numberOfFakeProperties)
                 .mapToObj(i -> {
                     // Generate fake data directly in the stream
                     AddressCreateRequest address = AddressCreateRequest.builder()
@@ -102,12 +104,12 @@ public class PropertyController {
                     boolean createForRent = faker.bool().bool() || !createForSale;
 
                     PropertyForSaleCreateRequest propertyForSale = createForSale ? PropertyForSaleCreateRequest.builder()
-                            .salePrice(faker.number().randomDouble(2, 5000, 20_000_000))
+                            .salePrice(BigDecimal.valueOf(faker.number().randomDouble(2, 5000, 20_000_000)))
                             .saleTerm(faker.lorem().sentence())
                             .build() : null;
 
                     PropertyForRentCreateRequest propertyForRent = createForRent ? PropertyForRentCreateRequest.builder()
-                            .rentalPrice(faker.number().randomDouble(2, 500, 300000))
+                            .rentalPrice(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 300000)))
                             .rentalTerm(faker.lorem().sentence())
                             .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
                             .build() : null;
@@ -121,18 +123,22 @@ public class PropertyController {
                             .daysPosted(daysPostedEnums[randomDaysPostedIndex])
                             .build();
 
-                    String availableFrom = String.format("%02d/%02d", faker.number().numberBetween(1, 12), faker.number().numberBetween(1, 28));
+                    LocalDate availableFrom = LocalDate.of(
+                            2024,
+                            faker.number().numberBetween(7, 9),
+                            faker.number().numberBetween(1, 28)
+                    );
 
-                    return FakePropertyCreateRequest.builder()
+                    return PropertyCreateRequest.builder()
                             .title(realEstateTitle)
                             .propertyForSale(propertyForSale)
                             .propertyForRent(propertyForRent)
                             .propertyPostService(postServiceCreate)
                             .accountId((long) faker.number().numberBetween(1, 7))
                             .address(address)
-                            .area((float) faker.number().randomDouble(2, 10, 1200))
+                            .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
                             .description(faker.lorem().paragraph())
-                            .totalFloor(faker.number().numberBetween(0, 20))
+                            .totalFloor((short) faker.number().numberBetween(0, 20))
                             .categoryId((long) faker.number().numberBetween(1, 5))
                             .houseDirection(directions[randomDir1Index])
                             .balconyDirection(directions[randomDir2Index])
@@ -143,7 +149,7 @@ public class PropertyController {
                 .collect(Collectors.toList()));
 
         ResponseData responseData = new ResponseData();
-        responseData.setDesc("Fake properties created successfully");
+        responseData.setDesc("Fake properties created successfully. Total " + numberOfFakeProperties + " properties created.");
         return ResponseEntity.ok(responseData);
     }
 

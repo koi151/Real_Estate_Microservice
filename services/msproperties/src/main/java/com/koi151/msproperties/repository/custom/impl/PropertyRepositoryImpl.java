@@ -34,32 +34,32 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         Join<PropertyEntity, ?> saleJoin = context.joins().get("propertyForSale");
         Join<PropertyEntity, ?> rentJoin = context.joins().get("propertyForRent");
 
-        if (request.getType() != null) {
-            if (request.getType() == PropertyTypeEnum.SALE) {
-                if (request.getPriceFrom() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.getPriceFrom()));
+        if (request.type() != null) {
+            if (request.type() == PropertyTypeEnum.SALE) {
+                if (request.priceFrom() != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.priceFrom()));
                 }
-                if (request.getPriceTo() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.getPriceTo()));
+                if (request.priceTo() != null) {
+                    predicates.add(cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.priceTo()));
                 }
-            } else if (request.getType() == PropertyTypeEnum.RENT) {
-                if (request.getPriceFrom() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.getPriceFrom()));
+            } else if (request.type() == PropertyTypeEnum.RENT) {
+                if (request.priceFrom() != null) {
+                    predicates.add(cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.priceFrom()));
                 }
-                if (request.getPriceTo() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.getPriceTo()));
+                if (request.priceTo() != null) {
+                    predicates.add(cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.priceTo()));
                 }
             }
         } else {
-            if (request.getPriceFrom() != null) {
+            if (request.priceFrom() != null) {
                 Predicate rentalPricePredicate = null;
                 Predicate salePricePredicate = null;
 
                 if (rentJoin != null) {
-                    rentalPricePredicate = cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.getPriceFrom());
+                    rentalPricePredicate = cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.priceFrom());
                 }
                 if (saleJoin != null) {
-                    salePricePredicate = cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.getPriceFrom());
+                    salePricePredicate = cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.priceFrom());
                 }
 
                 if (rentalPricePredicate != null && salePricePredicate != null) {
@@ -70,15 +70,15 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                     predicates.add(salePricePredicate);
                 }
             }
-            if (request.getPriceTo() != null) {
+            if (request.priceTo() != null) {
                 Predicate rentalPricePredicate = null;
                 Predicate salePricePredicate = null;
 
                 if (rentJoin != null) {
-                    rentalPricePredicate = cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.getPriceTo());
+                    rentalPricePredicate = cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.priceTo());
                 }
                 if (saleJoin != null) {
-                    salePricePredicate = cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.getPriceTo());
+                    salePricePredicate = cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.priceTo());
                 }
 
                 if (rentalPricePredicate != null && salePricePredicate != null) {
@@ -93,12 +93,12 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     }
 
     private static void addRoomConditions(PropertySearchRequest request, QueryConditionContextProperty context) {
-        addRoomCondition("bedroom", request.getBedrooms(), context);
-        addRoomCondition("bathroom", request.getBathrooms(), context);
-        addRoomCondition("kitchen", request.getKitchens(), context);
+        addRoomCondition("bedroom", request.bedrooms(), context);
+        addRoomCondition("bathroom", request.bathrooms(), context);
+        addRoomCondition("kitchen", request.kitchens(), context);
     }
 
-    private static void addRoomCondition(String roomType, Integer quantity, QueryConditionContextProperty context) {
+    private static void addRoomCondition(String roomType, Short quantity, QueryConditionContextProperty context) {
         if (quantity != null) {
             CriteriaBuilder cb = context.criteriaBuilder();
             List<Predicate> predicates = context.predicates();
@@ -119,36 +119,37 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
         Join<?, ?> addressJoin = context.joins().get("addressEntity");
 
-        if (request.getAreaFrom() != null)
-            predicates.add(cb.greaterThanOrEqualTo(root.get("area"), request.getAreaFrom()));
-        if (request.getAreaTo() != null)
-            predicates.add(cb.lessThanOrEqualTo(root.get("area"), request.getAreaTo()));
+        if (request.areaFrom() != null)
+            predicates.add(cb.greaterThanOrEqualTo(root.get("area"), request.areaFrom()));
+        if (request.areaTo() != null)
+            predicates.add(cb.lessThanOrEqualTo(root.get("area"), request.areaTo()));
 
-        if (request.getPaymentSchedule() != null)
-            predicates.add(cb.equal(context.joins().get("rentJoin").get("paymentSchedule"), request.getPaymentSchedule()));
+        if (request.paymentSchedule() != null)
+            predicates.add(cb.equal(context.joins().get("rentJoin").get("paymentSchedule"), request.paymentSchedule()));
 
-        if (StringUtil.checkString(request.getTerm())) {
-            if (request.getType().isPropertyForRent()) {
-                predicates.add(cb.like(context.joins().get("rentJoin").get("rentalTerm"),  "%" + request.getTerm() + "%"));
+        if (StringUtil.checkString(request.term())) {
+            if (request.type().isPropertyForRent()) {
+                predicates.add(cb.like(context.joins().get("rentJoin").get("rentalTerm"),  "%" + request.term() + "%"));
 
-            } else if (request.getType().isPropertyForSale()) {
-                predicates.add(cb.like(context.joins().get("rentJoin").get("saleTerm"),  "%" + request.getTerm() + "%"));
+            } else if (request.type().isPropertyForSale()) {
+                predicates.add(cb.like(context.joins().get("rentJoin").get("saleTerm"),  "%" + request.term() + "%"));
 
             }
         }
 
+        var addressRequest = request.addressSearchRequest();
         // address queries
-        if (StringUtil.checkString(request.getCity())) {
-            predicates.add(cb.like(addressJoin.get("city"),"%" + request.getCity() + "%"));
+        if (StringUtil.checkString(addressRequest.city())) {
+            predicates.add(cb.like(addressJoin.get("city"),"%" + addressRequest.city() + "%"));
         }
-        if (StringUtil.checkString(request.getDistrict())) {
-            predicates.add(cb.like(addressJoin.get("district"),"%" + request.getDistrict() + "%"));
+        if (StringUtil.checkString(addressRequest.district())) {
+            predicates.add(cb.like(addressJoin.get("district"),"%" + addressRequest.district() + "%"));
         }
-        if (StringUtil.checkString(request.getWard())) {
-            predicates.add(cb.like(addressJoin.get("ward"), "%" + request.getWard() + "%"));
+        if (StringUtil.checkString(addressRequest.ward())) {
+            predicates.add(cb.like(addressJoin.get("ward"), "%" + addressRequest.ward() + "%"));
         }
-        if (StringUtil.checkString(request.getStreet())) {
-            predicates.add((cb.like(addressJoin.get("streetAddress"), "%" + request.getStreet() + "%")));
+        if (StringUtil.checkString(addressRequest.streetAddress())) {
+            predicates.add((cb.like(addressJoin.get("streetAddress"), "%" + addressRequest.streetAddress() + "%")));
         }
 
         addRoomConditions(request, context);
@@ -158,12 +159,12 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     public static void joinColumns(PropertySearchRequest request, QueryConditionContextProperty context) {
         // Using LEFT JOIN ensures that all properties are included in the search results, even if they do not have associated sale, rental, ..etc records
 
-        if (request.getType() == null) {
+        if (request.type() == null) {
             context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
             context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
-        } else if (request.getType().isPropertyForRent()) {
+        } else if (request.type().isPropertyForRent()) {
             context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
-        } else if (request.getType().isPropertyForSale()) {
+        } else if (request.type().isPropertyForSale()) {
             context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
         }
 

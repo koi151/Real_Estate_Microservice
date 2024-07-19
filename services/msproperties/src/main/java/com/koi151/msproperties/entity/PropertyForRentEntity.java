@@ -26,7 +26,7 @@ public class PropertyForRentEntity {
     @Column(name = "rental_price", precision = 12, scale = 2, nullable = false)
     @NotNull(message = "Rental price is mandatory")
     @PositiveOrZero(message = "Rental price must be non-negative value")
-    @DecimalMax(value = "99_999_999_999", message = "Rental price cannot exceed 99,999,999,999")
+    @DecimalMax(value = "99999999999", message = "Rental price cannot exceed 99,999,999,999")
     private BigDecimal rentalPrice;
 
     @Column(name = "payment_schedule", nullable = false)

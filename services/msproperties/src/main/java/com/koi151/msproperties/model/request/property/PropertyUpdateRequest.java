@@ -1,14 +1,13 @@
 package com.koi151.msproperties.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentUpdateRequest;
 import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleUpdateRequest;
 import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperties.model.request.address.AddressUpdateRequest;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -37,7 +36,7 @@ public class PropertyUpdateRequest { // update to extends from create req
     private AddressUpdateRequest address;
 
     @PositiveOrZero(message = "Area must be positive or zero")
-    @DecimalMax(value = "99_999_999.99", message = "Area cannot exceed 99,999,999.99")
+    @DecimalMax(value = "99999999.99", message = "Area cannot exceed 99,999,999.99")
     private Float area;
 
     private String description;
@@ -50,8 +49,8 @@ public class PropertyUpdateRequest { // update to extends from create req
     private DirectionEnum balconyDirection;
     private StatusEnum status;
 
-    @Size(max = 5, message = "Property available date must be in 'MM-dd' format")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "MM-dd")
+    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     private String availableFrom;
 
     private List<String> imageUrlsRemove;

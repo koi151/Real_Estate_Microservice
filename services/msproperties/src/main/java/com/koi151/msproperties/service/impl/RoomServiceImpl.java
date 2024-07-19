@@ -26,8 +26,8 @@ public class RoomServiceImpl implements RoomService {
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + propertyId));
 
         RoomEntity roomEntity = RoomEntity.builder()
-                .roomType(request.getRoomType())
-                .quantity(request.getQuantity())
+                .roomType(request.roomType())
+                .quantity(request.quantity())
                 .propertyEntity(property) // Associate the room with the property
                 .build();
 

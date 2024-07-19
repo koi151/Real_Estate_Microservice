@@ -5,7 +5,6 @@ import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.AddressMapper;
 import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
-import com.koi151.msproperties.model.request.property.FakePropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
@@ -82,7 +81,7 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Transactional
-    public void createFakeProperties(List<FakePropertyCreateRequest> fakeProperties) {
+    public void createFakeProperties(List<PropertyCreateRequest> fakeProperties) {
 
         // Create property entities in parallel
         List<PropertyEntity> propertyEntities = fakeProperties.parallelStream()
@@ -158,8 +157,8 @@ public class PropertyServiceImpl implements PropertiesService {
         List<RoomEntity> currentRooms = existingProperty.getRooms();
 
         for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
-            String roomType = updatedRoom.getRoomType();
-            int quantity = updatedRoom.getQuantity();
+            String roomType = updatedRoom.roomType();
+            short quantity = updatedRoom.quantity();
 
             RoomEntity existingRoom = currentRooms.stream()
                     .filter(room -> room.getRoomType().equals(roomType))

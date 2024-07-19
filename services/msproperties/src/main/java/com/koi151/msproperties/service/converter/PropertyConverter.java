@@ -28,12 +28,12 @@ public class PropertyConverter {
         propertyEntity.getPropertyPostService().setPropertyEntity(propertyEntity);
         propertyEntity.getAddress().setPropertyEntity(propertyEntity);
 
-        if (request.getPropertyForSale() != null)
+        if (request.propertyForSale() != null)
             propertyEntity.getPropertyForSale().setPropertyEntity(propertyEntity);
-        if (request.getPropertyForRent() != null)
+        if (request.propertyForRent() != null)
             propertyEntity.getPropertyForRent().setPropertyEntity(propertyEntity);
 
-        if (request.getRooms() != null)
+        if (request.rooms() != null)
             propertyEntity.getRooms()
                     .forEach(roomEntity -> roomEntity.setPropertyEntity(propertyEntity));
 
