@@ -1,6 +1,5 @@
 package com.koi151.msproperties.entity;
 
-import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
@@ -59,7 +58,6 @@ public class PropertyEntity extends BaseEntity {
 
     @Column(name = "available_from", nullable = false, columnDefinition = "DATE")
     @NotNull(message = "Property available date is mandatory")
-    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
     private LocalDate availableFrom;
 
     @Column(name = "title", nullable = false, length = 100)
@@ -89,8 +87,8 @@ public class PropertyEntity extends BaseEntity {
     private short totalFloor;
 
     @Enumerated(EnumType.STRING)
-    @Column(name = "status", length = 20)
-    private StatusEnum status = StatusEnum.DRAFT;
+    @Column(name = "status", length = 20, nullable = false)
+    private StatusEnum status;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "house_direction", length = 20)

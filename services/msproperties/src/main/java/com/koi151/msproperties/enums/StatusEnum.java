@@ -12,8 +12,7 @@ public enum StatusEnum {
     ACTIVE ("Active"),
     INACTIVE ("Inactive"),
     DRAFT("Draft"),
-    PENDING ("Pending"),
-    EXPIRED("Expired");
+    PENDING ("Pending");
 
     private final String statusName;
 

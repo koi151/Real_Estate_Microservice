@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
+import java.time.DateTimeException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -94,7 +95,7 @@ public class ControllerAdvisor {
     @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
     public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
         List<String> details = new ArrayList<>();
-        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
+        details.add("UnexpectedTypeException occurred");
 
         ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError(ex.getMessage());
@@ -144,6 +145,19 @@ public class ControllerAdvisor {
 
         List<String> details = new ArrayList<>();
         details.add("Recheck status value");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(DateTimeException.class) // for validation and other purposes
+    public ResponseEntity<ErrorResponse> handleDateTimeException(DateTimeException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Recheck date time in request");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setError(ex.getMessage());

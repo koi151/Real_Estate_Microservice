@@ -1,12 +1,11 @@
 package com.koi151.msproperties.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
 import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
-import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateRequest;
+import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateUpdateRequest;
 import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperties.model.request.address.AddressCreateRequest;
 import jakarta.validation.Valid;
@@ -40,12 +39,13 @@ public record PropertyCreateRequest(
     @Valid
     AddressCreateRequest address,
     @Valid
-    PropertyPostServiceCreateRequest propertyPostService,
+    PropertyPostServiceCreateUpdateRequest propertyPostService,
 
     @NotNull(message = "Area value is mandatory")
     @PositiveOrZero(message = "Area must be non-negative value")
     @DecimalMax(value = "99999999.99", message = "Area cannot exceed 99,999,999.99")
     BigDecimal area,
+
 
     @PositiveOrZero(message = "Total floor must be non-negative value")
     @Max(value = 999, message = "Total floors cannot exceed 999")
@@ -58,7 +58,6 @@ public record PropertyCreateRequest(
     DirectionEnum balconyDirection,
     StatusEnum status,
     @NotNull(message = "Property available date is mandatory")
-    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate availableFrom
 ) {}

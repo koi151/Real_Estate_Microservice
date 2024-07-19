@@ -116,8 +116,8 @@ public class PropertyServiceImpl implements PropertiesService {
         }
 
         // Handle image removal
-        if (request != null && request.getImageUrlsRemove() != null && !request.getImageUrlsRemove().isEmpty()) {
-            request.getImageUrlsRemove().forEach(existingImagesUrlSet::remove); // faster than using removeALl
+        if (request != null && request.imageUrlsRemove() != null && !request.imageUrlsRemove().isEmpty()) {
+            request.imageUrlsRemove().forEach(existingImagesUrlSet::remove); // faster than using removeALl
         }
 
         // Handle image addition
@@ -141,19 +141,12 @@ public class PropertyServiceImpl implements PropertiesService {
 
     private void updatePropertyDetails(PropertyEntity existingProperty, PropertyUpdateRequest request) {
         if (request != null) {
-
-            if (request.getAddress() != null) {
-                AddressEntity updatedAddress = AddressMapper.INSTANCE.updateAddressEntity(request.getAddress());
-                updatedAddress.setId(existingProperty.getAddress().getId()); // Keep the existing ID
-                addressRepository.save(updatedAddress);
-            }
-
-            updateRooms(existingProperty, request.getRooms()); // update existing property info with request
+            updateExistingPropertyRooms(existingProperty, request.rooms()); // update rooms info separately
             propertyMapper.updatePropertyFromDto(request, existingProperty);
         }
     }
 
-    private void updateRooms(PropertyEntity existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
+    private void updateExistingPropertyRooms(PropertyEntity existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
         List<RoomEntity> currentRooms = existingProperty.getRooms();
 
         for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {

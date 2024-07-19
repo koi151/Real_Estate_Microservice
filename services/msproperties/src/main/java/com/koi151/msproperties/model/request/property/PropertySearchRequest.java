@@ -1,7 +1,6 @@
 package com.koi151.msproperties.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.PaymentScheduleEnum;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
@@ -13,7 +12,6 @@ import jakarta.validation.constraints.*;
 import java.math.BigDecimal;
 
 public record PropertySearchRequest (
-
     @Size(max = 100, message = "Title search must at most {max} characters")
     String title,
     PropertyTypeEnum type,
@@ -44,9 +42,8 @@ public record PropertySearchRequest (
     @Max(value = 999, message = "Total floor search value cannot exceed 999")
     Short totalFloor,
 
-    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    String availableFrom, //
+    String availableFrom,
 
     @Size(max = 1000, message = "Term search cannot exceed 1000 characters long")
     String term,

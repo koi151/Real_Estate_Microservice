@@ -8,8 +8,6 @@ import org.mapstruct.factory.Mappers;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface PropertyCategoryMapper {
-    PropertyCategoryMapper INSTANCE = Mappers.getMapper( PropertyCategoryMapper.class );
-
     PropertyCategoryHomeDTO toPropertyCategoryHomeDTO(PropertyCategoryEntity entity);
 
 }

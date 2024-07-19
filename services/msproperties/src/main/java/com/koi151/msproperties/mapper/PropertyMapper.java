@@ -1,6 +1,7 @@
 package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.entity.*;
+import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
@@ -19,10 +20,11 @@ import java.util.Objects;
 import java.util.stream.Stream;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
-        imports = {StringUtil.class, ListUtil.class, NumberUtil.class})
+        imports = {StringUtil.class, ListUtil.class, NumberUtil.class, StatusEnum.class})
 public interface PropertyMapper {
 
     // included rooms, propertyForRent, propertyForSale, propertyPostService, address entities
+    @Mapping(target = "status", expression = ("java(StatusEnum.DRAFT)"))
     PropertyEntity toPropertyEntity(PropertyCreateRequest request);
 
     @Mapping(target = "view", expression = "java(NumberUtil.generateRandomInteger(0, 20000))")
@@ -65,11 +67,11 @@ public interface PropertyMapper {
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
             nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS) // fields in the target object will retain their existing values if the corresponding fields in the source object are null
     @Mapping(target = "propertyForRent.rentalPrice", // get price existed in db when request price = 0.0, due to double type not accept null value
-            expression = "java(propertyForRentUpdateRequest.rentalPrice().compareTo(BigDecimal.ZERO) != 0 " +
+            expression = "java(propertyForRentUpdateRequest.rentalPrice() != null " +
                     "? propertyForRentUpdateRequest.rentalPrice() " +
                     ": mappingTarget.getRentalPrice())")
     @Mapping(target = "propertyForSale.salePrice",
-            expression = "java(propertyForSaleUpdateRequest.salePrice().compareTo(BigDecimal.ZERO) != 0 " +
+            expression = "java(propertyForSaleUpdateRequest.salePrice() != null " +
                     "? propertyForSaleUpdateRequest.salePrice() " +
                     ": mappingTarget.getSalePrice())")
     @Mapping(target = "rooms", ignore = true)

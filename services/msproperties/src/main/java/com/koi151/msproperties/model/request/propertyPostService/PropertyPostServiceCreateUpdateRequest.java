@@ -11,10 +11,10 @@ import java.time.LocalDateTime;
 
 @Builder(builderClassName = "PropertyPostServiceCreateRequestBuilder", toBuilder = true)
 @Jacksonized // for working with Jackson annotation - @JsonFormat
-public record PropertyPostServiceCreateRequest (
+public record PropertyPostServiceCreateUpdateRequest(
 
     @Future(message = "Posting date must be in the future")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm")
     LocalDateTime postingDate,
 
     PostingPackageEnum postingPackage,

@@ -1,8 +1,8 @@
 package com.koi151.msproperties.controller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.koi151.msproperties.enums.*;
+import com.koi151.msproperties.mapper.ResponseDataMapper;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.reponse.ResponseData;
 import com.koi151.msproperties.model.request.address.AddressCreateRequest;
@@ -11,10 +11,10 @@ import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
 import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
-import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateRequest;
+import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateUpdateRequest;
 import com.koi151.msproperties.service.PropertiesService;
 import jakarta.validation.Valid;
-import org.springframework.beans.factory.annotation.Autowired;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -32,14 +32,13 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/properties")
 public class PropertyController {
 
-    @Autowired
-    PropertiesService propertiesService;
-
-    @Autowired
-    ObjectMapper objectMapper;
+    private final PropertiesService propertiesService;
+//    private final ObjectMapper objectMapper;
+    private final ResponseDataMapper responseDataMapper;
 
     @GetMapping("/")
     public ResponseEntity<ResponseData> findAllProperties (
@@ -69,26 +68,28 @@ public class PropertyController {
         Faker faker = new Faker();
         int numberOfFakeProperties = 2000;
 
-        // property
-        DirectionEnum[] directions = DirectionEnum.values();
-        int randomDir1Index = faker.number().numberBetween(0, directions.length);
-        int randomDir2Index = faker.number().numberBetween(0, directions.length);
-
-        StatusEnum[] statuses = StatusEnum.values();
-        int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
-
-        // propertyForRent
-        PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
-
-        // propertyPostService
-        PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
-        int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
-
-        DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
-        int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
-
         propertiesService.createFakeProperties(IntStream.range(0, numberOfFakeProperties)
                 .mapToObj(i -> {
+                    // property
+                    DirectionEnum[] directions = DirectionEnum.values();
+                    int randomDir1Index = faker.number().numberBetween(0, directions.length);
+                    int randomDir2Index = faker.number().numberBetween(0, directions.length);
+
+                    StatusEnum[] statuses = StatusEnum.values();
+                    int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
+
+                    // propertyForRent
+                    PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
+
+                    // propertyPostService
+                    PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
+                    int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
+
+                    DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
+                    int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
+
+
+
                     // Generate fake data directly in the stream
                     AddressCreateRequest address = AddressCreateRequest.builder()
                             .city(faker.address().city())
@@ -116,7 +117,7 @@ public class PropertyController {
 
                     LocalDateTime postingDate = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 30));
 
-                    PropertyPostServiceCreateRequest postServiceCreate = PropertyPostServiceCreateRequest.builder()
+                    PropertyPostServiceCreateUpdateRequest postServiceCreate = PropertyPostServiceCreateUpdateRequest.builder()
                             .postingPackage(postingPackages[randomPostPackageIndex])
                             .priorityPushes((short) faker.number().numberBetween(0, 30))
                             .postingDate(postingDate)
@@ -164,12 +165,7 @@ public class PropertyController {
 
         var propertiesPage = propertiesService.getHomeProperties(params, pageable);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesPage);
-        responseData.setCurrentPage(page);
-        responseData.setTotalPages(propertiesPage.getTotalPages());
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalItems(propertiesPage.getTotalElements());
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties succeed");
@@ -197,13 +193,7 @@ public class PropertyController {
         Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
         var propertiesPage = propertiesService.findAllPropertiesByCategory(categoryId, pageable);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesPage);
-        responseData.setCurrentPage(page);
-        responseData.setTotalPages(propertiesPage.getTotalPages());
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalItems(propertiesPage.getTotalElements());
-
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
         responseData.setDesc(propertiesPage.isEmpty() ?
                 "No properties found with id: " + categoryId : "Success");
 
@@ -219,12 +209,7 @@ public class PropertyController {
         Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate").descending());
         var propertiesPage = propertiesService.findAllPropertiesByAccount(accountId, pageable);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesPage.getContent());
-        responseData.setCurrentPage(page);
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalItems(propertiesPage.getTotalElements());
-        responseData.setTotalPages(propertiesPage.getTotalPages());
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties by account id succeed");
@@ -243,12 +228,7 @@ public class PropertyController {
 
         var propertiesPage = propertiesService.findPropertiesByStatus(se, pageable);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesPage);
-        responseData.setCurrentPage(page);
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalPages(propertiesPage.getTotalPages());
-        responseData.setTotalItems(propertiesPage.getTotalElements());
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No properties found with status " + status
                 : "Success");

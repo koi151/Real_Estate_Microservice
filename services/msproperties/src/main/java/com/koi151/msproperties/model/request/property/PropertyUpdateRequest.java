@@ -1,57 +1,54 @@
 package com.koi151.msproperties.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
-import com.koi151.msproperties.annotations.LocalDatePattern;
 import com.koi151.msproperties.enums.DirectionEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentUpdateRequest;
 import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleUpdateRequest;
+import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateUpdateRequest;
 import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperties.model.request.address.AddressUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
-import lombok.Data;
 
+import java.time.LocalDate;
 import java.util.List;
 
-@Data
-public class PropertyUpdateRequest { // update to extends from create req
+public record PropertyUpdateRequest (
 
     @Size(min = 5, max = 100, message = "Title length must between {min} and {max} characters")
-    private String title;
+    String title,
 
-    private Long categoryId;
-    private Long accountId;
-
-    @Valid
-    private PropertyForSaleUpdateRequest propertyForSale;
+    Long categoryId,
+    Long accountId,
 
     @Valid
-    private PropertyForRentUpdateRequest propertyForRent;
-
+    PropertyForSaleUpdateRequest propertyForSale,
     @Valid
-    private List<RoomCreateUpdateRequest> rooms;
-
+    PropertyForRentUpdateRequest propertyForRent,
     @Valid
-    private AddressUpdateRequest address;
+    List<RoomCreateUpdateRequest> rooms,
+    @Valid
+    AddressUpdateRequest address,
+    @Valid
+    PropertyPostServiceCreateUpdateRequest propertyPostService,
 
     @PositiveOrZero(message = "Area must be positive or zero")
     @DecimalMax(value = "99999999.99", message = "Area cannot exceed 99,999,999.99")
-    private Float area;
+    Float area,
 
-    private String description;
+    String description,
 
     @PositiveOrZero(message = "Total floor must be positive or zero")
     @Max(value = 999, message = "Total floors cannot exceed 999")
-    private Integer totalFloor;
+    Integer totalFloor,
 
-    private DirectionEnum houseDirection;
-    private DirectionEnum balconyDirection;
-    private StatusEnum status;
+    DirectionEnum houseDirection,
+    DirectionEnum balconyDirection,
+    StatusEnum status,
 
-    @LocalDatePattern(message = "Property available date must be in 'yyyy-MM-dd' format")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    private String availableFrom;
+    LocalDate availableFrom,
 
-    private List<String> imageUrlsRemove;
-}
+    List<String> imageUrlsRemove
+) {}
