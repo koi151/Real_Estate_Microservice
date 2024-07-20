@@ -25,21 +25,21 @@ public interface PropertyMapper {
 
     // included rooms, propertyForRent, propertyForSale, propertyPostService, address entities
     @Mapping(target = "status", expression = ("java(StatusEnum.DRAFT)"))
-    PropertyEntity toPropertyEntity(PropertyCreateRequest request);
+    Property toPropertyEntity(PropertyCreateRequest request);
 
     @Mapping(target = "view", expression = "java(NumberUtil.generateRandomInteger(0, 20000))")
-    PropertyEntity toFakePropertyEntity(PropertyCreateRequest request);
+    Property toFakePropertyEntity(PropertyCreateRequest request);
 
     @Mapping(target = "propertyId", ignore = true)
-    @Mapping(target = "propertyEntity", ignore = true)
-    PropertyForRentEntity toPropertyForRentEntity(PropertyForRentCreateRequest request);
+    @Mapping(target = "property", ignore = true)
+    PropertyForRent toPropertyForRentEntity(PropertyForRentCreateRequest request);
 
     @Mapping(target = "propertyId", ignore = true)
-    @Mapping(target = "propertyEntity", ignore = true)
-    PropertyForSaleEntity toPropertyForSaleEntity(PropertyForSaleCreateRequest request);
+    @Mapping(target = "property", ignore = true)
+    PropertyForSale toPropertyForSaleEntity(PropertyForSaleCreateRequest request);
 
-    @Mapping(target = "propertyEntity", ignore = true)
-    RoomEntity toRoomEntity(RoomCreateUpdateRequest request);
+    @Mapping(target = "property", ignore = true)
+    Room toRoomEntity(RoomCreateUpdateRequest request);
 
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
@@ -49,7 +49,7 @@ public interface PropertyMapper {
     @Mapping(target = "status", source = "status.statusName")
     @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
     @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
-    DetailedPropertyDTO toDetailedPropertyDTO(PropertyEntity entity);
+    DetailedPropertyDTO toDetailedPropertyDTO(Property entity);
 
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
@@ -59,10 +59,10 @@ public interface PropertyMapper {
     @Mapping(target = "status", source = "status.statusName")
     @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
-    PropertySearchDTO toPropertySearchDTO(PropertyEntity entity);
+    PropertySearchDTO toPropertySearchDTO(Property entity);
 
     @Mapping(target = "status", source = "status.statusName")
-    PropertiesHomeDTO toPropertiesHomeDTO(PropertyEntity entity);
+    PropertiesHomeDTO toPropertiesHomeDTO(Property entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
             nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS) // fields in the target object will retain their existing values if the corresponding fields in the source object are null
@@ -75,16 +75,16 @@ public interface PropertyMapper {
                     "? propertyForSaleUpdateRequest.salePrice() " +
                     ": mappingTarget.getSalePrice())")
     @Mapping(target = "rooms", ignore = true)
-    void updatePropertyFromDto(PropertyUpdateRequest request, @MappingTarget PropertyEntity entity);
+    void updatePropertyFromDto(PropertyUpdateRequest request, @MappingTarget Property entity);
 
-    default String getFullAddressString(AddressEntity entity) {
+    default String getFullAddressString(Address entity) {
         List<String> addressList = Stream.of(entity.getStreetAddress(), entity.getWard(), entity.getDistrict(), entity.getCity())
                 .filter(Objects::nonNull)  // Filter out null values
                 .toList();  // Java 16+ or .collect(Collectors.toList())
         return StringUtil.toStringSeparateByRegex(addressList, ", ");
     }
 
-    default String getPropertyType(PropertyEntity entity) {
+    default String getPropertyType(Property entity) {
         boolean forRent = entity.getPropertyForRent() != null;
         boolean forSale = entity.getPropertyForSale() != null;
 

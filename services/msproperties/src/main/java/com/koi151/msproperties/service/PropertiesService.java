@@ -3,6 +3,7 @@ package com.koi151.msproperties.service;
 import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
 import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.model.dto.PropertyPostServiceDTO;
 import com.koi151.msproperties.model.dto.PropertySearchDTO;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;

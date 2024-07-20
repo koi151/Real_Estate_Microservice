@@ -3,12 +3,10 @@ package com.koi151.msproperties.entity;
 import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.io.Serial;
-import java.time.LocalDateTime;
 
 @Entity(name="property_category")
 @Getter
@@ -16,7 +14,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyCategoryEntity extends BaseEntity {
+public class PropertyCategory extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = -1682566055866886258L;

@@ -5,7 +5,6 @@ import com.koi151.msproperties.enums.PostingPackageEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
@@ -17,7 +16,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Builder
 @Entity(name = "property_post_service")
-public class PropertyPostServiceEntity {
+public class PropertyPostService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -26,7 +25,7 @@ public class PropertyPostServiceEntity {
     @OneToOne
     @MapsId
     @JoinColumn(name = "property_id")
-    private PropertyEntity propertyEntity;
+    private Property property;
 
     @Enumerated(EnumType.STRING)
     @Column(name = "days_posted", nullable = false)

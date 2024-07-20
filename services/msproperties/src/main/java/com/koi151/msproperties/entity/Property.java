@@ -17,7 +17,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyEntity extends BaseEntity {
+public class Property extends BaseEntity {
 
     @Serial
     private static final long serialVersionUID = 58116615802509522L;
@@ -27,26 +27,25 @@ public class PropertyEntity extends BaseEntity {
     @Column(name = "property_id")
     private Long propertyId;
 
-    @OneToOne(mappedBy = "propertyEntity",
+    @OneToOne(mappedBy = "property",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private PropertyForSaleEntity propertyForSale;
+    private PropertyForSale propertyForSale;
 
-    @OneToOne(mappedBy = "propertyEntity",
+    @OneToOne(mappedBy = "property",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private PropertyForRentEntity propertyForRent;
+    private PropertyForRent propertyForRent;
 
-    @OneToOne(mappedBy = "propertyEntity",
+    @OneToOne(mappedBy = "property",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    @JoinColumn(name = "address_id", nullable = false)
-    private AddressEntity address;
+    private Address address;
 
-    @OneToOne(mappedBy = "propertyEntity",  fetch = FetchType.LAZY, // querying for properties without needing their payment details.
+    @OneToOne(mappedBy = "property",  fetch = FetchType.LAZY, // querying for properties without needing their payment details.
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private PropertyPostServiceEntity propertyPostService;
+    private PropertyPostService propertyPostService;
 
-    @OneToMany(mappedBy = "propertyEntity", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "property", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<RoomEntity> rooms;
+    private List<Room> rooms;
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id is mandatory")

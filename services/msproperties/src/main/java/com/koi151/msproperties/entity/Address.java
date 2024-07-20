@@ -12,7 +12,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class AddressEntity {
+public class Address {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -21,7 +21,7 @@ public class AddressEntity {
     @OneToOne
     @MapsId
     @JoinColumn(name = "property_id")
-    private PropertyEntity propertyEntity;
+    private Property property;
 
     @Column(name = "city", nullable = false, length = 50)
     @NotBlank(message = "City name is mandatory")

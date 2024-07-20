@@ -13,7 +13,7 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PropertyForRentEntity {
+public class PropertyForRent {
 
     @Id
     private Long propertyId;
@@ -21,7 +21,7 @@ public class PropertyForRentEntity {
     @OneToOne
     @MapsId
     @JoinColumn(name = "property_id")
-    private PropertyEntity propertyEntity;
+    private Property property;
 
     @Column(name = "rental_price", precision = 12, scale = 2, nullable = false)
     @NotNull(message = "Rental price is mandatory")

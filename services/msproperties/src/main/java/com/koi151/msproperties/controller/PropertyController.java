@@ -49,13 +49,7 @@ public class PropertyController {
         Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate"));
         var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesPage.getContent());
-        responseData.setCurrentPage(page);
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalItems(propertiesPage.getTotalElements());
-        responseData.setTotalPages(propertiesPage.getTotalPages());
-
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties succeed");
@@ -235,6 +229,7 @@ public class PropertyController {
 
         return ResponseEntity.ok(responseData);
     }
+
 
     @PostMapping("/")
     public ResponseEntity<ResponseData> createProperty(

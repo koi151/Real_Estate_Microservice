@@ -15,7 +15,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class PropertyForSaleEntity {
+public class PropertyForSale {
 
     @Id
     private Long propertyId;
@@ -23,7 +23,7 @@ public class PropertyForSaleEntity {
     @OneToOne
     @MapsId
     @JoinColumn(name = "property_id")
-    private PropertyEntity propertyEntity;
+    private Property property;
 
     @Column(name = "sale_price")
     @NotNull(message = "Sale price is mandatory")

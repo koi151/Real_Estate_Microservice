@@ -1,6 +1,5 @@
 package com.koi151.msproperties.model.dto;
 
-import com.koi151.msproperties.entity.RoomEntity;
 import lombok.*;
 
 @Builder

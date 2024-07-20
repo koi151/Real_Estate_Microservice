@@ -1,7 +1,7 @@
 package com.koi151.msproperties.repository.custom.impl;
 
 
-import com.koi151.msproperties.entity.PropertyCategoryEntity;
+import com.koi151.msproperties.entity.PropertyCategory;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperties.repository.custom.PropertyCategoryRepositoryCustom;
 import com.koi151.msproperties.utils.CustomRepositoryUtils;
@@ -33,10 +33,10 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
     }
 
     @Override
-    public Page<PropertyCategoryEntity> getPropertyCategoryByCriteria(PropertyCategorySearchRequest request, Pageable pageable) {
+    public Page<PropertyCategory> getPropertyCategoryByCriteria(PropertyCategorySearchRequest request, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<PropertyCategoryEntity> cq = cb.createQuery(PropertyCategoryEntity.class);
-        Root<PropertyCategoryEntity> root = cq.from(PropertyCategoryEntity.class);
+        CriteriaQuery<PropertyCategory> cq = cb.createQuery(PropertyCategory.class);
+        Root<PropertyCategory> root = cq.from(PropertyCategory.class);
         List<Predicate> predicates = new ArrayList<>();
 
         if (request != null) {
@@ -52,7 +52,7 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
             cq.where(predicates.toArray(new Predicate[0]));
         }
 
-        TypedQuery<PropertyCategoryEntity> typedQuery = entityManager.createQuery(cq);
+        TypedQuery<PropertyCategory> typedQuery = entityManager.createQuery(cq);
         return CustomRepositoryUtils.applyPagination(typedQuery, pageable);
     }
 }

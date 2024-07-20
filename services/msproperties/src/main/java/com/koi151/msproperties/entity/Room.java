@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class RoomEntity {
+public class Room {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -22,7 +22,7 @@ public class RoomEntity {
     @ManyToOne
     @JoinColumn(name = "property_id")
     @NotNull(message = "Property id is mandatory")
-    private PropertyEntity propertyEntity;
+    private Property property;
 
     @Column(name = "room_type", nullable = false, length = 50)
     @NotEmpty(message = "Room type is mandatory")

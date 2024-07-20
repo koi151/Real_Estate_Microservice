@@ -81,7 +81,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         if (!propertySubmissionRepository.existsByAccountIdAndDeleted(accountId, false))
             throw new AccountNotFoundException("No property submission found from account id: " + accountId);
 
-        ResponseEntity<ResponseData> responseData = accountClient.getAccountNameAndRole(accountId);
+        ResponseEntity<ResponseData> responseData = accountClient.findAccountNameAndRoleById(accountId);
 
         if (responseData.getStatusCode().is2xxSuccessful() && responseData.getBody() != null) {
             Object accountDataObj = responseData.getBody().getData();

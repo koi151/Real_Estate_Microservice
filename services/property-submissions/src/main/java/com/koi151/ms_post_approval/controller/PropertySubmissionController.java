@@ -32,7 +32,7 @@ public class PropertySubmissionController {
 
         ResponseData responseData = ResponseData.builder()
                 .data(submissions)
-                .description("Property submission created successfully, will be censored by admin as soon as possible")
+                .description("Property submission created successfully, will be reviewed by admin as soon as possible")
                 .build();
 
         return new ResponseEntity<>(responseData, HttpStatus.CREATED);

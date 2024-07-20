@@ -23,7 +23,6 @@ import java.util.*;
 @Repository
 @Primary // need this to use custom repository instead of Spring Data JPA automatically generate queries based on method names
 public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
-
     @PersistenceContext // used to inject an EntityManager into a class
     private EntityManager entityManager;
 
@@ -31,8 +30,8 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         List<Predicate> predicates = context.predicates();
         CriteriaBuilder cb = context.criteriaBuilder();
 
-        Join<PropertyEntity, ?> saleJoin = context.joins().get("propertyForSale");
-        Join<PropertyEntity, ?> rentJoin = context.joins().get("propertyForRent");
+        Join<Property, ?> saleJoin = context.joins().get("propertyForSale");
+        Join<Property, ?> rentJoin = context.joins().get("propertyForRent");
 
         if (request.type() != null) {
             if (request.type() == PropertyTypeEnum.SALE) {
@@ -103,7 +102,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             CriteriaBuilder cb = context.criteriaBuilder();
             List<Predicate> predicates = context.predicates();
 
-            Join<PropertyEntity, ?> roomJoin = context.joins().get("roomEntities");
+            Join<Property, ?> roomJoin = context.joins().get("rooms");
 
             predicates.add(cb.and(
                     cb.equal(roomJoin.get("roomType"), roomType),
@@ -115,9 +114,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     private static void applySpecialQueryConditions(PropertySearchRequest request, QueryConditionContextProperty context) {
         List<Predicate> predicates = context.predicates();
         CriteriaBuilder cb = context.criteriaBuilder();
-        Root<PropertyEntity> root = context.root();
+        Root<Property> root = context.root();
 
-        Join<?, ?> addressJoin = context.joins().get("addressEntity");
+        Join<?, ?> addressJoin = context.joins().get("address");
 
         if (request.areaFrom() != null)
             predicates.add(cb.greaterThanOrEqualTo(root.get("area"), request.areaFrom()));
@@ -169,21 +168,21 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         }
 
         if (RequestUtil.locationRequested(request)) {
-            context.addJoin("addressEntity", context.root().join("addressEntity", JoinType.LEFT));
+            context.addJoin("address", context.root().join("address", JoinType.LEFT));
         }
 
         if (RequestUtil.roomRequested(request)) {
-            context.addJoin("roomEntities", context.root().join("roomEntities", JoinType.LEFT));
+            context.addJoin("rooms", context.root().join("rooms", JoinType.LEFT));
         }
     }
 
     @Override
-    public Page<PropertyEntity> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
+    public Page<Property> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder(); // API in JPA for creating dynamic query
-        CriteriaQuery<PropertyEntity> cq = cb.createQuery(PropertyEntity.class); // call method from EntityManager to get CriteriaQuery for building queries
-        Root<PropertyEntity> root = cq.from(PropertyEntity.class); // define PropertyEntity as root entity for queries
+        CriteriaQuery<Property> cq = cb.createQuery(Property.class); // call method from EntityManager to get CriteriaQuery for building queries
+        Root<Property> root = cq.from(Property.class); // define PropertyEntity as root entity for queries
 
-        Map<String, Join<PropertyEntity, ?>> joins = new HashMap<>();
+        Map<String, Join<Property, ?>> joins = new HashMap<>();
         List<Predicate> predicates = new ArrayList<>(); // interface in Criteria, used for building filter conditions for Criteria queries
 
         QueryConditionContextProperty context = new QueryConditionContextProperty(cb, cq, root, predicates, joins);
@@ -210,7 +209,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb)); // Use QueryUtils for converting Pageable sort to Order
         }
 
-        TypedQuery<PropertyEntity> typedQuery = entityManager.createQuery(cq);
+        TypedQuery<Property> typedQuery = entityManager.createQuery(cq);
         return CustomRepositoryUtils.applyPagination(typedQuery, pageable);
     }
 }

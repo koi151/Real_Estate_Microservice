@@ -18,24 +18,24 @@ public class PropertyConverter {
     private final PropertyMapper propertyMapper;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
 
-    public PropertyEntity toPropertyEntity (PropertyCreateRequest request, List<MultipartFile> imageFiles, boolean generateFakeProperties) {
-        PropertyEntity propertyEntity;
+    public Property toPropertyEntity (PropertyCreateRequest request, List<MultipartFile> imageFiles, boolean generateFakeProperties) {
+        Property property;
         if (generateFakeProperties)
-            propertyEntity = propertyMapper.toFakePropertyEntity(request);
+            property = propertyMapper.toFakePropertyEntity(request);
         else
-            propertyEntity = propertyMapper.toPropertyEntity(request);
+            property = propertyMapper.toPropertyEntity(request);
 
-        propertyEntity.getPropertyPostService().setPropertyEntity(propertyEntity);
-        propertyEntity.getAddress().setPropertyEntity(propertyEntity);
+        property.getPropertyPostService().setProperty(property);
+        property.getAddress().setProperty(property);
 
         if (request.propertyForSale() != null)
-            propertyEntity.getPropertyForSale().setPropertyEntity(propertyEntity);
+            property.getPropertyForSale().setProperty(property);
         if (request.propertyForRent() != null)
-            propertyEntity.getPropertyForRent().setPropertyEntity(propertyEntity);
+            property.getPropertyForRent().setProperty(property);
 
         if (request.rooms() != null)
-            propertyEntity.getRooms()
-                    .forEach(roomEntity -> roomEntity.setPropertyEntity(propertyEntity));
+            property.getRooms()
+                    .forEach(roomEntity -> roomEntity.setProperty(property));
 
         // add image to cloudinary and save to db as url strings
         if (imageFiles != null && !imageFiles.isEmpty()) {
@@ -43,9 +43,9 @@ public class PropertyConverter {
             if (imageUrls == null || imageUrls.isEmpty())
                 throw new RuntimeException("Failed to upload images to Cloudinary");
 
-            propertyEntity.setImageUrls(imageUrls);
+            property.setImageUrls(imageUrls);
         }
 
-        return propertyEntity;
+        return property;
     }
 }

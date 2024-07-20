@@ -1,6 +1,6 @@
 package com.koi151.msproperties.utils.QueryContext;
 
-import com.koi151.msproperties.entity.PropertyEntity;
+import com.koi151.msproperties.entity.Property;
 import jakarta.persistence.criteria.*;
 
 import java.util.List;
@@ -8,12 +8,12 @@ import java.util.Map;
 
 public record QueryConditionContextProperty(
         CriteriaBuilder criteriaBuilder,
-        CriteriaQuery<PropertyEntity> criteriaQuery,
-        Root<PropertyEntity> root,
+        CriteriaQuery<Property> criteriaQuery,
+        Root<Property> root,
         List<Predicate> predicates,
-        Map<String, Join<PropertyEntity, ?>> joins
+        Map<String, Join<Property, ?>> joins
 ) {
-    public void addJoin(String name, Join<PropertyEntity, ?> join) {
+    public void addJoin(String name, Join<Property, ?> join) {
         joins.put(name, join);
     }
 }

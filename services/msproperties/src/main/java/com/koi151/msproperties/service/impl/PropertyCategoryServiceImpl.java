@@ -1,33 +1,26 @@
 package com.koi151.msproperties.service.impl;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.customExceptions.CategoryNotFoundException;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
-import com.koi151.msproperties.entity.PropertyCategoryEntity;
+import com.koi151.msproperties.entity.PropertyCategory;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.PropertyCategoryMapper;
-import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
 import com.koi151.msproperties.model.dto.PropertyCategory.PropertyCategoryDetailDTO;
 import com.koi151.msproperties.model.dto.PropertyCategory.PropertyCategoryHomeDTO;
 import com.koi151.msproperties.model.dto.PropertyCategory.PropertyCategoryTitleDTO;
-import com.koi151.msproperties.model.reponse.PropertyCategorySearchResponse;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUpdateRequest;
 import com.koi151.msproperties.repository.PropertyCategoryRepository;
 import com.koi151.msproperties.service.PropertyCategoryService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.time.LocalDateTime;
-import java.time.temporal.ChronoUnit;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -41,14 +34,14 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
 
     @Override
     public Page<PropertyCategoryHomeDTO> getCategoriesHomePage(PropertyCategorySearchRequest request,Pageable pageable) {
-        Page<PropertyCategoryEntity> categoryEntities = propertyCategoryRepository.getPropertyCategoryByCriteria(request, pageable);
+        Page<PropertyCategory> categoryEntities = propertyCategoryRepository.getPropertyCategoryByCriteria(request, pageable);
         return categoryEntities.map(propertyCategoryMapper::toPropertyCategoryHomeDTO);
     }
 
     @Override
     public List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum status) {
         PageRequest pageRequest = PageRequest.of(0, 4, Sort.by("categoryId"));
-        Page<PropertyCategoryEntity> categories = propertyCategoryRepository.findByStatus(status, pageRequest);
+        Page<PropertyCategory> categories = propertyCategoryRepository.findByStatus(status, pageRequest);
 
         return categories.stream()
                 .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
@@ -56,21 +49,21 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     }
 
     @Override
-    public PropertyCategoryEntity getCategoryById(Integer id) {
+    public PropertyCategory getCategoryById(Integer id) {
         return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
 
     @Override
     public PropertyCategoryTitleDTO getCategoryTitleById(Integer id){
-        PropertyCategoryEntity category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
+        PropertyCategory category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
         return new PropertyCategoryTitleDTO(category.getTitle());
     }
 
-    public PropertyCategoryEntity createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
+    public PropertyCategory createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
 
-        PropertyCategoryEntity propertyCategoryEntity = PropertyCategoryEntity.builder()
+        PropertyCategory propertyCategory = PropertyCategory.builder()
                 .title(request.getTitle())
                 .description(request.getDescription())
                 .status(request.getStatus())
@@ -81,12 +74,12 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
             if (imageUrls == null || imageUrls.isEmpty()) {
                 throw new RuntimeException("Failed to upload images to Cloudinary");
             }
-            propertyCategoryEntity.setImageUrls(imageUrls);
+            propertyCategory.setImageUrls(imageUrls);
         }
 
-        propertyCategoryRepository.save(propertyCategoryEntity);
+        propertyCategoryRepository.save(propertyCategory);
 
-        return propertyCategoryEntity;
+        return propertyCategory;
     }
 
     @Override
@@ -102,7 +95,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
 
-    private void updateImages(PropertyCategoryEntity existingProperty, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
+    private void updateImages(PropertyCategory existingProperty, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
         Set<String> existingImagesUrlSet = new HashSet<>();
 
         // Initialize existingImagesUrlSet with current image URLs if they exist
@@ -134,7 +127,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
         existingProperty.setImageUrls(updatedImageUrls.isEmpty() ? null : updatedImageUrls);
     }
 
-    private void updateCategoryDetails(PropertyCategoryEntity existingCategory, PropertyCategoryUpdateRequest request) {
+    private void updateCategoryDetails(PropertyCategory existingCategory, PropertyCategoryUpdateRequest request) {
         if (request != null) {
 
             // Use Optional for Null check
@@ -144,7 +137,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
         }
     }
 
-    private PropertyCategoryDetailDTO convertToPropertyCategoryDTO(PropertyCategoryEntity savedProperty, PropertyCategoryUpdateRequest request) {
+    private PropertyCategoryDetailDTO convertToPropertyCategoryDTO(PropertyCategory savedProperty, PropertyCategoryUpdateRequest request) {
 
         return PropertyCategoryDetailDTO.builder()
                 .title(savedProperty.getTitle())

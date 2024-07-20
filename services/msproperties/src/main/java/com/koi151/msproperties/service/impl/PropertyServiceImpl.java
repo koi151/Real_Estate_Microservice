@@ -2,7 +2,6 @@ package com.koi151.msproperties.service.impl;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.mapper.AddressMapper;
 import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
@@ -30,61 +29,58 @@ public class PropertyServiceImpl implements PropertiesService {
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final RoomRepository roomRepository;
     private final PropertyRepository propertyRepository;
-    private final AddressRepository addressRepository;
-    private final PropertyMapper propertyMapper;
     private final PropertyConverter propertyConverter;
+    private final PropertyMapper propertyMapper;
 
     @Override
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
-        Page<PropertyEntity> propertyEntities = propertyRepository.findPropertiesByCriteria(request, pageable);
+        Page<Property> propertyEntities = propertyRepository.findPropertiesByCriteria(request, pageable);
         return propertyEntities.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
     }
 
-
     @Override
     public Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params, Pageable pageable) {
-        Page<PropertyEntity> properties = propertyRepository.findByDeleted(false, pageable);
+        Page<Property> properties = propertyRepository.findByDeleted(false, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
     public DetailedPropertyDTO getPropertyById(Long id) {
-        PropertyEntity property = propertyRepository.findByPropertyIdAndDeleted(id, false)
-                .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
+        Property property = findPropertyExistedById(id);
         return propertyMapper.toDetailedPropertyDTO(property);
     }
 
     @Override
     public Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId, Pageable pageable) {
-        Page<PropertyEntity> properties = propertyRepository.findByCategoryIdAndDeleted(categoryId, false, pageable);
+        Page<Property> properties = propertyRepository.findByCategoryIdAndDeleted(categoryId, false, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
     public Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
-        Page<PropertyEntity> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
+        Page<Property> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
         return properties.map(propertyMapper::toPropertySearchDTO);
     }
 
     @Override
     public Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable) {
-        Page<PropertyEntity> properties = propertyRepository.findByStatus(status, pageable);
+        Page<Property> properties = propertyRepository.findByStatus(status, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Transactional
     @Override
     public DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
-        PropertyEntity propertyEntity = propertyConverter.toPropertyEntity(request, imageFiles, false);
-        propertyRepository.save(propertyEntity);
-        return propertyMapper.toDetailedPropertyDTO(propertyEntity);
+        Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
+        propertyRepository.save(property);
+        return propertyMapper.toDetailedPropertyDTO(property);
     }
 
     @Transactional
     public void createFakeProperties(List<PropertyCreateRequest> fakeProperties) {
 
         // Create property entities in parallel
-        List<PropertyEntity> propertyEntities = fakeProperties.parallelStream()
+        List<Property> propertyEntities = fakeProperties.parallelStream()
                 .map(fakeProperty -> propertyConverter.toPropertyEntity(fakeProperty,null, true))
                 .toList();
 
@@ -107,7 +103,16 @@ public class PropertyServiceImpl implements PropertiesService {
 
     }
 
-    private void updateImages(PropertyEntity existingProperty, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
+    public Property findPropertyExistedById(Long id) {
+        return propertyRepository.findByPropertyIdAndDeleted(id, false)
+                .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
+    }
+
+    public boolean checkPropertyExistedById(Long id) {
+        return propertyRepository.existsByPropertyIdAndDeleted(id, false);
+    }
+
+    private void updateImages(Property existingProperty, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
         Set<String> existingImagesUrlSet = new HashSet<>();
 
         // Initialize existingImagesUrlSet with current image URLs if they exist
@@ -139,21 +144,21 @@ public class PropertyServiceImpl implements PropertiesService {
         existingProperty.setImageUrls(updatedImageUrls.isEmpty() ? null : updatedImageUrls);
     }
 
-    private void updatePropertyDetails(PropertyEntity existingProperty, PropertyUpdateRequest request) {
+    private void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {
         if (request != null) {
             updateExistingPropertyRooms(existingProperty, request.rooms()); // update rooms info separately
             propertyMapper.updatePropertyFromDto(request, existingProperty);
         }
     }
 
-    private void updateExistingPropertyRooms(PropertyEntity existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
-        List<RoomEntity> currentRooms = existingProperty.getRooms();
+    private void updateExistingPropertyRooms(Property existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
+        List<Room> currentRooms = existingProperty.getRooms();
 
         for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
             String roomType = updatedRoom.roomType();
             short quantity = updatedRoom.quantity();
 
-            RoomEntity existingRoom = currentRooms.stream()
+            Room existingRoom = currentRooms.stream()
                     .filter(room -> room.getRoomType().equals(roomType))
                     .findFirst()
                     .orElse(null);
@@ -165,10 +170,10 @@ public class PropertyServiceImpl implements PropertiesService {
                 // if quantity is the same, do nothing
             } else {
                 // Room type doesn't exist, create a new room
-                RoomEntity newRoom = RoomEntity.builder()
+                Room newRoom = Room.builder()
                         .roomType(roomType)
                         .quantity(quantity)
-                        .propertyEntity(existingProperty)
+                        .property(existingProperty)
                         .build();
 
                 roomRepository.save(newRoom);
