@@ -1,9 +1,7 @@
 package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.model.reponse.ResponseData;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)

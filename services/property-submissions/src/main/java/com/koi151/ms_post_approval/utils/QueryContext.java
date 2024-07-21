@@ -1,6 +1,5 @@
-package com.koi151.msproperties.utils.QueryContext;
+package com.koi151.ms_post_approval.utils;
 
-import com.koi151.msproperties.entity.PropertyCategory;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Predicate;
@@ -8,9 +7,9 @@ import jakarta.persistence.criteria.Root;
 
 import java.util.List;
 
-public record QueryConditionContextPropertyCategory(// record is immutable, replace lombok annotation - available since Java 14
+public record QueryContext<T>(
     CriteriaBuilder criteriaBuilder,
     CriteriaQuery<?> criteriaQuery,
-    Root<PropertyCategory> root,
+    Root<T> root,
     List<Predicate> predicates
 ) {}

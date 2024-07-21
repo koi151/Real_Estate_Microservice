@@ -38,14 +38,13 @@ public class PropertySubmission extends BaseEntity{
 
     @Column(name = "reference_code", length = 100, nullable = false, unique = true)
     @NotBlank(message = "Reference code cannot be blank")
-    @Size(max = 100, message = "Reference code cannot exceed 100 characters")
+    @Size(max = 100, message = "Reference code cannot exceed {max} characters")
     private String referenceCode;
 
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 
     @Column(name = "reviewer_id")
-    @Positive(message = "Reviewer id must be positive value")
     private Long reviewerId;
 
     @Column(name = "status", nullable = false)
@@ -53,6 +52,6 @@ public class PropertySubmission extends BaseEntity{
     private PostStatus status = PostStatus.PENDING;;
 
     @Column(name = "review_message", length = 3000)
-    @Size(max = 3000, message = "Review message cannot exceed 3000 characters")
+    @Size(max = 3000, message = "Review message cannot exceed {max} characters")
     private String reviewMessage;
 }

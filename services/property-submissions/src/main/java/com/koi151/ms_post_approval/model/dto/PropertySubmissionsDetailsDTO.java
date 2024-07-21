@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class PropertySubmissionDTO {
-    private List<PropertySubmissionDetailsDTO> content;
+public class PropertySubmissionsDetailsDTO {
+    private List<PropertySubmissionDetailedDTO> content;
     private PageMeta meta;
 }

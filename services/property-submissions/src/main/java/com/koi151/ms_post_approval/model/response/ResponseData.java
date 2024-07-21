@@ -10,6 +10,7 @@ import java.io.Serial;
 @Setter
 @SuperBuilder
 @NoArgsConstructor
+@AllArgsConstructor
 public class ResponseData extends AbstractDTO<Object> {
 
     @Serial

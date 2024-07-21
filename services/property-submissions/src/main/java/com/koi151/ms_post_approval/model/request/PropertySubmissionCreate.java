@@ -14,15 +14,14 @@ public record PropertySubmissionCreate (
     @Positive(message = "Property id must be positive value")
     Long propertyId,
     @NotNull(message = "Account id cannot be null")
-    @Positive(message = "Account id must be positive value")
     Long accountId,
     Long reviewerId,
     @NotBlank(message = "Reference code cannot be blank")
-    @Size(max = 100, message = "Reference code cannot longer than 100 characters")
+    @Size(max = 100, message = "Reference code cannot longer than {max} characters")
     String referenceCode,
     PostStatus status,
     PaymentMethod paymentMethod,
-    @Size(max = 3000, message = "Review message cannot exceed 3000 characters")
+    @Size(max = 3000, message = "Review message cannot exceed {max} characters")
     String reviewMessage
 ) {
 }

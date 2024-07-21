@@ -40,13 +40,16 @@ public class PropertyController {
 //    private final ObjectMapper objectMapper;
     private final ResponseDataMapper responseDataMapper;
 
+    private static final int MAX_PAGE_SIZE = 20;
+
     @GetMapping("/")
     public ResponseEntity<ResponseData> findAllProperties (
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit,
-            @RequestBody @Valid PropertySearchRequest request) {
-
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate"));
+            @RequestBody @Valid PropertySearchRequest request)
+    {
+        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate"));
         var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
@@ -155,7 +158,8 @@ public class PropertyController {
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
 
         var propertiesPage = propertiesService.getHomeProperties(params, pageable);
 
@@ -184,7 +188,8 @@ public class PropertyController {
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
         var propertiesPage = propertiesService.findAllPropertiesByCategory(categoryId, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
@@ -200,7 +205,8 @@ public class PropertyController {
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
-        Pageable pageable = PageRequest.of(page, limit, Sort.by("createdDate").descending());
+        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page, pageSize, Sort.by("createdDate").descending());
         var propertiesPage = propertiesService.findAllPropertiesByAccount(accountId, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
@@ -218,7 +224,8 @@ public class PropertyController {
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
         StatusEnum se = StatusEnum.valueOf(status.toUpperCase());
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
 
         var propertiesPage = propertiesService.findPropertiesByStatus(se, pageable);
 

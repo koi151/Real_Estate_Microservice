@@ -5,7 +5,7 @@ import lombok.Setter;
 
 @Getter
 @Setter
-public class PropertySubmissionDetailsDTO {
+public class PropertySubmissionDetailedDTO {
     private Long propertyId;
     private String referenceCode;
     private Long reviewerId;

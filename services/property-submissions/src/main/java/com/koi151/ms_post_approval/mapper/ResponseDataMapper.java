@@ -1,22 +1,25 @@
 package com.koi151.ms_post_approval.mapper;
 
-import com.koi151.ms_post_approval.model.dto.AccountWithSubmissionDTO;
-import com.koi151.ms_post_approval.model.dto.PropertySubmissionDetailsDTO;
 import com.koi151.ms_post_approval.model.response.PageMeta;
 import com.koi151.ms_post_approval.model.response.ResponseData;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.Named;
-import org.mapstruct.ReportingPolicy;
+import org.mapstruct.*;
 import org.springframework.data.domain.Page;
 
-@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
+@Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        builder = @Builder(disableBuilder = true))
 public interface ResponseDataMapper {
-//    @Mapping(target = "data", source = "propertyPages.content")
-//    @Mapping(target = "totalPages", source = "propertyPages.totalPages")
-//    @Mapping(target = "totalItems", source = "propertyPages.totalElements")
-//    @Mapping(target = "currentPage", source = "page")
-//    @Mapping(target = "maxPageItems", source = "limit")
-//    ResponseData toResponseData(Page<?> propertyPages, int page, int limit);
 
+    @Mapping(target = "data", source = "propertyPages.content")
+    @Mapping(target = "meta", source = "propertyPages", qualifiedByName = "pageToPageMeta")
+    ResponseData toResponseData(Page<?> propertyPages, @Context PaginationContext paginationContext);
+
+    @Named("pageToPageMeta")
+    default PageMeta pageToPageMeta(Page<?> page, @Context PaginationContext paginationContext) {
+        return PageMeta.builder()
+                .totalPages(page.getTotalPages())
+                .totalElements(page.getTotalElements())
+                .pageNumber(paginationContext.getPageNumber())
+                .pageSize(paginationContext.getPageSize())
+                .build();
+    }
 }

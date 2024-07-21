@@ -1,12 +1,14 @@
 package com.koi151.msproperties.controller;
 
 import com.koi151.msproperties.enums.StatusEnum;
+import com.koi151.msproperties.mapper.ResponseDataMapper;
 import com.koi151.msproperties.model.reponse.ResponseData;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperties.model.request.propertyCategory.PropertyCategoryUpdateRequest;
 import com.koi151.msproperties.service.PropertyCategoryService;
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -20,11 +22,13 @@ import java.util.List;
 
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/api/v1/properties/categories")
 public class PropertyCategoryController {
 
-    @Autowired
-    PropertyCategoryService propertyCategoryService;
+    private final PropertyCategoryService propertyCategoryService;
+    private final ResponseDataMapper responseDataMapper;
+    private static final int MAX_PAGE_SIZE = 20;
 
     @GetMapping("/home")
     public ResponseEntity<ResponseData> getCategoriesHomePage(
@@ -32,17 +36,12 @@ public class PropertyCategoryController {
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     ) {
-        Pageable pageable = PageRequest.of(page - 1, limit, Sort.by("createdDate").descending());
+        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
 
         var categoriesPage = propertyCategoryService.getCategoriesHomePage(request, pageable);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(categoriesPage.getContent());
-        responseData.setCurrentPage(page);
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalItems(categoriesPage.getTotalElements());
-        responseData.setTotalPages(categoriesPage.getTotalPages());
-
+        ResponseData responseData = responseDataMapper.toResponseData(categoriesPage, page, limit);
         responseData.setDesc(categoriesPage.isEmpty() ?
                 "No property category found" : "Get home property categories succeed");
 

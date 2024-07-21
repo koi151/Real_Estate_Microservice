@@ -9,5 +9,5 @@ import lombok.Setter;
 @Builder
 public class AccountWithSubmissionDTO {
     private AccountWithNameAndRoleDTO accountWithNameAndRoleDTO;
-    private PropertySubmissionDTO propertySubmissionDTO;
+    private PropertySubmissionsDetailsDTO propertySubmissionsDetailsDTO;
 }
