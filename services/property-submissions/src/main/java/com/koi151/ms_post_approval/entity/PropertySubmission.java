@@ -10,6 +10,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.io.Serial;
+import java.math.BigDecimal;
 
 @Entity(name = "property_submission")
 @Setter

@@ -192,4 +192,9 @@ public class PropertyServiceImpl implements PropertiesService {
                 })
                 .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
     }
+
+    @Override
+    public boolean propertyExistsCheck(Long id) {
+        return checkPropertyExistedById(id);
+    }
 }

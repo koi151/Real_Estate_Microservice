@@ -100,6 +100,20 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
+    @ExceptionHandler(PropertyServiceResponseException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyServiceResponseException(PropertyServiceResponseException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Failed to get properly response from Property service or invalid data response, recheck Property service again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
+
     // CONSTRAIN VIOLATION //
     @ExceptionHandler(ConstraintViolationException.class) // using for common case
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
@@ -117,5 +131,19 @@ public class ControllerAdvisor {
         }
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    // PROPERTY EXCEPTIONS
+    @ExceptionHandler(PropertyNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyNotFoundException(PropertyNotFoundException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Property not existed, recheck its information again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

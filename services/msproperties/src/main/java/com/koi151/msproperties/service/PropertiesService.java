@@ -28,4 +28,6 @@ public interface PropertiesService {
     void createFakeProperties(List<PropertyCreateRequest> fakeProperties);
     DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;
+
+    boolean propertyExistsCheck(Long id);
 }

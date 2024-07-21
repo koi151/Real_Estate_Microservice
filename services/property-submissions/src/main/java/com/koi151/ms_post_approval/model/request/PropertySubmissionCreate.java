@@ -11,7 +11,6 @@ import lombok.*;
 
 public record PropertySubmissionCreate (
     @NotNull(message = "Property id cannot be null")
-    @Positive(message = "Property id must be positive value")
     Long propertyId,
     @NotNull(message = "Account id cannot be null")
     Long accountId,

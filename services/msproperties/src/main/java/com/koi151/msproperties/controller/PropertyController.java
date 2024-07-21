@@ -264,7 +264,7 @@ public class PropertyController {
     }
 
     @PatchMapping("/{id}")
-    public  ResponseEntity<ResponseData> updateProperty(
+    public ResponseEntity<ResponseData> updateProperty(
             @PathVariable(name = "id") Long id,
             @RequestPart(required = false) @Valid PropertyUpdateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
@@ -274,6 +274,15 @@ public class PropertyController {
         responseData.setData(propertiesService.updateProperty(id, property, images));
         responseData.setDesc("Property updated successfully");
 
+        return ResponseEntity.ok(responseData);
+    }
+
+    @GetMapping("/{id}/exists") // used for other domains application request
+    public ResponseEntity<ResponseData> propertyExistsCheck(@PathVariable(name = "id") Long id) {
+        var res = propertiesService.propertyExistsCheck(id);
+        ResponseData responseData = new ResponseData();
+        responseData.setData(res);
+        responseData.setDesc("Success");
         return ResponseEntity.ok(responseData);
     }
 }

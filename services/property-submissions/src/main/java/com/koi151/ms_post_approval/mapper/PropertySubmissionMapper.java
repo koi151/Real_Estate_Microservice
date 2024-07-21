@@ -16,6 +16,7 @@ import java.util.List;
 public interface PropertySubmissionMapper {
 
     PropertySubmission toPropertySubmissionEntity(PropertySubmissionCreate request);
+    @Mapping(target = "status", source = "status.statusName")
     PropertySubmissionCreateDTO toPropertySubmissionCreateDTO(PropertySubmission entity);
 
     @Mapping(target = "status", source = "status.statusName")

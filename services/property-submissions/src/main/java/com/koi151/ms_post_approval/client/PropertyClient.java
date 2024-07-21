@@ -6,11 +6,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 
-@FeignClient(name = "account-service", url = "${application.config.admin-account-url}")
-public interface AccountClient {
-
-    @GetMapping("/{account-id}/name-and-role")
-    ResponseEntity<ResponseData> findAccountNameAndRoleById(
-            @PathVariable("account-id") Long accountId
-    );
+@FeignClient(name = "property-service", url = "${application.config.property-url}")
+public interface PropertyClient {
+    @GetMapping("/{id}/exists")
+    ResponseEntity<ResponseData> propertyExistsCheck (@PathVariable("id") Long accountId);
 }

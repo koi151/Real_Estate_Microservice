@@ -6,7 +6,6 @@ import com.koi151.ms_post_approval.customExceptions.AccountNotFoundException;
 import com.koi151.ms_post_approval.customExceptions.AccountServiceResponseException;
 import com.koi151.ms_post_approval.entity.PropertySubmission;
 import com.koi151.ms_post_approval.mapper.PropertySubmissionMapper;
-import com.koi151.ms_post_approval.mapper.ResponseDataMapper;
 import com.koi151.ms_post_approval.model.dto.*;
 import com.koi151.ms_post_approval.model.request.PropertySubmissionCreate;
 import com.koi151.ms_post_approval.model.request.PropertySubmissionSearchRequest;
