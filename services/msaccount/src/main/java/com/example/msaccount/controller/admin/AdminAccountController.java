@@ -1,5 +1,6 @@
 package com.example.msaccount.controller.admin;
 
+import com.example.msaccount.mapper.ResponseDataMapper;
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
 import com.example.msaccount.model.request.AccountLoginRequest;
@@ -26,6 +27,7 @@ import java.util.List;
 public class AdminAccountController {
 
     private final AccountService accountService;
+    private final ResponseDataMapper responseDataMapper;
 
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AccountLoginRequest request) {
@@ -52,7 +54,7 @@ public class AdminAccountController {
     }
 
     @GetMapping("/{id}/properties")
-    public ResponseEntity<ResponseData> findAccountWithProperties(
+    public ResponseEntity<ResponseData> findAccountWithProperties (
             @PathVariable(name = "id") Long id,
             @RequestParam(name = "page", defaultValue = "1") Integer page,
             @RequestParam(name = "limit", defaultValue = "10") Integer limit)
@@ -76,6 +78,19 @@ public class AdminAccountController {
 
         return ResponseEntity.ok(responseData);
     }
+
+
+    @GetMapping("/{account-id}")
+    public ResponseEntity<ResponseData> findAccountDetails(@PathVariable(name = "account-id") Long accountId) {
+        var account = accountService.findAccountDetails(accountId);
+        return ResponseEntity.ok(
+                ResponseData.builder()
+                        .data(account)
+                        .desc("Get account details succeed")
+                        .build()
+        );
+    }
+
 
     @GetMapping("/{account-id}/name-and-role")
     public ResponseEntity<ResponseData> getAccountNameAndRole(@PathVariable(name = "account-id") Long accountId) {

@@ -1,7 +1,10 @@
 package com.example.msaccount.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -10,6 +13,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
+@AllArgsConstructor
+@NoArgsConstructor
+@SuperBuilder
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractDTO<T> implements Serializable {
 

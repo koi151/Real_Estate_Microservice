@@ -1,6 +1,6 @@
-package com.example.msaccount.model.response;
+package com.koi151.property_submissions.model.response;
 
-import com.example.msaccount.model.dto.AbstractDTO;
+import com.koi151.property_submissions.model.dto.AbstractDTO;
 import lombok.*;
 import lombok.experimental.SuperBuilder;
 
@@ -14,11 +14,11 @@ import java.io.Serial;
 public class ResponseData extends AbstractDTO<Object> {
 
     @Serial
-    private static final long serialVersionUID = -7145586484567833095L;
+    private static final long serialVersionUID = -7081110393196421994L;
 
-    private short status = 200;
     private Object data;
-    private String desc;
+    private String description;
+    private int status = 200;
     private boolean isSuccess = true;
     private PageMeta meta;
 }

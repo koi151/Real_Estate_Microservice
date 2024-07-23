@@ -4,8 +4,7 @@ import com.example.msaccount.enums.AccountStatusEnum;
 import lombok.*;
 
 @Builder
-@Getter
-@Setter
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountDTO {
@@ -15,7 +14,7 @@ public class AccountDTO {
     private String role;
     private String accountName;
     private String phone;
-    private AccountStatusEnum accountStatus;
+    private String accountStatus;
     private String firstName;
     private String lastName;
     private String email;

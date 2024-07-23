@@ -16,6 +16,7 @@ import java.util.List;
 
 public interface AccountService {
     List<AdminAccountDTO> findAllAdminAccounts();
+    AccountDTO findAccountDetails(Long accountId);
     AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id);
     Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
     AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar);

@@ -1,6 +1,7 @@
 package com.example.msaccount.mapper;
 
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
 import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
 import com.example.msaccount.model.dto.PropertyDTO;
@@ -23,4 +24,9 @@ public interface AccountMapper {
 
     @Mapping(source = "role.name", target = "role")
     AccountWithNameAndRoleDTO toAccountWithNameAndRoleDTO(Account account);
+
+    @Mapping(target = "role", source = "role.name")
+    @Mapping(target = "accountStatus", source = "accountStatus.status")
+    @Mapping(target = "accountType", source = "role.accountType.accountType")
+    AccountDTO toAccountDTO(Account account);
 }

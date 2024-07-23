@@ -87,7 +87,7 @@ public class AccountConverter {
                 .accountId(account.getAccountId())
                 .accountName(account.getAccountName())
                 .phone(account.getPhone())
-                .accountStatus(account.getAccountStatus())
+                .accountStatus(account.getAccountStatus().getStatus())
                 .firstName(account.getFirstName())
                 .lastName(account.getLastName())
                 .email(account.getEmail())

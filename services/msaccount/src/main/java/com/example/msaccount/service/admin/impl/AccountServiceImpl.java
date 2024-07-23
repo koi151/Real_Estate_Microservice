@@ -73,6 +73,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
+    public AccountDTO findAccountDetails(Long accountId) {
+        return accountMapper.toAccountDTO(
+                accountRepository.findByAccountIdAndDeleted(accountId, false)
+                        .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId))
+        );
+    }
+
+    @Override
     public AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id) {
         return accountRepository.findByAccountIdAndDeleted(id, false)
                 .map(accountMapper::toAccountWithNameAndRoleDTO)
@@ -217,7 +225,7 @@ public class AccountServiceImpl implements AccountService {
                 .lastName(savedAccount.getLastName())
                 .email(savedAccount.getEmail())
                 .phone(savedAccount.getPhone())
-                .accountStatus(savedAccount.getAccountStatus())
+                .accountStatus(savedAccount.getAccountStatus().getStatus())
                 .avatarUrl(savedAccount.getAvatarUrl())
                 .build();
     }
