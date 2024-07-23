@@ -1,5 +1,6 @@
 package com.example.msaccount.controller.admin;
 
+import com.example.msaccount.mapper.PaginationContext;
 import com.example.msaccount.mapper.ResponseDataMapper;
 import com.example.msaccount.model.dto.AccountDTO;
 import com.example.msaccount.model.dto.AccountSearchDTO;
@@ -32,10 +33,10 @@ public class AdminAccountController {
     @PostMapping("/login")
     public ResponseEntity<?> login(@Valid @RequestBody AccountLoginRequest request) {
         try {
-            ResponseData responseData = new ResponseData();
-            responseData.setData(accountService.login(request.getAccountName(), request.getPassword()));
-            responseData.setDesc("Account login successful");
-
+            ResponseData responseData = ResponseData.builder()
+                .data(accountService.login(request.getAccountName(), request.getPassword()))
+                .desc("Account login successful")
+                .build();
             return new ResponseEntity<>(responseData, HttpStatus.ACCEPTED);
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
@@ -45,12 +46,12 @@ public class AdminAccountController {
     @GetMapping("/")
     public ResponseEntity<ResponseData> findAllAdminAccounts() {
         var accounts = accountService.findAllAdminAccounts();
-
-        ResponseData responseData = new ResponseData();
-        responseData.setData(accounts);
-        responseData.setDesc(!accounts.isEmpty() ? "Success" : "No admin account found");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(
+                ResponseData.builder()
+                    .data(accounts)
+                    .desc(!accounts.isEmpty() ? "Success" : "No admin account found")
+                    .build()
+        );
     }
 
     @GetMapping("/{id}/properties")
@@ -63,13 +64,8 @@ public class AdminAccountController {
         var accountPage = accountService.findAccountWithProperties(id, pageable);
         var accountProperties = accountPage.getContent().get(0).getProperties();
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(accountPage.getContent());
-        responseData.setTotalItems(accountPage.getTotalElements());
-
-        responseData.setMaxPageItems(limit);
-        responseData.setTotalPages(accountPage.getTotalPages());
-        responseData.setCurrentPage(accountPage.getNumber() + 1);
+        PaginationContext paginationContext = new PaginationContext(page, limit);
+        ResponseData responseData = responseDataMapper.toResponseData(accountPage, paginationContext);
 
         if (accountPage.hasContent() && !accountProperties.isEmpty())
             responseData.setDesc("Account with properties found.");
@@ -78,7 +74,6 @@ public class AdminAccountController {
 
         return ResponseEntity.ok(responseData);
     }
-
 
     @GetMapping("/{account-id}")
     public ResponseEntity<ResponseData> findAccountDetails(@PathVariable(name = "account-id") Long accountId) {
@@ -91,16 +86,15 @@ public class AdminAccountController {
         );
     }
 
-
     @GetMapping("/{account-id}/name-and-role")
     public ResponseEntity<ResponseData> getAccountNameAndRole(@PathVariable(name = "account-id") Long accountId) {
         var account = accountService.findAccountNameAndRoleById(accountId);
-
-        ResponseData responseData = new ResponseData();
-        responseData.setData(account);
-        responseData.setDesc("Get account with name and role succeed");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(
+                ResponseData.builder()
+                    .data(account)
+                    .desc("Get account with name and role succeed")
+                    .build()
+        );
     }
 
     @PostMapping("/")
@@ -108,13 +102,13 @@ public class AdminAccountController {
             @RequestPart @Valid AccountCreateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ) {
-            var accountCreated = accountService.createAccount(account, avatar);
-
-            ResponseData responseData = new ResponseData();
-            responseData.setData(accountCreated);
-            responseData.setDesc("Success");
-
-            return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+        var accountCreated = accountService.createAccount(account, avatar);
+        return new ResponseEntity<>(
+                ResponseData.builder()
+                        .data(accountCreated)
+                        .desc("Account created successfully")
+                        .build()
+                , HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
@@ -123,12 +117,12 @@ public class AdminAccountController {
             @RequestPart(required = false) AccountUpdateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ){
-        ResponseData responseData = new ResponseData();
-
-        responseData.setData(accountService.updateAccount(id, account, avatar));
-        responseData.setDesc("Success");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(
+                ResponseData.builder()
+                    .data(accountService.updateAccount(id, account, avatar))
+                    .desc("Account updated successfully")
+                    .build()
+        );
     }
 
     @GetMapping("/status/{status}")
@@ -137,23 +131,24 @@ public class AdminAccountController {
             @RequestParam(defaultValue = "4") Integer pageSize
     ) {
         AccountStatusEnum se = AccountStatusEnum.valueOf(status.toUpperCase());
-        List<AccountSearchDTO> accountsData = accountService.getAccountsByStatus(se, pageSize);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(accountsData);
-        responseData.setDesc((!accountsData.isEmpty()) ? "Success" : "No account " + status + " found");
-
-        return ResponseEntity.ok(responseData);
+        var accounts = accountService.getAccountsByStatus(se, pageSize);
+        return ResponseEntity.ok(
+                ResponseData.builder()
+                        .data(accounts)
+                        .desc((!accounts.isEmpty()) ? "Success" : "No account with status " + status + " found")
+                        .build()
+        );
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseData> deleteAdminAccount(@PathVariable(name = "id") Long id) {
         accountService.deleteAdminAccount(id);
-
-        ResponseData responseData = new ResponseData();
-        responseData.setDesc("Account deleted successful");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(
+            ResponseData.builder()
+                .desc("Account deleted successful")
+                .build()
+        );
     }
 
 }
