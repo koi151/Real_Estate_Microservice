@@ -98,6 +98,19 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
+    @ExceptionHandler(ServiceCommunicationException.class)
+    public ResponseEntity<ErrorResponse> handleServiceCommunicationException(ServiceCommunicationException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Failed to get properly response from service or invalid response from service, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
+
     @ExceptionHandler(AccountServiceCommunicationException.class)
     public ResponseEntity<ErrorResponse> handleAccountServiceCommunicationException(AccountServiceCommunicationException ex) {
 

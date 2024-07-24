@@ -13,4 +13,9 @@ public interface AccountClient {
     ResponseEntity<ResponseData> findAccountNameAndRoleById(
             @PathVariable("account-id") Long accountId
     );
+
+    @GetMapping("/{account-id}")
+    ResponseEntity<ResponseData> findAccountDetails(
+            @PathVariable(name = "account-id") Long accountId
+    );
 }
