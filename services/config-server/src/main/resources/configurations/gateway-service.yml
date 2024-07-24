@@ -28,3 +28,7 @@ spring:
           uri: http://localhost:8070/
           predicates:
             - Path=/api/v1/property-submissions/**
+        - id: payment
+          uri: http://localhost:8080/
+          predicates:
+            - Path=/api/v1/payment/**
