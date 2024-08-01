@@ -7,6 +7,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Getter
@@ -17,16 +18,16 @@ public class PropertySearchDTO {
     private String title;
     private String type;
     private Integer categoryId;
-    private Float area;
-    private Double rentalPrice;
-    private Double salePrice;
+    private BigDecimal area;
+    private BigDecimal rentalPrice;
+    private BigDecimal salePrice;
     private String description;
     private Integer totalFloor;
     private String houseDirection;
     private String balconyDirection;
     private String status;
     private String availableFrom;
-    private String address;
+    private String address; //
     private List<String> imageUrls;
-    private List<RoomNameQuantityDTO> rooms;
+    private List<RoomNameQuantityDTO> rooms;//
 }

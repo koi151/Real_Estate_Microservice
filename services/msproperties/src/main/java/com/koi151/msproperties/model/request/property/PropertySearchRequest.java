@@ -1,31 +1,37 @@
 package com.koi151.msproperties.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.koi151.msproperties.annotation.PriceRangeConstraint;
 import com.koi151.msproperties.enums.DirectionEnum;
-import com.koi151.msproperties.enums.PaymentScheduleEnum;
-import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.model.request.address.AddressSearchRequest;
+import com.koi151.msproperties.model.request.propertyCategory.PropertyCategorySearchRequest;
+import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentSearchRequest;
+import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleSearchRequest;
+import com.koi151.msproperties.model.request.rooms.RoomSearchRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 public record PropertySearchRequest (
-    @Size(max = 100, message = "Title search must at most {max} characters")
+    @Size(max = 100, message = "Title searching must at most {max} characters")
     String title,
-    PropertyTypeEnum type,
-    PaymentScheduleEnum paymentSchedule,
+    @Valid
+    PropertyForRentSearchRequest propertyForRent,
+    @Valid
+    PropertyForSaleSearchRequest propertyForSale,
+    @Valid
+    PropertyCategorySearchRequest propertyCategory,
     DirectionEnum houseDirection,
     DirectionEnum balconyDirection,
     StatusEnum status,
-
-    Integer categoryId,
     @PositiveOrZero(message = "Min area must be non-negative value")
     BigDecimal areaFrom,
 
-    @PositiveOrZero(message = "Max area must be non-negative value")
-    @DecimalMax(value = "99999999.99", message = "Area search value cannot exceed 99,999,999.99")
+    @PositiveOrZero(message = "Area searching value must be non-negative value")
+    @DecimalMax(value = "99999999.99", message = "Area searching value cannot exceed 99,999,999.99")
     BigDecimal areaTo,
 
     @PositiveOrZero(message = "Min price must be non-negative value")
@@ -38,28 +44,18 @@ public record PropertySearchRequest (
     @Size(max = 1000, message = "Description search must be at most {max} characters long")
     String description,
 
-    @PositiveOrZero(message = "Total floor search request must be non-negative value")
+    @PositiveOrZero(message = "Total floor searching request must be non-negative value")
     @Max(value = 999, message = "Total floor search value cannot exceed 999")
     Short totalFloor,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     String availableFrom,
 
-    @Size(max = 1000, message = "Term search cannot exceed 1000 characters long")
+    @Size(max = 1000, message = "Term searching cannot exceed 1000 characters long")
     String term,
 
-    @Valid // need update
-    AddressSearchRequest addressSearchRequest,
-
-    @PositiveOrZero(message = "Number of bedrooms must be non-negative value")
-    @Max(value = 999, message = "Number of bedroom search cannot exceed {max}")
-    Short bedrooms,
-
-    @PositiveOrZero(message = "Number of bathrooms must be non-negative value")
-    @Max(value = 999, message = "Number of bathrooms search cannot exceed {max}")
-    Short bathrooms,
-
-    @PositiveOrZero(message = "Number of kitchens must be non-negative value")
-    @Max(value = 999, message = "Number of kitchens search cannot exceed {max}")
-    Short kitchens
+    @Valid
+    AddressSearchRequest address,
+    @Valid
+    List<RoomSearchRequest> rooms
 ){}

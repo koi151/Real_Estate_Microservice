@@ -5,10 +5,10 @@ import jakarta.validation.constraints.Size;
 
 public record PropertyCategorySearchRequest (
 
-    @Size(max = 100, message = "Title must be at most 100 characters long")
+    @Size(max = 100, message = "Category title searching must be at most 100 characters long")
     String title,
 
-    @Size(max = 1000, message = "Description search must be at most {max} characters long")
+    @Size(max = 1000, message = "Category searching must be at most {max} characters long")
     String description,
 
     StatusEnum status,

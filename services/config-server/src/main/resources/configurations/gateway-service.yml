@@ -12,10 +12,6 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: login
-          uri: http://localhost:8080/
-          predicates:
-            - Path=/api/v1/login
         - id: properties
           uri: http://localhost:8050/
           predicates:
@@ -23,7 +19,7 @@ spring:
         - id: account
           uri: http://localhost:8060/
           predicates:
-            - Path=/api/v1/account/**, /api/v1/admin/accounts/**
+            - Path=/api/v1/accounts/**, /api/v1/admin/accounts/**
         - id: property-submissions
           uri: http://localhost:8070/
           predicates:

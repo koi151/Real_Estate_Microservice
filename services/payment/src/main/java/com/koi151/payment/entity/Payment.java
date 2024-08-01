@@ -31,7 +31,7 @@ public class Payment extends BaseEntity {
     @NotNull(message = "Property id is mandatory in payment")
     private Long propertyId;
 
-    @Column(name = "amount", precision = 12, scale = 2, columnDefinition = "UNSIGNED", nullable = false)
+    @Column(name = "amount", precision = 12, scale = 2, nullable = false)
     @NotNull(message = "Payment amount is mandatory")
     @PositiveOrZero(message = "Payment amount must be non-negative value")
     @DecimalMax(value = "99999999999", message = "Rental price cannot exceed 99,999,999,999")

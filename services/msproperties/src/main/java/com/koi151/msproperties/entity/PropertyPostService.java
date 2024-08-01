@@ -35,7 +35,7 @@ public class PropertyPostService {
     @Column(name = "posting_package", nullable = false)
     private PostingPackageEnum postingPackage;
 
-    @Column(name = "priority_pushes", columnDefinition = "SMALLINT UNSIGNED")
+    @Column(name = "priority_pushes", columnDefinition = "SMALLINT")
     @PositiveOrZero(message = "Priority pushes time must be non-negative value")
     @Max(value = 10000, message = "Priority pushes time cannot exceed 10000")
     private short priorityPushes;

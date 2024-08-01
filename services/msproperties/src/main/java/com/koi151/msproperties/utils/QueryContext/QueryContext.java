@@ -6,14 +6,15 @@ import jakarta.persistence.criteria.*;
 import java.util.List;
 import java.util.Map;
 
-public record QueryConditionContextProperty(
+public record QueryContext<T>(
         CriteriaBuilder criteriaBuilder,
-        CriteriaQuery<Property> criteriaQuery,
-        Root<Property> root,
+        CriteriaQuery<?> criteriaQuery,
+        Root<T> root,
         List<Predicate> predicates,
-        Map<String, Join<Property, ?>> joins
+        Map<String, Join<T, ?>> joins
+
 ) {
-    public void addJoin(String name, Join<Property, ?> join) {
+    public void addJoin(String name, Join<T, ?> join) {
         joins.put(name, join);
     }
 }

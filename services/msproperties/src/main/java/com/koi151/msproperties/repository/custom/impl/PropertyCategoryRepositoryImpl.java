@@ -44,7 +44,7 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
 
             // Apply normal query condition
             Set<String> excludedFields = new HashSet<>(); // currently empty
-            CustomRepositoryUtils.appendNormalQueryConditions(request, root, cb, predicates, excludedFields);
+//            CustomRepositoryUtils.appendNormalQueryConditions(request, root, cb, predicates, excludedFields);
         }
 
         // Apply predicates if there are any, otherwise no filter (select all)

@@ -11,6 +11,27 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
+@NamedEntityGraph(name = "Property.search",
+    attributeNodes = {
+        @NamedAttributeNode("propertyForSale"),
+        @NamedAttributeNode("propertyForRent"),
+        @NamedAttributeNode("address"),
+        @NamedAttributeNode("rooms"),
+        @NamedAttributeNode("propertyPostService")
+    }
+)
+@Table(
+    indexes = {
+        @Index(name = "idx_area", columnList = "area"),
+        @Index(name = "idx_title", columnList = "title"),
+        @Index(name = "idx_category_id", columnList = "category_id"),
+        @Index(name = "idx_account_id", columnList = "account_id"),
+        @Index(name = "idx_available_from", columnList = "available_from"),
+        @Index(name = "idx_status", columnList = "status"),
+        @Index(name = "idx_house_direction", columnList = "house_direction"),
+        @Index(name = "idx_balcony_direction", columnList = "balcony_direction")
+    }
+)
 @Entity(name = "property")
 @Getter
 @Setter
@@ -27,23 +48,23 @@ public class Property extends BaseEntity {
     @Column(name = "property_id")
     private Long propertyId;
 
-    @OneToOne(mappedBy = "property",
+    @OneToOne(mappedBy = "property", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForSale propertyForSale;
 
-    @OneToOne(mappedBy = "property",
+    @OneToOne(mappedBy = "property", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyForRent propertyForRent;
 
-    @OneToOne(mappedBy = "property",
+    @OneToOne(mappedBy = "property", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Address address;
 
-    @OneToOne(mappedBy = "property",  fetch = FetchType.LAZY, // querying for properties without needing their payment details.
+    @OneToOne(mappedBy = "property",  fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private PropertyPostService propertyPostService;
 
-    @OneToMany(mappedBy = "property", fetch = FetchType.LAZY,
+    @OneToMany(mappedBy = "property",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Room> rooms;
 
@@ -96,4 +117,10 @@ public class Property extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
     private DirectionEnum balconyDirection;
+
+    public PropertyPostService getPropertyPostService() {
+        System.out.println("Fetching propertyPostService");
+        return propertyPostService;
+    }
+
 }

@@ -17,6 +17,7 @@ import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -34,8 +35,8 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Override
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
-        Page<Property> propertyEntities = propertyRepository.findPropertiesByCriteria(request, pageable);
-        return propertyEntities.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
+        Page<Property> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
+        return propertyPage.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
     }
 
     @Override

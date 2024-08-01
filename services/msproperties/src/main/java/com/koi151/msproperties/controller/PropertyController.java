@@ -63,7 +63,7 @@ public class PropertyController {
     @PostMapping("/generateFakeProperties")
     private ResponseEntity<ResponseData> generateFakeProperties() {
         Faker faker = new Faker();
-        int numberOfFakeProperties = 2000;
+        int numberOfFakeProperties = 20000;
 
         propertiesService.createFakeProperties(IntStream.range(0, numberOfFakeProperties)
                 .mapToObj(i -> {
