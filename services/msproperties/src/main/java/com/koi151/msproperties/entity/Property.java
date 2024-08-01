@@ -11,15 +11,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@NamedEntityGraph(name = "Property.search",
-    attributeNodes = {
-        @NamedAttributeNode("propertyForSale"),
-        @NamedAttributeNode("propertyForRent"),
-        @NamedAttributeNode("address"),
-        @NamedAttributeNode("rooms"),
-        @NamedAttributeNode("propertyPostService")
-    }
-)
 @NamedEntityGraph(name = "Property.saleSearch",
     attributeNodes = {
         @NamedAttributeNode("propertyForSale")

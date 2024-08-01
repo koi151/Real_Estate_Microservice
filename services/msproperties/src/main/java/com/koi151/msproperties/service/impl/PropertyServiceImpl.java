@@ -1,6 +1,7 @@
 package com.koi151.msproperties.service.impl;
 
 import com.koi151.msproperties.entity.*;
+import com.koi151.msproperties.enums.RoomTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
@@ -164,7 +165,7 @@ public class PropertyServiceImpl implements PropertiesService {
         List<Rooms> currentRooms = existingProperty.getRooms();
 
         for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
-            String roomType = updatedRoom.roomType();
+            RoomTypeEnum roomType = updatedRoom.roomType();
             short quantity = updatedRoom.quantity();
 
             Rooms existingRooms = currentRooms.stream()

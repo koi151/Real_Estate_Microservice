@@ -1,5 +1,6 @@
 package com.koi151.msproperties.entity;
 
+import com.koi151.msproperties.enums.RoomTypeEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotEmpty;
@@ -24,13 +25,12 @@ public class Rooms {
     @NotNull(message = "Property id is mandatory")
     private Property property;
 
-    @Column(name = "room_type", nullable = false, length = 50)
-    @NotEmpty(message = "Room type is mandatory")
-    @Size(max = 50, message = "Room type cannot exceed 50 characters")
-    private String roomType;
+    @Column(name = "room_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private RoomTypeEnum roomType;
 
     @Column(name = "quantity", nullable = false, columnDefinition = "SMALLINT UNSIGNED")
     @NotNull(message = "Room quantity is mandatory")
-    @Max(value = 999, message = "Room quantity cannot exceed 999")
+    @Max(value = 999, message = "{roomType} quantity cannot exceed 999")
     private short quantity;
 }

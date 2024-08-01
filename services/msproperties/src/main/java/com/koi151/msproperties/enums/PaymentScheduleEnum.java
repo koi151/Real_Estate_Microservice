@@ -18,7 +18,6 @@ public enum PaymentScheduleEnum {
     OTHER("According to agreement");
 
     private final String scheduleName;
-
     private static final PaymentScheduleEnum[] VALUES = values(); // Cache enum values for performance
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)

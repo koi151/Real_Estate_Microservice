@@ -5,6 +5,8 @@ import com.koi151.msproperties.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum PropertyTypeEnum {
@@ -12,6 +14,7 @@ public enum PropertyTypeEnum {
     SALE("For sale");
 
     private final String type;
+    private static final PropertyTypeEnum[] VALUES = values(); // Cache enum values for performance
 
     public boolean isPropertyForRent() {
         return this == RENT;
@@ -22,7 +25,11 @@ public enum PropertyTypeEnum {
     }
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static PropertyTypeEnum fromString(String status) {
-        return status == null ? null : PropertyTypeEnum.valueOf(status.toUpperCase());
+    public static PropertyTypeEnum fromString(String s) {
+        return s == null ? null
+                : Arrays.stream(VALUES)
+                .filter(value -> value.name().equals(s.toUpperCase()))
+                .findFirst()
+                .orElseThrow(() -> new InvalidEnumValueException("Invalid PropertyTypeEnum enum value: " + s));
     }
 }

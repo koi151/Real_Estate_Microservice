@@ -5,6 +5,8 @@ import com.koi151.msproperties.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Arrays;
+
 @Getter
 @RequiredArgsConstructor
 public enum DirectionEnum {
@@ -18,9 +20,15 @@ public enum DirectionEnum {
     SOUTH_WEST("South West");
 
     private final String directionName;
+    private static final DirectionEnum[] VALUES = values(); // Cache enum values for performance
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static DirectionEnum fromString(String status) {
-        return status == null ? null : DirectionEnum.valueOf(status.toUpperCase());
+    public static DirectionEnum fromString(String s) {
+        return s == null ? null
+                : Arrays.stream(VALUES)
+                .filter(value -> value.name().equals(s.toUpperCase())) // case-sensitive comparison
+                .findFirst()
+                .orElseThrow(() -> new InvalidEnumValueException("Invalid DirectionEnum enum value: " + s));
     }
+
 }

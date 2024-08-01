@@ -35,7 +35,7 @@ public class RoomServiceImpl implements RoomService {
 
         return RoomDTO.builder()
                 .roomId(savedRooms.getRoomId())
-                .roomType(savedRooms.getRoomType())
+                .roomType(String.valueOf(savedRooms.getRoomType()))
                 .quantity(savedRooms.getQuantity())
                 .propertyId(propertyId)
                 .build();

@@ -27,8 +27,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -86,6 +85,7 @@ public class PropertyController {
                     DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
                     int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
 
+
                     // Generate fake data directly in the stream
                     AddressCreateRequest address = AddressCreateRequest.builder()
                             .city(faker.address().city())
@@ -120,8 +120,26 @@ public class PropertyController {
                             .daysPosted(daysPostedEnums[randomDaysPostedIndex])
                             .build();
 
-//                    RoomCreateUpdateRequest roomCreateReq = RoomCreateUpdateRequest.builder()
-//                            .roomType()
+                    // rooms
+                    RoomTypeEnum[] roomTypes = RoomTypeEnum.values();
+                    Set<RoomTypeEnum> usedRoomTypes = new HashSet<>(); // Track used room types
+                    List<RoomCreateUpdateRequest> rooms = new ArrayList<>();
+
+                    int numRooms = faker.number().numberBetween(1, 4);
+                    for (int j = 0; j < numRooms; j++) {
+                        RoomTypeEnum randomRoomType;
+                        do {
+                            int randomRoomTypeIndex = faker.number().numberBetween(0, roomTypes.length);
+                            randomRoomType = roomTypes[randomRoomTypeIndex];
+                        } while (usedRoomTypes.contains(randomRoomType));
+
+                        usedRoomTypes.add(randomRoomType);
+
+                        rooms.add(RoomCreateUpdateRequest.builder()
+                                .roomType(randomRoomType)
+                                .quantity((short) faker.number().numberBetween(1, 10))
+                                .build());
+                    }
 
 
                     LocalDate availableFrom = LocalDate.of(
@@ -137,6 +155,7 @@ public class PropertyController {
                             .propertyPostService(postServiceCreate)
                             .accountId((long) faker.number().numberBetween(1, 7))
                             .address(address)
+                            .rooms(rooms)
                             .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
                             .description(faker.lorem().paragraph())
                             .totalFloor((short) faker.number().numberBetween(0, 20))
