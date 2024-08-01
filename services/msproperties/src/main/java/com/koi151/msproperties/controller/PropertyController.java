@@ -12,6 +12,7 @@ import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
 import com.koi151.msproperties.model.request.propertyForSale.PropertyForSaleCreateRequest;
 import com.koi151.msproperties.model.request.propertyPostService.PropertyPostServiceCreateUpdateRequest;
+import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperties.service.PropertiesService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -52,7 +53,7 @@ public class PropertyController {
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate"));
         var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
-        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties succeed");
@@ -84,8 +85,6 @@ public class PropertyController {
 
                     DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
                     int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
-
-
 
                     // Generate fake data directly in the stream
                     AddressCreateRequest address = AddressCreateRequest.builder()
@@ -120,6 +119,10 @@ public class PropertyController {
                             .postingDate(postingDate)
                             .daysPosted(daysPostedEnums[randomDaysPostedIndex])
                             .build();
+
+//                    RoomCreateUpdateRequest roomCreateReq = RoomCreateUpdateRequest.builder()
+//                            .roomType()
+
 
                     LocalDate availableFrom = LocalDate.of(
                             2024,
@@ -163,7 +166,7 @@ public class PropertyController {
 
         var propertiesPage = propertiesService.getHomeProperties(params, pageable);
 
-        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties succeed");
@@ -192,7 +195,7 @@ public class PropertyController {
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
         var propertiesPage = propertiesService.findAllPropertiesByCategory(categoryId, pageable);
 
-        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty() ?
                 "No properties found with id: " + categoryId : "Success");
 
@@ -209,7 +212,7 @@ public class PropertyController {
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("createdDate").descending());
         var propertiesPage = propertiesService.findAllPropertiesByAccount(accountId, pageable);
 
-        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No property found"
                 : "Get properties by account id succeed");
@@ -229,7 +232,7 @@ public class PropertyController {
 
         var propertiesPage = propertiesService.findPropertiesByStatus(se, pageable);
 
-        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, limit);
+        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
                 ? "No properties found with status " + status
                 : "Success");

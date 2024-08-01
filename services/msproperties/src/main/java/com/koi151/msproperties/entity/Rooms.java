@@ -13,7 +13,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class Room {
+public class Rooms {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

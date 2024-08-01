@@ -1,6 +1,6 @@
 package com.koi151.msproperties.service.impl;
 
-import com.koi151.msproperties.entity.Room;
+import com.koi151.msproperties.entity.Rooms;
 import com.koi151.msproperties.model.dto.RoomDTO;
 import com.koi151.msproperties.entity.Property;
 import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
@@ -25,18 +25,18 @@ public class RoomServiceImpl implements RoomService {
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + propertyId));
 
-        Room room = Room.builder()
+        Rooms rooms = Rooms.builder()
                 .roomType(request.roomType())
                 .quantity(request.quantity())
                 .property(property) // Associate the room with the property
                 .build();
 
-        Room savedRoom = roomRepository.save(room);
+        Rooms savedRooms = roomRepository.save(rooms);
 
         return RoomDTO.builder()
-                .roomId(savedRoom.getRoomId())
-                .roomType(savedRoom.getRoomType())
-                .quantity(savedRoom.getQuantity())
+                .roomId(savedRooms.getRoomId())
+                .roomType(savedRooms.getRoomType())
+                .quantity(savedRooms.getQuantity())
                 .propertyId(propertyId)
                 .build();
     }

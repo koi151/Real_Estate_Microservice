@@ -43,8 +43,7 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
             QueryConditionContextPropertyCategory context = new QueryConditionContextPropertyCategory(cb, cq, root, predicates);
 
             // Apply normal query condition
-            Set<String> excludedFields = new HashSet<>(); // currently empty
-//            CustomRepositoryUtils.appendNormalQueryConditions(request, root, cb, predicates, excludedFields);
+//            Set<String> excludedFields = new HashSet<>(); // currently empty
         }
 
         // Apply predicates if there are any, otherwise no filter (select all)
@@ -56,3 +55,4 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
         return CustomRepositoryUtils.applyPagination(typedQuery, pageable);
     }
 }
+

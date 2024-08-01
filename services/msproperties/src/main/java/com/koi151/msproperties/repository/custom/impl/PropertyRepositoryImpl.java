@@ -12,10 +12,9 @@ import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Repository;
@@ -29,8 +28,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     @PersistenceContext // used to inject an EntityManager into a class
     private EntityManager entityManager;
 
-    private static final Logger logger = LoggerFactory.getLogger(PropertyRepositoryImpl.class);
-
     private static void applyPriceFilters(PropertySearchRequest request, QueryContext<Property> context) {
         List<Predicate> predicates = context.predicates();
         CriteriaBuilder cb = context.criteriaBuilder();
@@ -38,21 +35,21 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         Join<Property, ?> saleJoin = context.joins().get("propertyForSale");
         Join<Property, ?> rentJoin = context.joins().get("propertyForRent");
 
-        if (saleJoin != null || rentJoin != null) {
-            if (saleJoin != null) {
-                if (request.priceFrom() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.priceFrom()));
-                }
-                if (request.priceTo() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.priceTo()));
-                }
-            } else { // rentJoin != null
-                if (request.priceFrom() != null) {
-                    predicates.add(cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.priceFrom()));
-                }
-                if (request.priceTo() != null) {
-                    predicates.add(cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.priceTo()));
-                }
+        if (saleJoin != null) {
+            if (request.propertyForSale().priceFrom() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.propertyForSale().priceFrom()));
+            }
+            if (request.propertyForSale().priceTo() != null) {
+                predicates.add(cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.propertyForSale().priceTo()));
+            }
+        }
+
+        if (rentJoin != null) {
+            if (request.propertyForRent().priceFrom() != null) {
+                predicates.add(cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.propertyForRent().priceFrom()));
+            }
+            if (request.propertyForRent().priceTo() != null) {
+                predicates.add(cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.propertyForRent().priceTo()));
             }
         }
     }
@@ -63,10 +60,10 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             Join<Property, ?> roomJoin = context.joins().get("rooms");
 
             request.rooms().forEach(roomReq -> context.predicates().add(
-                cb.and(
-                    cb.equal(roomJoin.get("roomType"), roomReq.roomType()),
-                    cb.equal(roomJoin.get("quantity"), roomReq.quantity())
-                )
+                    cb.and(
+                            cb.equal(roomJoin.get("roomType"), roomReq.roomType()),
+                            cb.equal(roomJoin.get("quantity"), roomReq.quantity())
+                    )
             ));
         }
     }
@@ -88,10 +85,10 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
         if (StringUtil.checkString(request.term())) {
             if (request.propertyForRent() != null) {
-                predicates.add(cb.like(context.joins().get("rentJoin").get("rentalTerm"),  "%" + request.term() + "%"));
+                predicates.add(cb.like(context.joins().get("rentJoin").get("rentalTerm"), "%" + request.term() + "%"));
 
             } else if (request.propertyForSale() != null) {
-                predicates.add(cb.like(context.joins().get("saleJoin").get("saleTerm"),  "%" + request.term() + "%"));
+                predicates.add(cb.like(context.joins().get("saleJoin").get("saleTerm"), "%" + request.term() + "%"));
             }
         }
 
@@ -99,10 +96,10 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         if (addressRequest != null && addressJoin != null) {
             // address queries
             if (StringUtil.checkString(addressRequest.city())) {
-                predicates.add(cb.like(addressJoin.get("city"),"%" + addressRequest.city() + "%"));
+                predicates.add(cb.like(addressJoin.get("city"), "%" + addressRequest.city() + "%"));
             }
             if (StringUtil.checkString(addressRequest.district())) {
-                predicates.add(cb.like(addressJoin.get("district"),"%" + addressRequest.district() + "%"));
+                predicates.add(cb.like(addressJoin.get("district"), "%" + addressRequest.district() + "%"));
             }
             if (StringUtil.checkString(addressRequest.ward())) {
                 predicates.add(cb.like(addressJoin.get("ward"), "%" + addressRequest.ward() + "%"));
@@ -118,50 +115,101 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
     public static void joinColumns(PropertySearchRequest request, QueryContext<Property> context) {
         // Using LEFT JOIN ensures that all properties are included in the search results, even if they do not have associated sale, rental, ..etc records
-
-        if (request.propertyForRent() == null && request.propertyForSale() == null ) {
-            context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
+        if (request.propertyForRent() != null) {
             context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
-        } else if (request.propertyForRent() != null) {
-            context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
-        } else {
+        }
+        if (request.propertyForSale() != null) {
             context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
         }
-
         if (RequestUtil.locationRequested(request)) {
             context.addJoin("address", context.root().join("address", JoinType.LEFT));
         }
-
         if (request.rooms() != null && !request.rooms().isEmpty()) {
             context.addJoin("rooms", context.root().join("rooms", JoinType.LEFT));
         }
     }
 
-
     @Override
     public Page<Property> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
-        CriteriaBuilder cb = entityManager.getCriteriaBuilder(); // API in JPA for creating dynamic query
-        CriteriaQuery<Property> cq = cb.createQuery(Property.class); // call method from EntityManager to get CriteriaQuery for building queries
-        Root<Property> root = cq.from(Property.class); // define PropertyEntity as root entity for queries
-
-
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Property> cq = cb.createQuery(Property.class);
+        Root<Property> root = cq.from(Property.class);
+        List<Predicate> predicates = new ArrayList<>();
         Map<String, Join<Property, ?>> joins = new HashMap<>();
-        List<Predicate> predicates = new ArrayList<>(); // interface in Criteria, used for building filter conditions for Criteria queries
 
         QueryContext<Property> context = new QueryContext<>(cb, cq, root, predicates, joins);
 
-        // Exclude specific fields
-        Set<String> excludedFields = new HashSet<>(Set.of( // Exclude fields that for special query method handling
-                "propertyForRent", "propertyForSale", "propertyCategory", "areaFrom", "areaTo",
-                "priceFrom", "priceTo", "address", "rooms"
-        ));
+        if (request != null) {
+            joinColumns(request, context);
 
-        // Apply default query options (LIKE for Strings, EXACT for others)
+            // Exclude specific fields
+            Set<String> excludedFields = new HashSet<>(Set.of(
+                    "propertyForRent", "propertyForSale", "propertyCategory", "areaFrom", "areaTo",
+                    "priceFrom", "priceTo", "address", "rooms"
+            ));
+            Map<String, QueryFieldOptionEnum> queryOptions = buildQueryOptions(request, excludedFields);
+            CustomRepositoryUtils.appendNormalQueryConditions(request, context, queryOptions);
+            applySpecialQueryConditions(request, context);
+        }
+
+        predicates.add(cb.equal(root.get("deleted"), false)); //
+        cq.where(predicates.toArray(new Predicate[0]));
+
+        // Apply Sorting
+        if (pageable.getSort().isSorted()) {
+            cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb));
+        }
+
+        // Create TypedQuery before setting hints
+        TypedQuery<Property> typedQuery = entityManager.createQuery(cq);
+
+        if (request != null) {
+            // Apply entity graph base on request
+            applyEntityGraph(request, typedQuery);
+        }
+
+        // Apply pagination directly to the query
+        typedQuery.setFirstResult((int) pageable.getOffset());
+        typedQuery.setMaxResults(pageable.getPageSize());
+
+        // Fetch the paginated results
+        List<Property> results = typedQuery.getResultList();
+
+        // Get the total count using a separate count query (optimized)
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Property> countRoot = countQuery.from(Property.class);
+        countQuery.select(cb.count(countRoot));
+
+        // Copy predicates from the original query to the count query
+        if (cq.getRestriction() != null) {
+            countQuery.where(cq.getRestriction());
+        }
+
+        // Perform count query only if necessary
+        int totalCount = results.size();
+        return new PageImpl<>(results, pageable, totalCount);
+    }
+
+    // Helper method to choose the appropriate EntityGraph (you'll need to implement the logic)
+    private void applyEntityGraph(PropertySearchRequest request, TypedQuery<Property> typedQuery) {
+        if (request.propertyForSale() != null)
+            typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.saleSearch"));
+        if (request.propertyForRent() != null)
+            typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.rentSearch"));
+        if (request.address() != null)
+            typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.addressSearch"));
+        if (request.rooms() != null && !request.rooms().isEmpty())
+            typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.roomSearch"));
+    }
+
+
+    // Helper method to build query options (you can move this to CustomRepositoryUtils if needed)
+    private Map<String, QueryFieldOptionEnum> buildQueryOptions(PropertySearchRequest request, Set<String> excludedFields) {
         Map<String, QueryFieldOptionEnum> queryOptions = new HashMap<>();
-        for (Field field : request.getClass().getDeclaredFields()) { // can seperated into other method
+        for (Field field : request.getClass().getDeclaredFields()) {
             var type = field.getType();
             String fieldName = field.getName();
-            if (!excludedFields.contains(fieldName)) { // excluded fields for special query
+            if (!excludedFields.contains(fieldName)) {
                 if (type == String.class) {
                     queryOptions.put(field.getName(), QueryFieldOptionEnum.LIKE_STRING);
                 } else if (Number.class.isAssignableFrom(type)) {
@@ -171,36 +219,93 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                 }
             }
         }
-        // Join columns
-        joinColumns(request, context);
-
-        // Append normal query
-        CustomRepositoryUtils.appendNormalQueryConditions(request, context, queryOptions);
-
-        // Append special query (complex)
-        applySpecialQueryConditions(request, context);
-
-        if (!predicates.isEmpty()) {
-            cq.where(predicates.toArray(new Predicate[0]));
-        }
-
-        // Apply Sorting
-        if (pageable.getSort().isSorted()) {
-            cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb)); // Use QueryUtils for converting Pageable sort to Order
-        }
-
-        TypedQuery<Property> typedQuery = entityManager.createQuery(cq);
-
-        /*
-           Use EntityGraph to specify related entities that should be fetched along with the main entity
-           If not, accessing data in service layer -> trigger lazy loading -> n+1 query problem
-        * */
-        typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.search"));
-        return CustomRepositoryUtils.applyPagination(typedQuery, pageable);
+        return queryOptions;
     }
 }
 
 
+//@Override
+//public Page<Property> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
+//    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//    CriteriaQuery<Property> cq = cb.createQuery(Property.class);
+//    Root<Property> root = cq.from(Property.class);
+//    List<Predicate> predicates = new ArrayList<>();
+//    Map<String, Join<Property, ?>> joins = new HashMap<>();
+//
+//    QueryContext<Property> context = new QueryContext<>(cb, cq, root, predicates, joins);
+//
+//    if (request != null) {
+//        joinColumns(request, context);
+//
+//        // Exclude specific fields
+//        Set<String> excludedFields = new HashSet<>(Set.of( // Exclude fields that for special query method handling
+//                "propertyForRent", "propertyForSale", "propertyCategory", "areaFrom", "areaTo",
+//                "priceFrom", "priceTo", "address", "rooms"
+//        ));
+//        Map<String, QueryFieldOptionEnum> queryOptions = buildQueryOptions(request, excludedFields);
+//        CustomRepositoryUtils.appendNormalQueryConditions(request, context, queryOptions);
+//        applySpecialQueryConditions(request, context);
+//    }
+//
+//    if (!predicates.isEmpty()) {
+//        cq.where(predicates.toArray(new Predicate[0]));
+//    }
+//
+//    // Apply Sorting
+//    if (pageable.getSort().isSorted()) {
+//        cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb));
+//    }
+//
+//    TypedQuery<Property> typedQuery = entityManager.createQuery(cq);
+//
+//    if (request.propertyForSale() != null)
+//        typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.saleSearch"));
+//    if (request.propertyForRent() != null)
+//        typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.rentSearch"));
+//    if (request.address() != null)
+//        typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.addressSearch"));
+//    if (request.rooms() != null && !request.rooms().isEmpty())
+//        typedQuery.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("Property.roomSearch"));
+//
+//    // Apply pagination directly to the query
+//    typedQuery.setFirstResult((int) pageable.getOffset());
+//    typedQuery.setMaxResults(pageable.getPageSize());
+//
+//    // Fetch the paginated results
+//    List<Property> results = typedQuery.getResultList();
+//
+//    // Get the total count using a separate count query
+//    CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+//    Root<Property> countRoot = countQuery.from(Property.class);
+//    countQuery.select(cb.count(countRoot));
+//
+//    // Copy predicates from the original query to the count query
+//    if (cq.getRestriction() != null) {
+//        countQuery.where(cq.getRestriction());
+//    }
+//
+//    int totalCount = typedQuery.getResultList().size();
+//    return new PageImpl<>(results, pageable, totalCount);
+//}
+//
+//// Helper method to build query options (you can move this to CustomRepositoryUtils if needed)
+//private Map<String, QueryFieldOptionEnum> buildQueryOptions(PropertySearchRequest request, Set<String> excludedFields) {
+//    Map<String, QueryFieldOptionEnum> queryOptions = new HashMap<>();
+//    for (Field field : request.getClass().getDeclaredFields()) {
+//        var type = field.getType();
+//        String fieldName = field.getName();
+//        if (!excludedFields.contains(fieldName)) {
+//            if (type == String.class) {
+//                queryOptions.put(field.getName(), QueryFieldOptionEnum.LIKE_STRING);
+//            } else if (Number.class.isAssignableFrom(type)) {
+//                queryOptions.put(field.getName(), QueryFieldOptionEnum.NUMBER);
+//            } else if (field.getType().isEnum()) {
+//                queryOptions.put(field.getName(), QueryFieldOptionEnum.ENUM);
+//            }
+//        }
+//    }
+//    return queryOptions;
+//}
 
 
 //  JDBC with JPA

@@ -13,12 +13,11 @@ import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import com.koi151.msproperties.service.converter.PropertyConverter;
-import jakarta.transaction.Transactional;
 import lombok.*;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
@@ -34,36 +33,42 @@ public class PropertyServiceImpl implements PropertiesService {
     private final PropertyMapper propertyMapper;
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
         Page<Property> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
         return propertyPage.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params, Pageable pageable) {
         Page<Property> properties = propertyRepository.findByDeleted(false, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public DetailedPropertyDTO getPropertyById(Long id) {
         Property property = findPropertyExistedById(id);
         return propertyMapper.toDetailedPropertyDTO(property);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId, Pageable pageable) {
         Page<Property> properties = propertyRepository.findByCategoryIdAndDeleted(categoryId, false, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
         Page<Property> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
         return properties.map(propertyMapper::toPropertySearchDTO);
     }
 
     @Override
+    @Transactional(readOnly = true)
     public Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable) {
         Page<Property> properties = propertyRepository.findByStatus(status, pageable);
         return properties.map(propertyMapper::toPropertiesHomeDTO);
@@ -104,11 +109,13 @@ public class PropertyServiceImpl implements PropertiesService {
 
     }
 
+    @Transactional(readOnly = true)
     public Property findPropertyExistedById(Long id) {
         return propertyRepository.findByPropertyIdAndDeleted(id, false)
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
     }
 
+    @Transactional(readOnly = true)
     public boolean checkPropertyExistedById(Long id) {
         return propertyRepository.existsByPropertyIdAndDeleted(id, false);
     }
@@ -145,7 +152,8 @@ public class PropertyServiceImpl implements PropertiesService {
         existingProperty.setImageUrls(updatedImageUrls.isEmpty() ? null : updatedImageUrls);
     }
 
-    private void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {
+    @Transactional
+    protected void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {
         if (request != null) {
             updateExistingPropertyRooms(existingProperty, request.rooms()); // update rooms info separately
             propertyMapper.updatePropertyFromDto(request, existingProperty);
@@ -153,38 +161,39 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     private void updateExistingPropertyRooms(Property existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
-        List<Room> currentRooms = existingProperty.getRooms();
+        List<Rooms> currentRooms = existingProperty.getRooms();
 
         for (RoomCreateUpdateRequest updatedRoom : updatedRooms) {
             String roomType = updatedRoom.roomType();
             short quantity = updatedRoom.quantity();
 
-            Room existingRoom = currentRooms.stream()
+            Rooms existingRooms = currentRooms.stream()
                     .filter(room -> room.getRoomType().equals(roomType))
                     .findFirst()
                     .orElse(null);
 
-            if (existingRoom != null) {
+            if (existingRooms != null) {
                 // Room type exists in the property
-                if (existingRoom.getQuantity() != quantity) // Quantity is different, update it
-                    existingRoom.setQuantity(quantity);
+                if (existingRooms.getQuantity() != quantity) // Quantity is different, update it
+                    existingRooms.setQuantity(quantity);
                 // if quantity is the same, do nothing
             } else {
                 // Room type doesn't exist, create a new room
-                Room newRoom = Room.builder()
+                Rooms newRooms = Rooms.builder()
                         .roomType(roomType)
                         .quantity(quantity)
                         .property(existingProperty)
                         .build();
 
-                roomRepository.save(newRoom);
-                currentRooms.add(newRoom);
+                roomRepository.save(newRooms);
+                currentRooms.add(newRooms);
             }
         }
         existingProperty.setRooms(currentRooms);
     }
 
     @Override
+    @Transactional
     public void deleteProperty(Long id) throws PropertyNotFoundException {
         propertyRepository.findById(Math.toIntExact(id))
                 .map(existingProperty -> {
@@ -195,6 +204,7 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
+    @Transactional
     public boolean propertyExistsCheck(Long id) {
         return checkPropertyExistedById(id);
     }

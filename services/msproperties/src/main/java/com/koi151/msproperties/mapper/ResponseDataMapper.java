@@ -11,6 +11,6 @@ public interface ResponseDataMapper {
     @Mapping(target = "totalPages", source = "propertyPages.totalPages")
     @Mapping(target = "totalItems", source = "propertyPages.totalElements")
     @Mapping(target = "currentPage", source = "page")
-    @Mapping(target = "maxPageItems", source = "limit")
-    ResponseData toResponseData(Page<?> propertyPages, int page, int limit);
+    @Mapping(target = "maxPageItems", source = "pageSize")
+    ResponseData toResponseData(Page<?> propertyPages, int page, int pageSize);
 }

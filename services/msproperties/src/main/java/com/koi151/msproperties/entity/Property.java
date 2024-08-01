@@ -20,6 +20,26 @@ import java.util.List;
         @NamedAttributeNode("propertyPostService")
     }
 )
+@NamedEntityGraph(name = "Property.saleSearch",
+    attributeNodes = {
+        @NamedAttributeNode("propertyForSale")
+    }
+)
+@NamedEntityGraph(name = "Property.rentSearch",
+    attributeNodes = {
+        @NamedAttributeNode("propertyForRent")
+    }
+)
+@NamedEntityGraph(name = "Property.addressSearch",
+    attributeNodes = {
+        @NamedAttributeNode("address")
+    }
+)
+@NamedEntityGraph(name = "Property.roomSearch",
+    attributeNodes = {
+        @NamedAttributeNode("rooms")
+    }
+)
 @Table(
     indexes = {
         @Index(name = "idx_area", columnList = "area"),
@@ -66,7 +86,7 @@ public class Property extends BaseEntity {
 
     @OneToMany(mappedBy = "property",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-    private List<Room> rooms;
+    private List<Rooms> rooms;
 
     @Column(name = "category_id", nullable = false)
     @NotNull(message = "Category id is mandatory")

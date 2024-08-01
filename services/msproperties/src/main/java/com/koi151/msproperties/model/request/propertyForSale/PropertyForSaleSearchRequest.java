@@ -1,11 +1,15 @@
 package com.koi151.msproperties.model.request.propertyForSale;
 
+import com.koi151.msproperties.annotation.PriceRangeConstraint;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.PositiveOrZero;
 import jakarta.validation.constraints.Size;
+import lombok.Builder;
 
 import java.math.BigDecimal;
 
+@Builder
+@PriceRangeConstraint
 public record PropertyForSaleSearchRequest(
     @PositiveOrZero(message = "Property sale max price searching must be non-negative value")
     @DecimalMax(value = "9000000000", message = "Property rental max price cannot exceed 90,000,000,000")

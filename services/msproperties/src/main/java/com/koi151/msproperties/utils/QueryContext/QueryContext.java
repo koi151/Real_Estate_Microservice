@@ -3,6 +3,7 @@ package com.koi151.msproperties.utils.QueryContext;
 import com.koi151.msproperties.entity.Property;
 import jakarta.persistence.criteria.*;
 
+import javax.swing.*;
 import java.util.List;
 import java.util.Map;
 

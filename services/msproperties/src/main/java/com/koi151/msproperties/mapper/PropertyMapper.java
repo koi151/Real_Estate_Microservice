@@ -39,7 +39,7 @@ public interface PropertyMapper {
     PropertyForSale toPropertyForSaleEntity(PropertyForSaleCreateRequest request);
 
     @Mapping(target = "property", ignore = true)
-    Room toRoomEntity(RoomCreateUpdateRequest request);
+    Rooms toRoomEntity(RoomCreateUpdateRequest request);
 
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
@@ -57,6 +57,7 @@ public interface PropertyMapper {
     @Mapping(target = "rentalPrice", source = "propertyForRent.rentalPrice")
     @Mapping(target = "salePrice", source = "propertyForSale.salePrice")
     @Mapping(target = "status", source = "status.statusName")
+    @Mapping(target = "rooms", source = "rooms")
     @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     PropertySearchDTO toPropertySearchDTO(Property entity);

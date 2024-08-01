@@ -4,8 +4,11 @@ package com.koi151.msproperties.utils;
 import com.koi151.msproperties.enums.QueryFieldOptionEnum;
 import com.koi151.msproperties.repository.custom.impl.PropertyRepositoryImpl;
 import com.koi151.msproperties.utils.QueryContext.QueryContext;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
 import jakarta.persistence.TypedQuery;
-import jakarta.persistence.criteria.Path;
+import jakarta.persistence.criteria.*;
+import org.hibernate.query.criteria.JpaQueryableCriteria;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
@@ -20,8 +23,10 @@ public class CustomRepositoryUtils {
 
     private static final Logger logger = LoggerFactory.getLogger(PropertyRepositoryImpl.class);
 
+    @PersistenceContext // used to inject an EntityManager into a class
+    private static EntityManager entityManager;
 
-    // Apply pagination to the TypedQuery
+//     Apply pagination to the TypedQuery
     public static <T> Page<T> applyPagination(TypedQuery<T> query, Pageable pageable) {
         int totalElements = query.getResultList().size(); // Total elements before pagination
         query.setFirstResult((int) pageable.getOffset());
@@ -30,6 +35,42 @@ public class CustomRepositoryUtils {
         logger.info("Number of properties fetched: {}", results.size());
         return new PageImpl<>(results, pageable, totalElements);
     }
+
+
+    // Apply pagination to the TypedQuery
+//    public static <T> Page<T> applyPagination(EntityManager entityManager, TypedQuery<T> query, Pageable pageable) {
+//        // Set pagination parameters directly on the TypedQuery
+//        query.setFirstResult((int) pageable.getOffset());
+//        query.setMaxResults(pageable.getPageSize());
+//
+//        // Fetch only the requested page of results
+//        List<T> results = query.getResultList();
+//        logger.info("Number of properties fetched: {}", results.size());
+//
+//        // Get the total count using a separate count query
+//        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+//        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+//        Root<T> countRoot = countQuery.from(query.getResultType());
+//
+//        countQuery.select(cb.count(countRoot));
+//
+//        // Copy predicates from the original query to the count query
+//        Predicate restrictions = query.unwrap(JpaQueryableCriteria.class).getRestriction();
+//        if (restrictions != null) {
+//            countQuery.where(restrictions);
+//        }
+//
+//        Long totalCount = entityManager.createQuery(countQuery).getSingleResult();
+//
+//        return new PageImpl<>(results, pageable, totalCount);
+//    }
+
+
+
+
+
+
+
 
     public static <T, E> void appendNormalQueryConditions(E request, QueryContext<T> context, Map<String, QueryFieldOptionEnum> queryOptions) {
 

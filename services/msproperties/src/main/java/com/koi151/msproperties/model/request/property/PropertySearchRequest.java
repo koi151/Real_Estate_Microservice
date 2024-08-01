@@ -34,13 +34,6 @@ public record PropertySearchRequest (
     @DecimalMax(value = "99999999.99", message = "Area searching value cannot exceed 99,999,999.99")
     BigDecimal areaTo,
 
-    @PositiveOrZero(message = "Min price must be non-negative value")
-    Long priceFrom,
-
-    @PositiveOrZero(message = "Max price must be non-negative value")
-    @DecimalMax(value = "99999999999", message = "Max price search cannot exceed 99,999,999,999")
-    Long priceTo,
-
     @Size(max = 1000, message = "Description search must be at most {max} characters long")
     String description,
 
