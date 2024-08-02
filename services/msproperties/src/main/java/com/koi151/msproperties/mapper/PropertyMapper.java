@@ -2,9 +2,8 @@ package com.koi151.msproperties.mapper;
 
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.dto.DetailedPropertyDTO;
-import com.koi151.msproperties.model.dto.PropertiesHomeDTO;
-import com.koi151.msproperties.model.dto.PropertySearchDTO;
+import com.koi151.msproperties.model.dto.*;
+import com.koi151.msproperties.model.projection.PropertySearchProjection;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperties.model.request.propertyForRent.PropertyForRentCreateRequest;
@@ -17,6 +16,7 @@ import org.mapstruct.*;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
@@ -44,29 +44,49 @@ public interface PropertyMapper {
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
     @Mapping(target = "propertyForRent.paymentSchedule", source = "propertyForRent.paymentSchedule.scheduleName")
-    @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
+    @Mapping(target = "address", expression = "java(getFullAddressStringFromEntity(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     @Mapping(target = "status", source = "status.statusName")
     @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
     @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     DetailedPropertyDTO toDetailedPropertyDTO(Property entity);
 
+//    @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
+//    @Mapping(target = "houseDirection", source = "houseDirection.directionName")
+//    @Mapping(target = "type", expression = "java(getPropertyType(entity))")
+//    @Mapping(target = "rentalPrice", source = "propertyForRent.rentalPrice")
+//    @Mapping(target = "salePrice", source = "propertyForSale.salePrice")
+//    @Mapping(target = "status", source = "status.statusName")
+//    @Mapping(target = "rooms", source = "rooms", qualifiedByName = "mapRoomsToRoomNameQuantityDTOs")
+//    @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
+//    @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
+//    PropertySearchDTO toPropertySearchDTO(Property entity);
+
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
     @Mapping(target = "houseDirection", source = "houseDirection.directionName")
-    @Mapping(target = "type", expression = "java(getPropertyType(entity))")
+    @Mapping(target = "type", expression = "java(getPropertyType(projection))")
     @Mapping(target = "rentalPrice", source = "propertyForRent.rentalPrice")
     @Mapping(target = "salePrice", source = "propertyForSale.salePrice")
     @Mapping(target = "status", source = "status.statusName")
-    @Mapping(target = "rooms", source = "rooms")
-    @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
-    @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
-    PropertySearchDTO toPropertySearchDTO(Property entity);
+//    @Mapping(target = "rooms", source = "rooms", qualifiedByName = "mapRoomsToRoomNameQuantityDTOs")
+    @Mapping(target = "address", expression = "java(getFullAddressString(projection.getAddress()))")
+    @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(projection.getImageUrls(), \",\"))")
+    PropertySearchDTO toPropertySearchDTO(PropertySearchProjection projection);
+
+    @Named("mapRoomsToRoomNameQuantityDTOs")
+    default List<RoomNameQuantityDTO> mapRoomsToRoomNameQuantityDTOs(List<Rooms> rooms) {
+        return rooms.stream()
+                .map(room -> new RoomNameQuantityDTO(room.getRoomType().getName(), room.getQuantity()))
+                .collect(Collectors.toList());
+    }
+
 
     @Mapping(target = "status", source = "status.statusName")
     PropertiesHomeDTO toPropertiesHomeDTO(Property entity);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
-            nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS) // fields in the target object will retain their existing values if the corresponding fields in the source object are null
+            nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+    // fields in the target object will retain their existing values if the corresponding fields in the source object are null
     @Mapping(target = "propertyForRent.rentalPrice", // get price existed in db when request price = 0.0, due to double type not accept null value
             expression = "java(propertyForRentUpdateRequest.rentalPrice() != null " +
                     "? propertyForRentUpdateRequest.rentalPrice() " +
@@ -78,14 +98,21 @@ public interface PropertyMapper {
     @Mapping(target = "rooms", ignore = true)
     void updatePropertyFromDto(PropertyUpdateRequest request, @MappingTarget Property entity);
 
-    default String getFullAddressString(Address entity) {
+    default String getFullAddressString(AddressDTO dto) {
+        List<String> addressList = Stream.of(dto.getStreet(), dto.getWard(), dto.getDistrict(), dto.getCity())
+                .filter(Objects::nonNull)  // Filter out null values
+                .toList();  // Java 16+ or .collect(Collectors.toList())
+        return StringUtil.toStringSeparateByRegex(addressList, ", ");
+    }
+
+    default String getFullAddressStringFromEntity(Address entity) { // temp
         List<String> addressList = Stream.of(entity.getStreetAddress(), entity.getWard(), entity.getDistrict(), entity.getCity())
                 .filter(Objects::nonNull)  // Filter out null values
                 .toList();  // Java 16+ or .collect(Collectors.toList())
         return StringUtil.toStringSeparateByRegex(addressList, ", ");
     }
 
-    default String getPropertyType(Property entity) {
+    default String getPropertyType(PropertySearchProjection entity) {
         boolean forRent = entity.getPropertyForRent() != null;
         boolean forSale = entity.getPropertyForSale() != null;
 
@@ -98,4 +125,8 @@ public interface PropertyMapper {
         }
         return "Unknown";
     }
+
+
+//    PropertySearchDTO convertToPropertySearchDTO(PropertySearchProjection projection);
+
 }

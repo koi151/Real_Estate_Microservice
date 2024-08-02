@@ -8,6 +8,7 @@ src/test/
 # ENV
 services/.env
 .env.*
+.env
 services/local.env
 
 # Maven specific

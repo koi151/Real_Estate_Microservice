@@ -1,18 +1,14 @@
 package com.koi151.msproperties.model.dto;
 
-import com.koi151.msproperties.enums.DirectionEnum;
-import com.koi151.msproperties.enums.PaymentScheduleEnum;
-import com.koi151.msproperties.enums.PropertyTypeEnum;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.List;
 
-@Getter
-@Setter
+@Data
+@AllArgsConstructor
 @NoArgsConstructor
+@Builder
 public class PropertySearchDTO {
 
     private String title;
@@ -27,7 +23,7 @@ public class PropertySearchDTO {
     private String balconyDirection;
     private String status;
     private String availableFrom;
-    private String address; //
+    private String address;
     private List<String> imageUrls;
-    private List<RoomNameQuantityDTO> rooms;//
+    private List<RoomNameQuantityDTO> rooms;
 }

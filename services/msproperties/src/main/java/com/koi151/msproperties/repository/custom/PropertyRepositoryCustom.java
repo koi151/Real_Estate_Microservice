@@ -1,12 +1,12 @@
 package com.koi151.msproperties.repository.custom;
 
-import com.koi151.msproperties.entity.Property;
+import com.koi151.msproperties.model.projection.PropertySearchProjection;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;
+import jakarta.persistence.Tuple;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.jpa.repository.EntityGraph;
 
 public interface PropertyRepositoryCustom {
-    Page<Property> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable);
+    Page<Tuple> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable);
 }
 

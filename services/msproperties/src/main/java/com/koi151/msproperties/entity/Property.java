@@ -128,10 +128,4 @@ public class Property extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
     private DirectionEnum balconyDirection;
-
-    public PropertyPostService getPropertyPostService() {
-        System.out.println("Fetching propertyPostService");
-        return propertyPostService;
-    }
-
 }
