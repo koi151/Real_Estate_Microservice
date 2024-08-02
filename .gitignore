@@ -6,9 +6,9 @@ target/
 src/test/
 
 # ENV
+.env
 services/.env
 .env.*
-.env
 services/local.env
 
 # Maven specific
