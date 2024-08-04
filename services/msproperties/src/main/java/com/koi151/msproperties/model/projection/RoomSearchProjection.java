@@ -1,14 +1,11 @@
 package com.koi151.msproperties.model.projection;
 
 import com.koi151.msproperties.enums.RoomTypeEnum;
-import lombok.AllArgsConstructor;
-import lombok.Data;
+
+public record RoomSearchProjection (
+//    Long propertyId,
+    RoomTypeEnum roomType,
+    Short quantity
+){}
 
 
-@Data
-@AllArgsConstructor
-public class RoomSearchProjection {
-    private RoomTypeEnum roomType;
-    private Short quantity;
-
-}

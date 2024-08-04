@@ -6,6 +6,15 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+@Table(
+    indexes = {
+        @Index(name = "idx_address_property_id", columnList = "property_id"),
+        @Index(name = "idx_address_city", columnList = "city"),
+        @Index(name = "idx_address_district", columnList = "district"),
+        @Index(name = "idx_address_ward", columnList = "ward"),
+        @Index(name = "idx_address_location", columnList = "city, district, ward")
+    }
+)
 @Entity(name = "address")
 @Getter
 @Setter

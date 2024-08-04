@@ -53,9 +53,9 @@ public class PropertyController {
         var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
-        responseData.setDesc(propertiesPage.isEmpty()
-                ? "No property found"
-                : "Get properties succeed");
+//        responseData.setDesc(propertiesPage.isEmpty()
+//                ? "No property found"
+//                : "Get properties succeed");
 
         return ResponseEntity.ok(responseData);
     }

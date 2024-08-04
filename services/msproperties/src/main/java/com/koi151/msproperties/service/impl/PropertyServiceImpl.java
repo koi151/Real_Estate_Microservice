@@ -5,7 +5,6 @@ import com.koi151.msproperties.enums.RoomTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
-import com.koi151.msproperties.model.projection.PropertySearchProjection;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
@@ -38,8 +37,7 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional(readOnly = true)
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
         var propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
-//        return propertyPage.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
-        return null; // testing
+        return propertyPage.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
     }
 
     @Override

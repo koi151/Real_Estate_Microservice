@@ -3,9 +3,7 @@ package com.koi151.msproperties.entity;
 import com.koi151.msproperties.enums.RoomTypeEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 @Entity(name = "room")
@@ -14,6 +12,13 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@Table(
+    indexes = {
+        @Index(name = "idx_room_property_id", columnList = "property_id"),
+        @Index(name = "idx_room_room_type", columnList = "room_type"),
+        @Index(name = "idx_room_quantity", columnList = "quantity")
+    }
+)
 public class Rooms {
 
     @Id

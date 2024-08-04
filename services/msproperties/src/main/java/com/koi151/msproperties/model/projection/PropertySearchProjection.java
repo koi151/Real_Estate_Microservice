@@ -1,30 +1,36 @@
 package com.koi151.msproperties.model.projection;
 
-import com.koi151.msproperties.enums.DirectionEnum;
+import com.koi151.msproperties.entity.Address;
+import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
-import com.koi151.msproperties.model.dto.AddressDTO;
-import com.koi151.msproperties.model.dto.RoomNameQuantityDTO;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
-public interface PropertySearchProjection {
-    Long getPropertyId();
-    PropertyForRentSearchProjection getPropertyForRent();
-    PropertyForSaleSearchProjection getPropertyForSale();
-    String getTitle();
-    String getType();
-    Integer getCategoryId();
-    BigDecimal getArea();
-    BigDecimal getRentalPrice();
-    BigDecimal getSalePrice();
-    String getDescription();
-    Integer getTotalFloor();
-    DirectionEnum getHouseDirection();
-    DirectionEnum getBalconyDirection();
-    StatusEnum getStatus();
-    LocalDate getAvailableFrom();
-    AddressDTO getAddress();
-    String getImageUrls();
-    List<RoomSearchProjection> getRooms();
+
+@Data
+@Builder
+@AllArgsConstructor
+public class PropertySearchProjection {
+    private Long propertyId;
+    private String title;
+    private PropertyTypeEnum type;
+    private Integer categoryId;
+    private BigDecimal area;
+    private BigDecimal rentalPrice;
+    private BigDecimal salePrice;
+    private String description;
+    private Short totalFloor;
+    private StatusEnum status;
+    private LocalDate availableFrom;
+    private Address address;
+    private String imageUrls;
+    private List<RoomSearchProjection> rooms;
+    private PropertyPostServiceProjection propertyPostService;
 }
+
+
+

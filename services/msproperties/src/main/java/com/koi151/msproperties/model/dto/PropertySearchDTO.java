@@ -10,7 +10,7 @@ import java.util.List;
 @NoArgsConstructor
 @Builder
 public class PropertySearchDTO {
-
+    private Long propertyId;
     private String title;
     private String type;
     private Integer categoryId;
@@ -26,4 +26,5 @@ public class PropertySearchDTO {
     private String address;
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
+    private PropertyPostServiceSearchDTO propertyPostService;
 }

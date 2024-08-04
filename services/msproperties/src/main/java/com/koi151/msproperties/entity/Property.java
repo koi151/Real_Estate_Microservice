@@ -5,32 +5,26 @@ import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
-@NamedEntityGraph(name = "Property.saleSearch",
+
+//@NamedEntityGraph(name = "Property.roomSearch",
+//    attributeNodes = {
+//        @NamedAttributeNode("rooms")
+//    }
+//)
+@NamedEntityGraph(name = "property-with-details",
     attributeNodes = {
+        @NamedAttributeNode("propertyPostService"),
+        @NamedAttributeNode("propertyForRent"),
         @NamedAttributeNode("propertyForSale")
-    }
-)
-@NamedEntityGraph(name = "Property.rentSearch",
-    attributeNodes = {
-        @NamedAttributeNode("propertyForRent")
-    }
-)
-@NamedEntityGraph(name = "Property.addressSearch",
-    attributeNodes = {
-        @NamedAttributeNode("address")
-    }
-)
-@NamedEntityGraph(name = "Property.roomSearch",
-    attributeNodes = {
-        @NamedAttributeNode("rooms")
-    }
-)
+    })
 @Table(
     indexes = {
         @Index(name = "idx_area", columnList = "area"),
@@ -41,6 +35,10 @@ import java.util.List;
         @Index(name = "idx_status", columnList = "status"),
         @Index(name = "idx_house_direction", columnList = "house_direction"),
         @Index(name = "idx_balcony_direction", columnList = "balcony_direction")
+
+        // Composite Indexes
+//        @Index(name = "idx_title_area_category", columnList = "title, area, category_id"),
+
     }
 )
 @Entity(name = "property")
