@@ -5,20 +5,12 @@ import com.koi151.msproperties.enums.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import java.io.Serial;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
 
-//@NamedEntityGraph(name = "Property.roomSearch",
-//    attributeNodes = {
-//        @NamedAttributeNode("rooms")
-//    }
-//)
 @NamedEntityGraph(name = "property-with-details",
     attributeNodes = {
         @NamedAttributeNode("propertyPostService"),

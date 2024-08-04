@@ -25,7 +25,7 @@ public class PropertySearchProjection {
     private String description;
     private Short totalFloor;
     private StatusEnum status;
-    private LocalDate availableFrom;
+//    private LocalDate availableFrom;
     private Address address;
     private String imageUrls;
     private List<RoomSearchProjection> rooms;

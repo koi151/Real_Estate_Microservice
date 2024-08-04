@@ -1,10 +1,14 @@
 package com.koi151.msproperties.service.impl;
 
+import com.google.common.reflect.TypeToken;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.RoomTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
 import com.koi151.msproperties.mapper.PropertyMapper;
 import com.koi151.msproperties.model.dto.*;
+import com.koi151.msproperties.model.projection.PropertySearchProjection;
 import com.koi151.msproperties.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
@@ -14,13 +18,20 @@ import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import com.koi151.msproperties.service.converter.PropertyConverter;
+import com.koi151.msproperties.utils.PageTypeAdapter;
 import lombok.*;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.lang.reflect.Type;
 import java.util.*;
 
 @Service
@@ -33,12 +44,31 @@ public class PropertyServiceImpl implements PropertiesService {
     private final PropertyConverter propertyConverter;
     private final PropertyMapper propertyMapper;
 
+    @Autowired
+    RedisTemplate redisTemplate;
+    private final Gson gson = new GsonBuilder()
+            .registerTypeAdapter(Page.class, new PageTypeAdapter())
+            .create();
+
     @Override
     @Transactional(readOnly = true)
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
-        var propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
-        return propertyPage.map(propertyMapper::toPropertySearchDTO);  // Map to DTOs using streams
+        String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
+        String redisData = (String) redisTemplate.opsForValue().get(redisKey);
+
+        if (redisData == null) {
+            Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
+            Page<PropertySearchDTO> result = propertyPage.map(propertyMapper::toPropertySearchDTO);
+            String jsonData = gson.toJson(result);
+            redisTemplate.opsForValue().set(redisKey, jsonData);
+            return result;
+        } else {
+            Type pageType = new TypeToken<Page<PropertySearchDTO>>() {}.getType();
+            return gson.fromJson(redisData, pageType);
+        }
     }
+
+
 
     @Override
     @Transactional(readOnly = true)

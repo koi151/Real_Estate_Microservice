@@ -9,5 +9,5 @@ import java.time.LocalDateTime;
 @Builder
 public class PropertyPostServiceSearchDTO {
     private String postingPackage;
-    private LocalDateTime postingDate;
+//    private LocalDateTime postingDate;
 }
