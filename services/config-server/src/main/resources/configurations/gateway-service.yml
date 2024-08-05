@@ -16,15 +16,23 @@ spring:
           uri: http://localhost:8050/
           predicates:
             - Path=/api/v1/properties/**
+
         - id: account
           uri: http://localhost:8060/
           predicates:
             - Path=/api/v1/accounts/**, /api/v1/admin/accounts/**
+
         - id: property-submissions
           uri: http://localhost:8070/
           predicates:
             - Path=/api/v1/property-submissions/**
+
         - id: payment
           uri: http://localhost:8080/
           predicates:
             - Path=/api/v1/payment/**
+
+        - id: listing-services
+          uri: http://localhost:8090/
+          predicates:
+            - Path=/api/v1/listing-services/**

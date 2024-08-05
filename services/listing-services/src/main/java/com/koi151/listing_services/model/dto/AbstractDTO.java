@@ -1,4 +1,4 @@
-package com.koi151.msproperties.model.dto;
+package com.koi151.listing_services.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.Data;
@@ -6,15 +6,13 @@ import lombok.Data;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
 
 @Data
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractDTO<T> implements Serializable {
 
     @Serial
-    private static final long serialVersionUID = -699889113463942885L;
+    private static final long serialVersionUID = 8423816176701443652L;
 
     private LocalDateTime createdDate;
     //    private String createdBy;
