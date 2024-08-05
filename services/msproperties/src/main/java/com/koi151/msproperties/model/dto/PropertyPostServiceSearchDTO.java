@@ -1,6 +1,5 @@
 package com.koi151.msproperties.model.dto;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Builder;
 import lombok.Data;
 

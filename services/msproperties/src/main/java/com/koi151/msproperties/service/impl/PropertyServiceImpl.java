@@ -3,6 +3,7 @@ package com.koi151.msproperties.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.RoomTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
@@ -48,7 +49,6 @@ public class PropertyServiceImpl implements PropertiesService {
 
         String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
         String redisData = redisTemplate.opsForValue().get(redisKey);
-
         try {
             if (redisData == null) {
                 Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
@@ -65,6 +65,7 @@ public class PropertyServiceImpl implements PropertiesService {
             throw new RuntimeException("Json processing error occurred");
         }
     }
+
 
     @Override
     @Transactional(readOnly = true)
@@ -91,8 +92,7 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional(readOnly = true)
     public Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
         Page<Property> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
-//        return properties.map(propertyMapper::toPropertySearchDTO);
-        return null; // temp
+        return properties.map(propertyMapper::toPropertySearchDTO);
     }
 
     @Override

@@ -34,7 +34,7 @@ public class RedisConfig {
     @Bean
     public RedisCacheConfiguration cacheConfiguration() {
         return RedisCacheConfiguration.defaultCacheConfig()
-            .entryTtl(Duration.ofMinutes(60))
+            .entryTtl(Duration.ofMinutes(5))
             .disableCachingNullValues()
             .serializeValuesWith(
                 RedisSerializationContext.SerializationPair.fromSerializer(

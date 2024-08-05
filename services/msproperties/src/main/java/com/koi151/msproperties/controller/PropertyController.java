@@ -53,9 +53,9 @@ public class PropertyController {
         var propertiesPage = propertiesService.findAllProperties(request, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
-//        responseData.setDesc(propertiesPage.isEmpty()
-//                ? "No property found"
-//                : "Get properties succeed");
+        responseData.setDesc(propertiesPage.isEmpty()
+            ? "No property found"
+            : "Get properties succeed");
 
         return ResponseEntity.ok(responseData);
     }
@@ -233,8 +233,8 @@ public class PropertyController {
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
-                ? "No property found"
-                : "Get properties by account id succeed");
+            ? "No property found"
+            : "Get properties by account id succeed");
 
         return ResponseEntity.ok(responseData);
     }
@@ -253,8 +253,8 @@ public class PropertyController {
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
-                ? "No properties found with status " + status
-                : "Success");
+            ? "No properties found with status " + status
+            : "Success");
 
         return ResponseEntity.ok(responseData);
     }
