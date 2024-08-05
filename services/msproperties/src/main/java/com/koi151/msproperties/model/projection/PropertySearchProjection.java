@@ -1,5 +1,6 @@
 package com.koi151.msproperties.model.projection;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.koi151.msproperties.entity.Address;
 import com.koi151.msproperties.enums.PropertyTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
@@ -25,7 +26,7 @@ public class PropertySearchProjection {
     private String description;
     private Short totalFloor;
     private StatusEnum status;
-//    private LocalDate availableFrom;
+    private LocalDate availableFrom;
     private Address address;
     private String imageUrls;
     private List<RoomSearchProjection> rooms;

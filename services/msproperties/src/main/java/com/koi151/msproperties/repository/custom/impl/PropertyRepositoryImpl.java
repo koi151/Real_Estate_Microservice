@@ -16,7 +16,6 @@ import jakarta.persistence.Tuple;
 import jakarta.persistence.TypedQuery;
 import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -214,6 +213,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
         postServiceJoin.get("postingPackage").alias("postingPackage"),
         postServiceJoin.get("postingDate").alias("postingDate")
     );
+
     TypedQuery<Tuple> query = entityManager.createQuery(cq);
     query.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("property-with-details"));
 
@@ -242,8 +242,8 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
 
                 // Extract PropertyPostService data from the tuple
                 PropertyPostServiceProjection postServiceProjection = new PropertyPostServiceProjection(
-                    tuple.get("postingPackage", PostingPackageEnum.class)
-//                    tuple.get("postingDate", LocalDateTime.class)
+                    tuple.get("postingPackage", PostingPackageEnum.class),
+                    tuple.get("postingDate", LocalDateTime.class)
                 );
 
                 return PropertySearchProjection.builder()
@@ -257,7 +257,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
                     .description(tuple.get("description", String.class))
                     .totalFloor(tuple.get("totalFloor", Short.class))
                     .status(tuple.get("status", StatusEnum.class))
-//                    .availableFrom(tuple.get("availableFrom", LocalDate.class))
+                    .availableFrom(tuple.get("availableFrom", LocalDate.class))
                     .address(tuple.get("address", Address.class))
                     .imageUrls(tuple.get("imageUrls", String.class))
                     .rooms(propertyRooms)

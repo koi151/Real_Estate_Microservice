@@ -1,8 +1,8 @@
 package com.koi151.msproperties.service.impl;
 
-import com.google.common.reflect.TypeToken;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.msproperties.entity.*;
 import com.koi151.msproperties.enums.RoomTypeEnum;
 import com.koi151.msproperties.enums.StatusEnum;
@@ -14,24 +14,20 @@ import com.koi151.msproperties.model.request.property.PropertySearchRequest;
 import com.koi151.msproperties.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperties.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperties.repository.*;
+import com.koi151.msproperties.repository.custom.impl.PropertyRepositoryImpl;
 import com.koi151.msproperties.service.PropertiesService;
 import com.koi151.msproperties.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperties.customExceptions.PropertyNotFoundException;
 import com.koi151.msproperties.service.converter.PropertyConverter;
-import com.koi151.msproperties.utils.PageTypeAdapter;
 import lombok.*;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cache.annotation.CacheConfig;
-import org.springframework.cache.annotation.Cacheable;
-import org.springframework.context.annotation.Import;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.lang.reflect.Type;
 import java.util.*;
 
 @Service
@@ -44,31 +40,31 @@ public class PropertyServiceImpl implements PropertiesService {
     private final PropertyConverter propertyConverter;
     private final PropertyMapper propertyMapper;
 
-    @Autowired
-    RedisTemplate redisTemplate;
-    private final Gson gson = new GsonBuilder()
-            .registerTypeAdapter(Page.class, new PageTypeAdapter())
-            .create();
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
+    private static final Logger logger = LoggerFactory.getLogger(PropertyRepositoryImpl.class);
 
-    @Override
-    @Transactional(readOnly = true)
     public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
-        String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
-        String redisData = (String) redisTemplate.opsForValue().get(redisKey);
 
-        if (redisData == null) {
-            Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
-            Page<PropertySearchDTO> result = propertyPage.map(propertyMapper::toPropertySearchDTO);
-            String jsonData = gson.toJson(result);
-            redisTemplate.opsForValue().set(redisKey, jsonData);
-            return result;
-        } else {
-            Type pageType = new TypeToken<Page<PropertySearchDTO>>() {}.getType();
-            return gson.fromJson(redisData, pageType);
+        String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
+        String redisData = redisTemplate.opsForValue().get(redisKey);
+
+        try {
+            if (redisData == null) {
+                Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
+                Page<PropertySearchDTO> result = propertyPage.map(propertyMapper::toPropertySearchDTO);
+                String jsonData = objectMapper.writeValueAsString(result);
+                redisTemplate.opsForValue().set(redisKey, jsonData);
+                return result;
+            } else {
+                JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, PropertySearchDTO.class);
+                return objectMapper.readValue(redisData, pageType);
+            }
+        } catch (JsonProcessingException ex) {
+            logger.error("Json processing error occurred "  + ex.getMessage());
+            throw new RuntimeException("Json processing error occurred");
         }
     }
-
-
 
     @Override
     @Transactional(readOnly = true)
