@@ -7,6 +7,7 @@ import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.io.Serial;
+import java.util.List;
 
 @Entity(name = "post_service_category")
 @Getter
@@ -23,16 +24,20 @@ public class PostServiceCategory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postServiceCategoryId;
 
-    @Column(name = "name", nullable = false, unique = true)
+    @OneToMany(mappedBy = "postServiceCategory", fetch = FetchType.LAZY,
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<PostService> postService;
+
+    @Column(name = "name", nullable = false, unique = true, length = 100)
     @NotBlank(message = "Post service category name is mandatory")
     @Size(min = 6, max = 100, message = "Post service category name must between {min} and {max} characters")
     private String name;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.ACTIVE;
 
-    @Column(name = "description")
+    @Column(name = "description", length = 2000)
     @Size(max = 2000, message = "Post service category description cannot exceed {max} characters")
     private String description;
 }

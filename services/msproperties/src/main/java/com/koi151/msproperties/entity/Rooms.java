@@ -25,7 +25,7 @@ public class Rooms {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long roomId;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "property_id")
     @NotNull(message = "Property id is mandatory")
     private Property property;
