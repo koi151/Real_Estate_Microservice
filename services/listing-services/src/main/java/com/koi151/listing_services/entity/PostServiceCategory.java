@@ -21,7 +21,7 @@ public class PostServiceCategory extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postServiceCategoryId;
+    private int postServiceCategoryId;
 
     @Column(name = "name", nullable = false, unique = true)
     @NotBlank(message = "Post service category name is mandatory")

@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class AccountServiceImpl implements AccountService {
 
     private final PasswordEncoder passwordEncoder;
@@ -124,6 +123,7 @@ public class AccountServiceImpl implements AccountService {
 
 
     @Override
+    @Transactional
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         validateAccountCreateRequest(request);
         Account newAccount = accountConverter.toAccountEntity(request, avatar);

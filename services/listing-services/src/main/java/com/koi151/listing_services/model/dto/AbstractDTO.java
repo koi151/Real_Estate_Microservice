@@ -1,13 +1,19 @@
 package com.koi151.listing_services.model.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 
 @Data
+@SuperBuilder
+@AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractDTO<T> implements Serializable {
 
