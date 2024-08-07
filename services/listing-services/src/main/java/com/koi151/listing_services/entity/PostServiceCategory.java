@@ -24,8 +24,7 @@ public class PostServiceCategory extends BaseEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int postServiceCategoryId;
 
-    @OneToMany(mappedBy = "postServiceCategory", fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "postServiceCategory", fetch = FetchType.LAZY)
     private List<PostService> postService;
 
     @Column(name = "name", nullable = false, unique = true, length = 100)

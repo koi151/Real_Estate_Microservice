@@ -24,12 +24,18 @@ public class PostService {
     private long post_service_id;
 
     @OneToOne(mappedBy = "postService", fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     private PostServicePricing postServicePricing;
 
-    @OneToMany(mappedBy = "postService", fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    @OneToMany(mappedBy = "postService",
+            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
+    private List<PostServicePackage> postServicePackage;
+
+    @OneToMany(mappedBy = "postService", cascade = CascadeType.ALL)
     private List<Promotion> promotions;
+
+    @OneToMany(mappedBy = "postService")
+    private List<PropertyServicePackage> propertyServicePackages;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_service_category_id")
