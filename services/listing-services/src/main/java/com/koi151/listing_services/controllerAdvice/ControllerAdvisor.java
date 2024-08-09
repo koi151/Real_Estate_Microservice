@@ -1,6 +1,9 @@
 package com.koi151.listing_services.controllerAdvice;
 
+import com.koi151.listing_services.customExceptions.DuplicatePostServiceCategoryException;
+import com.koi151.listing_services.customExceptions.DuplicatePostServiceException;
 import com.koi151.listing_services.customExceptions.InvalidEnumValueException;
+import com.koi151.listing_services.customExceptions.PostServiceCategoryNotFoundException;
 import com.koi151.listing_services.model.response.ErrorResponse;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -35,9 +38,9 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getBindingResult().getFieldErrors()
-                .stream() // create new stream
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList()); // convert to list
+            .stream() // create new stream
+            .map(FieldError::getDefaultMessage)
+            .collect(Collectors.toList()); // convert to list
 
         ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError("Validation failed");
@@ -61,6 +64,43 @@ public class ControllerAdvisor {
             errorResponse.setError("Duplicate entry: ");
             errorResponse.setDetails(details);
         }
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(PostServiceCategoryNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePostServiceCategoryNotFoundException(PostServiceCategoryNotFoundException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Post service category not exists, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
+    }
+
+    // duplicate ex
+    @ExceptionHandler(DuplicatePostServiceException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicatePostServiceException(DuplicatePostServiceException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Post service validate failed, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(DuplicatePostServiceCategoryException.class)
+    public ResponseEntity<ErrorResponse> handleDuplicatePostServiceCategoryException(DuplicatePostServiceCategoryException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Post service category validate failed, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }

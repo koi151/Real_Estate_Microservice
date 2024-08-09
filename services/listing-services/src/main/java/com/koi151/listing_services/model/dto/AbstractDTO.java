@@ -13,6 +13,7 @@ import java.time.LocalDateTime;
 
 @Data
 @SuperBuilder
+@NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public abstract class AbstractDTO<T> implements Serializable {

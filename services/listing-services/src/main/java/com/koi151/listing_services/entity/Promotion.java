@@ -1,9 +1,9 @@
 package com.koi151.listing_services.entity;
 
+import com.koi151.listing_services.enums.PackageType;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Max;
-import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.math.BigDecimal;
@@ -23,6 +23,10 @@ public class Promotion {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_service_id")
     private PostService postService;
+
+    @Column(name = "package_type", nullable = false)
+    @Enumerated(EnumType.STRING)
+    private PackageType packageType;
 
     @Column(name = "percent_discount", precision = 5, scale = 2)
     @Max(value = 100, message = "Discount percentage cannot exceed {max}%")

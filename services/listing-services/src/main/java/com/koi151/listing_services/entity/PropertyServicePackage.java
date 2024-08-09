@@ -2,13 +2,12 @@ package com.koi151.listing_services.entity;
 
 import com.koi151.listing_services.enums.Status;
 import jakarta.persistence.*;
-import jakarta.validation.constraints.Size;
 import lombok.*;
 
 import java.io.Serial;
 import java.util.List;
 
-@Entity(name = "property_post_service_id")
+@Entity(name = "property_post_service")
 @Getter
 @Setter
 @NoArgsConstructor

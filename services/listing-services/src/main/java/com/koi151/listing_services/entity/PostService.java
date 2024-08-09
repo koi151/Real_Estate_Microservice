@@ -1,7 +1,7 @@
 package com.koi151.listing_services.entity;
 
 
-import com.ctc.wstx.shaded.msv_core.verifier.ValidationUnrecoverableException;
+import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
@@ -11,7 +11,7 @@ import lombok.*;
 import java.time.LocalDateTime;
 import java.util.List;
 
-@Entity(name = "post_service_id")
+@Entity(name = "post_service")
 @Getter
 @Setter
 @AllArgsConstructor
@@ -21,7 +21,7 @@ public class PostService {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long post_service_id;
+    private long postServiceId;
 
     @OneToOne(mappedBy = "postService", fetch = FetchType.LAZY,
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
@@ -39,10 +39,10 @@ public class PostService {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_service_category_id")
-    private PostServiceCategory postServiceCategoryId;
+    private PostServiceCategory postServiceCategory;
 
-    @Column(name = "post_service_category_id", nullable = false, unique = true, length = 100)
-    @NotNull(message = "Post service category id is mandatory")
+    @Column(name = "name", nullable = false, unique = true, length = 100)
+    @NotNull(message = "Post service name is mandatory")
     @Size(min = 5, max = 100, message = "Post service name must between {min} and {max} characters")
     private String name;
 
@@ -56,7 +56,6 @@ public class PostService {
 
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
-
 }
 
 
