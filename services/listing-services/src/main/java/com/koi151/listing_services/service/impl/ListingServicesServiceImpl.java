@@ -9,6 +9,7 @@ import com.koi151.listing_services.model.request.PostServiceCreateRequest;
 import com.koi151.listing_services.repository.PostServiceCategoryRepository;
 import com.koi151.listing_services.repository.PostServiceRepository;
 import com.koi151.listing_services.service.ListingServicesService;
+import com.koi151.listing_services.service.converter.ListingServiceConverter;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class ListingServicesServiceImpl implements ListingServicesService {
     private final ListingServiceMapper listingServiceMapper;
     private final PostServiceRepository postServiceRepository;
     private final PostServiceCategoryRepository postServiceCategoryRepository;
+    private final ListingServiceConverter listingServiceConverter;
 
     @Override
     @Transactional
@@ -29,8 +31,9 @@ public class ListingServicesServiceImpl implements ListingServicesService {
         if (postServiceRepository.existsByName(request.name()))
             throw new DuplicatePostServiceException("Post service with name '" + request.name() + "' already existed");
 
-        PostService entity = postServiceRepository.save(listingServiceMapper.toPostServiceEntity(request));
-        return listingServiceMapper.toPostServiceCreateDTO(entity);
+        PostService entity = listingServiceConverter.toPostServiceEntity(request);
+        PostService savedData = postServiceRepository.save(entity);
+        return listingServiceMapper.toPostServiceCreateDTO(savedData);
     }
 }
 

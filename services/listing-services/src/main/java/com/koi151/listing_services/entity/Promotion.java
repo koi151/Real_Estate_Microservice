@@ -6,6 +6,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Max;
 import lombok.*;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 
 @Entity(name = "promotion")
@@ -14,7 +15,10 @@ import java.math.BigDecimal;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class Promotion {
+public class Promotion extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = -6762626185918224172L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

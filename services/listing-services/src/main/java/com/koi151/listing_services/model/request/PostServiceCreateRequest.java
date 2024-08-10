@@ -1,8 +1,6 @@
 package com.koi151.listing_services.model.request;
 
-import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.enums.Status;
-import jakarta.validation.Valid;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;

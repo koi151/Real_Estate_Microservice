@@ -10,7 +10,7 @@ import java.util.List;
 @Builder
 public class PostServiceCreateDTO {
 
-    private Long post_service_id;
+    private Long postServiceId;
     private Long postServiceCategoryId;
     private PostServicePricingDTO postServicePricing;
     private List<PromotionDTO> promotions;

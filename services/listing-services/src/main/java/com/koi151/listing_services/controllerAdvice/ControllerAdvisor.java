@@ -61,7 +61,7 @@ public class ControllerAdvisor {
             List<String> details = new ArrayList<>();
             details.add(message);
 
-            errorResponse.setError("Duplicate entry: ");
+            errorResponse.setError("Data validate failed: ");
             errorResponse.setDetails(details);
         }
 

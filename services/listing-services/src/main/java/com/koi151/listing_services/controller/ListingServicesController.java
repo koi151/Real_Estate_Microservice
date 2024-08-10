@@ -26,7 +26,9 @@ public class ListingServicesController {
     ) {
         var postService = listingServicesService.createPostService(request);
         return ResponseEntity.ok(ResponseData.builder()
-            .desc("Created post service successfully")
+            .desc("Created post service successfully" +
+                (request.postServicePricing().startDate() == null
+                    ? ", post service pricing start date by default will begin at current time" : ""))
             .data(postService)
             .build());
     }

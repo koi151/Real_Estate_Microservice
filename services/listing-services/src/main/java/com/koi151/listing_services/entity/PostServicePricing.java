@@ -7,6 +7,7 @@ import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
+import org.springframework.data.annotation.CreatedDate;
 
 import java.io.Serial;
 import java.math.BigDecimal;
@@ -41,6 +42,7 @@ public class PostServicePricing extends BaseEntity {
     private BigDecimal price;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP(0)", nullable = false)
+    @CreatedDate
     private LocalDateTime startDate;
 
     @Column(name = "end_date", columnDefinition = "TIMESTAMP(0)")
