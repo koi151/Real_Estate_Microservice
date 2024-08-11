@@ -18,7 +18,7 @@ public record PostServiceCreateRequest (
     Status status,
     @Size(max = 2000, message = "Post service description cannot exceed {max} characters")
     String description,
-    PostServicePricingCreateRequest postServicePricing,
+    List<PostServicePricingCreateRequest> postServicePricings,
     List<PromotionCreateRequest> promotions,
     @Future(message = "Posting date must be in the future")
     LocalDateTime postingDate

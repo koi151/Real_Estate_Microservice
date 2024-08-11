@@ -1,10 +1,11 @@
 package com.koi151.listing_services.entity;
 
 
-import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
@@ -44,6 +45,11 @@ public class PostService {
     @NotNull(message = "Post service name is mandatory")
     @Size(min = 5, max = 100, message = "Post service name must between {min} and {max} characters")
     private String name;
+
+    @Column(name = "available_units", nullable = false)
+    @NotNull(message = "Post service available unit quantity is mandatory")
+    @Positive(message = "Post service available unit quantity must greater than zero")
+    private int availableUnits;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

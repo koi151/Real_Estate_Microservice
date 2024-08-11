@@ -9,10 +9,9 @@ import java.util.List;
 @Data
 @Builder
 public class PostServiceCreateDTO {
-
     private Long postServiceId;
     private Long postServiceCategoryId;
-    private PostServicePricingDTO postServicePricing;
+    private List<PostServicePricingDTO> postServicePricings;
     private List<PromotionDTO> promotions;
     private String name;
     private String status;
