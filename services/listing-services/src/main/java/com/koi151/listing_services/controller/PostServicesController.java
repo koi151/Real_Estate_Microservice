@@ -1,6 +1,8 @@
 package com.koi151.listing_services.controller;
 
+import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.model.request.PostServiceCreateRequest;
+import com.koi151.listing_services.model.request.PostServicePricingCreateRequest;
 import com.koi151.listing_services.model.response.ResponseData;
 import com.koi151.listing_services.service.ListingServicesService;
 import com.koi151.listing_services.service.PostServiceService;
@@ -9,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.stream.Collectors;
 
 @RestController
 @RequiredArgsConstructor
@@ -27,10 +31,21 @@ public class PostServicesController {
         @RequestBody @Valid PostServiceCreateRequest request
     ) {
         var postService = postServiceService.createPostService(request);
+        String description = "Created post service successfully";
+
+        var pricingsWithNullStartDate = request.postServicePricings().stream()
+            .filter(pricing -> pricing.startDate() == null)
+            .map(PostServicePricingCreateRequest::packageType) // Get the PackageType enum
+            .map(PackageType::getPackageName)
+            .toList();
+
+        if (!pricingsWithNullStartDate.isEmpty()) {
+            String pricingsString = pricingsWithNullStartDate.toString();
+            description += ". The following post service pricings have their start date set to the current time by default: " + pricingsString;
+        }
+
         return ResponseEntity.status(HttpStatus.CREATED).body(ResponseData.builder()
-            .desc("Created post service successfully" +
-                (request.postServicePricing().startDate() == null
-                    ? ", post service pricing start date by default will begin at current time" : ""))
+            .desc(description)
             .data(postService)
             .build());
     }

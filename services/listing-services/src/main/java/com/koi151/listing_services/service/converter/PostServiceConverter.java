@@ -13,7 +13,10 @@ public class PostServiceConverter {
 
     public PostService toPostServiceEntity(PostServiceCreateRequest request) {
         PostService entity = postServiceMapper.toPostServiceEntity(request);
-        entity.getPostServicePricing().setPostService(entity); // pricing always != null due to BaseEntity extends
+        if (entity.getPostServicePricings() != null) {
+            entity.getPostServicePricings().forEach(postServicePricing ->
+                postServicePricing.setPostService(entity));
+        }
         entity.getPromotions().forEach(promotionEntity ->
                 promotionEntity.setPostService(entity));
         return entity;

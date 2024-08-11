@@ -9,7 +9,7 @@ import java.util.List;
 public class PropertyServicePackageCreateDTO {
     private Long propertyServiceId;
     private PostService postService;
-    private List<PostServicePackageDTO> postServicePackages;
+    private List<PostServicePackageCreateDTO> postServicePackages;
     private String packageType;
     private String status;
 }

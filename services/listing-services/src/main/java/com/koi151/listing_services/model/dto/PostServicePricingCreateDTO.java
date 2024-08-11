@@ -1,6 +1,5 @@
 package com.koi151.listing_services.model.dto;
 
-import jakarta.persistence.EnumType;
 import lombok.Builder;
 import lombok.Data;
 
@@ -9,7 +8,7 @@ import java.time.LocalDateTime;
 
 @Data
 @Builder
-public class PostServicePricingDTO {
+public class PostServicePricingCreateDTO {
     private BigDecimal price;
     private LocalDateTime startDate;
     private LocalDateTime endDate;
