@@ -24,10 +24,10 @@ public class PostServicePricing extends BaseEntity {
     private static final long serialVersionUID = -6091883146945983588L;
 
     @Id
-    private Long postServiceId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long postServicePricingId;
 
-    @OneToOne
-    @MapsId
+    @ManyToOne
     @JoinColumn(name = "post_service_id")
     private PostService postService;
 

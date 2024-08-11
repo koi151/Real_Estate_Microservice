@@ -1,7 +1,9 @@
 package com.koi151.listing_services.entity;
 
+import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotNull;
 import lombok.*;
 
 import java.io.Serial;
@@ -28,6 +30,10 @@ public class PropertyServicePackage extends BaseEntity {
 
     @OneToMany(mappedBy = "propertyServicePackage", cascade = CascadeType.ALL)
     private List<PostServicePackage> postServicePackages;
+
+    @Column(name = "package_type")
+    @NotNull(message = "Property service package type is mandatory")
+    private PackageType packageType;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)

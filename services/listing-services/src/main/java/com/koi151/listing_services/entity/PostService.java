@@ -23,9 +23,8 @@ public class PostService {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long postServiceId;
 
-    @OneToOne(mappedBy = "postService", fetch = FetchType.LAZY,
-            cascade = {CascadeType.PERSIST, CascadeType.MERGE})
-    private PostServicePricing postServicePricing;
+    @OneToMany(mappedBy = "postService", cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
+    private List<PostServicePricing> postServicePricings;
 
     @OneToMany(mappedBy = "postService",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE})
