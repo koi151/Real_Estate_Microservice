@@ -141,7 +141,6 @@ public class PropertyController {
                                 .build());
                     }
 
-
                     LocalDate availableFrom = LocalDate.of(
                             2024,
                             faker.number().numberBetween(7, 9),
@@ -292,16 +291,14 @@ public class PropertyController {
             @RequestPart(required = false) List<MultipartFile> images
     ){
         ResponseData responseData = new ResponseData();
-
         responseData.setData(propertiesService.updateProperty(id, property, images));
         responseData.setDesc("Property updated successfully");
-
         return ResponseEntity.ok(responseData);
     }
 
     @GetMapping("/{id}/exists") // used for other domains application request
     public ResponseEntity<ResponseData> propertyExistsCheck(@PathVariable(name = "id") Long id) {
-        var res = propertiesService.propertyExistsCheck(id);
+        var res = propertiesService.propertyActiveCheck(id);
         ResponseData responseData = new ResponseData();
         responseData.setData(res);
         responseData.setDesc("Success");

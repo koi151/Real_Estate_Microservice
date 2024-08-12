@@ -22,3 +22,7 @@ spring:
     baseline-version: 0
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+application:
+  config:
+    properties-url: http://localhost:9090/api/v1/properties

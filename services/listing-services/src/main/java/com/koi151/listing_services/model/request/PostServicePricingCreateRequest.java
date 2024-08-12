@@ -1,9 +1,6 @@
 package com.koi151.listing_services.model.request;
 
 import com.koi151.listing_services.enums.PackageType;
-import jakarta.persistence.Column;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotNull;

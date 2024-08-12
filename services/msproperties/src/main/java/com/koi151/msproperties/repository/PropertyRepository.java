@@ -18,7 +18,7 @@ public interface PropertyRepository extends JpaRepository<Property, Integer>, Pr
 //    @Query("SELECT p.propertyPostService FROM property p WHERE p.propertyId = :id") // created new repository instead to adhere SRP
 //    PropertyPostServiceEntity findPropertyPostServiceByPropertyId(@Param("id") Long id);
 
-    boolean existsByPropertyIdAndDeleted(Long propertyId, boolean deleted);
+    boolean existsByPropertyIdAndDeletedAndStatus(Long propertyId, boolean deleted, StatusEnum status);
     Page<Property> findByDeleted(boolean deleted, Pageable pageable);
     Page<Property> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, Pageable pageable);
     Page<Property> findByAccountIdAndDeleted(Long accountId, boolean deleted, Pageable pageable);

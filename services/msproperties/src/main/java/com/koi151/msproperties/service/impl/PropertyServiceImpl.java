@@ -144,8 +144,8 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Transactional(readOnly = true)
-    public boolean checkPropertyExistedById(Long id) {
-        return propertyRepository.existsByPropertyIdAndDeleted(id, false);
+    public boolean checkPropertyActiveById(Long id) {
+        return propertyRepository.existsByPropertyIdAndDeletedAndStatus(id, false, StatusEnum.ACTIVE);
     }
 
     private void updateImages(Property existingProperty, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
@@ -233,7 +233,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Override
     @Transactional
-    public boolean propertyExistsCheck(Long id) {
-        return checkPropertyExistedById(id);
+    public boolean propertyActiveCheck(Long id) {
+        return checkPropertyActiveById(id);
     }
 }

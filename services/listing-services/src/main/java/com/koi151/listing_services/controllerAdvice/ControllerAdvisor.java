@@ -1,9 +1,6 @@
 package com.koi151.listing_services.controllerAdvice;
 
-import com.koi151.listing_services.customExceptions.DuplicatePostServiceCategoryException;
-import com.koi151.listing_services.customExceptions.DuplicatePostServiceException;
-import com.koi151.listing_services.customExceptions.InvalidEnumValueException;
-import com.koi151.listing_services.customExceptions.PostServiceCategoryNotFoundException;
+import com.koi151.listing_services.customExceptions.*;
 import com.koi151.listing_services.model.response.ErrorResponse;
 import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.http.HttpStatus;
@@ -97,6 +94,31 @@ public class ControllerAdvisor {
     public ResponseEntity<ErrorResponse> handleDuplicatePostServiceCategoryException(DuplicatePostServiceCategoryException ex) {
         List<String> details = new ArrayList<>();
         details.add("Post service category validate failed, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    // NOT EXISTS EX ==================================
+    @ExceptionHandler(PostServiceNotExistedException.class)
+    public ResponseEntity<ErrorResponse> handlePostServiceNotExistedException(PostServiceNotExistedException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Post service not existed, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    @ExceptionHandler(PropertyNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handlePropertyNotFoundException(PropertyNotFoundException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Property not existed, recheck again");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setDetails(details);

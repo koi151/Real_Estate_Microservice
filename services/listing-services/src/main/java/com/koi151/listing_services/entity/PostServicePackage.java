@@ -21,6 +21,9 @@ public class PostServicePackage {
     @EmbeddedId
     PostServicePackageKey postServicePackageKey;
 
+    @Column(name = "property_id") // from other service -> open feign
+    private long propertyId;
+
     @ManyToOne(fetch= FetchType.LAZY)
     @JoinColumn(name = "property_service_id", insertable = false, updatable = false)
     PropertyServicePackage propertyServicePackage;

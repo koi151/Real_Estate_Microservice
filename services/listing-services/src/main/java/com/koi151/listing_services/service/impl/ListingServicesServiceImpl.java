@@ -1,6 +1,8 @@
 package com.koi151.listing_services.service.impl;
 
+import com.koi151.listing_services.client.PropertyClient;
 import com.koi151.listing_services.customExceptions.PostServiceNotExistedException;
+import com.koi151.listing_services.customExceptions.PropertyNotFoundException;
 import com.koi151.listing_services.entity.PostService;
 import com.koi151.listing_services.entity.PropertyServicePackage;
 import com.koi151.listing_services.mapper.PostServiceMapper;
@@ -25,31 +27,27 @@ public class ListingServicesServiceImpl implements ListingServicesService {
     private final PropertyServicePackageMapper propertyServicePackageMapper;
     private final PropertyPostPackageRepository propertyPostPackageRepository;
     private final PostServiceRepository postServiceRepository;
+    private final PropertyClient propertyClient;
+
+    private void postServiceCreateValidate(PropertyServicePackageCreateRequest request) {
+//        boolean propertyServicePackageExisted = propertyPostPackageRepository.fi
+
+        // property id check
+        var propertyResponse = propertyClient.propertyExistsCheck(request.propertyId());
+        if (!propertyResponse.getStatusCode().is2xxSuccessful() || propertyResponse.getBody() == null) //
+            throw new PropertyNotFoundException("Property not found with id: " + request.propertyId());
+
+        // post service ids check
+        Set<Long> propertyPostIdsNotExists = postServiceRepository.findMissingPostServiceIds(request.postServicePackageIds());
+        if (!propertyPostIdsNotExists.isEmpty())
+            throw new PostServiceNotExistedException("Property service ids not exists: " + propertyPostIdsNotExists);
+
+    }
 
     @Override
     @Transactional
     public PropertyServicePackageCreateDTO createPostServicePackage(PropertyServicePackageCreateRequest request) {
-//        if (!postServiceRepository.existsAllByPostServiceIdIn(request.postServicePackageIds())) {
-            // find ids that not exists
-
-        List<Long> propertyPostIdsNotExists = postServiceRepository.findIdsByPostServiceIdNotIn(request.postServicePackageIds());
-        if (propertyPostIdsNotExists != null)
-            throw new PostServiceNotExistedException("Property post ids not exists: " + propertyPostIdsNotExists);
-
-
-        List<PostService> existingServices = postServiceRepository.findAllById(request.postServicePackageIds());
-        Set<Long> existingIds = existingServices.stream()
-                .map(PostService::getPostServiceId)
-                .collect(Collectors.toSet());
-
-        List<Long> missingIds = request.postServicePackageIds().stream()
-                .filter(id -> !existingIds.contains(id))
-                .toList();
-
-        if (!missingIds.isEmpty()) {
-            throw new PostServiceNotExistedException("The following PostService IDs do not exist: " + missingIds);
-        }
-
+        postServiceCreateValidate(request);
         PropertyServicePackage postServicePackage = propertyServicePackageMapper.toPostServicePackageEntity(request);
         propertyPostPackageRepository.save(postServicePackage);
         return propertyServicePackageMapper.toPropertyServicePackageCreateDTO(postServicePackage);

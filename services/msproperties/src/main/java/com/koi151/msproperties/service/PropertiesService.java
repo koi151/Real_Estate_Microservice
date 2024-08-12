@@ -29,5 +29,5 @@ public interface PropertiesService {
     DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;
 
-    boolean propertyExistsCheck(Long id);
+    boolean propertyActiveCheck(Long id);
 }
