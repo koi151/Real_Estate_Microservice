@@ -9,7 +9,7 @@ import lombok.*;
 import java.io.Serial;
 import java.util.List;
 
-@Entity(name = "property_post_service")
+@Entity(name = "property_service_package")
 @Getter
 @Setter
 @NoArgsConstructor
@@ -22,11 +22,10 @@ public class PropertyServicePackage extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long propertyServiceId;
+    private Long propertyServicePackageId;
 
-    @ManyToOne
-    @JoinColumn(name = "post_service_id")
-    private PostService postService;
+    @Column(name = "property_id") // from other service -> open feign
+    private long propertyId;
 
     @OneToMany(mappedBy = "propertyServicePackage", cascade = CascadeType.ALL)
     private List<PostServicePackage> postServicePackages;
@@ -39,19 +38,3 @@ public class PropertyServicePackage extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private Status status;
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

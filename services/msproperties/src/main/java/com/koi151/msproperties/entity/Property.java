@@ -13,7 +13,7 @@ import java.util.List;
 
 @NamedEntityGraph(name = "property-with-details",
     attributeNodes = {
-        @NamedAttributeNode("propertyPostService"),
+//        @NamedAttributeNode("propertyPostService"),
         @NamedAttributeNode("propertyForRent"),
         @NamedAttributeNode("propertyForSale")
     })

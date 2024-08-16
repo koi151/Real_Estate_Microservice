@@ -25,7 +25,6 @@ public class PropertyConverter {
         else
             property = propertyMapper.toPropertyEntity(request);
 
-        property.getPropertyPostService().setProperty(property);
         property.getAddress().setProperty(property);
 
         if (request.propertyForSale() != null)

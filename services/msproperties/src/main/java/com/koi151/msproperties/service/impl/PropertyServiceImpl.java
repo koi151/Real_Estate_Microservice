@@ -143,11 +143,6 @@ public class PropertyServiceImpl implements PropertiesService {
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + id));
     }
 
-    @Transactional(readOnly = true)
-    public boolean checkPropertyActiveById(Long id) {
-        return propertyRepository.existsByPropertyIdAndDeletedAndStatus(id, false, StatusEnum.ACTIVE);
-    }
-
     private void updateImages(Property existingProperty, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
         Set<String> existingImagesUrlSet = new HashSet<>();
 
@@ -232,8 +227,8 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public boolean propertyActiveCheck(Long id) {
-        return checkPropertyActiveById(id);
+        return propertyRepository.existsByPropertyIdAndDeletedAndStatus(id, false, StatusEnum.ACTIVE);
     }
 }

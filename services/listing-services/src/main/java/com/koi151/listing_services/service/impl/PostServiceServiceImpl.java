@@ -4,7 +4,6 @@ import com.koi151.listing_services.customExceptions.DuplicatePostServiceExceptio
 import com.koi151.listing_services.customExceptions.PostServiceCategoryNotFoundException;
 import com.koi151.listing_services.entity.PostService;
 import com.koi151.listing_services.mapper.PostServiceMapper;
-import com.koi151.listing_services.mapper.PropertyServicePackageMapper;
 import com.koi151.listing_services.model.dto.PostServiceCreateDTO;
 import com.koi151.listing_services.model.request.PostServiceCreateRequest;
 import com.koi151.listing_services.repository.PostServiceCategoryRepository;

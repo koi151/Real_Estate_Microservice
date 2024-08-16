@@ -77,11 +77,13 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
 
-    // duplicate ex
-    @ExceptionHandler(DuplicatePostServiceException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicatePostServiceException(DuplicatePostServiceException ex) {
+    // DUPLICATE ENTITY ==============================================
+    @ExceptionHandler({ DuplicatePostServiceException.class, DuplicatePostServiceCategoryException.class, DuplicatedPropertyPostPackageException.class })
+    public ResponseEntity<ErrorResponse> handleDuplicateException(RuntimeException ex) {
+
         List<String> details = new ArrayList<>();
-        details.add("Post service validate failed, recheck again");
+        StringBuilder detailMessage = getDetailMessage(ex);
+        details.add(String.valueOf(detailMessage));
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setDetails(details);
@@ -90,17 +92,21 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(DuplicatePostServiceCategoryException.class)
-    public ResponseEntity<ErrorResponse> handleDuplicatePostServiceCategoryException(DuplicatePostServiceCategoryException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Post service category validate failed, recheck again");
+    private static StringBuilder getDetailMessage(RuntimeException ex) {
+        StringBuilder detailMessage = new StringBuilder();
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setDetails(details);
-        errorResponse.setError(ex.getMessage());
+        if (ex instanceof DuplicatePostServiceException) {
+            detailMessage.append("Post service");
+        } else if (ex instanceof DuplicatePostServiceCategoryException) {
+            detailMessage.append("Post service category");
+        } else if (ex instanceof DuplicatedPropertyPostPackageException){
+            detailMessage.append("Post service property post package");
+        }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        detailMessage.append(" validate failed, please recheck again");
+        return detailMessage;
     }
+
 
     // NOT EXISTS EX ==================================
     @ExceptionHandler(PostServiceNotExistedException.class)
@@ -125,5 +131,18 @@ public class ControllerAdvisor {
         errorResponse.setError(ex.getMessage());
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+    }
+
+    // OTHER SERVICES UNAVAILABLE EX ================================
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceUnavailableException(ServiceUnavailableException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Service is unavailable now, recheck if error occurred or service is not working");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
     }
 }

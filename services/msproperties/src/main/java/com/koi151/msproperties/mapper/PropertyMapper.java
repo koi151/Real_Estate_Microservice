@@ -48,8 +48,8 @@ public interface PropertyMapper {
     @Mapping(target = "address", expression = "java(getFullAddressStringFromEntity(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     @Mapping(target = "status", source = "status.statusName")
-    @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
-    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
+//    @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
+//    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     DetailedPropertyDTO toDetailedPropertyDTO(Property entity);
 
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")

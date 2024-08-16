@@ -8,9 +8,10 @@ import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 
 import java.time.LocalDateTime;
-import java.util.Set;
+import java.util.List;
 
 public record PropertyServicePackageCreateRequest (
+    @NotNull(message = "Property id is mandatory")
     Long propertyId,
     @NotNull(message = "Property service package type is mandatory")
     PackageType packageType,
@@ -18,7 +19,7 @@ public record PropertyServicePackageCreateRequest (
     @Future(message = "Posting date must be in the future")
     LocalDateTime postingDate,
     Status status,
-    @NotNull
-    @NotEmpty
-    Set<Long> postServicePackageIds
+    @NotNull(message = "Post service ids used for that property service package is mandatory")
+    @NotEmpty(message = "Post service ids used for that property service package is mandatory")
+    List<Long> postServiceIds
 ) {}

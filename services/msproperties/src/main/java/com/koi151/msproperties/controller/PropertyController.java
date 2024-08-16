@@ -296,12 +296,12 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
-    @GetMapping("/{id}/exists") // used for other domains application request
+    @GetMapping("/{id}/active") // used for other domains application request
     public ResponseEntity<ResponseData> propertyExistsCheck(@PathVariable(name = "id") Long id) {
         var res = propertiesService.propertyActiveCheck(id);
         ResponseData responseData = new ResponseData();
         responseData.setData(res);
-        responseData.setDesc("Success");
+        responseData.setDesc("Property with id " + id + " is " + (res ? "active" : "not active or exists"));
         return ResponseEntity.ok(responseData);
     }
 }

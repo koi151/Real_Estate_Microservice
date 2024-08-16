@@ -8,6 +8,6 @@ import org.springframework.web.bind.annotation.PathVariable;
 
 @FeignClient(name = "property-service", url = "${application.config.properties-url}")
 public interface PropertyClient {
-    @GetMapping("/{id}/exists")
+    @GetMapping("/{id}/active")
     ResponseEntity<ResponseData> propertyExistsCheck(@PathVariable(name = "id") Long id);
 }

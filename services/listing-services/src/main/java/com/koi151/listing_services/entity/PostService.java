@@ -34,9 +34,6 @@ public class PostService {
     @OneToMany(mappedBy = "postService", cascade = CascadeType.ALL)
     private List<Promotion> promotions;
 
-    @OneToMany(mappedBy = "postService")
-    private List<PropertyServicePackage> propertyServicePackages;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_service_category_id")
     private PostServiceCategory postServiceCategory;
@@ -62,13 +59,3 @@ public class PostService {
     @Column(name = "expired_at")
     private LocalDateTime expiredAt;
 }
-
-
-
-
-
-
-
-
-
-
