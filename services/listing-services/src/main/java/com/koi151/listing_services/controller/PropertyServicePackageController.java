@@ -15,6 +15,16 @@ import org.springframework.web.bind.annotation.*;
 public class PropertyServicePackageController {
 
     private final ListingServicesService listingServicesService;
+
+    @GetMapping("/{id}/post-services")
+    public ResponseEntity<ResponseData> findPropertyPostServicesById(@PathVariable(name = "id") Long id) {
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(listingServicesService.findPropertyServicePackageWithsPostServices(id))
+            .desc("Get property post service with id: " + id + " succeed")
+            .build());
+    }
+
+
     @PostMapping("/")
     public ResponseEntity<ResponseData> createPropertyServicePackage(@RequestBody @Valid PropertyServicePackageCreateRequest request) {
         var propertyServicePackage = listingServicesService.createPostServicePackage(request);
