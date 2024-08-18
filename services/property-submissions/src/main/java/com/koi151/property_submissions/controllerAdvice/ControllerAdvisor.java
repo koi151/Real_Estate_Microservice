@@ -98,8 +98,8 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
-    @ExceptionHandler(ServiceCommunicationException.class)
-    public ResponseEntity<ErrorResponse> handleServiceCommunicationException(ServiceCommunicationException ex) {
+    @ExceptionHandler(ServiceUnavailableException.class)
+    public ResponseEntity<ErrorResponse> handleServiceCommunicationException(ServiceUnavailableException ex) {
 
         List<String> details = new ArrayList<>();
         details.add("Failed to get properly response from service or invalid response from service, recheck again");

@@ -18,8 +18,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -53,32 +53,35 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
 
         List<Object[]> results = entityManager.createQuery(cq).getResultList();
 
-        if (results.isEmpty()) {
-            return null;
-        }
-
         // Process the results into a DTO
-        PropertyServicePackageSummaryDTO propertyServicePackageSummaryDTO = null;
-        List<PostServiceBasicInfoDTO> postServiceBasicInfoDTOs = new ArrayList<>();
+        return results.stream()
+            .map(result -> {
+                Long propertyServicePackageId = (Long) result[0];
+                String packageType = (String) result[1];
+                Long postServiceId = (Long) result[2];
+                String postServiceName = (String) result[3];
+                Integer availableUnits = (Integer) result[4];
 
-        for (Object[] result : results) {
-            Long propertyServicePackageId = (Long) result[0];
-            String packageType = (String) result[1];
-            Long postServiceId = (Long) result[2];
-            String postServiceName = (String) result[3];
-            Integer availableUnits = (Integer) result[4];
-
-            if (propertyServicePackageSummaryDTO == null) {
-                propertyServicePackageSummaryDTO = PropertyServicePackageSummaryDTO.builder()
-                    .propertyPostPackageId(propertyServicePackageId)
-                    .packageType(packageType)
-                    .postServiceBasicInfoDTOs(postServiceBasicInfoDTOs)
+                return new Object[] {
+                    propertyServicePackageId,
+                    packageType,
+                    new PostServiceBasicInfoDTO(postServiceId, postServiceName, availableUnits)
+                };
+            })
+            .collect(Collectors.groupingBy(obj -> (Long) obj[0])) // Group by propertyServicePackageId
+            .entrySet()
+            .stream()
+            .map(entry -> {
+                List<Object[]> groupedResults = entry.getValue();
+                return PropertyServicePackageSummaryDTO.builder()
+                    .propertyPostPackageId(entry.getKey())
+                    .packageType((String) groupedResults.get(0)[1])
+                    .postServiceBasicInfoDTOs(groupedResults.stream()
+                        .map(obj -> (PostServiceBasicInfoDTO) obj[2])
+                        .collect(Collectors.toList()))
                     .build();
-            }
-
-            postServiceBasicInfoDTOs.add(new PostServiceBasicInfoDTO(postServiceId, postServiceName, availableUnits));
-        }
-
-        return propertyServicePackageSummaryDTO;
+            })
+            .findFirst()
+            .orElse(null);
     }
 }

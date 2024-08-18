@@ -145,4 +145,18 @@ public class ControllerAdvisor {
 
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
     }
+
+    // DESERIALIZE EX
+    @ExceptionHandler(FailedToDeserializingData.class)
+    public ResponseEntity<ErrorResponse> handleFailedToDeserializingData(FailedToDeserializingData ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Failed to deserialize data, recheck again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setDetails(details);
+        errorResponse.setError(ex.getMessage());
+
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+    }
 }
+

@@ -297,7 +297,7 @@ public class PropertyController {
     }
 
     @GetMapping("/{id}/active") // used for other domains application request
-    public ResponseEntity<ResponseData> propertyExistsCheck(@PathVariable(name = "id") Long id) {
+    public ResponseEntity<ResponseData> propertyActiveCheck(@PathVariable(name = "id") Long id) {
         var res = propertiesService.propertyActiveCheck(id);
         ResponseData responseData = new ResponseData();
         responseData.setData(res);

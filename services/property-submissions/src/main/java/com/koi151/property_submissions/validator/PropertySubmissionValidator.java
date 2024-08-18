@@ -1,4 +1,4 @@
-package com.koi151.property_submissions.validation;
+package com.koi151.property_submissions.validator;
 
 import com.koi151.property_submissions.client.PropertyClient;
 import com.koi151.property_submissions.customExceptions.*;
@@ -19,7 +19,7 @@ public class PropertySubmissionValidator {
 
     public void validatePropertySubmissionCreateRequest(PropertySubmissionCreate request) {
        try {
-           ResponseEntity<ResponseData> propertyResponse = propertyClient.propertyExistsCheck(request.propertyId());
+           ResponseEntity<ResponseData> propertyResponse = propertyClient.propertyActiveCheck(request.propertyId());
            // check property existence by id
            if (propertyResponse.getStatusCode().is2xxSuccessful() && propertyResponse.getBody() != null) {
                if (propertyResponse.getBody().getData().equals(false))

@@ -16,7 +16,8 @@ import com.koi151.property_submissions.model.response.PurchaseResponse;
 import com.koi151.property_submissions.model.response.ResponseData;
 import com.koi151.property_submissions.repository.PropertySubmissionRepository;
 import com.koi151.property_submissions.service.PropertySubmissionService;
-import com.koi151.property_submissions.validation.PropertySubmissionValidator;
+import com.koi151.property_submissions.validator.PropertySubmissionValidator;
+import com.koi151.property_submissions.validator.ServiceResponseValidator;
 import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -45,6 +46,9 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     private final AccountClient accountClient;
     private final PropertyClient propertyClient;
 
+    // validator
+    private final ServiceResponseValidator serviceResponseValidator;
+
     @Override
     public Page<PropertySubmissionDetailedDTO> findAllPropertySubmissions(PropertySubmissionSearchRequest request, Pageable pageable) {
         Page<PropertySubmission> submissionPage = propertySubmissionRepository.findPropertySubmissionsByCriteria(request, pageable);
@@ -55,38 +59,37 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Override
     @Transactional
     public PropertySubmissionCreateDTO createPropertySubmission(PropertySubmissionCreate request) {
-        try {
-            var customerResponse = accountClient.findAccountDetails(request.accountId());
-            var propertyPostServiceResponse = propertyClient.findPostServicesById(request.propertyId());
+        ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
+                () -> propertyClient.findPostServicesById(request.propertyId()), // utilizing a functional interface
+                "Property",
+                "property post service data"
+        );
 
-            if (!propertyPostServiceResponse.getStatusCode().is2xxSuccessful() && propertyPostServiceResponse.getBody() == null)
-                throw new PropertyServiceResponseException("Failed to fetch property post service data from Property service");
-            if (!customerResponse.getStatusCode().is2xxSuccessful() && customerResponse.getBody() == null)
-                throw new AccountServiceResponseException("Failed to fetch account data from Account service");
+        ResponseEntity<ResponseData> customerResponse = serviceResponseValidator.fetchServiceData(
+                () -> accountClient.findAccountDetails(request.accountId()),
+                "Account",
+                "account data"
+        );
 
-            var customerData = objectMapper.convertValue(Objects.requireNonNull(Objects.requireNonNull(customerResponse.getBody()).getData()), CustomerResponse.class);
-            var purchaseData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PurchaseResponse.class);
 
-            propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
-            PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
-            propertySubmissionRepository.save(entity);
+        var customerData = objectMapper.convertValue(Objects.requireNonNull(Objects.requireNonNull(customerResponse.getBody()).getData()), CustomerResponse.class);
+        var purchaseData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PurchaseResponse.class);
 
-            submissionProducer.sendSubmissionConfirmation(
-                    new SubmissionConfirmation(
-                            request.referenceCode(),
-                            BigDecimal.TEN,
-                            request.paymentMethod(),
-                            customerData,
-                            purchaseData
-                    )
-            );
+        propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
+        PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
+        propertySubmissionRepository.save(entity);
 
-            return propertySubmissionMapper.toPropertySubmissionCreateDTO(entity);
+        submissionProducer.sendSubmissionConfirmation(
+                new SubmissionConfirmation(
+                        request.referenceCode(),
+                        BigDecimal.TEN,
+                        request.paymentMethod(),
+                        customerData,
+                        purchaseData
+                )
+        );
 
-        } catch (FeignException ex) {
-            log.error("Error occurred while fetching data in other service: {}", ex.getMessage());
-            throw new ServiceCommunicationException("Error communicating with other service");
-        }
+        return propertySubmissionMapper.toPropertySubmissionCreateDTO(entity);
     }
 
     @Override

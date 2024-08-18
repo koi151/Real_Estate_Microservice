@@ -1,5 +1,9 @@
 package com.koi151.listing_services.service.impl;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JavaType;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koi151.listing_services.customExceptions.FailedToDeserializingData;
 import com.koi151.listing_services.entity.PostServicePackage;
 import com.koi151.listing_services.entity.PropertyServicePackage;
 import com.koi151.listing_services.entity.keys.PostServicePackageKey;
@@ -16,13 +20,20 @@ import com.koi151.listing_services.service.ListingServicesService;
 import com.koi151.listing_services.validator.PostServiceValidate;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.data.domain.Page;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class ListingServicesServiceImpl implements ListingServicesService {
 
     private final PropertyServicePackageRepository propertyServicePackageRepository;
@@ -30,8 +41,11 @@ public class ListingServicesServiceImpl implements ListingServicesService {
     private final PostServicePackageRepository postServicePackageRepository;
 
     private final PropertyServicePackageMapper propertyServicePackageMapper;
-    private final PostServiceValidate postServiceValidate;
     private final PostServiceMapper postServiceMapper;
+    private final PostServiceValidate postServiceValidate;
+
+    private final RedisTemplate<String, String> redisTemplate;
+    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -67,8 +81,34 @@ public class ListingServicesServiceImpl implements ListingServicesService {
     @Override
     @Transactional
     public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {
-        return propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
+        String redisKey = "propertyServicePackageSummary:" + id;
+
+        return Optional.ofNullable(redisTemplate.opsForValue().get(redisKey))
+            .map(redisData -> {
+                try {
+                    return objectMapper.readValue(redisData, PropertyServicePackageSummaryDTO.class);
+                } catch (JsonProcessingException e) {
+                    log.error("Error deserializing Redis data", e);
+                    throw new FailedToDeserializingData("Failed to deserializing Redis data");
+                }
+            })
+            .orElseGet(() -> {
+                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
+                try {
+                    redisTemplate.opsForValue().set(redisKey, objectMapper.writeValueAsString(result));
+                } catch (JsonProcessingException e) {
+                    log.error("Error deserializing Redis data", e);
+                    throw new FailedToDeserializingData(e.getMessage());
+                }
+                return result;
+            });
     }
+
+//    @Override
+//    @Transactional
+//    public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {
+//        return propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
+//    }
 }
 
 
