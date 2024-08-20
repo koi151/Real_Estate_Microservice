@@ -18,8 +18,11 @@ spring:
       bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#     when a consumer receive a message, it will check if type of the object matched submissionConfirmation type or not
+#     if MATCHED, it will be deserialized into a SubmissionConfirmation instance and accepted for processing
+#     else reject
       properties:
-        spring.json.type.mapping: SubmissionConfirmation:com.koi151.property_submissions.kafka.SubmissionConfirmation
+        spring.json.type.mapping: submissionConfirmation:com.koi151.property_submissions.kafka.SubmissionConfirmation
 
 
 api:
@@ -30,4 +33,4 @@ application:
     property-url: http://localhost:9090/api/v1/properties
 #    payment-url: http://localhost:9090/api/v1/payment
     admin-account-url: http://localhost:9090/api/v1/admin/accounts
-    listing-services-url: http://localhost:9090/api/v1//listing-services
+    listing-services-url: http://localhost:9090/api/v1/listing-services

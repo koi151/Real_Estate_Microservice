@@ -7,12 +7,11 @@ import org.springframework.kafka.config.TopicBuilder;
 
 @Configuration
 public class KafkaSubmissionTopicConfig {
-
     @Bean
     public NewTopic submissionTopic() {
         return TopicBuilder
-                .name("submission-topic")
-                .build();
+            .name("submission-topic")
+            .build();
     }
 
 }

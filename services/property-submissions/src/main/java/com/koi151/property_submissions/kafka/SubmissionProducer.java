@@ -16,11 +16,11 @@ public class SubmissionProducer {
     private final KafkaTemplate<String, SubmissionConfirmation> kafkaTemplate;
 
     public void sendSubmissionConfirmation(SubmissionConfirmation submissionConfirmation) {
-        log.info("sending order confirmation");
+        log.info("sending property submission confirmation");
         Message<SubmissionConfirmation> message = MessageBuilder
-                .withPayload(submissionConfirmation)
-                .setHeader(KafkaHeaders.TOPIC, "order-topic")
-                .build();
+            .withPayload(submissionConfirmation)
+            .setHeader(KafkaHeaders.TOPIC, "submission-topic")
+            .build();
         kafkaTemplate.send(message);
     }
 

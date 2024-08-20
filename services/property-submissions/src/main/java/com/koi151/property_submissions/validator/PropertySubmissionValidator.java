@@ -35,6 +35,7 @@ public class PropertySubmissionValidator {
            if (propertySubmissionRepository.existsByReferenceCode(request.referenceCode())) {
                throw new DuplicateReferenceCodeException("Duplicate reference code");
            }
+
        } catch (FeignException ex) {
            System.out.println("Error fetching account information: {}" + ex.getMessage());
            throw new ProductServiceCommunicationException("Error communicating with account service");

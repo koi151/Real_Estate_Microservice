@@ -67,29 +67,29 @@ public class AccountServiceImpl implements AccountService {
     @Override
     public List<AdminAccountDTO> findAllAdminAccounts() {
         return adminAccountRepository.findAllByAccountDeleted(false, Sort.by("accountId")).stream()
-                .map(adminAccountConverter::toAdminAccountDTO)
-                .collect(Collectors.toList());
+            .map(adminAccountConverter::toAdminAccountDTO)
+            .collect(Collectors.toList());
     }
 
     @Override
     public AccountDTO findAccountDetails(Long accountId) {
         return accountMapper.toAccountDTO(
-                accountRepository.findByAccountIdAndDeleted(accountId, false)
-                        .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId))
+            accountRepository.findByAccountIdAndAccountStatusAndDeleted(accountId, AccountStatusEnum.ACTIVE, false)
+                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId))
         );
     }
 
     @Override
     public AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id) {
-        return accountRepository.findByAccountIdAndDeleted(id, false)
-                .map(accountMapper::toAccountWithNameAndRoleDTO)
-                .orElseThrow(() -> new AccountNotFoundException("Account not found with id:" + id));
+        return accountRepository.findByAccountIdAndAccountStatusAndDeleted(id, AccountStatusEnum.ACTIVE, false)
+            .map(accountMapper::toAccountWithNameAndRoleDTO)
+            .orElseThrow(() -> new AccountNotFoundException("Account not found with id:" + id));
     }
 
     @Override
     public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
 
-        Account account = accountRepository.findByAccountIdAndDeleted(accountId, false)
+        Account account = accountRepository.findByAccountIdAndAccountStatusAndDeleted(accountId, AccountStatusEnum.ACTIVE, false)
                 .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
 
         // Fetch Properties using Feign Client
@@ -152,15 +152,15 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     public AccountDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatarFile) {
-        return accountRepository.findByAccountIdAndDeleted(id, false) // del
-                .map(existingAccountEntity -> {
-                    updateAccountDetails(existingAccountEntity, request);
-                    updateAvatar(existingAccountEntity, avatarFile);
+        return accountRepository.findByAccountIdAndAccountStatusAndDeleted(id, AccountStatusEnum.ACTIVE, false) // del
+            .map(existingAccountEntity -> {
+                updateAccountDetails(existingAccountEntity, request);
+                updateAvatar(existingAccountEntity, avatarFile);
 
-                    return accountRepository.save(existingAccountEntity);
-                })
-                .map(this::convertToAccountDTO)
-                .orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: " + id));
+                return accountRepository.save(existingAccountEntity);
+            })
+            .map(this::convertToAccountDTO)
+            .orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: " + id));
     }
 
 

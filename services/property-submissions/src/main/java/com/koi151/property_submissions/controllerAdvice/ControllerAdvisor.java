@@ -89,7 +89,7 @@ public class ControllerAdvisor {
     public ResponseEntity<ErrorResponse> handleAccountServiceResponseException(AccountServiceResponseException ex) {
 
         List<String> details = new ArrayList<>();
-        details.add("Failed to get properly response from Account service or invalid data response, recheck Account service again");
+        details.add("Failed to get proper response from Account service or invalid data response, recheck Account service again");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setError(ex.getMessage());
@@ -102,7 +102,7 @@ public class ControllerAdvisor {
     public ResponseEntity<ErrorResponse> handleServiceCommunicationException(ServiceUnavailableException ex) {
 
         List<String> details = new ArrayList<>();
-        details.add("Failed to get properly response from service or invalid response from service, recheck again");
+        details.add("Failed to get proper response from service or invalid response from service, recheck again");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setError(ex.getMessage());

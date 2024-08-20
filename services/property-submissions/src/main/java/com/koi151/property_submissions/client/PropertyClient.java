@@ -10,7 +10,4 @@ import org.springframework.web.bind.annotation.PathVariable;
 public interface PropertyClient {
     @GetMapping("/{id}/active")
     ResponseEntity<ResponseData> propertyActiveCheck (@PathVariable("id") Long accountId);
-
-    @GetMapping("/post-services/{id}")
-    ResponseEntity<ResponseData> findPostServicesById(@PathVariable(name = "id") Long id);
 }

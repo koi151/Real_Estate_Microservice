@@ -61,7 +61,7 @@ public class ListingServicesServiceImpl implements ListingServicesService {
 
         // Map PostServices info to PostServicePackage entities
         List<PostServicePackage> postServicePackagesEntities = postServices.stream()
-            .map(postService -> PostServicePackage.builder() // use builder instead of mapstruct for reducing code complexity in this cae
+            .map(postService -> PostServicePackage.builder() // use builder instead of mapstruct to reduce code complexity in this case
                 .postServicePackageKey(PostServicePackageKey.builder()
                     .postServiceId(postService.postServiceId())
                     .propertyServicePackageId(savedPropertyServicePackage.getPropertyServicePackageId())

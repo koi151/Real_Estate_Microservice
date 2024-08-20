@@ -2,6 +2,7 @@ package com.koi151.property_submissions.service.impl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.property_submissions.client.AccountClient;
+import com.koi151.property_submissions.client.ListingServicesClient;
 import com.koi151.property_submissions.client.PropertyClient;
 import com.koi151.property_submissions.customExceptions.*;
 import com.koi151.property_submissions.entity.PropertySubmission;
@@ -44,7 +45,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     private final ObjectMapper objectMapper;
 
     private final AccountClient accountClient;
-    private final PropertyClient propertyClient;
+    private final ListingServicesClient listingServicesClient;
 
     // validator
     private final ServiceResponseValidator serviceResponseValidator;
@@ -60,33 +61,35 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Transactional
     public PropertySubmissionCreateDTO createPropertySubmission(PropertySubmissionCreate request) {
         ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
-                () -> propertyClient.findPostServicesById(request.propertyId()), // utilizing a functional interface
-                "Property",
-                "property post service data"
+            () -> listingServicesClient.findPropertyPostServicesById(request.propertyId()), // utilizing a functional interface
+            "Listing services",
+            "property post service data"
         );
 
         ResponseEntity<ResponseData> customerResponse = serviceResponseValidator.fetchServiceData(
-                () -> accountClient.findAccountDetails(request.accountId()),
-                "Account",
-                "account data"
+            () -> accountClient.findAccountDetails(request.accountId()),
+            "Account",
+            "account data"
         );
 
-
-        var customerData = objectMapper.convertValue(Objects.requireNonNull(Objects.requireNonNull(customerResponse.getBody()).getData()), CustomerResponse.class);
+        var customerData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
         var purchaseData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PurchaseResponse.class);
 
+        // validate
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
+
         PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
         propertySubmissionRepository.save(entity);
 
+        // sending a confirmation message about a property submission to a Kafka topic
         submissionProducer.sendSubmissionConfirmation(
-                new SubmissionConfirmation(
-                        request.referenceCode(),
-                        BigDecimal.TEN,
-                        request.paymentMethod(),
-                        customerData,
-                        purchaseData
-                )
+            new SubmissionConfirmation( // this will be serialized
+                request.referenceCode(),
+                BigDecimal.TEN,
+                request.paymentMethod(),
+                customerData,
+                purchaseData
+            )
         );
 
         return propertySubmissionMapper.toPropertySubmissionCreateDTO(entity);

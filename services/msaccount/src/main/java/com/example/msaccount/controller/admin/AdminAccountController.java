@@ -79,10 +79,10 @@ public class AdminAccountController {
     public ResponseEntity<ResponseData> findAccountDetails(@PathVariable(name = "account-id") Long accountId) {
         var account = accountService.findAccountDetails(accountId);
         return ResponseEntity.ok(
-                ResponseData.builder()
-                        .data(account)
-                        .desc("Get account details succeed")
-                        .build()
+            ResponseData.builder()
+                .data(account)
+                .desc("Get account details succeed")
+                .build()
         );
     }
 
