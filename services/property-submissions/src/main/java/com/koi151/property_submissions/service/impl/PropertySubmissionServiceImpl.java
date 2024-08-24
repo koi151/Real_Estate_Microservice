@@ -61,7 +61,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Transactional
     public PropertySubmissionCreateDTO createPropertySubmission(PropertySubmissionCreate request) {
         ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
-            () -> listingServicesClient.findPropertyPostServicesById(request.propertyId()), // utilizing a functional interface
+            () -> listingServicesClient.findPropertyPackageServiceById(request.propertyId()), // utilizing a functional interface
             "Listing services",
             "property post service data"
         );
@@ -72,6 +72,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
             "account data"
         );
 
+        // extract body data
         var customerData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
         var purchaseData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PurchaseResponse.class);
 
@@ -79,8 +80,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
 
         PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
-        // price
-//        var
+//        entity.setTotalFee();
 
         propertySubmissionRepository.save(entity);
 

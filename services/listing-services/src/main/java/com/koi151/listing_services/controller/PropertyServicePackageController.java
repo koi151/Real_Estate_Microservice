@@ -16,14 +16,16 @@ public class PropertyServicePackageController {
 
     private final PropertyServicePackageService propertyServicePackageService;
 
-    @GetMapping("/{id}/post-services")
-    public ResponseEntity<ResponseData> findPropertyPostServicesById(@PathVariable(name = "id") Long id) {
+    @GetMapping("/{id}/property-service-package")
+    public ResponseEntity<ResponseData> findPropertyServicePackageById(@PathVariable(name = "id") Long id) {
+        var result = propertyServicePackageService.findPropertyServicePackageWithsPostServices(id);
         return ResponseEntity.ok(ResponseData.builder()
-            .data(propertyServicePackageService.findPropertyServicePackageWithsPostServices(id))
-            .desc("Get property post service with id: " + id + " succeed")
+            .data(result)
+            .desc(result != null
+                ? "Successfully get property service package with id: " + id
+                : "No property service package found with id: " + id)
             .build());
     }
-
 
     @PostMapping("/")
     public ResponseEntity<ResponseData> createPropertyServicePackage(@RequestBody @Valid PropertyServicePackageCreateRequest request) {

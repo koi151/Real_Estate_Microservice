@@ -1,25 +1,22 @@
 package com.koi151.listing_services.repository.custom.impl;
 
-import com.koi151.listing_services.entity.PostService;
-import com.koi151.listing_services.entity.PostServicePackage;
-import com.koi151.listing_services.entity.PropertyServicePackage;
+import com.koi151.listing_services.entity.*;
 import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO;
 import com.koi151.listing_services.model.dto.PropertyServicePackageSummaryDTO;
 import com.koi151.listing_services.repository.custom.PropertyServicePackageRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
-import jakarta.persistence.criteria.CriteriaBuilder;
-import jakarta.persistence.criteria.CriteriaQuery;
-import jakarta.persistence.criteria.Join;
-import jakarta.persistence.criteria.JoinType;
-import jakarta.persistence.criteria.Root;
+import jakarta.persistence.Tuple;
+import jakarta.persistence.criteria.*;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
@@ -32,56 +29,74 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
     @Override
     public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-        CriteriaQuery<Object[]> cq = cb.createQuery(Object[].class);
+        CriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
 
         Root<PropertyServicePackage> root = cq.from(PropertyServicePackage.class);
-
         Join<PropertyServicePackage, PostServicePackage> propertyServicePackageJoin = root.join("postServicePackages", JoinType.LEFT);
         Join<PostServicePackage, PostService> postServiceJoin = propertyServicePackageJoin.join("postService", JoinType.LEFT);
+        Join<PostService, PostServicePricing> postServicePricingJoin = postServiceJoin.join("postServicePricings", JoinType.LEFT);
+        Join<PostService, Promotion> promotionJoin = postServiceJoin.join("promotions", JoinType.LEFT);
 
-        // Convert the PackageType enum to its string representation
+        // Select fields and compute case for package type
         cq.multiselect(
-            root.get("propertyServicePackageId"),
+            root.get("propertyServicePackageId").alias("propertyServicePackageId"),
             cb.selectCase(root.get("packageType"))
                 .when(PackageType.STANDARD, PackageType.STANDARD.getPackageName())
                 .when(PackageType.PREMIUM, PackageType.PREMIUM.getPackageName())
-                .when(PackageType.EXCLUSIVE, PackageType.EXCLUSIVE.getPackageName()),
-            postServiceJoin.get("postServiceId"),
-            postServiceJoin.get("name"),
-            postServiceJoin.get("availableUnits")
-        ).where(cb.equal(root.get("propertyServicePackageId"), id));
+                .when(PackageType.EXCLUSIVE, PackageType.EXCLUSIVE.getPackageName())
+                .alias("packageType"),
+            postServiceJoin.get("postServiceId").alias("postServiceId"),
+            postServiceJoin.get("name").alias("name"),
+            postServiceJoin.get("availableUnits").alias("availableUnits"),
+            postServicePricingJoin.get("price").alias("price"),
+            promotionJoin.get("discountPercentage").alias("discountPercentage"),
+            promotionJoin.get("priceDiscount").alias("priceDiscount")
+        ).where(
+            cb.equal(root.get("propertyServicePackageId"), id),
+            cb.equal(postServicePricingJoin.get("packageType"), root.get("packageType")) // Ensure package type matches for pricing
+        );
 
-        List<Object[]> results = entityManager.createQuery(cq).getResultList();
+        List<Tuple> results = entityManager.createQuery(cq).getResultList();
 
-        // Process the results into a DTO
-        return results.stream()
-            .map(result -> {
-                Long propertyServicePackageId = (Long) result[0];
-                String packageType = (String) result[1];
-                Long postServiceId = (Long) result[2];
-                String postServiceName = (String) result[3];
-                Integer availableUnits = (Integer) result[4];
+        if (results.isEmpty()) {
+            return null;  // Return null if no results found
+        }
 
-                return new Object[] {
-                    propertyServicePackageId,
-                    packageType,
-                    new PostServiceBasicInfoDTO(postServiceId, postServiceName, availableUnits)
-                };
-            })
-            .collect(Collectors.groupingBy(obj -> (Long) obj[0])) // Group by propertyServicePackageId
-            .entrySet()
-            .stream()
-            .map(entry -> {
-                List<Object[]> groupedResults = entry.getValue();
-                return PropertyServicePackageSummaryDTO.builder()
-                    .propertyPostPackageId(entry.getKey())
-                    .packageType((String) groupedResults.get(0)[1])
-                    .postServiceBasicInfoDTOs(groupedResults.stream()
-                        .map(obj -> (PostServiceBasicInfoDTO) obj[2])
-                        .collect(Collectors.toList()))
-                    .build();
-            })
-            .findFirst()
-            .orElse(null);
+        List<PostServiceBasicInfoDTO> postServiceBasicInfoDTOs = new ArrayList<>();
+        BigDecimal totalFee = BigDecimal.ZERO;
+
+        for (Tuple result : results) {
+            Long postServiceId = result.get("postServiceId", Long.class);
+            String postServiceName = result.get("name", String.class);
+            Integer availableUnits = result.get("availableUnits", Integer.class);
+
+            BigDecimal standardPrice = result.get("price", BigDecimal.class);
+            BigDecimal discountPercentage = result.get("discountPercentage", BigDecimal.class);
+            BigDecimal priceDiscount = result.get("priceDiscount", BigDecimal.class);
+
+            // Calculate total fee considering discounts
+            if (standardPrice != null) {
+                BigDecimal priceDiscountedFromPromo = (discountPercentage != null) ? standardPrice.multiply(discountPercentage.divide(new BigDecimal(100), RoundingMode.HALF_EVEN)) : BigDecimal.ZERO;
+                BigDecimal discountPrice = (priceDiscount != null) ? priceDiscount : BigDecimal.ZERO;
+                totalFee = totalFee.add(standardPrice.subtract(priceDiscountedFromPromo).subtract(discountPrice).max(BigDecimal.ZERO));
+            }
+
+            // Add the post service basic info DTO to the list
+            postServiceBasicInfoDTOs.add(new PostServiceBasicInfoDTO(postServiceId, postServiceName, availableUnits));
+        }
+
+        // Get the first result to extract package details
+        Tuple firstResult = results.get(0);
+
+        return PropertyServicePackageSummaryDTO.builder()
+            .propertyPostPackageId(firstResult.get("propertyServicePackageId", Long.class))
+            .packageType(firstResult.get("packageType", String.class))
+            .totalFee(totalFee)
+            .postServiceBasicInfoDTOs(postServiceBasicInfoDTOs)
+            .build();
     }
+
+
+
+
 }
