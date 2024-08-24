@@ -32,11 +32,11 @@ public class Promotion extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PackageType packageType;
 
-    @Column(name = "percent_discount", precision = 5, scale = 2)
-    @Max(value = 100, message = "Discount percentage cannot exceed {max}%")
+    @Column(name = "discount_percentage", columnDefinition = "DECIMAL(5,2) DEFAULT 0.00")
+    @DecimalMax(value = "100", message = "Discount percentage cannot exceed {max}%")
     private BigDecimal discountPercentage;
 
-    @Column(name = "price_discount", precision = 10, scale = 2)
+    @Column(name = "price_discount", columnDefinition = "DECIMAL(10,2) DEFAULT 0.00")
     @DecimalMax(value = "999999999.99", message = "Price discount cannot exceed {max}")
     private BigDecimal priceDiscount;
 }

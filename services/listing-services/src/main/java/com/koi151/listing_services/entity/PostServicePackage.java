@@ -34,17 +34,17 @@ public class PostServicePackage {
     @Positive(message = "Units remaining quantity must be greater than zero")
     private int unitsRemaining;
 
-    @Column(name = "price_at_creation", columnDefinition = "DEFAULT 0.00")
+    @Column(name = "price_at_creation", columnDefinition = "DECIMAL(9,2) DEFAULT 0.00")
     @PositiveOrZero(message = "Post service price must be non-negative value")
     @DecimalMax(value = "99999999.99", message = "Post service price cannot exceed {value}")
     private BigDecimal priceAtCreation;
 
-    @Column(name = "discount_percentage_at_creation", columnDefinition = "DEFAULT 0.00")
+    @Column(name = "discount_percentage_at_creation", columnDefinition = "DECIMAL(5,2) DEFAULT 0.00")
     @PositiveOrZero(message = "Discount percentage must be non-negative value")
     @DecimalMax(value = "99.99", message = "Post service price cannot exceed {value}")
     private BigDecimal discountPercentageAtCreation;
 
-    @Column(name = "price_discount_at_creation", columnDefinition = "DEFAULT 0.00")
+    @Column(name = "price_discount_at_creation", columnDefinition = "DECIMAL(9,2) DEFAULT 0.00")
     @PositiveOrZero(message = "Price discount must be non-negative value")
     @DecimalMax(value = "99999999.99", message = "Price discount cannot exceed {value}")
     private BigDecimal priceDiscountAtCreation;

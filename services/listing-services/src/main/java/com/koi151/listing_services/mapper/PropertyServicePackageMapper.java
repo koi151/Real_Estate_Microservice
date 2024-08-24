@@ -6,6 +6,7 @@ import com.koi151.listing_services.model.dto.PropertyServicePackageCreateDTO;
 import com.koi151.listing_services.model.request.PropertyServicePackageCreateRequest;
 import org.mapstruct.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -18,5 +19,6 @@ public interface PropertyServicePackageMapper {
     @Mapping(target = "packageType", source = "entity.packageType.packageName")
     @Mapping(target = "status", source = "entity.status.statusName")
     @Mapping(target = "postServices.postServicePricings.packageType", source = "postServices")
-    PropertyServicePackageCreateDTO toPropertyServicePackageCreateDTO(PropertyServicePackage entity, List<PostServiceBasicInfoDTO> postServices);
+//    @Mapping(target = "totalFee", source = "totalFee")
+    PropertyServicePackageCreateDTO toPropertyServicePackageCreateDTO(PropertyServicePackage entity, List<PostServiceBasicInfoDTO> postServices, BigDecimal totalFee);
 }

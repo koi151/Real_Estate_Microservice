@@ -56,64 +56,61 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
 
         // Create and save PropertyServicePackage entity from request
         PropertyServicePackage propertyServicePackage = propertyServicePackageMapper.toPropertyServicePackageEntity(request);
+        var savedPropertyServicePackage = propertyServicePackageRepository.save(propertyServicePackage);
 
-        // Calculate the total fee of services used
-        var totalFee = request.postServiceIds().stream()
-            .map(postServiceId -> {
-                // Fetch the standard price using Optional
-                BigDecimal standardPrice = postServicePricingRepository
-                    .findPriceByPostServiceIdAndPackageType(postServiceId, request.packageType())
-                    .orElseThrow(() -> new EntityNotFoundCustomException(
-                        "Price not found for post service ID: " + postServiceId + " and package type: " + request.packageType()
-                    ));
+        // Fetch PostServices with NAME and ID in one go based on request service IDs
+        List<PostServiceBasicInfoDTO> postServices = postServiceRepository.getNameAndAvailableUnitsById(request.postServiceIds());
 
-                // Fetch discount information using Optional
-                Optional<Tuple> discountInfo = promotionRepository.findPromotionInfoByPostServiceIdAndPackageType(postServiceId, request.packageType());
+        // Map PostServices info to PostServicePackage entities
+        List<PostServicePackage> postServicePackagesEntities = postServices.stream()
+            .map(postService -> {
+                Optional<Tuple> discountInfo = promotionRepository.findPromotionInfoByPostServiceIdAndPackageType(postService.postServiceId(), request.packageType());
 
                 // Initialize discount values
                 BigDecimal discountPercentage = BigDecimal.ZERO;
                 BigDecimal priceDiscount = BigDecimal.ZERO;
 
-                // Check if discount information is present
                 if (discountInfo.isPresent()) {
                     Tuple tuple = discountInfo.get();
                     discountPercentage = tuple.get(0, BigDecimal.class);
                     priceDiscount = tuple.get(1, BigDecimal.class);
                 }
 
-                // Calculate final price after applying discounts and ensure no negative values
-                return standardPrice
-                    .subtract(standardPrice.multiply(discountPercentage.divide(new BigDecimal(100), RoundingMode.HALF_EVEN)))
-                    .subtract(priceDiscount)
-                    .max(BigDecimal.ZERO);
+                return PostServicePackage.builder() // Use builder instead of MapStruct to reduce code complexity in this case
+                    .postServicePackageKey(PostServicePackageKey.builder()
+                        .postServiceId(postService.postServiceId())
+                        .propertyServicePackageId(savedPropertyServicePackage.getPropertyServicePackageId())
+                        .build())
+                    .postService(postServiceMapper.toPostServiceEntity(postService))
+                    .propertyServicePackage(savedPropertyServicePackage)
+                    .unitsRemaining(postService.availableUnits())
+                    .priceAtCreation(postServicePricingRepository
+                        .findPriceByPostServiceIdAndPackageType(postService.postServiceId(), request.packageType())
+                        .orElseThrow(() -> new EntityNotFoundCustomException(
+                            "Price not found for post service ID: " + postService.postServiceId() + " and package type: " + request.packageType()
+                        )))
+                .priceDiscountAtCreation(priceDiscount)
+                .discountPercentageAtCreation(discountPercentage)
+                .build();
             })
-            .reduce(BigDecimal.ZERO, BigDecimal::add); // Sum up all the prices with discounts
-
-        propertyServicePackage.setTotalFee(totalFee);
-
-        // Save the PropertyServicePackage entity
-        var savedPropertyServicePackage = propertyServicePackageRepository.save(propertyServicePackage);
-
-        // Fetch PostServices in one go based on request service IDs
-        List<PostServiceBasicInfoDTO> postServices = postServiceRepository.getNameAndAvailableUnitsById(request.postServiceIds());
-
-        // Map PostServices info to PostServicePackage entities
-        List<PostServicePackage> postServicePackagesEntities = postServices.stream()
-            .map(postService -> PostServicePackage.builder() // Use builder instead of MapStruct to reduce code complexity in this case
-                .postServicePackageKey(PostServicePackageKey.builder()
-                    .postServiceId(postService.postServiceId())
-                    .propertyServicePackageId(savedPropertyServicePackage.getPropertyServicePackageId())
-                    .build())
-                .postService(postServiceMapper.toPostServiceEntity(postService))
-                .propertyServicePackage(savedPropertyServicePackage)
-                .unitsRemaining(postService.availableUnits())
-                .build())
             .toList();
 
         // Save PostServicePackages in batch
         postServicePackageRepository.saveAll(postServicePackagesEntities);
 
-        return propertyServicePackageMapper.toPropertyServicePackageCreateDTO(propertyServicePackage, postServices);
+        BigDecimal totalFee = postServicePackagesEntities.stream()
+            .map(postServicePackage -> {
+                BigDecimal standardPrice = postServicePackage.getPriceAtCreation();
+                BigDecimal discountPercentage = postServicePackage.getDiscountPercentageAtCreation();
+
+                // Calculate final price after applying discounts and ensure no negative values
+                return standardPrice
+                    .subtract(standardPrice.multiply(discountPercentage.divide(new BigDecimal(100), RoundingMode.HALF_EVEN)))
+                    .subtract(postServicePackage.getPriceDiscountAtCreation())
+                    .max(BigDecimal.ZERO);
+            }).reduce(BigDecimal.ZERO, BigDecimal::add);
+
+        return propertyServicePackageMapper.toPropertyServicePackageCreateDTO(propertyServicePackage, postServices, totalFee);
     }
 
 

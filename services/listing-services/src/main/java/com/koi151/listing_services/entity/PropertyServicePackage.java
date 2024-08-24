@@ -41,9 +41,4 @@ public class PropertyServicePackage extends BaseEntity {
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
     private Status status = Status.PENDING;
-
-    @Column(name = "total_fee", precision = 10, scale = 2, nullable = false)
-    @PositiveOrZero(message = "Total fee must be non-negative value")
-    @DecimalMax(value = "99999999.99", message = "Total fee cannot exceed 99,999,999.99")
-    private BigDecimal totalFee;
 }
