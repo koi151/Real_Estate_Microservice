@@ -117,28 +117,27 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
     @Override
     @Transactional
     public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {
-//        String redisKey = "propertyServicePackageSummary:" + id;
-//
-//        return Optional.ofNullable(redisTemplate.opsForValue().get(redisKey))
-//            .map(redisData -> { // data available in redis
-//                try {
-//                    return objectMapper.readValue(redisData, PropertyServicePackageSummaryDTO.class);
-//                } catch (JsonProcessingException e) {
-//                    log.error("Error deserializing Redis data", e);
-//                    throw new FailedToDeserializingData("Failed to deserializing Redis data");
-//                }
-//            })
-//            .orElseGet(() -> { // in case of redis not saved data
-//                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
-                return propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
-//                try {
-//                    redisTemplate.opsForValue().set(redisKey, objectMapper.writeValueAsString(result));
-//                } catch (JsonProcessingException e) {
-//                    log.error("Error deserializing Redis data", e);
-//                    throw new FailedToDeserializingData(e.getMessage());
-//                }
-//                return result;
-//            });
+        String redisKey = "propertyServicePackageSummary:" + id;
+
+        return Optional.ofNullable(redisTemplate.opsForValue().get(redisKey))
+            .map(redisData -> { // data available in redis
+                try {
+                    return objectMapper.readValue(redisData, PropertyServicePackageSummaryDTO.class);
+                } catch (JsonProcessingException e) {
+                    log.error("Error deserializing Redis data", e);
+                    throw new FailedToDeserializingData("Failed to deserializing Redis data");
+                }
+            })
+            .orElseGet(() -> { // in case of redis not saved data
+                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
+                try {
+                    redisTemplate.opsForValue().set(redisKey, objectMapper.writeValueAsString(result));
+                } catch (JsonProcessingException e) {
+                    log.error("Error deserializing Redis data", e);
+                    throw new FailedToDeserializingData(e.getMessage());
+                }
+                return result;
+            });
     }
 
 //    @Override
