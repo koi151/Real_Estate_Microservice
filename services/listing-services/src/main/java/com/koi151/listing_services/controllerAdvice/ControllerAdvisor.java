@@ -65,10 +65,12 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(PostServiceCategoryNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePostServiceCategoryNotFoundException(PostServiceCategoryNotFoundException ex) {
+    // Entity not found ex
+
+    @ExceptionHandler(EntityNotFoundCustomException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundCustomException(EntityNotFoundCustomException ex) {
         List<String> details = new ArrayList<>();
-        details.add("Post service category not exists, recheck again");
+        details.add("Entity not exists, recheck again");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setDetails(details);
@@ -76,7 +78,6 @@ public class ControllerAdvisor {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
-
     // DUPLICATE ENTITY ==============================================
     @ExceptionHandler({ DuplicatePostServiceException.class, DuplicatePostServiceCategoryException.class, DuplicatedPropertyPostPackageException.class })
     public ResponseEntity<ErrorResponse> handleDuplicateException(RuntimeException ex) {

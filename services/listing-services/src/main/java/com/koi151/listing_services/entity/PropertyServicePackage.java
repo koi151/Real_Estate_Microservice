@@ -3,10 +3,13 @@ package com.koi151.listing_services.entity;
 import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.enums.Status;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
 import java.io.Serial;
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity(name = "property_service_package")
@@ -31,10 +34,16 @@ public class PropertyServicePackage extends BaseEntity {
     private List<PostServicePackage> postServicePackages;
 
     @Column(name = "package_type")
+    @Enumerated(EnumType.STRING)
     @NotNull(message = "Property service package type is mandatory")
     private PackageType packageType;
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    private Status status;
+    private Status status = Status.PENDING;
+
+    @Column(name = "total_fee", precision = 10, scale = 2, nullable = false)
+    @PositiveOrZero(message = "Total fee must be non-negative value")
+    @DecimalMax(value = "99999999.99", message = "Total fee cannot exceed 99,999,999.99")
+    private BigDecimal totalFee;
 }

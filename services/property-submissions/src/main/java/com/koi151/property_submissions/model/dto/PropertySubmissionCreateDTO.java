@@ -4,6 +4,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.math.BigDecimal;
+
 @Getter
 @Setter
 @Builder
@@ -14,4 +16,5 @@ public class PropertySubmissionCreateDTO {
     private Long reviewerId;
     private String status;
     private String reviewMessage;
+    private BigDecimal totalFee;
 }

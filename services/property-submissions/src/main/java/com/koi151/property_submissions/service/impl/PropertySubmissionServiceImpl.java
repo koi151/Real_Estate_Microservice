@@ -79,6 +79,9 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
 
         PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
+        // price
+//        var
+
         propertySubmissionRepository.save(entity);
 
         // sending a confirmation message about a property submission to a Kafka topic

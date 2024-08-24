@@ -1,8 +1,8 @@
 package com.koi151.listing_services.service.impl;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koi151.listing_services.customExceptions.EntityNotFoundCustomException;
 import com.koi151.listing_services.customExceptions.FailedToDeserializingData;
 import com.koi151.listing_services.entity.PostServicePackage;
 import com.koi151.listing_services.entity.PropertyServicePackage;
@@ -13,20 +13,19 @@ import com.koi151.listing_services.model.dto.PropertyServicePackageSummaryDTO;
 import com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO;
 import com.koi151.listing_services.model.dto.PropertyServicePackageCreateDTO;
 import com.koi151.listing_services.model.request.PropertyServicePackageCreateRequest;
-import com.koi151.listing_services.repository.PostServicePackageRepository;
-import com.koi151.listing_services.repository.PostServiceRepository;
-import com.koi151.listing_services.repository.PropertyServicePackageRepository;
-import com.koi151.listing_services.service.ListingServicesService;
+import com.koi151.listing_services.repository.*;
+import com.koi151.listing_services.service.PropertyServicePackageService;
 import com.koi151.listing_services.validator.PostServiceValidate;
+import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.data.domain.Page;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.List;
 import java.util.Optional;
 
@@ -34,11 +33,13 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class ListingServicesServiceImpl implements ListingServicesService {
+public class PropertyServicePackageServiceImpl implements PropertyServicePackageService {
 
     private final PropertyServicePackageRepository propertyServicePackageRepository;
     private final PostServiceRepository postServiceRepository;
     private final PostServicePackageRepository postServicePackageRepository;
+    private final PostServicePricingRepository postServicePricingRepository;
+    private final PromotionRepository promotionRepository;
 
     private final PropertyServicePackageMapper propertyServicePackageMapper;
     private final PostServiceMapper postServiceMapper;
@@ -49,19 +50,56 @@ public class ListingServicesServiceImpl implements ListingServicesService {
 
     @Override
     @Transactional
-    public PropertyServicePackageCreateDTO createPostServicePackage(PropertyServicePackageCreateRequest request) {
+    public PropertyServicePackageCreateDTO createPropertyServicePackage(PropertyServicePackageCreateRequest request) {
+        // Validate the request
         postServiceValidate.postServiceCreateValidate(request);
 
-        // Create and save PropertyServicePackage
+        // Create and save PropertyServicePackage entity from request
         PropertyServicePackage propertyServicePackage = propertyServicePackageMapper.toPropertyServicePackageEntity(request);
+
+        // Calculate the total fee of services used
+        var totalFee = request.postServiceIds().stream()
+            .map(postServiceId -> {
+                // Fetch the standard price using Optional
+                BigDecimal standardPrice = postServicePricingRepository
+                    .findPriceByPostServiceIdAndPackageType(postServiceId, request.packageType())
+                    .orElseThrow(() -> new EntityNotFoundCustomException(
+                        "Price not found for post service ID: " + postServiceId + " and package type: " + request.packageType()
+                    ));
+
+                // Fetch discount information using Optional
+                Optional<Tuple> discountInfo = promotionRepository.findPromotionInfoByPostServiceIdAndPackageType(postServiceId, request.packageType());
+
+                // Initialize discount values
+                BigDecimal discountPercentage = BigDecimal.ZERO;
+                BigDecimal priceDiscount = BigDecimal.ZERO;
+
+                // Check if discount information is present
+                if (discountInfo.isPresent()) {
+                    Tuple tuple = discountInfo.get();
+                    discountPercentage = tuple.get(0, BigDecimal.class);
+                    priceDiscount = tuple.get(1, BigDecimal.class);
+                }
+
+                // Calculate final price after applying discounts and ensure no negative values
+                return standardPrice
+                    .subtract(standardPrice.multiply(discountPercentage.divide(new BigDecimal(100), RoundingMode.HALF_EVEN)))
+                    .subtract(priceDiscount)
+                    .max(BigDecimal.ZERO);
+            })
+            .reduce(BigDecimal.ZERO, BigDecimal::add); // Sum up all the prices with discounts
+
+        propertyServicePackage.setTotalFee(totalFee);
+
+        // Save the PropertyServicePackage entity
         var savedPropertyServicePackage = propertyServicePackageRepository.save(propertyServicePackage);
 
-        // Fetch PostServices in one go base on request service id
+        // Fetch PostServices in one go based on request service IDs
         List<PostServiceBasicInfoDTO> postServices = postServiceRepository.getNameAndAvailableUnitsById(request.postServiceIds());
 
         // Map PostServices info to PostServicePackage entities
         List<PostServicePackage> postServicePackagesEntities = postServices.stream()
-            .map(postService -> PostServicePackage.builder() // use builder instead of mapstruct to reduce code complexity in this case
+            .map(postService -> PostServicePackage.builder() // Use builder instead of MapStruct to reduce code complexity in this case
                 .postServicePackageKey(PostServicePackageKey.builder()
                     .postServiceId(postService.postServiceId())
                     .propertyServicePackageId(savedPropertyServicePackage.getPropertyServicePackageId())
@@ -77,6 +115,7 @@ public class ListingServicesServiceImpl implements ListingServicesService {
 
         return propertyServicePackageMapper.toPropertyServicePackageCreateDTO(propertyServicePackage, postServices);
     }
+
 
     @Override
     @Transactional

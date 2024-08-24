@@ -1,7 +1,7 @@
 package com.koi151.listing_services.service.impl;
 
 import com.koi151.listing_services.customExceptions.DuplicatePostServiceException;
-import com.koi151.listing_services.customExceptions.PostServiceCategoryNotFoundException;
+import com.koi151.listing_services.customExceptions.EntityNotFoundCustomException;
 import com.koi151.listing_services.entity.PostService;
 import com.koi151.listing_services.mapper.PostServiceMapper;
 import com.koi151.listing_services.model.dto.PostServiceCreateDTO;
@@ -27,7 +27,7 @@ public class PostServiceServiceImpl implements PostServiceService {
     @Transactional
     public PostServiceCreateDTO createPostService(PostServiceCreateRequest request) {
         if (!postServiceCategoryRepository.existsById(Math.toIntExact(request.postServiceCategoryId()))) // category check
-            throw new PostServiceCategoryNotFoundException("Cannot found post service category with id: " + request.postServiceCategoryId());
+            throw new EntityNotFoundCustomException("Cannot found post service category with id: " + request.postServiceCategoryId());
         if (postServiceRepository.existsByName(request.name()))
             throw new DuplicatePostServiceException("Post service with name '" + request.name() + "' already existed");
 

@@ -1,6 +1,9 @@
-package com.koi151.property_submissions.model.response;
+package com.koi151.payment.model.response;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor

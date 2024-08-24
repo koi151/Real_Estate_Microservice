@@ -35,10 +35,10 @@ public class PostServicePricing extends BaseEntity {
     @Enumerated(EnumType.STRING)
     private PackageType packageType;
 
-    @Column(name = "price", precision = 12, scale = 2)
+    @Column(name = "price", precision = 9, scale = 2)
     @NotNull(message = "Post service pricing cannot be empty")
     @PositiveOrZero(message = "Post service pricing must be non-negative value")
-    @DecimalMax(value = "9999999999.99", message = "Post service pricing cannot exceed 9,999,999,999.99")
+    @DecimalMax(value = "9999999.99", message = "Post service pricing cannot exceed 9,999,999.99")
     private BigDecimal price;
 
     @Column(name = "start_date", columnDefinition = "TIMESTAMP(0)", nullable = false)

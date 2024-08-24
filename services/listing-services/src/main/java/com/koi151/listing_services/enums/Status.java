@@ -12,7 +12,8 @@ import java.util.Arrays;
 @AllArgsConstructor
 public enum Status {
     ACTIVE("Active"),
-    INACTIVE("Inactive");
+    INACTIVE("Inactive"),
+    PENDING("Pending");
 
     private final String statusName;
     private static final Status[] VALUES = values();

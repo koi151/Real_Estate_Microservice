@@ -53,8 +53,8 @@ public class PropertySubmission extends BaseEntity{
     @Size(max = 3000, message = "Review message cannot exceed {max} characters")
     private String reviewMessage;
 
-    @Column(name = "total_amount")
-    @PositiveOrZero(message = "Total amount must be non-negative value")
-    @DecimalMax(value = "9999999.99", message = "Total amount exceeded 9,999,999.99, recheck again")
-    private BigDecimal totalAmount;
+    @Column(name = "total_fee", precision = 10, scale = 2, nullable = false)
+    @PositiveOrZero(message = "Total fee must be non-negative value")
+    @DecimalMax(value = "99999999.99", message = "Total fee cannot exceed 99,999,999.99")
+    private BigDecimal totalFee;
 }
