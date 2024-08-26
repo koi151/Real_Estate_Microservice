@@ -3,8 +3,8 @@ package com.koi151.listing_services.validator;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.listing_services.client.PropertyClient;
 import com.koi151.listing_services.customExceptions.DuplicatedPropertyPostPackageException;
+import com.koi151.listing_services.customExceptions.EntityNotFoundCustomException;
 import com.koi151.listing_services.customExceptions.PostServiceNotExistedException;
-import com.koi151.listing_services.customExceptions.PropertyNotFoundException;
 import com.koi151.listing_services.customExceptions.ServiceUnavailableException;
 import com.koi151.listing_services.model.request.PropertyServicePackageCreateRequest;
 import com.koi151.listing_services.repository.PostServiceRepository;
@@ -39,7 +39,7 @@ public class PostServiceValidate {
                         Objects.requireNonNull(Objects.requireNonNull(propertyResponse.getBody()).getData()), Boolean.class);
 
                 if (!propertyData)
-                    throw new PropertyNotFoundException("Property with id: " + request.propertyId() + " is not found or currently inactive");
+                    throw new EntityNotFoundCustomException("Property with id: " + request.propertyId() + " is not found or currently inactive");
             } else {
                 throw new ServiceUnavailableException("Property service is unavailable right now");
             }

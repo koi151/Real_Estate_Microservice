@@ -13,15 +13,16 @@ import com.koi151.listing_services.model.dto.PropertyServicePackageSummaryDTO;
 import com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO;
 import com.koi151.listing_services.model.dto.PropertyServicePackageCreateDTO;
 import com.koi151.listing_services.model.request.PropertyServicePackageCreateRequest;
+import com.koi151.listing_services.model.request.PropertyServicePackageSearchRequest;
 import com.koi151.listing_services.repository.*;
 import com.koi151.listing_services.service.PropertyServicePackageService;
 import com.koi151.listing_services.validator.PostServiceValidate;
+import com.koi151.listing_services.validator.PropertyServicePackageSearchValidate;
 import jakarta.persistence.Tuple;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.data.util.Pair;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -43,10 +44,12 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
 
     private final PropertyServicePackageMapper propertyServicePackageMapper;
     private final PostServiceMapper postServiceMapper;
+    private final ObjectMapper objectMapper;
+
     private final PostServiceValidate postServiceValidate;
+    private final PropertyServicePackageSearchValidate propertyServicePackageSearchValidate;
 
     private final RedisTemplate<String, String> redisTemplate;
-    private final ObjectMapper objectMapper;
 
     @Override
     @Transactional
@@ -116,8 +119,9 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
 
     @Override
     @Transactional
-    public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {
-        String redisKey = "propertyServicePackageSummary:" + id;
+    public PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(PropertyServicePackageSearchRequest request) {
+        propertyServicePackageSearchValidate.propertyServicePackageSearchValidate(request);
+        String redisKey = "propertyServicePackageSummary:" + request.packageId() + request.propertyId();
 
         return Optional.ofNullable(redisTemplate.opsForValue().get(redisKey))
             .map(redisData -> { // data available in redis
@@ -129,7 +133,7 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
                 }
             })
             .orElseGet(() -> { // in case of redis not saved data
-                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageWithsPostServices(id);
+                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageByCriteria(request);
                 try {
                     redisTemplate.opsForValue().set(redisKey, objectMapper.writeValueAsString(result));
                 } catch (JsonProcessingException e) {
@@ -139,7 +143,6 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
                 return result;
             });
     }
-
 //    @Override
 //    @Transactional
 //    public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {

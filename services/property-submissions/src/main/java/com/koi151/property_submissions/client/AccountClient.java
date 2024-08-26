@@ -11,11 +11,11 @@ public interface AccountClient {
 
     @GetMapping("/{account-id}/name-and-role")
     ResponseEntity<ResponseData> findAccountNameAndRoleById(
-            @PathVariable("account-id") Long accountId
+        @PathVariable("account-id") Long accountId
     );
 
     @GetMapping("/{account-id}")
     ResponseEntity<ResponseData> findAccountDetails(
-            @PathVariable(name = "account-id") Long accountId
+        @PathVariable(name = "account-id") Long accountId
     );
 }

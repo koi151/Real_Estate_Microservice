@@ -61,7 +61,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Transactional
     public PropertySubmissionCreateDTO createPropertySubmission(PropertySubmissionCreate request) {
         ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
-            () -> listingServicesClient.findPropertyPackageServiceById(request.propertyId()), // utilizing a functional interface
+            () -> listingServicesClient.findPropertyServicePackageByPropertyId(request.propertyId()), // utilizing a functional interface
             "Listing services",
             "property post service data"
         );
@@ -73,8 +73,11 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         );
 
         // extract body data
-        var customerData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
         var purchaseData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PurchaseResponse.class);
+        if (purchaseData == null)
+            throw new EntityNotFoundException("Property service package not found with id: " + request.propertyId());
+
+        var customerData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
 
         // validate
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
@@ -101,7 +104,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Override
     public AccountWithSubmissionDTO getPropertySubmissionByAccount(Long accountId, Pageable pageable) {
         if (!propertySubmissionRepository.existsByAccountIdAndDeleted(accountId, false))
-            throw new AccountNotFoundException("No property submission found from account id: " + accountId);
+            throw new EntityNotFoundException("No property submission found with account id: " + accountId);
 
         try {
             ResponseEntity<ResponseData> responseData = accountClient.findAccountNameAndRoleById(accountId);

@@ -23,7 +23,7 @@ public class PropertySubmissionValidator {
            // check property existence by id
            if (propertyResponse.getStatusCode().is2xxSuccessful() && propertyResponse.getBody() != null) {
                if (propertyResponse.getBody().getData().equals(false))
-                   throw new PropertyNotFoundException("Property not found with id: " + request.propertyId());
+                   throw new EntityNotFoundException("Property not found with id: " + request.propertyId());
            } else {
                throw new PropertyServiceResponseException("Failed to check property existence");
            }

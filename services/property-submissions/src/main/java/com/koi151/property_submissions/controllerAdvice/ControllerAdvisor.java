@@ -58,11 +58,12 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException ex) {
+    // ENTITY NOT FOUND EX =================================
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
 
         List<String> details = new ArrayList<>();
-        details.add("Account do not have any property submission, recheck again");
+        details.add("Entity not found, recheck again");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setError(ex.getMessage());
@@ -70,6 +71,8 @@ public class ControllerAdvisor {
 
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
+
+    // DUPLICATE ENTITY EX =================================
 
     @ExceptionHandler(DuplicateReferenceCodeException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateReferenceCodeException(DuplicateReferenceCodeException ex) {
@@ -168,19 +171,5 @@ public class ControllerAdvisor {
         }
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
-
-    // PROPERTY EXCEPTIONS
-    @ExceptionHandler(PropertyNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePropertyNotFoundException(PropertyNotFoundException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Property not existed, recheck its information again");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 }

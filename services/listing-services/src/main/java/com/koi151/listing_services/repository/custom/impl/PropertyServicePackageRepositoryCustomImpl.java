@@ -4,6 +4,7 @@ import com.koi151.listing_services.entity.*;
 import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO;
 import com.koi151.listing_services.model.dto.PropertyServicePackageSummaryDTO;
+import com.koi151.listing_services.model.request.PropertyServicePackageSearchRequest;
 import com.koi151.listing_services.repository.custom.PropertyServicePackageRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -27,7 +28,7 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
     private final EntityManager entityManager;
 
     @Override
-    public PropertyServicePackageSummaryDTO findPropertyServicePackageWithsPostServices(Long id) {
+    public PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(PropertyServicePackageSearchRequest request) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
 
@@ -37,7 +38,7 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
         Join<PostService, PostServicePricing> postServicePricingJoin = postServiceJoin.join("postServicePricings", JoinType.LEFT);
         Join<PostService, Promotion> promotionJoin = postServiceJoin.join("promotions", JoinType.LEFT);
 
-        // Select fields and compute case for package type
+        // Build the select clause with multiselect
         cq.multiselect(
             root.get("propertyServicePackageId").alias("propertyServicePackageId"),
             cb.selectCase(root.get("packageType"))
@@ -51,10 +52,23 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
             postServicePricingJoin.get("price").alias("price"),
             promotionJoin.get("discountPercentage").alias("discountPercentage"),
             promotionJoin.get("priceDiscount").alias("priceDiscount")
-        ).where(
-            cb.equal(root.get("propertyServicePackageId"), id),
-            cb.equal(postServicePricingJoin.get("packageType"), root.get("packageType")) // Ensure package type matches for pricing
         );
+//        .where(
+//            cb.equal(root.get("packageId"), request.packageId()),
+//            cb.equal(postServicePricingJoin.get("packageType"), root.get("packageType")) // Ensure package type matches for pricing
+//        )
+
+//         Prepare predicates for where clause
+        List<Predicate> predicates = new ArrayList<>();
+        predicates.add(cb.equal(postServicePricingJoin.get("packageType"), root.get("packageType"))); // Ensure package type matches for pricing
+
+        if (request.packageId() != null)
+            predicates.add(cb.equal(root.get("propertyServicePackageId"), request.packageId()));
+        if (request.propertyId() != null)
+            predicates.add(cb.equal(root.get("propertyId"), request.propertyId()));
+
+        // Apply where clause with the list of predicates
+        cq.where(predicates.toArray(new Predicate[0]));
 
         List<Tuple> results = entityManager.createQuery(cq).getResultList();
 

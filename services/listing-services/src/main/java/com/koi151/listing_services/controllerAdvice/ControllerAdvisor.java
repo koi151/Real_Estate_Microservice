@@ -93,6 +93,7 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
+    // VALIDATION FAILED EX ===========================================
     private static StringBuilder getDetailMessage(RuntimeException ex) {
         StringBuilder detailMessage = new StringBuilder();
 
@@ -106,6 +107,18 @@ public class ControllerAdvisor {
 
         detailMessage.append(" validate failed, please recheck again");
         return detailMessage;
+    }
+
+    @ExceptionHandler(ValidationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleValidationFailedException(ValidationFailedException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("Validation failed");
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
     }
 
 
@@ -122,17 +135,6 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    @ExceptionHandler(PropertyNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handlePropertyNotFoundException(PropertyNotFoundException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Property not existed, recheck again");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setDetails(details);
-        errorResponse.setError(ex.getMessage());
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
-    }
 
     // OTHER SERVICES UNAVAILABLE EX ================================
     @ExceptionHandler(ServiceUnavailableException.class)
