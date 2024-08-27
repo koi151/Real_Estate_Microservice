@@ -3,6 +3,7 @@ package com.koi151.property_submissions.service.impl;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.koi151.property_submissions.client.AccountClient;
 import com.koi151.property_submissions.client.ListingServicesClient;
+import com.koi151.property_submissions.client.PaymentClient;
 import com.koi151.property_submissions.client.PropertyClient;
 import com.koi151.property_submissions.customExceptions.*;
 import com.koi151.property_submissions.entity.PropertySubmission;
@@ -10,6 +11,7 @@ import com.koi151.property_submissions.kafka.SubmissionConfirmation;
 import com.koi151.property_submissions.kafka.SubmissionProducer;
 import com.koi151.property_submissions.mapper.PropertySubmissionMapper;
 import com.koi151.property_submissions.model.dto.*;
+import com.koi151.property_submissions.model.request.PaymentCreateRequest;
 import com.koi151.property_submissions.model.request.PropertySubmissionCreate;
 import com.koi151.property_submissions.model.request.PropertySubmissionSearchRequest;
 import com.koi151.property_submissions.model.response.CustomerResponse;
@@ -30,6 +32,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -48,6 +51,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
 
     private final AccountClient accountClient;
     private final ListingServicesClient listingServicesClient;
+    private final PaymentClient paymentClient;
 
     // validator
     private final ServiceResponseValidator serviceResponseValidator;
@@ -92,6 +96,20 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         entity.setTotalFee(propertyPackageData.totalFee());
 
         propertySubmissionRepository.save(entity);
+
+        // payment request
+        PaymentCreateRequest paymentRequest = PaymentCreateRequest.builder()
+            .propertyId(request.propertyId())
+            .totalFee(propertyPackageData.totalFee())
+            .orderInfo("Payment information of services used for property post with id:" + request.propertyId())
+            .bankCode("VCB")
+            .transactionNo("273423774268")
+            .payDate(LocalDateTime.now())
+            .status("pending")
+            .build();
+
+        paymentClient.createPayment(paymentRequest);
+
 
         // sending a confirmation message about a property submission to a Kafka topic
         submissionProducer.sendSubmissionConfirmation(
@@ -143,3 +161,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         }
     }
 }
+
+
+// error handler for payment
+// check condition payment

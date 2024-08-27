@@ -31,6 +31,6 @@ api:
 application:
   config:
     property-url: http://localhost:9090/api/v1/properties
-#    payment-url: http://localhost:9090/api/v1/payment
+    payment-url: http://localhost:9090/api/v1/payment
     admin-account-url: http://localhost:9090/api/v1/admin/accounts
     listing-services-url: http://localhost:9090/api/v1/listing-services
