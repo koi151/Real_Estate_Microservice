@@ -25,17 +25,17 @@ public class Payment extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int payment_id;
+    private Long paymentId;
 
     @Column(name = "property_id", nullable = false)
     @NotNull(message = "Property id is mandatory in payment")
     private Long propertyId;
 
-    @Column(name = "amount", precision = 12, scale = 2, nullable = false)
-    @NotNull(message = "Payment amount is mandatory")
+    @Column(name = "total_fee", precision = 12, scale = 2, nullable = false)
+    @NotNull(message = "Total fee in payment is mandatory")
     @PositiveOrZero(message = "Payment amount must be non-negative value")
-    @DecimalMax(value = "99999999999", message = "Rental price cannot exceed 99,999,999,999")
-    private BigDecimal amount;
+    @DecimalMax(value = "99999999.99", message = "Total fee of payment cannot exceed {value}")
+    private BigDecimal totalFee;
 
     @Column(name = "order_info", columnDefinition = "TEXT")
     private String orderInfo;
@@ -46,15 +46,15 @@ public class Payment extends BaseEntity {
 
     @Column(name = "transaction_no", length = 50, nullable = false)
     @NotBlank(message = "Transaction is mandatory")
-    private String TransactionNo;
+    private String transactionNo;
 
     @Column(name = "pay_date", nullable = false)
     @NotNull(message = "Pay date is mandatory")
-    LocalDate payDate;
+    private LocalDate payDate;
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    StatusEnum status;
+    private StatusEnum status;
 }
 
 

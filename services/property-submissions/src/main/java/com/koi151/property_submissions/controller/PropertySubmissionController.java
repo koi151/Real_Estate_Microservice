@@ -31,12 +31,13 @@ public class PropertySubmissionController {
     public ResponseEntity<ResponseData> createPropertySubmission(@RequestBody @Valid PropertySubmissionCreate request) {
         var submissions = propertySubmissionService.createPropertySubmission(request);
 
-        ResponseData responseData = ResponseData.builder()
+        return new ResponseEntity<>(
+            ResponseData.builder()
                 .data(submissions)
                 .description("Property submission created successfully, will be reviewed by admin as soon as possible")
-                .build();
-
-        return new ResponseEntity<>(responseData, HttpStatus.CREATED);
+                .build(),
+            HttpStatus.CREATED
+        );
     }
 
     @GetMapping("/")
