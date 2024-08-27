@@ -10,11 +10,10 @@ import com.koi151.property_submissions.kafka.SubmissionConfirmation;
 import com.koi151.property_submissions.kafka.SubmissionProducer;
 import com.koi151.property_submissions.mapper.PropertySubmissionMapper;
 import com.koi151.property_submissions.model.dto.*;
-import com.koi151.property_submissions.model.request.PropertyServicePackageSearchRequest;
 import com.koi151.property_submissions.model.request.PropertySubmissionCreate;
 import com.koi151.property_submissions.model.request.PropertySubmissionSearchRequest;
 import com.koi151.property_submissions.model.response.CustomerResponse;
-import com.koi151.property_submissions.model.response.PurchaseResponse;
+import com.koi151.property_submissions.model.response.PropertyServicePackageResponse;
 import com.koi151.property_submissions.model.response.ResponseData;
 import com.koi151.property_submissions.repository.PropertySubmissionRepository;
 import com.koi151.property_submissions.service.PropertySubmissionService;
@@ -80,17 +79,17 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         );
 
         // extract body data
-        var purchaseData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PurchaseResponse.class);
-        if (purchaseData == null)
+        var propertyPackageData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PropertyServicePackageResponse.class);
+        if (propertyPackageData == null)
             throw new EntityNotFoundException("Property service package not found with id: " + request.propertyId());
 
-        var customerData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
+        var accountData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
 
         // validate
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
 
         PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
-//        entity.setTotalFee();
+        entity.setTotalFee(propertyPackageData.totalFee());
 
         propertySubmissionRepository.save(entity);
 
@@ -100,8 +99,8 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
                 request.referenceCode(),
                 BigDecimal.TEN,
                 request.paymentMethod(),
-                customerData,
-                purchaseData
+                accountData,
+                propertyPackageData
             )
         );
 
