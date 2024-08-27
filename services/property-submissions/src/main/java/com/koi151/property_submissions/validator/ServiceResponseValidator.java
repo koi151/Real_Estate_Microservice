@@ -1,6 +1,11 @@
 package com.koi151.property_submissions.validator;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koi151.property_submissions.client.AccountClient;
+import com.koi151.property_submissions.customExceptions.ResourceNotFoundException;
 import com.koi151.property_submissions.customExceptions.ServiceUnavailableException;
+import com.koi151.property_submissions.model.response.CustomerResponse;
+import com.koi151.property_submissions.model.response.PurchaseResponse;
 import com.koi151.property_submissions.model.response.ResponseData;
 import feign.FeignException;
 import lombok.RequiredArgsConstructor;
@@ -8,6 +13,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
+import java.util.Objects;
 import java.util.function.Supplier;
 
 @Component
@@ -25,8 +32,11 @@ public class ServiceResponseValidator {
             return response;
 
         } catch (FeignException ex) {
-            log.error("Error occurred while fetching data in {} service: {}", serviceName, ex.getMessage());
-            throw new ServiceUnavailableException(serviceName + " service is unavailable right now");
+//            log.error("Error occurred while fetching data in {} service: {}", serviceName, ex.getMessage().startsWith("details:[\""));
+            String errorMessage = ex.getMessage();
+            int detailsPos = ex.getMessage().indexOf("details");
+            errorMessage = errorMessage.substring(detailsPos+11, errorMessage.length() - 4);
+            throw new ResourceNotFoundException(errorMessage);
         }
     }
 }

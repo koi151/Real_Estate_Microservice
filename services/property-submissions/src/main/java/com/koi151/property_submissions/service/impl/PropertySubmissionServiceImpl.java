@@ -31,7 +31,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 @Service
@@ -61,13 +63,12 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Override
     @Transactional
     public PropertySubmissionCreateDTO createPropertySubmission(PropertySubmissionCreate request) {
-        // extract request, check if property have any property service package exists by property id
-        PropertyServicePackageSearchRequest propertySubmissionRequest = PropertyServicePackageSearchRequest.builder()
-            .propertyId(request.propertyId())
-            .build();
+        // Convert the request object to a map of query parameters
+        Map<String, String> queryParams = new HashMap<>();
+        queryParams.put("propertyId", String.valueOf(request.propertyId()));
 
         ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
-            () -> listingServicesClient.findPropertyServicePackageByCriteria(propertySubmissionRequest), // utilizing a functional interface
+            () -> listingServicesClient.findPropertyServicePackageByCriteria(queryParams), // utilizing a functional interface
             "Listing services",
             "property post service data"
         );
