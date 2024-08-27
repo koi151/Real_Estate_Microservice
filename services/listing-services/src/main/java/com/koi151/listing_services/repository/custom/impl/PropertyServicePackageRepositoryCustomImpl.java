@@ -4,7 +4,6 @@ import com.koi151.listing_services.entity.*;
 import com.koi151.listing_services.enums.PackageType;
 import com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO;
 import com.koi151.listing_services.model.dto.PropertyServicePackageSummaryDTO;
-import com.koi151.listing_services.model.request.PropertyServicePackageSearchRequest;
 import com.koi151.listing_services.repository.custom.PropertyServicePackageRepositoryCustom;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
@@ -18,6 +17,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Repository
 @RequiredArgsConstructor
@@ -28,7 +28,7 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
     private final EntityManager entityManager;
 
     @Override
-    public PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(PropertyServicePackageSearchRequest request) {
+    public PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(Map<String, String> params) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
         CriteriaQuery<Tuple> cq = cb.createQuery(Tuple.class);
 
@@ -62,10 +62,10 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
         List<Predicate> predicates = new ArrayList<>();
         predicates.add(cb.equal(postServicePricingJoin.get("packageType"), root.get("packageType"))); // Ensure package type matches for pricing
 
-        if (request.packageId() != null)
-            predicates.add(cb.equal(root.get("propertyServicePackageId"), request.packageId()));
-        if (request.propertyId() != null)
-            predicates.add(cb.equal(root.get("propertyId"), request.propertyId()));
+        if (params.get("packageId") != null)
+            predicates.add(cb.equal(root.get("propertyServicePackageId"), params.get("packageId")));
+        if (params.get("propertyId") != null)
+            predicates.add(cb.equal(root.get("propertyId"), params.get("propertyId")));
 
         // Apply where clause with the list of predicates
         cq.where(predicates.toArray(new Predicate[0]));

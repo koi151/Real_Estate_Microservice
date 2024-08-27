@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/listing-services/property-service-package")
@@ -18,14 +20,16 @@ public class PropertyServicePackageController {
     private final PropertyServicePackageService propertyServicePackageService;
 
     @GetMapping("/")
-    public ResponseEntity<ResponseData> findPropertyServicePackageByCriteria(@RequestBody PropertyServicePackageSearchRequest request) {
-        var result = propertyServicePackageService.findPropertyServicePackageByCriteria(request);
+    public ResponseEntity<ResponseData> findPropertyServicePackageByCriteria(
+            @RequestParam Map<String, String> params
+    ) {
+        var result = propertyServicePackageService.findPropertyServicePackageByCriteria(params);
 
         String desc = (result != null ? "Successfully retrieved " : "No ") +
             "property service package found with " +
-            (request.propertyId() != null
-                ? "property id: " + request.propertyId()
-                : "package id: " + request.packageId());
+            (params.containsKey("propertyId")
+                ? "property id: " + params.get("propertyId")
+                : "package name: " + params.get("packageName"));
 
         return ResponseEntity.ok(
             ResponseData.builder()

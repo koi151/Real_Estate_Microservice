@@ -28,6 +28,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 
@@ -119,9 +120,9 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
 
     @Override
     @Transactional
-    public PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(PropertyServicePackageSearchRequest request) {
-        propertyServicePackageSearchValidate.propertyServicePackageSearchValidate(request);
-        String redisKey = "propertyServicePackageSummary:" + request.packageId() + request.propertyId();
+    public PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(Map<String, String> params) {
+        propertyServicePackageSearchValidate.propertyServicePackageSearchValidate(params);
+        String redisKey = "propertyServicePackageSummary:" + params.get("packageId") + params.get("propertyId");
 
         return Optional.ofNullable(redisTemplate.opsForValue().get(redisKey))
             .map(redisData -> { // data available in redis
@@ -133,7 +134,7 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
                 }
             })
             .orElseGet(() -> { // in case of redis not saved data
-                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageByCriteria(request);
+                PropertyServicePackageSummaryDTO result = propertyServicePackageRepository.findPropertyServicePackageByCriteria(params);
                 try {
                     redisTemplate.opsForValue().set(redisKey, objectMapper.writeValueAsString(result));
                 } catch (JsonProcessingException e) {

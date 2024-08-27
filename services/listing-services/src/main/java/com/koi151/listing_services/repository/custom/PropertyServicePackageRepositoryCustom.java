@@ -1,9 +1,10 @@
 package com.koi151.listing_services.repository.custom;
 
 import com.koi151.listing_services.model.dto.PropertyServicePackageSummaryDTO;
-import com.koi151.listing_services.model.request.PropertyServicePackageSearchRequest;
+
+import java.util.Map;
 
 public interface PropertyServicePackageRepositoryCustom {
-    PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(PropertyServicePackageSearchRequest request);
+    PropertyServicePackageSummaryDTO findPropertyServicePackageByCriteria(Map<String, String> params);
 
 }

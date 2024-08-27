@@ -172,4 +172,17 @@ public class ControllerAdvisor {
 
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
+
+    // VALIDATION FAILED EX
+    @ExceptionHandler(ValidationFailedException.class)
+    public ResponseEntity<ErrorResponse> handleValidationFailedException(ValidationFailedException ex) {
+        List<String> details = new ArrayList<>();
+        details.add(ex.getMessage());
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError("Validation failed");
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
 }

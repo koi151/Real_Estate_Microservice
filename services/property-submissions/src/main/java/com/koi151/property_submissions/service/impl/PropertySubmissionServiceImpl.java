@@ -10,6 +10,7 @@ import com.koi151.property_submissions.kafka.SubmissionConfirmation;
 import com.koi151.property_submissions.kafka.SubmissionProducer;
 import com.koi151.property_submissions.mapper.PropertySubmissionMapper;
 import com.koi151.property_submissions.model.dto.*;
+import com.koi151.property_submissions.model.request.PropertyServicePackageSearchRequest;
 import com.koi151.property_submissions.model.request.PropertySubmissionCreate;
 import com.koi151.property_submissions.model.request.PropertySubmissionSearchRequest;
 import com.koi151.property_submissions.model.response.CustomerResponse;
@@ -60,8 +61,13 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
     @Override
     @Transactional
     public PropertySubmissionCreateDTO createPropertySubmission(PropertySubmissionCreate request) {
+        // extract request, check if property have any property service package exists by property id
+        PropertyServicePackageSearchRequest propertySubmissionRequest = PropertyServicePackageSearchRequest.builder()
+            .propertyId(request.propertyId())
+            .build();
+
         ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
-            () -> listingServicesClient.findPropertyServicePackageByPropertyId(request.propertyId()), // utilizing a functional interface
+            () -> listingServicesClient.findPropertyServicePackageByCriteria(propertySubmissionRequest), // utilizing a functional interface
             "Listing services",
             "property post service data"
         );
