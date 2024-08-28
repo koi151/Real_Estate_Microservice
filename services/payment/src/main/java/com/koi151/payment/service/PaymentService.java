@@ -4,5 +4,5 @@ import com.koi151.payment.model.dto.PaymentCreateDTO;
 import com.koi151.payment.model.request.PaymentCreateRequest;
 
 public interface PaymentService {
-    PaymentCreateDTO createPayment(PaymentCreateRequest request);
+    PaymentCreateDTO createPaymentFromSubmission(PaymentCreateRequest request);
 }

@@ -21,9 +21,9 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getBindingResult().getFieldErrors()
-                .stream()
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList());
+            .stream()
+            .map(FieldError::getDefaultMessage)
+            .collect(Collectors.toList());
 
         ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError("Validation failed");
@@ -87,19 +87,19 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
     }
 
-    // FEIGN CLIENT SERVICE //
-    @ExceptionHandler(AccountServiceResponseException.class)
-    public ResponseEntity<ErrorResponse> handleAccountServiceResponseException(AccountServiceResponseException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Failed to get proper response from Account service or invalid data response, recheck Account service again");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
+    // FEIGN CLIENT SERVICE ========================
+//    @ExceptionHandler(AccountServiceResponseException.class)
+//    public ResponseEntity<ErrorResponse> handleAccountServiceResponseException(AccountServiceResponseException ex) {
+//
+//        List<String> details = new ArrayList<>();
+//        details.add("Failed to get proper response from Account service or invalid data response, recheck Account service again");
+//
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setError(ex.getMessage());
+//        errorResponse.setDetails(details);
+//
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//    }
 
     @ExceptionHandler(ServiceUnavailableException.class)
     public ResponseEntity<ErrorResponse> handleServiceCommunicationException(ServiceUnavailableException ex) {
@@ -114,47 +114,47 @@ public class ControllerAdvisor {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
     }
 
-    @ExceptionHandler(AccountServiceCommunicationException.class)
-    public ResponseEntity<ErrorResponse> handleAccountServiceCommunicationException(AccountServiceCommunicationException ex) {
+//    @ExceptionHandler(AccountServiceCommunicationException.class)
+//    public ResponseEntity<ErrorResponse> handleAccountServiceCommunicationException(AccountServiceCommunicationException ex) {
+//
+//        List<String> details = new ArrayList<>();
+//        details.add("Error occurred in Account Service, recheck again");
+//
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setError(ex.getMessage());
+//        errorResponse.setDetails(details);
+//
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//    }
 
-        List<String> details = new ArrayList<>();
-        details.add("Error occurred in Account Service, recheck again");
+//    @ExceptionHandler(ProductServiceCommunicationException.class)
+//    public ResponseEntity<ErrorResponse> handleProductServiceCommunicationException(ProductServiceCommunicationException ex) {
+//
+//        List<String> details = new ArrayList<>();
+//        details.add("Error occurred in Property Service, recheck again");
+//
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setError(ex.getMessage());
+//        errorResponse.setDetails(details);
+//
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//    }
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    @ExceptionHandler(ProductServiceCommunicationException.class)
-    public ResponseEntity<ErrorResponse> handleProductServiceCommunicationException(ProductServiceCommunicationException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Error occurred in Property Service, recheck again");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
-
-    @ExceptionHandler(PropertyServiceResponseException.class)
-    public ResponseEntity<ErrorResponse> handlePropertyServiceResponseException(PropertyServiceResponseException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Failed to get properly response from Property service or invalid data response, recheck Property service again");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
-    }
+//    @ExceptionHandler(PropertyServiceResponseException.class)
+//    public ResponseEntity<ErrorResponse> handlePropertyServiceResponseException(PropertyServiceResponseException ex) {
+//
+//        List<String> details = new ArrayList<>();
+//        details.add("Failed to get properly response from Property service or invalid data response, recheck Property service again");
+//
+//        ErrorResponse errorResponse = new ErrorResponse();
+//        errorResponse.setError(ex.getMessage());
+//        errorResponse.setDetails(details);
+//
+//        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(errorResponse);
+//    }
 
 
-    // CONSTRAIN VIOLATION //
+    // CONSTRAIN VIOLATION ===========================
     @ExceptionHandler(ConstraintViolationException.class) // using for common case
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         Throwable cause = ex.getCause();

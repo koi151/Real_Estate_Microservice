@@ -1,9 +1,5 @@
 package com.koi151.property_submissions.model.request;
 
-import jakarta.validation.constraints.DecimalMax;
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.PositiveOrZero;
 import lombok.Builder;
 
 import java.math.BigDecimal;
@@ -16,6 +12,6 @@ public record PaymentCreateRequest(
     String orderInfo,
     String bankCode,
     String transactionNo,
-    LocalDateTime payDate,
-    String status
+    String paymentMethod,
+    LocalDateTime payDate
 ) {}

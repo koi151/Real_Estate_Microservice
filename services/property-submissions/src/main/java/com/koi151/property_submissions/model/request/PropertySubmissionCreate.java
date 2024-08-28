@@ -16,6 +16,7 @@ public record PropertySubmissionCreate (
     @Size(max = 100, message = "Reference code cannot longer than {max} characters")
     String referenceCode,
     PostStatus status,
+    @NotNull(message = "Payment method is mandatory")
     PaymentMethod paymentMethod,
     @Size(max = 3000, message = "Review message cannot exceed {max} characters")
     String reviewMessage

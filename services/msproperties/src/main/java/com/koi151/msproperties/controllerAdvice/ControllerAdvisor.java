@@ -50,9 +50,9 @@ public class ControllerAdvisor {
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getBindingResult().getFieldErrors()
-                .stream() // create new stream
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList()); // convert to list
+            .stream() // create new stream
+            .map(FieldError::getDefaultMessage)
+            .collect(Collectors.toList()); // convert to list
 
         ErrorResponse errorResponseDTO = new ErrorResponse();
         errorResponseDTO.setError("Validation failed");
@@ -62,7 +62,7 @@ public class ControllerAdvisor {
     }
 
     //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
-    // The below error type occurred when violated @NotNull validate
+    // The below error type occurred when violated @NotNull validation
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<Object> handleConstraintViolationException(
             ConstraintViolationException ex) {

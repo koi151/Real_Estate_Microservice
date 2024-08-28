@@ -1,6 +1,7 @@
 package com.koi151.payment.entity;
 
-import com.koi151.payment.enums.StatusEnum;
+import com.koi151.payment.enums.PaymentMethod;
+import com.koi151.payment.enums.Status;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
@@ -37,6 +38,10 @@ public class Payment extends BaseEntity {
     @DecimalMax(value = "99999999.99", message = "Total fee of payment cannot exceed {value}")
     private BigDecimal totalFee;
 
+    @Column(name = "payment_method", nullable = false)
+    @NotNull(message = "Payment method is mandatory")
+    private PaymentMethod paymentMethod;
+
     @Column(name = "order_info", columnDefinition = "TEXT")
     private String orderInfo;
 
@@ -54,7 +59,7 @@ public class Payment extends BaseEntity {
 
     @Column(name = "status", nullable = false)
     @Enumerated(EnumType.STRING)
-    private StatusEnum status;
+    private Status status;
 }
 
 

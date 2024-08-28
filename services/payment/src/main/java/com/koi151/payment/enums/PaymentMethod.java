@@ -1,7 +1,7 @@
-package com.koi151.property_submissions.enums;
+package com.koi151.payment.enums;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
-import com.koi151.property_submissions.customExceptions.InvalidEnumValueException;
+import com.koi151.payment.customExceptions.InvalidEnumValueException;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -19,14 +19,14 @@ public enum PaymentMethod {
 
     private final String methodName;
 
-    private static final PaymentMethod[] VALUES = values(); // Cache enum values for performance
+    private static final PaymentMethod[] VALUES = values();
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static PaymentMethod fromString(String s) {
         return s == null ? null
-                : Arrays.stream(VALUES)
-                .filter(value -> value.name().equals(s.toUpperCase()))
-                .findFirst()
-                .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentMethod enum value: " + s));
+            : Arrays.stream(VALUES)
+            .filter(value -> value.name().equals(s.toUpperCase()))
+            .findFirst()
+            .orElseThrow(() -> new InvalidEnumValueException("Invalid payment method enum value: " + s));
     }
 }

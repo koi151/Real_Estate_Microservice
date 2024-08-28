@@ -17,4 +17,5 @@ public class PropertySubmissionCreateDTO {
     private String status;
     private String reviewMessage;
     private BigDecimal totalFee;
+    private String paymentMethod;
 }

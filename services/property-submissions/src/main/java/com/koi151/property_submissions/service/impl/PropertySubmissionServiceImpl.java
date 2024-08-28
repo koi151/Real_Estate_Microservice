@@ -82,44 +82,47 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
             "account data"
         );
 
-        // extract body data
+        // extract body data ==========
         var propertyPackageData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PropertyServicePackageResponse.class);
         if (propertyPackageData == null)
             throw new EntityNotFoundException("Property service package not found with id: " + request.propertyId());
 
         var accountData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
-
-        // validate
+        // =======
+        // validate submission request
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
 
         PropertySubmission entity = propertySubmissionMapper.toPropertySubmissionEntity(request);
         entity.setTotalFee(propertyPackageData.totalFee());
 
-        propertySubmissionRepository.save(entity);
+        propertySubmissionRepository.save(entity); // save submission entity
 
         // payment request
         PaymentCreateRequest paymentRequest = PaymentCreateRequest.builder()
             .propertyId(request.propertyId())
             .totalFee(propertyPackageData.totalFee())
-            .orderInfo("Payment information of services used for property post with id:" + request.propertyId())
+            .paymentMethod(request.paymentMethod().toString())
+            .orderInfo("Payment information of services used for property post with id: " + request.propertyId())
             .bankCode("VCB")
             .transactionNo("273423774268")
             .payDate(LocalDateTime.now())
-            .status("pending")
             .build();
 
-        paymentClient.createPayment(paymentRequest);
-
+        // send request to Payment service
+        serviceResponseValidator.fetchServiceData(
+            () -> paymentClient.createPaymentFromSubmission(paymentRequest),
+            "Payment",
+            "payment data"
+        );
 
         // sending a confirmation message about a property submission to a Kafka topic
         submissionProducer.sendSubmissionConfirmation(
-            new SubmissionConfirmation( // this will be serialized
-                request.referenceCode(),
-                BigDecimal.TEN,
-                request.paymentMethod(),
-                accountData,
-                propertyPackageData
-            )
+            SubmissionConfirmation.builder()
+                .referenceCode(request.referenceCode())
+                .paymentMethod(request.paymentMethod())
+                .customerResponse(accountData)
+                .propertyServicePackageResponse(propertyPackageData)
+                .build()
         );
 
         return propertySubmissionMapper.toPropertySubmissionCreateDTO(entity);
@@ -148,9 +151,9 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
                 PropertySubmissionsDetailsDTO propertySubmissionsDetailsDTO = propertySubmissionMapper.toPropertySubmissionDTO(submissionDTOPage);
 
                 return AccountWithSubmissionDTO.builder()
-                        .accountWithNameAndRoleDTO(accountDTO)
-                        .propertySubmissionsDetailsDTO(propertySubmissionsDetailsDTO)
-                        .build();
+                    .accountWithNameAndRoleDTO(accountDTO)
+                    .propertySubmissionsDetailsDTO(propertySubmissionsDetailsDTO)
+                    .build();
 
             } else {
                 throw new AccountServiceResponseException("Failed to fetch account information from account service");
@@ -165,3 +168,4 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
 
 // error handler for payment
 // check condition payment
+// merge branch

@@ -19,7 +19,8 @@ public class PaymentServiceImpl implements PaymentService {
 
     @Override
     @Transactional
-    public PaymentCreateDTO createPayment(PaymentCreateRequest request) {
+    public PaymentCreateDTO createPaymentFromSubmission (PaymentCreateRequest request) {
+        // Payment create from Submission service data which is already validated
         Payment entity = paymentRepository.save(paymentMapper.toPaymentEntity(request));
         return paymentMapper.toPaymentCreateDTO(entity);
     }

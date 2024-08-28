@@ -17,6 +17,7 @@ public interface PropertySubmissionMapper {
 
     PropertySubmission toPropertySubmissionEntity(PropertySubmissionCreate request);
     @Mapping(target = "status", source = "status.statusName")
+    @Mapping(target = "paymentMethod", source = "paymentMethod.methodName")
     PropertySubmissionCreateDTO toPropertySubmissionCreateDTO(PropertySubmission entity);
 
     @Mapping(target = "status", source = "status.statusName")

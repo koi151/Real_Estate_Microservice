@@ -1,13 +1,12 @@
 package com.koi151.payment.model.request;
 
-import com.koi151.payment.enums.StatusEnum;
+import com.koi151.payment.enums.PaymentMethod;
 import jakarta.validation.constraints.DecimalMax;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 public record PaymentCreateRequest (
@@ -28,9 +27,9 @@ public record PaymentCreateRequest (
     @NotBlank(message = "Transaction code is mandatory")
     String transactionNo,
 
-    @NotNull(message = "Pay date is mandatory")
-    LocalDateTime payDate,
+    @NotNull(message = "Payment method is mandatory")
+    PaymentMethod paymentMethod,
 
-    @NotNull(message = "Payment status is mandatory")
-    StatusEnum status
+    @NotNull(message = "Pay date is mandatory")
+    LocalDateTime payDate
 ) {}

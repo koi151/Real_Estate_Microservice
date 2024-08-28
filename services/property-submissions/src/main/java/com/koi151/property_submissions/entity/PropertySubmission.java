@@ -39,6 +39,7 @@ public class PropertySubmission extends BaseEntity{
     @Size(max = 100, message = "Reference code cannot exceed {max} characters")
     private String referenceCode;
 
+    @Column(name = "payment_method", nullable = false)
     @Enumerated(EnumType.STRING)
     private PaymentMethod paymentMethod;
 

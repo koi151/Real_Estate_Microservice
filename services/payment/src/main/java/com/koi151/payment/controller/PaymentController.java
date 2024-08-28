@@ -20,8 +20,8 @@ public class PaymentController {
     private final PaymentService paymentService;
 
     @PostMapping("/")
-    public ResponseEntity<ResponseData> createPayment(@RequestBody @Valid PaymentCreateRequest request) {
-        var paymentResult = paymentService.createPayment(request);
+    public ResponseEntity<ResponseData> createPaymentFromSubmission(@RequestBody @Valid PaymentCreateRequest request) {
+        var paymentResult = paymentService.createPaymentFromSubmission(request);
         return new ResponseEntity<>(
             ResponseData.builder()
                 .data(paymentResult)
