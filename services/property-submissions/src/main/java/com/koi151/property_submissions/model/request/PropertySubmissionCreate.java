@@ -13,7 +13,7 @@ public record PropertySubmissionCreate (
     Long accountId,
     Long reviewerId,
     @NotBlank(message = "Reference code cannot be blank")
-    @Size(max = 100, message = "Reference code cannot longer than {max} characters")
+    @Size(max = 50, message = "Reference code cannot exceed {max} characters")
     String referenceCode,
     PostStatus status,
     @NotNull(message = "Payment method is mandatory")

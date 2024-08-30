@@ -19,6 +19,7 @@ public class PaymentCreateDTO {
     private String orderInfo;
     private String bankCode;
     private String transactionNo;
+    private String referenceCode;
     private LocalDate payDate;
     private String status;
 }

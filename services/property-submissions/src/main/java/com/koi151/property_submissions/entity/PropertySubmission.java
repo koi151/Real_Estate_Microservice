@@ -34,9 +34,9 @@ public class PropertySubmission extends BaseEntity{
     @Positive(message = "Account id must be positive value")
     private Long accountId;
 
-    @Column(name = "reference_code", length = 100, nullable = false, unique = true)
+    @Column(name = "reference_code", length = 50, nullable = false, unique = true)
     @NotBlank(message = "Reference code cannot be blank")
-    @Size(max = 100, message = "Reference code cannot exceed {max} characters")
+    @Size(max = 50, message = "Reference code cannot exceed {max} characters")
     private String referenceCode;
 
     @Column(name = "payment_method", nullable = false)

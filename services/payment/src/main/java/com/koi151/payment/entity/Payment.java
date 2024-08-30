@@ -49,6 +49,10 @@ public class Payment extends BaseEntity {
     @NotBlank(message = "Bank code is mandatory")
     private String bankCode;
 
+    @Column(name = "reference_code", length = 50, nullable = false)
+    @NotBlank(message = "Reference code is mandatory")
+    private String referenceCode;
+
     @Column(name = "transaction_no", length = 50, nullable = false)
     @NotBlank(message = "Transaction is mandatory")
     private String transactionNo;

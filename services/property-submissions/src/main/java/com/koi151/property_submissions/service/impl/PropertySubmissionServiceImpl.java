@@ -70,25 +70,29 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         Map<String, String> queryParams = new HashMap<>();
         queryParams.put("propertyId", String.valueOf(request.propertyId()));
 
-        ResponseEntity<ResponseData> propertyPostServiceResponse = serviceResponseValidator.fetchServiceData(
+        // fetch property service package info from Listing-services service
+        ResponseEntity<ResponseData> propertyServicePackageRes = serviceResponseValidator.fetchServiceData(
             () -> listingServicesClient.findPropertyServicePackageByCriteria(queryParams), // utilizing a functional interface
-            "Listing services",
+            "Property package service",
             "property post service data"
         );
 
-        ResponseEntity<ResponseData> customerResponse = serviceResponseValidator.fetchServiceData(
+        // fetch account info from Account service
+        ResponseEntity<ResponseData> customerRes = serviceResponseValidator.fetchServiceData(
             () -> accountClient.findAccountDetails(request.accountId()),
             "Account",
             "account data"
         );
 
-        // extract body data ==========
-        var propertyPackageData = objectMapper.convertValue(Objects.requireNonNull(propertyPostServiceResponse.getBody()).getData(), PropertyServicePackageResponse.class);
-        if (propertyPackageData == null)
+        // extract body data from client service responses ==========
+        var propertyPackageData = objectMapper.convertValue(Objects.requireNonNull(propertyServicePackageRes.getBody()).getData(), PropertyServicePackageResponse.class);
+        if (propertyPackageData == null) // !
             throw new EntityNotFoundException("Property service package not found with id: " + request.propertyId());
 
-        var accountData = objectMapper.convertValue(Objects.requireNonNull(customerResponse.getBody()).getData(), CustomerResponse.class);
-        // =======
+        var customerData = objectMapper.convertValue(Objects.requireNonNull(customerRes.getBody()).getData(), CustomerResponse.class);
+        if (customerData == null) // !
+            throw new EntityNotFoundException("Account information not found with id: " + request.accountId());
+
         // validate submission request
         propertySubmissionValidator.validatePropertySubmissionCreateRequest(request);
 
@@ -100,12 +104,14 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         // payment request
         PaymentCreateRequest paymentRequest = PaymentCreateRequest.builder()
             .propertyId(request.propertyId())
+            .referenceCode(request.referenceCode())
             .totalFee(propertyPackageData.totalFee())
+            .transactionNo("82374297492384732") // for testing
+            .payDate(LocalDateTime.now()) // for testing
             .paymentMethod(request.paymentMethod().toString())
             .orderInfo("Payment information of services used for property post with id: " + request.propertyId())
             .bankCode("VCB")
-            .transactionNo("273423774268")
-            .payDate(LocalDateTime.now())
+            .customer(customerData)
             .build();
 
         // send request to Payment service
@@ -120,7 +126,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
             SubmissionConfirmation.builder()
                 .referenceCode(request.referenceCode())
                 .paymentMethod(request.paymentMethod())
-                .customerResponse(accountData)
+                .customerResponse(customerData)
                 .propertyServicePackageResponse(propertyPackageData)
                 .build()
         );

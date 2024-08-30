@@ -20,16 +20,20 @@ public record PaymentCreateRequest (
     BigDecimal totalFee,
 
     String orderInfo,
-
+    CustomerRequest customer,
     @NotBlank(message = "Bank code is mandatory")
     String bankCode,
 
+    // Temp for testing =======================
     @NotBlank(message = "Transaction code is mandatory")
     String transactionNo,
+    @NotNull(message = "Pay date is mandatory")
+    LocalDateTime payDate,
+
+    //==================
+    @NotBlank(message = "Reference code is mandatory")
+    String referenceCode,
 
     @NotNull(message = "Payment method is mandatory")
-    PaymentMethod paymentMethod,
-
-    @NotNull(message = "Pay date is mandatory")
-    LocalDateTime payDate
+    PaymentMethod paymentMethod
 ) {}
