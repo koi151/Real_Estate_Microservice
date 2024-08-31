@@ -1,0 +1,34 @@
+server:
+  port: 8040
+spring:
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: create
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+#  kafka:
+#    producer:
+#      bootstrap-servers: localhost:9092
+#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#      #     when a consumer receive a message, it will check if type of the object matched submissionConfirmation type or not
+#      #     if MATCHED, it will be deserialized into a SubmissionConfirmation instance and accepted for processing
+#      #     else reject
+#      properties:
+#        spring.json.type.mapping: submissionConfirmation:com.koi151.property_submissions.kafka.SubmissionConfirmation
+
+application:
+  config:
+    api:
+      prefix: api/v1
+#    property-url: http://localhost:9090/api/v1/properties
+#    payment-url: http://localhost:9090/api/v1/payment
+#    admin-account-url: http://localhost:9090/api/v1/admin/accounts
+#    listing-services-url: http://localhost:9090/api/v1/listing-services
