@@ -1,18 +1,11 @@
 server:
   port: 8040
 spring:
-  datasource:
-    url: ${DATABASE_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
-    driver-class-name: com.mysql.cj.jdbc.Driver
-  jpa:
-    generate-ddl: false
-    hibernate:
-      ddl-auto: create
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQLDialect
+  data:
+    mongodb:
+      database: ${MONGO_DATABASE_NAME}
+      uri: ${MONGO_URL}
+
 #  kafka:
 #    producer:
 #      bootstrap-servers: localhost:9092

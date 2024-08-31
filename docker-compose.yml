@@ -15,6 +15,16 @@ services:
       - microservices-net
     restart: unless-stopped
 
+  mongodb:
+    image: mongo
+    container_name: mongodb
+    environment:
+      - MONGO_URI=${MONGO_URL}
+    # volumes:  # Optional: Comment out since don't need local data persistence
+    #   - mongo:/data
+    networks:
+      - microservices-net
+
   redis:
     container_name: ms-redis
     image: redis:latest
@@ -35,6 +45,7 @@ services:
       - "22181:2181"
     networks:
       - microservices-net
+
   kafka:
     image: confluentinc/cp-kafka:latest
     container_name: ms_kafka
