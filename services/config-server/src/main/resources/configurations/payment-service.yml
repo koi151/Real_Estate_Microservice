@@ -15,6 +15,16 @@ spring:
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+  kafka:
+    producer:
+      bootstrap-servers: localhost:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      #     when a consumer receive a message, it will check if type of the object matched submissionConfirmation type or not
+      #     if MATCHED, it will be deserialized into a PaymentCreateRequest instance and accepted for processing
+      #     else reject
+      properties:
+        spring.json.type.mapping: paymentConfirmation:com.koi151.payment.model.request.PaymentCreateRequest
   flyway:
     baseline-on-migrate: true
     enabled: true

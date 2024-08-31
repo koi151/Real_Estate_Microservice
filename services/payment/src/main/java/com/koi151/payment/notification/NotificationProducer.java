@@ -15,11 +15,12 @@ import org.springframework.stereotype.Service;
 @Service
 public class NotificationProducer {
 
+    // KafkaTemplate provide methods for sending messages to Kafka
     private final KafkaTemplate<String, PaymentNotificationRequest>  kafkaTemplate;
 
     public void sendNotification(PaymentNotificationRequest request) {
         log.info("Sending notification with body = < {} >", request);
-        Message<PaymentNotificationRequest> message = MessageBuilder
+        Message<PaymentNotificationRequest> message = MessageBuilder // create Kafka Message
             .withPayload(request)
             .setHeader(KafkaHeaders.TOPIC, "payment-topic")
             .build();
