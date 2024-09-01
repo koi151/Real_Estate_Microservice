@@ -13,6 +13,7 @@ import com.koi151.payment.model.response.ErrorResponse;
 
 import java.sql.SQLIntegrityConstraintViolationException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -22,15 +23,11 @@ public class ControllerAdvisor {
     // ENUM EX ====================
     @ExceptionHandler(InvalidEnumValueException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Recheck status value");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return new ResponseEntity<>(ErrorResponse.builder()
+            .error(ex.getMessage())
+            .details(Collections.singletonList("Enum value not legit, recheck again")) // create unmodifiable List
+            .build()
+            , HttpStatus.BAD_REQUEST);
     }
 
     // CONSTRAIN VIOLATION ===========================
@@ -38,34 +35,36 @@ public class ControllerAdvisor {
     @ExceptionHandler(ConstraintViolationException.class)
     public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
         Throwable cause = ex.getCause();
-        ErrorResponse errorResponse = new ErrorResponse();
 
         if (cause instanceof SQLIntegrityConstraintViolationException sqlEx) {
             String message = cause.getMessage();
-
-            List<String> details = new ArrayList<>();
-            details.add(message);
-
-            errorResponse.setError("Duplicate entry: ");
-            errorResponse.setDetails(details);
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                .body(ErrorResponse.builder()
+                    .error("Duplicate entry: ")
+                    .details(Collections.singletonList(message))
+                    .build());
         }
 
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(Collections.singletonList("Constraint violated, recheck again"))
+                .build();
     }
 
     // exception throw when violate jakarta validation
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
-        List<String> errors = ex.getBindingResult().getFieldErrors()
-            .stream() // create new stream
+        List<String> details = ex.getBindingResult().getFieldErrors()
+            .stream()
             .map(FieldError::getDefaultMessage)
-            .collect(Collectors.toList()); // convert to list
+            .toList();
 
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError("Validation failed");
-        errorResponseDTO.setDetails(errors);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error("Validation failed")
+                .details(details)
+                .build());
     }
 }
