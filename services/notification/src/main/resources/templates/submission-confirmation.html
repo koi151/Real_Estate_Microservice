@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Order Details</title>
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #007BFF;
+            color: #fff;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+
+        .price { /* New style for price formatting */
+            text-align: right; /* Align prices to the right */
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Order Details</h1>
+    <p>Customer: <span class="highlight" th:text="${customerName}"></span></p>
+    <p>Order ID: <span class="highlight" th:text="${referenceCode}"></span></p>
+
+    <table>
+        <thead>
+        <tr>
+            <th>Service Name</th>
+            <th>Available units</th>
+            <th>Price</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="service : ${propertyServicePackage.postServiceBasicInfo}">
+            <td th:text="${service.name}"></td>
+            <td th:text="${service.availableUnits}"></td>
+            <td class="price" th:text="${#numbers.formatCurrency(service.price, 'USD')}"></td>
+        </tr>
+        </tbody>
+    </table>
+
+    <div class="footer">
+        <p>Total Amount: <span class="highlight" th:text="${#numbers.formatCurrency(propertyServicePackage.totalFee, 'USD')}"></span></p>
+        <p>This is an automated message. Please do not reply to this email.</p>
+        <p>&copy; 2024 Koi151. All rights reserved.</p>
+    </div>
+</div>
+</body>
+
+</html>

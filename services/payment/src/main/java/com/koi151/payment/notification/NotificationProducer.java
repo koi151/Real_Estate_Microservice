@@ -1,6 +1,5 @@
 package com.koi151.payment.notification;
 
-import com.koi151.payment.model.request.PaymentNotificationRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.core.KafkaTemplate;

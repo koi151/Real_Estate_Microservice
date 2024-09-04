@@ -11,6 +11,6 @@ import java.math.BigDecimal;
 public record SubmissionConfirmation(
     String referenceCode,
     PaymentMethod paymentMethod,
-    CustomerResponse customerResponse,
-    PropertyServicePackageResponse propertyServicePackageResponse
+    CustomerResponse customer,
+    PropertyServicePackageResponse propertyServicePackage
 ) {}

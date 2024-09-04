@@ -1,11 +1,8 @@
-package com.koi151.listing_services.model.dto;
-
-import lombok.Builder;
+package com.koi151.notification.kafka.submission;
 
 import java.math.BigDecimal;
 
-@Builder
-public record PostServiceBasicInfoDTO(
+public record PostServiceBasicInfo (
     Long postServiceId,
     BigDecimal price,
     String name,

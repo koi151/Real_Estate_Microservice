@@ -7,5 +7,5 @@ public record PropertyServicePackageResponse (
     Long propertyPostPackageId,
     String packageType,
     BigDecimal totalFee,
-    List<PostServiceBasicInfoResponse> postServiceBasicInfoDTOs
+    List<PostServiceBasicInfoResponse> postServiceBasicInfo
 ){}

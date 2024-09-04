@@ -1,16 +1,14 @@
-package com.koi151.payment.model.request;
+package com.koi151.notification.kafka.payment;
 
-import com.koi151.payment.enums.PaymentMethod;
-import lombok.Builder;
+import com.koi151.notification.enums.PaymentMethod;
 
 import java.math.BigDecimal;
 
-@Builder
-public record PaymentNotificationRequest (
+public record PaymentConfirmation(
     String referenceCode,
     BigDecimal totalFee,
     PaymentMethod paymentMethod,
     String customerFirstName,
     String customerLastName,
     String customerEmail
-) {}
+) { }

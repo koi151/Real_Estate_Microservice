@@ -3,25 +3,36 @@ server:
 spring:
   data:
     mongodb:
+#      username:
+#      password:
+#      host: localhost
       database: ${MONGO_DATABASE_NAME}
       uri: ${MONGO_URL}
+#      authentication-database: admin
 
-#  kafka:
-#    producer:
-#      bootstrap-servers: localhost:9092
-#      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-#      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
-#      #     when a consumer receive a message, it will check if type of the object matched submissionConfirmation type or not
-#      #     if MATCHED, it will be deserialized into a SubmissionConfirmation instance and accepted for processing
-#      #     else reject
-#      properties:
-#        spring.json.type.mapping: submissionConfirmation:com.koi151.property_submissions.kafka.SubmissionConfirmation
+  kafka:
+    consumer:
+      bootstrap-servers: localhost:9092
+      group-id: paymentGroup,orderGroup # Consumer belong to 1 of these
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+        spring.json.type.mapping: submissionConfirmation:com.koi151.notification.kafka.submission.SubmissionConfirmation,paymentConfirmation:com.koi151.notification.kafka.payment.PaymentConfirmation
 
-application:
-  config:
-    api:
-      prefix: api/v1
-#    property-url: http://localhost:9090/api/v1/properties
-#    payment-url: http://localhost:9090/api/v1/payment
-#    admin-account-url: http://localhost:9090/api/v1/admin/accounts
-#    listing-services-url: http://localhost:9090/api/v1/listing-services
+  mail:
+    host: localhost
+    port: 1025
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000

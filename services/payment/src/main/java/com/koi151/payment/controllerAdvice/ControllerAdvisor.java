@@ -49,7 +49,7 @@ public class ControllerAdvisor {
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
                 .details(Collections.singletonList("Constraint violated, recheck again"))
-                .build();
+                .build());
     }
 
     // exception throw when violate jakarta validation

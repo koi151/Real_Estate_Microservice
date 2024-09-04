@@ -16,5 +16,5 @@ public class PropertyServicePackageSummaryDTO {
     Long propertyPostPackageId;
     String packageType;
     BigDecimal totalFee;
-    List<PostServiceBasicInfoDTO> postServiceBasicInfoDTOs;
+    List<PostServiceBasicInfoDTO> postServiceBasicInfo;
 }

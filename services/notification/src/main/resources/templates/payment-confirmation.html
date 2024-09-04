@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Confirmation</title>
+    <style>
+        body {
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 30px;
+            background-color: #fff;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            color: #007BFF;
+            margin-bottom: 20px;
+        }
+
+        p {
+            margin-bottom: 15px;
+        }
+
+        .highlight {
+            font-weight: bold;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            text-align: center;
+            text-decoration: none;
+            color: #fff;
+            background-color: #007BFF;
+            border-radius: 6px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+
+        .button:hover {
+            background-color: #0056b3;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+            font-size: 14px;
+            color: #777;
+        }
+    </style>
+</head>
+
+<body>
+<div class="container">
+    <h1>Payment Confirmed!</h1>
+    <p>Hi <span class="highlight" th:text="${customerName}"></span>,</p>
+    <p>We're happy to inform you that your payment of <span class="highlight">$<span th:text="${totalFee}"></span></span> has been successfully processed.</p>
+    <p>Your order reference is: <span class="highlight" th:text="${referenceCode}"></span></p>
+    <p>Thank you for choosing our service. If you have any questions, feel free to contact us.</p>
+
+    <div class="footer">
+        <p>This is an automated message. Please do not reply.</p>
+        <p>&copy; 2024 Koi151. All rights reserved.</p>
+    </div>
+</div>
+</body>
+</html>

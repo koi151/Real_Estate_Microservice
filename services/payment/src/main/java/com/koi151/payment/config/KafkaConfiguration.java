@@ -1,6 +1,6 @@
 //package com.koi151.payment.config;
 //
-//import com.koi151.payment.model.request.PaymentNotificationRequest;
+//import com.koi151.payment.notification.PaymentNotificationRequest;
 //import org.apache.kafka.clients.producer.ProducerConfig;
 //import org.apache.kafka.common.serialization.StringSerializer;
 //import org.springframework.context.annotation.Bean;

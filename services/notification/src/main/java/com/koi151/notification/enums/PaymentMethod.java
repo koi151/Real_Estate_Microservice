@@ -9,7 +9,7 @@ import java.util.Arrays;
 
 @Getter
 @RequiredArgsConstructor
-public enum PaymentMethods {
+public enum PaymentMethod {
     CREDIT_CARD ("Credit card"),
     E_WALLET ("E-wallet"),
     ONLINE_BANKING ("Online banking"),
@@ -19,14 +19,14 @@ public enum PaymentMethods {
 
     private final String methodName;
 
-    private static final PaymentMethods[] VALUES = values(); // Cache enum values for performance
+    private static final PaymentMethod[] VALUES = values(); // Cache enum values for performance
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
-    public static PaymentMethods fromString(String s) {
+    public static PaymentMethod fromString(String s) {
         return s == null ? null
-                : Arrays.stream(VALUES)
-                .filter(value -> value.name().equals(s.toUpperCase()))
-                .findFirst()
-                .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentMethod enum value: " + s));
+            : Arrays.stream(VALUES)
+            .filter(value -> value.name().equals(s.toUpperCase()))
+            .findFirst()
+            .orElseThrow(() -> new InvalidEnumValueException("Invalid PaymentMethod enum value: " + s));
     }
 }

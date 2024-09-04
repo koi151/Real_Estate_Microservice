@@ -15,7 +15,9 @@ import java.util.List;
 public interface PostServiceRepository extends JpaRepository<PostService, Long>, PostServiceRepositoryCustom {
     boolean existsByName(String name);
 
-    @Query("SELECT new com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO(ps.postServiceId, ps.name, ps.availableUnits) " +
-            "FROM post_service ps WHERE ps.postServiceId IN :ids")
-    List<PostServiceBasicInfoDTO> getNameAndAvailableUnitsById(@Param("ids") Iterable<Long> ids);
+    @Query("SELECT new com.koi151.listing_services.model.dto.PostServiceBasicInfoDTO(ps.postServiceId, psp.price, ps.name, ps.availableUnits) " +
+            "FROM post_service ps " +
+            "JOIN ps.postServicePricings psp " +
+            "WHERE ps.postServiceId IN :ids")
+    List<PostServiceBasicInfoDTO> getPostServiceBasicInfoById(@Param("ids") Iterable<Long> ids);
 }

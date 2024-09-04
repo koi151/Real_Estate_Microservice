@@ -1,17 +1,5 @@
 spring:
-  application:
-    name: notification-service
   config:
     import: optional:configserver:http://localhost:8888
-
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-
-logging:
-  level:
-    org.mongodb.driver: INFO
-
+  application:
+    name: notification-service

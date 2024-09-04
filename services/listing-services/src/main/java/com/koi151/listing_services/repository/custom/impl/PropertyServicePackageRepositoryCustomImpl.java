@@ -82,6 +82,7 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
         for (Tuple result : results) {
             Long postServiceId = result.get("postServiceId", Long.class);
             String postServiceName = result.get("name", String.class);
+            BigDecimal servicePrice = result.get("price", BigDecimal.class);
             Integer availableUnits = result.get("availableUnits", Integer.class);
 
             BigDecimal standardPrice = result.get("price", BigDecimal.class);
@@ -95,8 +96,13 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
                 totalFee = totalFee.add(standardPrice.subtract(priceDiscountedFromPromo).subtract(discountPrice).max(BigDecimal.ZERO));
             }
 
-            // Add the post service basic info DTO to the list
-            postServiceBasicInfoDTOs.add(new PostServiceBasicInfoDTO(postServiceId, postServiceName, availableUnits));
+            // Add the post service basic info DTO to the list postServiceId, postServiceName, availableUnits
+            postServiceBasicInfoDTOs.add(PostServiceBasicInfoDTO.builder()
+                .postServiceId(postServiceId)
+                .name(postServiceName)
+                .availableUnits(availableUnits)
+                .price(servicePrice)
+                .build());
         }
 
         // Get the first result to extract package details
@@ -106,7 +112,7 @@ public class PropertyServicePackageRepositoryCustomImpl implements PropertyServi
             .propertyPostPackageId(firstResult.get("propertyServicePackageId", Long.class))
             .packageType(firstResult.get("packageType", String.class))
             .totalFee(totalFee)
-            .postServiceBasicInfoDTOs(postServiceBasicInfoDTOs)
+            .postServiceBasicInfo(postServiceBasicInfoDTOs)
             .build();
     }
 

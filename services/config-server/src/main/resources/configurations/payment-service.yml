@@ -24,7 +24,7 @@ spring:
       #     if MATCHED, it will be deserialized into a PaymentCreateRequest instance and accepted for processing
       #     else reject
       properties:
-        spring.json.type.mapping: paymentConfirmation:com.koi151.payment.model.request.PaymentCreateRequest
+        spring.json.type.mapping: paymentConfirmation:com.koi151.payment.notification.PaymentNotificationRequest
   flyway:
     baseline-on-migrate: true
     enabled: true

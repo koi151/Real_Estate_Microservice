@@ -71,7 +71,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         queryParams.put("propertyId", String.valueOf(request.propertyId()));
 
         // fetch property service package info from Listing-services service
-        ResponseEntity<ResponseData> propertyServicePackageRes = serviceResponseValidator.fetchServiceData(
+        ResponseEntity<ResponseData> propertyPackageServiceRes = serviceResponseValidator.fetchServiceData(
             () -> listingServicesClient.findPropertyServicePackageByCriteria(queryParams), // utilizing a functional interface
             "Property package service",
             "property post service data"
@@ -85,7 +85,7 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
         );
 
         // extract body data from client service responses ==========
-        var propertyPackageData = objectMapper.convertValue(Objects.requireNonNull(propertyServicePackageRes.getBody()).getData(), PropertyServicePackageResponse.class);
+        var propertyPackageData = objectMapper.convertValue(Objects.requireNonNull(propertyPackageServiceRes.getBody()).getData(), PropertyServicePackageResponse.class);
         if (propertyPackageData == null) // !
             throw new EntityNotFoundException("Property service package not found with id: " + request.propertyId());
 
@@ -126,8 +126,8 @@ public class PropertySubmissionServiceImpl implements PropertySubmissionService 
             SubmissionConfirmation.builder()
                 .referenceCode(request.referenceCode())
                 .paymentMethod(request.paymentMethod())
-                .customerResponse(customerData)
-                .propertyServicePackageResponse(propertyPackageData)
+                .customer(customerData)
+                .propertyServicePackage(propertyPackageData)
                 .build()
         );
 

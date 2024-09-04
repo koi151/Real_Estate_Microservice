@@ -12,11 +12,6 @@ spring:
         locator:
           enabled: true
       routes:
-        - id: notification
-          uri: http://localhost:8040/
-          predicates:
-          - Path=/api/v1/notifications/**
-
         - id: properties
           uri: http://localhost:8050/
           predicates:
