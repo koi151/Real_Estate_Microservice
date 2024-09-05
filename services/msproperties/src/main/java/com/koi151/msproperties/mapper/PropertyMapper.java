@@ -68,7 +68,7 @@ public interface PropertyMapper {
     @Mapping(target = "address", expression = "java(getFullAddressString(projection.address()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(projection.imageUrls(), \",\"))")
     @Mapping(target = "rooms", expression = "java(toRoomNameQuantityDTOs(projection.rooms()))")
-    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
+//    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     PropertySearchDTO toPropertySearchDTO(PropertySearchProjection projection);
 
     // Helper function to map rooms

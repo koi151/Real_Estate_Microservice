@@ -26,5 +26,5 @@ public class PropertySearchDTO {
     private String address;
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
-    private PropertyPostServiceSearchDTO propertyPostService;
+//    private PropertyPostServiceSearchDTO propertyPostService;
 }

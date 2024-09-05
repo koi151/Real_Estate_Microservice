@@ -63,6 +63,19 @@ services:
     networks:
       - microservices-net
 
+  keycloak:
+    container_name: keycloak-ms
+    image: quay.io/keycloak/keycloak:25.0.4
+    ports:
+      - 9098:8080
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    networks:
+      - microservices-net
+    command:
+      - "start-dev"
+
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin

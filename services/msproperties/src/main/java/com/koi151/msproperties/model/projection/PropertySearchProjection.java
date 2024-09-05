@@ -24,8 +24,8 @@ public record PropertySearchProjection (
      LocalDate availableFrom,
      Address address,
      String imageUrls,
-     List<RoomSearchProjection> rooms,
-     PropertyPostServiceProjection propertyPostService
+     List<RoomSearchProjection> rooms
+//     PropertyPostServiceProjection propertyPostService
 ) {}
 
 

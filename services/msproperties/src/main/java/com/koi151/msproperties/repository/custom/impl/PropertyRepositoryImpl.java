@@ -149,7 +149,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         // Always need these joins since it require in property response
         context.addJoin("address", context.root().join("address", JoinType.LEFT));
         context.addJoin("rooms", context.root().join("rooms", JoinType.LEFT));
-        context.addJoin("propertyPostService", context.root().join("propertyPostService", JoinType.LEFT));
     }
 
 @Override
@@ -186,7 +185,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
     // get existed join
     Join<Property, ?> roomJoin = joins.get("rooms");
     Join<Property, ?> addressJoin = joins.get("address");
-    Join<Property, ?> postServiceJoin = joins.get("propertyPostService");
+//    Join<Property, ?> postServiceJoin = joins.get("propertyPostService");
 
     // Create a projection query
     cq.multiselect(
@@ -209,9 +208,9 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
         addressJoin.alias("address"),
         root.get("imageUrls").alias("imageUrls"),
         roomJoin.get("roomType").alias("roomType"),
-        roomJoin.get("quantity").alias("quantity"),
-        postServiceJoin.get("postingPackage").alias("postingPackage"),
-        postServiceJoin.get("postingDate").alias("postingDate")
+        roomJoin.get("quantity").alias("quantity")
+//        postServiceJoin.get("postingPackage").alias("postingPackage"),
+//        postServiceJoin.get("postingDate").alias("postingDate")
     );
 
     TypedQuery<Tuple> query = entityManager.createQuery(cq);
@@ -241,10 +240,10 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
                 List<RoomSearchProjection> propertyRooms = roomsByPropertyId.getOrDefault(entry.getKey(), new ArrayList<>());
 
                 // Extract PropertyPostService data from the tuple
-                PropertyPostServiceProjection postServiceProjection = new PropertyPostServiceProjection(
-                    tuple.get("postingPackage", PostingPackageEnum.class),
-                    tuple.get("postingDate", LocalDateTime.class)
-                );
+//                PropertyPostServiceProjection postServiceProjection = new PropertyPostServiceProjection(
+//                    tuple.get("postingPackage", PostingPackageEnum.class),
+//                    tuple.get("postingDate", LocalDateTime.class)
+//                );
 
                 return PropertySearchProjection.builder()
                     .propertyId(tuple.get("propertyId", Long.class))
@@ -261,7 +260,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
                     .address(tuple.get("address", Address.class))
                     .imageUrls(tuple.get("imageUrls", String.class))
                     .rooms(propertyRooms)
-                    .propertyPostService(postServiceProjection)
+//                    .propertyPostService(postServiceProjection)
                     .build();
             })
             .collect(Collectors.toList());
