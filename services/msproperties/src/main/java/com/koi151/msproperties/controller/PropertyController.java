@@ -21,6 +21,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -37,12 +38,12 @@ import java.util.stream.IntStream;
 public class PropertyController {
 
     private final PropertiesService propertiesService;
-//    private final ObjectMapper objectMapper;
     private final ResponseDataMapper responseDataMapper;
 
     private static final int MAX_PAGE_SIZE = 20;
 
     @GetMapping("/")
+    @PreAuthorize("hasAnyAuthority('DEMO_ROLE')")
     public ResponseEntity<ResponseData> findAllProperties (
             @RequestParam(required = false, defaultValue = "1") int page,
             @RequestParam(required = false, defaultValue = "10") int limit,
@@ -148,22 +149,22 @@ public class PropertyController {
                     );
 
                     return PropertyCreateRequest.builder()
-                            .title(realEstateTitle)
-                            .propertyForSale(propertyForSale)
-                            .propertyForRent(propertyForRent)
-                            .propertyPostService(postServiceCreate)
-                            .accountId((long) faker.number().numberBetween(1, 7))
-                            .address(address)
-                            .rooms(rooms)
-                            .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
-                            .description(faker.lorem().paragraph())
-                            .totalFloor((short) faker.number().numberBetween(0, 20))
-                            .categoryId((long) faker.number().numberBetween(1, 5))
-                            .houseDirection(directions[randomDir1Index])
-                            .balconyDirection(directions[randomDir2Index])
-                            .status(statuses[randomStatusIndex])
-                            .availableFrom(availableFrom)
-                            .build();
+                        .title(realEstateTitle)
+                        .propertyForSale(propertyForSale)
+                        .propertyForRent(propertyForRent)
+                        .propertyPostService(postServiceCreate)
+                        .accountId((long) faker.number().numberBetween(1, 7))
+                        .address(address)
+                        .rooms(rooms)
+                        .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
+                        .description(faker.lorem().paragraph())
+                        .totalFloor((short) faker.number().numberBetween(0, 20))
+                        .categoryId((long) faker.number().numberBetween(1, 5))
+                        .houseDirection(directions[randomDir1Index])
+                        .balconyDirection(directions[randomDir2Index])
+                        .status(statuses[randomStatusIndex])
+                        .availableFrom(availableFrom)
+                        .build();
                 })
                 .collect(Collectors.toList()));
 
@@ -186,8 +187,8 @@ public class PropertyController {
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
-                ? "No property found"
-                : "Get properties succeed");
+            ? "No property found"
+            : "Get properties succeed");
 
         return ResponseEntity.ok(responseData);
     }
@@ -260,6 +261,7 @@ public class PropertyController {
 
 
     @PostMapping("/")
+    @PreAuthorize("hasPermission(@propertyCategoryServiceImpl,'create_properties')")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images

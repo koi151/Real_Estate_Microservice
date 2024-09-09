@@ -17,3 +17,4 @@ public interface PropertySubmissionRepository extends JpaRepository<PropertySubm
     Page<PropertySubmission> findPropertySubmissionByAccountIdAndDeleted(Long id, boolean deleted, Pageable pageable);
     Page<PropertySubmission> findAllByDeleted(Pageable pageable, boolean deleted); // remove del, add in search criteria
 }
+

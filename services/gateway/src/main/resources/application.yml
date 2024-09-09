@@ -7,4 +7,4 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: "http://localhost:9098/realms/micro-services"
+          issuer-uri: "http://localhost:9098/realms/real-estate-microservice"
