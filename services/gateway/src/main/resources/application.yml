@@ -8,3 +8,4 @@ spring:
       resourceserver:
         jwt:
           issuer-uri: "http://localhost:9098/realms/real-estate-microservice"
+          jwk-set-uri: "http://localhost:9098/realms/real-estate-microservice/protocol/openid-connect/certs"

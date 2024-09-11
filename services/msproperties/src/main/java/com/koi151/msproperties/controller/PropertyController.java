@@ -43,11 +43,11 @@ public class PropertyController {
     private static final int MAX_PAGE_SIZE = 20;
 
     @GetMapping("/")
-    @PreAuthorize("hasAnyAuthority('DEMO_ROLE')")
+    @PreAuthorize("hasAuthority('SCOPE_properties_view')")
     public ResponseEntity<ResponseData> findAllProperties (
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int limit,
-            @RequestBody @Valid PropertySearchRequest request)
+        @RequestParam(required = false, defaultValue = "1") int page,
+        @RequestParam(required = false, defaultValue = "10") int limit,
+        @RequestBody @Valid PropertySearchRequest request)
     {
         int pageSize = Math.min(limit, MAX_PAGE_SIZE);
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate"));
@@ -62,109 +62,110 @@ public class PropertyController {
     }
 
     @PostMapping("/generateFakeProperties")
+    @PreAuthorize("hasAuthority('SCOPE_properties_create')")
     private ResponseEntity<ResponseData> generateFakeProperties() {
         Faker faker = new Faker();
         int numberOfFakeProperties = 20000;
 
         propertiesService.createFakeProperties(IntStream.range(0, numberOfFakeProperties)
-                .mapToObj(i -> {
-                    // property
-                    DirectionEnum[] directions = DirectionEnum.values();
-                    int randomDir1Index = faker.number().numberBetween(0, directions.length);
-                    int randomDir2Index = faker.number().numberBetween(0, directions.length);
+            .mapToObj(i -> {
+                // property
+                DirectionEnum[] directions = DirectionEnum.values();
+                int randomDir1Index = faker.number().numberBetween(0, directions.length);
+                int randomDir2Index = faker.number().numberBetween(0, directions.length);
 
-                    StatusEnum[] statuses = StatusEnum.values();
-                    int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
+                StatusEnum[] statuses = StatusEnum.values();
+                int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
 
-                    // propertyForRent
-                    PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
+                // propertyForRent
+                PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
 
-                    // propertyPostService
-                    PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
-                    int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
+                // propertyPostService
+                PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
+                int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
 
-                    DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
-                    int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
+                DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
+                int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
 
 
-                    // Generate fake data directly in the stream
-                    AddressCreateRequest address = AddressCreateRequest.builder()
-                            .city(faker.address().city())
-                            .district(faker.address().cityName())
-                            .ward(faker.address().streetName())
-                            .streetAddress(faker.address().streetAddress())
-                            .build();
-
-                    String realEstateTitle = faker.commerce().material() + " " + faker.commerce().department();
-
-                    // Ensure at least one property type is present
-                    boolean createForSale = faker.bool().bool();
-                    boolean createForRent = faker.bool().bool() || !createForSale;
-
-                    PropertyForSaleCreateRequest propertyForSale = createForSale ? PropertyForSaleCreateRequest.builder()
-                            .salePrice(BigDecimal.valueOf(faker.number().randomDouble(2, 5000, 20_000_000)))
-                            .saleTerm(faker.lorem().sentence())
-                            .build() : null;
-
-                    PropertyForRentCreateRequest propertyForRent = createForRent ? PropertyForRentCreateRequest.builder()
-                            .rentalPrice(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 300000)))
-                            .rentalTerm(faker.lorem().sentence())
-                            .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
-                            .build() : null;
-
-                    LocalDateTime postingDate = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 30));
-
-                    PropertyPostServiceCreateUpdateRequest postServiceCreate = PropertyPostServiceCreateUpdateRequest.builder()
-                            .postingPackage(postingPackages[randomPostPackageIndex])
-                            .priorityPushes((short) faker.number().numberBetween(0, 30))
-                            .postingDate(postingDate)
-                            .daysPosted(daysPostedEnums[randomDaysPostedIndex])
-                            .build();
-
-                    // rooms
-                    RoomTypeEnum[] roomTypes = RoomTypeEnum.values();
-                    Set<RoomTypeEnum> usedRoomTypes = new HashSet<>(); // Track used room types
-                    List<RoomCreateUpdateRequest> rooms = new ArrayList<>();
-
-                    int numRooms = faker.number().numberBetween(1, 4);
-                    for (int j = 0; j < numRooms; j++) {
-                        RoomTypeEnum randomRoomType;
-                        do {
-                            int randomRoomTypeIndex = faker.number().numberBetween(0, roomTypes.length);
-                            randomRoomType = roomTypes[randomRoomTypeIndex];
-                        } while (usedRoomTypes.contains(randomRoomType));
-
-                        usedRoomTypes.add(randomRoomType);
-
-                        rooms.add(RoomCreateUpdateRequest.builder()
-                                .roomType(randomRoomType)
-                                .quantity((short) faker.number().numberBetween(1, 10))
-                                .build());
-                    }
-
-                    LocalDate availableFrom = LocalDate.of(
-                            2024,
-                            faker.number().numberBetween(7, 9),
-                            faker.number().numberBetween(1, 28)
-                    );
-
-                    return PropertyCreateRequest.builder()
-                        .title(realEstateTitle)
-                        .propertyForSale(propertyForSale)
-                        .propertyForRent(propertyForRent)
-                        .propertyPostService(postServiceCreate)
-                        .accountId((long) faker.number().numberBetween(1, 7))
-                        .address(address)
-                        .rooms(rooms)
-                        .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
-                        .description(faker.lorem().paragraph())
-                        .totalFloor((short) faker.number().numberBetween(0, 20))
-                        .categoryId((long) faker.number().numberBetween(1, 5))
-                        .houseDirection(directions[randomDir1Index])
-                        .balconyDirection(directions[randomDir2Index])
-                        .status(statuses[randomStatusIndex])
-                        .availableFrom(availableFrom)
+                // Generate fake data directly in the stream
+                AddressCreateRequest address = AddressCreateRequest.builder()
+                        .city(faker.address().city())
+                        .district(faker.address().cityName())
+                        .ward(faker.address().streetName())
+                        .streetAddress(faker.address().streetAddress())
                         .build();
+
+                String realEstateTitle = faker.commerce().material() + " " + faker.commerce().department();
+
+                // Ensure at least one property type is present
+                boolean createForSale = faker.bool().bool();
+                boolean createForRent = faker.bool().bool() || !createForSale;
+
+                PropertyForSaleCreateRequest propertyForSale = createForSale ? PropertyForSaleCreateRequest.builder()
+                        .salePrice(BigDecimal.valueOf(faker.number().randomDouble(2, 5000, 20_000_000)))
+                        .saleTerm(faker.lorem().sentence())
+                        .build() : null;
+
+                PropertyForRentCreateRequest propertyForRent = createForRent ? PropertyForRentCreateRequest.builder()
+                        .rentalPrice(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 300000)))
+                        .rentalTerm(faker.lorem().sentence())
+                        .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
+                        .build() : null;
+
+                LocalDateTime postingDate = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 30));
+
+                PropertyPostServiceCreateUpdateRequest postServiceCreate = PropertyPostServiceCreateUpdateRequest.builder()
+                        .postingPackage(postingPackages[randomPostPackageIndex])
+                        .priorityPushes((short) faker.number().numberBetween(0, 30))
+                        .postingDate(postingDate)
+                        .daysPosted(daysPostedEnums[randomDaysPostedIndex])
+                        .build();
+
+                // rooms
+                RoomTypeEnum[] roomTypes = RoomTypeEnum.values();
+                Set<RoomTypeEnum> usedRoomTypes = new HashSet<>(); // Track used room types
+                List<RoomCreateUpdateRequest> rooms = new ArrayList<>();
+
+                int numRooms = faker.number().numberBetween(1, 4);
+                for (int j = 0; j < numRooms; j++) {
+                    RoomTypeEnum randomRoomType;
+                    do {
+                        int randomRoomTypeIndex = faker.number().numberBetween(0, roomTypes.length);
+                        randomRoomType = roomTypes[randomRoomTypeIndex];
+                    } while (usedRoomTypes.contains(randomRoomType));
+
+                    usedRoomTypes.add(randomRoomType);
+
+                    rooms.add(RoomCreateUpdateRequest.builder()
+                            .roomType(randomRoomType)
+                            .quantity((short) faker.number().numberBetween(1, 10))
+                            .build());
+                }
+
+                LocalDate availableFrom = LocalDate.of(
+                        2024,
+                        faker.number().numberBetween(7, 9),
+                        faker.number().numberBetween(1, 28)
+                );
+
+                return PropertyCreateRequest.builder()
+                    .title(realEstateTitle)
+                    .propertyForSale(propertyForSale)
+                    .propertyForRent(propertyForRent)
+                    .propertyPostService(postServiceCreate)
+                    .accountId((long) faker.number().numberBetween(1, 7))
+                    .address(address)
+                    .rooms(rooms)
+                    .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
+                    .description(faker.lorem().paragraph())
+                    .totalFloor((short) faker.number().numberBetween(0, 20))
+                    .categoryId((long) faker.number().numberBetween(1, 5))
+                    .houseDirection(directions[randomDir1Index])
+                    .balconyDirection(directions[randomDir2Index])
+                    .status(statuses[randomStatusIndex])
+                    .availableFrom(availableFrom)
+                    .build();
                 })
                 .collect(Collectors.toList()));
 
@@ -175,10 +176,11 @@ public class PropertyController {
 
 
     @GetMapping("/home")
+    @PreAuthorize("hasAuthority('SCOPE_properties_view')")
     public ResponseEntity<?> findHomeProperties(
-            @RequestParam Map<String, Object> params,
-            @RequestParam(required = false, defaultValue = "1") int page,
-            @RequestParam(required = false, defaultValue = "10") int limit
+        @RequestParam Map<String, Object> params,
+        @RequestParam(required = false, defaultValue = "1") int page,
+        @RequestParam(required = false, defaultValue = "10") int limit
     ) {
         int pageSize = Math.min(limit, MAX_PAGE_SIZE);
         Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
@@ -195,13 +197,10 @@ public class PropertyController {
 
     @GetMapping("/detail/{id}")
     public ResponseEntity<ResponseData> findPropertyById(@PathVariable(name = "id") Long id) {
-        var property = propertiesService.getPropertyById(id);
-
-        ResponseData responseData = new ResponseData();
-        responseData.setData(property);
-        responseData.setDesc("Success");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(propertiesService.getPropertyById(id))
+            .desc("Success")
+        .build());
     }
 
     @GetMapping("/category/{category-id}")
@@ -223,9 +222,9 @@ public class PropertyController {
 
     @GetMapping("/account/{account-id}")
     public ResponseEntity<ResponseData> findPropertiesByAccount(
-            @PathVariable(name = "account-id") Long accountId,
-            @RequestParam(required = false, defaultValue = "0") int page,
-            @RequestParam(required = false, defaultValue = "10") int limit
+        @PathVariable(name = "account-id") Long accountId,
+        @RequestParam(required = false, defaultValue = "0") int page,
+        @RequestParam(required = false, defaultValue = "10") int limit
     ) {
         int pageSize = Math.min(limit, MAX_PAGE_SIZE);
         Pageable pageable = PageRequest.of(page, pageSize, Sort.by("createdDate").descending());
@@ -251,59 +250,56 @@ public class PropertyController {
 
         var propertiesPage = propertiesService.findPropertiesByStatus(se, pageable);
 
-        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
-        responseData.setDesc(propertiesPage.isEmpty()
-            ? "No properties found with status " + status
-            : "Success");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(responseDataMapper.toResponseData(propertiesPage, page, pageSize))
+            .desc(propertiesPage.isEmpty()
+                ? "No properties found with status " + status
+                : "Success")
+            .build()
+        );
     }
 
-
     @PostMapping("/")
-    @PreAuthorize("hasPermission(@propertyCategoryServiceImpl,'create_properties')")
+    @PreAuthorize("hasAuthority('SCOPE_properties_create')")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
     ) {
-
-        DetailedPropertyDTO propertyRes = propertiesService.createProperty(property, images);
-
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertyRes);
-        responseData.setDesc("Property post created successfully");
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(responseData);
+        return ResponseEntity.status(HttpStatus.CREATED)
+            .body(ResponseData.builder()
+                .data(propertiesService.createProperty(property, images))
+                .desc("Property post created successfully")
+                .build());
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_properties_delete')")
     public ResponseEntity<ResponseData> deleteProperty (@PathVariable(name = "id") Long id) {
-        ResponseData responseData = new ResponseData();
-
         propertiesService.deleteProperty(id);
-        responseData.setDesc("Property deleted successfully");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .desc("Property deleted successfully")
+            .build());
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_properties_update')")
     public ResponseEntity<ResponseData> updateProperty(
-            @PathVariable(name = "id") Long id,
-            @RequestPart(required = false) @Valid PropertyUpdateRequest property,
-            @RequestPart(required = false) List<MultipartFile> images
+        @PathVariable(name = "id") Long id,
+        @RequestPart(required = false) @Valid PropertyUpdateRequest property,
+        @RequestPart(required = false) List<MultipartFile> images
     ){
-        ResponseData responseData = new ResponseData();
-        responseData.setData(propertiesService.updateProperty(id, property, images));
-        responseData.setDesc("Property updated successfully");
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(propertiesService.updateProperty(id, property, images))
+            .desc("Property updated successfully")
+            .build());
     }
 
     @GetMapping("/{id}/active") // used for other domains application request
     public ResponseEntity<ResponseData> propertyActiveCheck(@PathVariable(name = "id") Long id) {
         var res = propertiesService.propertyActiveCheck(id);
-        ResponseData responseData = new ResponseData();
-        responseData.setData(res);
-        responseData.setDesc("Property with id " + id + " is " + (res ? "active" : "not active or exists"));
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(res)
+            .desc("Property with id " + id + " is " + (res ? "active" : "not active or exists"))
+            .build());
     }
 }
