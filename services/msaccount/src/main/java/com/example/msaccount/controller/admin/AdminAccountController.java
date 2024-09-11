@@ -17,6 +17,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -44,38 +45,40 @@ public class AdminAccountController {
     }
 
     @GetMapping("/")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
     public ResponseEntity<ResponseData> findAllAdminAccounts() {
         var accounts = accountService.findAllAdminAccounts();
         return ResponseEntity.ok(
-                ResponseData.builder()
-                    .data(accounts)
-                    .desc(!accounts.isEmpty() ? "Success" : "No admin account found")
-                    .build()
+            ResponseData.builder()
+                .data(accounts)
+                .desc(!accounts.isEmpty() ? "Success" : "No admin account found")
+                .build()
         );
     }
 
     @GetMapping("/{id}/properties")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
     public ResponseEntity<ResponseData> findAccountWithProperties (
-            @PathVariable(name = "id") Long id,
-            @RequestParam(name = "page", defaultValue = "1") Integer page,
-            @RequestParam(name = "limit", defaultValue = "10") Integer limit)
+        @PathVariable(name = "id") Long id,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "10") Integer limit)
     {
         Pageable pageable = PageRequest.of(page - 1, limit);
         var accountPage = accountService.findAccountWithProperties(id, pageable);
         var accountProperties = accountPage.getContent().get(0).getProperties();
 
         PaginationContext paginationContext = new PaginationContext(page, limit);
-        ResponseData responseData = responseDataMapper.toResponseData(accountPage, paginationContext);
 
-        if (accountPage.hasContent() && !accountProperties.isEmpty())
-            responseData.setDesc("Account with properties found.");
-        else
-            responseData.setDesc("Account has no property post.");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(responseDataMapper.toResponseData(accountPage, paginationContext))
+            .desc(accountPage.hasContent() && !accountProperties.isEmpty()
+                ? "Account with properties found."
+                : "Account has no property post.")
+            .build());
     }
 
     @GetMapping("/{account-id}")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
     public ResponseEntity<ResponseData> findAccountDetails(@PathVariable(name = "account-id") Long accountId) {
         var account = accountService.findAccountDetails(accountId);
         return ResponseEntity.ok(
@@ -87,6 +90,7 @@ public class AdminAccountController {
     }
 
     @GetMapping("/{account-id}/name-and-role")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
     public ResponseEntity<ResponseData> getAccountNameAndRole(@PathVariable(name = "account-id") Long accountId) {
         var account = accountService.findAccountNameAndRoleById(accountId);
         return ResponseEntity.ok(
@@ -98,50 +102,54 @@ public class AdminAccountController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_create')")
     public ResponseEntity<ResponseData> createAccount(
             @RequestPart @Valid AccountCreateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ) {
         var accountCreated = accountService.createAccount(account, avatar);
         return new ResponseEntity<>(
-                ResponseData.builder()
-                        .data(accountCreated)
-                        .desc("Account created successfully")
-                        .build()
-                , HttpStatus.CREATED);
+            ResponseData.builder()
+                    .data(accountCreated)
+                    .desc("Account created successfully")
+                    .build()
+            , HttpStatus.CREATED);
     }
 
     @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_update')")
     public ResponseEntity<ResponseData> updateAccount(
             @PathVariable(name = "id") Long id,
             @RequestPart(required = false) AccountUpdateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ){
         return ResponseEntity.ok(
-                ResponseData.builder()
-                    .data(accountService.updateAccount(id, account, avatar))
-                    .desc("Account updated successfully")
-                    .build()
+            ResponseData.builder()
+                .data(accountService.updateAccount(id, account, avatar))
+                .desc("Account updated successfully")
+                .build()
         );
     }
 
     @GetMapping("/status/{status}")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
     public ResponseEntity<ResponseData> getAccountByStatus(
             @PathVariable(name = "status") String status,
             @RequestParam(defaultValue = "4") Integer pageSize
     ) {
         AccountStatusEnum se = AccountStatusEnum.valueOf(status.toUpperCase());
-
         var accounts = accountService.getAccountsByStatus(se, pageSize);
+
         return ResponseEntity.ok(
-                ResponseData.builder()
-                        .data(accounts)
-                        .desc((!accounts.isEmpty()) ? "Success" : "No account with status " + status + " found")
-                        .build()
+            ResponseData.builder()
+                .data(accounts)
+                .desc((!accounts.isEmpty()) ? "Success" : "No account with status " + status + " found")
+                .build()
         );
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_delete')")
     public ResponseEntity<ResponseData> deleteAdminAccount(@PathVariable(name = "id") Long id) {
         accountService.deleteAdminAccount(id);
         return ResponseEntity.ok(
@@ -150,5 +158,4 @@ public class AdminAccountController {
                 .build()
         );
     }
-
 }

@@ -11,12 +11,6 @@ spring:
       hibernate:
         format_sql: true
         use_sql_comments: true
-
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: http://localhost:9098/realms/real-estate-microservice/protocol/openid-connect/certs
 logging:
   level:
     org.hibernate.SQL: DEBUG
