@@ -27,3 +27,6 @@ spring:
     baseline-version: 0
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+api:
+  prefix: api/v1/properties

@@ -26,3 +26,6 @@ spring:
 application:
   config:
     properties-url: http://localhost:9090/api/v1/properties
+
+api:
+  prefix: api/v1/listing-services

@@ -15,13 +15,13 @@ import org.springframework.web.multipart.MultipartFile;
 import java.util.List;
 
 public interface AccountService {
-    List<AdminAccountDTO> findAllAdminAccounts();
-    AccountDTO findAccountDetails(Long accountId);
-    AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id);
-    Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
+//    List<AdminAccountDTO> findAllAdminAccounts();
+//    AccountDTO findAccountDetails(Long accountId);
+//    AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id);
+//    Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
     AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
-    String login(String userName, String password) throws Exception;
-    AccountDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatar);
-    List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize);
-    void deleteAdminAccount(Long id);
+//    ===String login(String userName, String password) throws Exception;
+//    AccountDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatar);
+//    List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize);
+//    void deleteAdminAccount(Long id);
 }

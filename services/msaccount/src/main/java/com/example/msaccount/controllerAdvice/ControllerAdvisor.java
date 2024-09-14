@@ -189,10 +189,30 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler(PasswordMismatchException.class)
-    public ResponseEntity<ErrorResponse> handlePasswordMismatchException(InvalidEnumValueException ex) {
+    public ResponseEntity<ErrorResponse> handlePasswordMismatchException(PasswordMismatchException ex) {
 
         List<String> details = new ArrayList<>();
         details.add("Retype password does not match, please try again");
+
+        ErrorResponse errorResponse = new ErrorResponse();
+        errorResponse.setError(ex.getMessage());
+        errorResponse.setDetails(details);
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<String> handleInvalidRequestException(InvalidRequestException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+    }
+
+    // KEYCLOAK ==============
+    @ExceptionHandler(KeycloakAccountCreationException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakAccountCreationException(KeycloakAccountCreationException ex) {
+
+        List<String> details = new ArrayList<>();
+        details.add("Cause: " + ex.getCause());
+        details.add("Check the account creation request information before sending to Keycloak");
 
         ErrorResponse errorResponse = new ErrorResponse();
         errorResponse.setError(ex.getMessage());

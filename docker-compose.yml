@@ -76,6 +76,7 @@ services:
       KC_DB_URL_DATABASE: auth
       KC_DB_USERNAME: ${MYSQL_USER}
       KC_DB_PASSWORD: ${MYSQL_USER_PASSWORD}
+      KC_LOG_LEVEL: DEBUG
     networks:
       - microservices-net
     command:

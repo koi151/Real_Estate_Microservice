@@ -9,7 +9,7 @@ spring:
   jpa:
     generate-ddl: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: create
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
@@ -24,7 +24,9 @@ application:
     properties-url: http://localhost:9090/api/v1/properties
 
 api:
-  prefix: api/v1
+  admin-prefix: api/v1/admin/accounts
+  client-prefix: api/v1/accounts
+
 jwt:
   expiration: 2592000 #30 days = 30 * 24 * 60 * 60
 #  secretKey:

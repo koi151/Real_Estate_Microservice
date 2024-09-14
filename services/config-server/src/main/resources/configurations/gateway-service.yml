@@ -36,3 +36,6 @@ spring:
           uri: http://localhost:8090/
           predicates:
             - Path=/api/v1/listing-services/**
+
+api:
+  prefix: api/v1/admin/accounts

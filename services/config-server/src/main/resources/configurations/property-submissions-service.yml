@@ -24,9 +24,8 @@ spring:
       properties:
         spring.json.type.mapping: submissionConfirmation:com.koi151.property_submissions.kafka.SubmissionConfirmation
 
-
 api:
-  prefix: api/v1
+  prefix: api/v1/property-submissions
 
 application:
   config:

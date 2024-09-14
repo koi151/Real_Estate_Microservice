@@ -10,8 +10,7 @@ import lombok.*;
 public class AccountDTO {
 
     private String accountType;
-    private Long accountId;
-    private String role;
+//    private String role;
     private String accountName;
     private String phone;
     private String accountStatus;

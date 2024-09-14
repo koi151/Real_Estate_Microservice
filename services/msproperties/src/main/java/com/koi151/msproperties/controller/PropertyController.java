@@ -260,7 +260,6 @@ public class PropertyController {
     }
 
     @PostMapping("/")
-    @PreAuthorize("hasAuthority('SCOPE_properties_create')")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images
