@@ -13,21 +13,23 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @Getter
+@NoArgsConstructor
 public class KeycloakProvider {
 
     @Value("${KEYCLOAK_SERVER_URL}")
     public String serverURL;
+
     @Value("${KEYCLOAK_REALM}")
     public String realm;
+
     @Value("${KEYCLOAK_CLIENT_ID}")
     public String clientID;
+
     @Value("${KEYCLOAK_CLIENT_SECRET}")
     public String clientSecret;
 
     private static final Keycloak keycloak = null;
 
-    public KeycloakProvider() {
-    }
 
     public Keycloak getInstance() {
         return KeycloakBuilder.builder()

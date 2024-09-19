@@ -1,35 +1,30 @@
 package com.example.msaccount.service.admin.impl;
 
-import com.example.msaccount.client.PropertiesClient;
-import com.example.msaccount.customExceptions.*;
+import com.example.msaccount.config.KeycloakProvider;
+import com.example.msaccount.entity.Account;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.*;
-import com.example.msaccount.model.dto.admin.AdminAccountDTO;
-import com.example.msaccount.model.request.AccountCreateRequest;
-import com.example.msaccount.model.request.AccountUpdateRequest;
-import com.example.msaccount.enums.AccountStatusEnum;
-import com.example.msaccount.model.response.ResponseData;
-//import com.example.msaccount.repository.AccountRepository;
-//import com.example.msaccount.repository.admin.AdminAccountRepository;
-import com.example.msaccount.service.KeycloakAdminClientService;
+import com.example.msaccount.model.request.admin.AccountCreateRequest;
+import com.example.msaccount.repository.AccountRepository;
+
+import com.example.msaccount.service.KeycloakUserService;
 import com.example.msaccount.service.admin.AccountService;
-import com.example.msaccount.service.converter.AccountConverter;
 import com.example.msaccount.utils.CloudinaryUploadUtil;
 import com.example.msaccount.validator.AccountValidator;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.data.domain.*;
-import org.springframework.http.ResponseEntity;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import org.keycloak.admin.client.CreatedResponseUtil;
+import org.keycloak.admin.client.resource.UsersResource;
+import org.keycloak.representations.idm.GroupRepresentation;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -44,12 +39,13 @@ public class AccountServiceImpl implements AccountService {
 //    private final AuthenticationManager authenticationManager;
 //    private final JwtTokenUtil jwtTokenUtil;
 //    private final PropertiesClient propertiesClient;
+
+    private final AccountRepository accountRepository;
     private final AccountValidator accountValidator;
-    private final KeycloakAdminClientService keycloakAdminClientService;
+    private final KeycloakUserService keycloakUserService;
     private final CloudinaryUploadUtil cloudinaryUploadUtil;
 
-    private final AccountConverter accountConverter;
-//    private final AccountMapper accountMapper;
+    private final AccountMapper accountMapper;
 //    private final ObjectMapper objectMapper;
 
 //    @Override
@@ -124,8 +120,14 @@ public class AccountServiceImpl implements AccountService {
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         accountValidator.validateAccountCreateRequest(request);
         String avatarUrl = cloudinaryUploadUtil.avatarCloudinaryUpdate(avatar);
-        keycloakAdminClientService.createKeycloakUser(request, avatarUrl);
-        return accountConverter.toAccountDTO(request, avatarUrl);
+
+        Response keycloakRes = keycloakUserService.createUser(request);
+        String userId =  CreatedResponseUtil.getCreatedId(keycloakRes);
+
+        Account entity = accountMapper.toAccountEntity(request, userId);
+        accountRepository.save(entity);
+
+        return accountMapper.toAccountDTO(request, avatarUrl);
     }
 
 //    @Override

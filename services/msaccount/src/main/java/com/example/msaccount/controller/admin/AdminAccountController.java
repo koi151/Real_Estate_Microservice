@@ -1,21 +1,13 @@
 package com.example.msaccount.controller.admin;
 
-import com.example.msaccount.config.KeycloakProvider;
-import com.example.msaccount.mapper.PaginationContext;
 import com.example.msaccount.mapper.ResponseDataMapper;
 import com.example.msaccount.model.response.ResponseData;
-import com.example.msaccount.model.request.AccountCreateRequest;
-import com.example.msaccount.model.request.AccountUpdateRequest;
-import com.example.msaccount.enums.AccountStatusEnum;
-import com.example.msaccount.service.KeycloakAdminClientService;
+import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.service.admin.AccountService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 

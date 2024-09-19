@@ -1,19 +1,9 @@
 package com.example.msaccount.service.converter;
 
-import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
-import com.example.msaccount.customExceptions.RoleNotFoundException;
-import com.example.msaccount.enums.AccountTypeEnum;
 import com.example.msaccount.model.dto.AccountDTO;
-import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
-import com.example.msaccount.model.dto.admin.AdminAccountDTO;
-import com.example.msaccount.model.request.AccountCreateRequest;
-import com.example.msaccount.service.admin.impl.CloudinaryServiceImpl;
-import com.example.msaccount.utils.StringUtil;
+import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
-import org.springframework.web.multipart.MultipartFile;
 
 @Component
 @RequiredArgsConstructor
@@ -63,17 +53,17 @@ public class AccountConverter {
 
 //    public toAccountWithPropertiesDTO toAccountWithPropertiesDTO(Account)
 
-    public AccountDTO toAccountDTO(AccountCreateRequest request, String avatarUrl) {
-        return AccountDTO.builder()
-            .accountName(request.accountName())
-            .phone(request.phone())
-            .firstName(request.firstName())
-            .lastName(request.lastName())
-            .email(request.email())
-            .avatarUrl(avatarUrl)
-//            .role(account.getRole().getName())
-            .build();
-    }
+//    public AccountDTO toAccountDTO(AccountCreateRequest request, String avatarUrl) {
+//        return AccountDTO.builder()
+//            .accountName(request.getAccountType())
+//            .phone(request.phone())
+//            .firstName(request.firstName())
+//            .lastName(request.lastName())
+//            .email(request.email())
+//            .avatarUrl(avatarUrl)
+////            .role(account.getRole().getName())
+//            .build();
+//    }
 
 //    public AdminAccountDTO toAdminAccountDTO(Account account) {
 //        return AdminAccountDTO.builder()

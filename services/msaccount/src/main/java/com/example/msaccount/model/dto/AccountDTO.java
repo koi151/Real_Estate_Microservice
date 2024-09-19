@@ -1,6 +1,5 @@
 package com.example.msaccount.model.dto;
 
-import com.example.msaccount.enums.AccountStatusEnum;
 import lombok.*;
 
 @Builder
@@ -8,14 +7,14 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccountDTO {
-
-    private String accountType;
-//    private String role;
     private String accountName;
-    private String phone;
-    private String accountStatus;
+    private Boolean accountEnable;
+    private String avatarUrl;
+
+    private String roleName;
     private String firstName;
     private String lastName;
     private String email;
-    private String avatarUrl;
+    private String phone;
+    private Boolean isAdmin;
 }

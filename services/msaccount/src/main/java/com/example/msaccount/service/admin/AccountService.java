@@ -1,18 +1,8 @@
 package com.example.msaccount.service.admin;
 
 import com.example.msaccount.model.dto.AccountDTO;
-import com.example.msaccount.model.dto.AccountSearchDTO;
-import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
-import com.example.msaccount.model.dto.AccountWithPropertiesDTO;
-import com.example.msaccount.model.dto.admin.AdminAccountDTO;
-import com.example.msaccount.model.request.AccountCreateRequest;
-import com.example.msaccount.model.request.AccountUpdateRequest;
-import com.example.msaccount.enums.AccountStatusEnum;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
+import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.util.List;
 
 public interface AccountService {
 //    List<AdminAccountDTO> findAllAdminAccounts();

@@ -1,25 +1,25 @@
-package com.example.msaccount.model.request;
+package com.example.msaccount.model.request.admin;
 
-import com.example.msaccount.enums.AccountStatusEnum;
-import com.example.msaccount.enums.AccountTypeEnum;
 import jakarta.validation.constraints.*;
 
-public record AccountCreateRequest(
+public record AccountCreateRequest (
 
-    AccountTypeEnum accountType,
+    @NotNull(message = "Account type is mandatory")
+    Boolean isAdmin,
 
-//    @NotNull(message = "Role ID cannot be null")
-//    Long roleId,
+    @NotBlank(message = "Role name is mandatory")
+    String roleName,
 
-    @NotBlank(message = "User name is mandatory")
-    @Size(min = 5, max = 30, message = "User name length must be between {min} and {max} characters")
+    @NotBlank(message = "Account name is mandatory")
+    @Size(min = 5, max = 30, message = "Account name length must be between {min} and {max} characters")
     @Pattern(regexp = "[A-Za-z0-9.\\s]+", message = "Account name contains invalid characters")
     String accountName,
 
     @NotBlank(message = "Phone number is mandatory")
     String phone,
 
-    AccountStatusEnum status,
+    @NotNull(message = "Account status is mandatory")
+    boolean accountEnable,
 
     @NotBlank(message = "First name is mandatory")
     @Size(min = 1, max = 30, message = "First name length must be between {min} and {max} characters")
@@ -38,13 +38,14 @@ public record AccountCreateRequest(
     String password,
 
     @NotBlank(message = "Password retype is mandatory")
-    String retypePassword,
+    String passwordRetype,
 
     @Email(message = "Invalid email")
     @NotBlank(message = "Email cannot be blank")
     String email
 
-//    long facebookAccountId,
+//    private long facebookAccountId;
 //
-//    long googleAccountId
-) { }
+//    private long googleAccountId;
+//
+) {}

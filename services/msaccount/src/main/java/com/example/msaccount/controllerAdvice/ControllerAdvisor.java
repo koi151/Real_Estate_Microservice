@@ -5,7 +5,7 @@ import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.model.response.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.UnexpectedTypeException;
+import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -20,49 +20,19 @@ import java.util.stream.Collectors;
 @RestControllerAdvice
 public class ControllerAdvisor {
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public ResponseEntity<ErrorResponse> handleMethodArgumentNotValidException(MethodArgumentNotValidException exp) {
-//        var errors = new HashMap<>();
-//        exp.getBindingResult().getAllErrors()
-//                .forEach(error -> {
-//                    var fieldName = ((FieldError) error).getField();
-//                    var errorMessage = error.getDefaultMessage();
-//                    errors.put(fieldName, errorMessage);
-//                });
-//
-//        return ResponseEntity
-//                .status(HttpStatus.BAD_REQUEST)
-//                .body(new ErrorResponse(errors));
-//    }
-
     //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
-    // The below error type occurred when violated @NotNull validate
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(
-            ConstraintViolationException ex) {
-
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         List<String> constraintViolations = ex.getConstraintViolations()
                 .stream()
                 .map(ConstraintViolation::getMessage)
                 .collect(Collectors.toList());
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError("Validation Failed");
-        errorResponse.setDetails(constraintViolations);
-
-        return ResponseEntity.badRequest().body(errorResponse);
-    }
-
-    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
-    public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Invalid enumeration values provided. Recheck type, houseDirection, balconyDirection or status");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error("Validation Failed")
+                .details(constraintViolations)
+                .build());
     }
 
     @ExceptionHandler(EmptyFileException.class)
@@ -70,11 +40,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Images file is empty, recheck file value again");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError("Validation Error");
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponse);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error("Validation Error")
+                .details(details)
+                .build());
     }
 
     @ExceptionHandler(CloudinaryUploadFailedException.class)
@@ -82,11 +52,11 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Unexpected error appeared in Cloudinary API, cannot upload image Cloudinary");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 
     @ExceptionHandler(PhoneAlreadyExistsException.class)
@@ -94,47 +64,35 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Phone number already existed, please choose another one");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 
-    @ExceptionHandler(AccountAlreadyExistsException.class)
-    public ResponseEntity<ErrorResponse> handleUserNameAlreadyExistsException(AccountAlreadyExistsException ex) {
+    @ExceptionHandler(EntityAlreadyExistsException.class)
+    public ResponseEntity<ErrorResponse> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex) {
         List<String> details = new ArrayList<>();
-        details.add("User name already existed, please choose another one");
+        details.add("Entity already existed, cannot duplicate");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.CONFLICT).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.CONFLICT)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 
-    @ExceptionHandler(AccountNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleAccountNotFoundException(AccountNotFoundException ex) {
+    @ExceptionHandler(EntityNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
         List<String> details = new ArrayList<>();
-        details.add("Account not existed or might be deleted");
+        details.add("Entity not existed or might be deleted");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
-    }
-
-    @ExceptionHandler(RoleNotFoundException.class)
-    public ResponseEntity<Object> handleRoleNotFoundException(RoleNotFoundException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Role not existed, recheck role id again");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>(ErrorResponse.builder()
+            .error(ex.getMessage())
+            .details(details)
+            .build()
+        , HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnauthorizedActionException.class)
@@ -142,25 +100,25 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Current account do not have permission to create new account.");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.FORBIDDEN);
+        return new ResponseEntity<>(ErrorResponse.builder()
+            .error(ex.getMessage())
+            .details(details)
+            .build()
+        , HttpStatus.FORBIDDEN);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
 
         List<String> errors = ex.getBindingResult().getFieldErrors()
-                .stream() // create new stream
-                .map(FieldError::getDefaultMessage)
-                .collect(Collectors.toList()); // convert to list
+            .stream()
+            .map(FieldError::getDefaultMessage)
+            .collect(Collectors.toList());
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError("Validation failed");
-        errorResponse.setDetails(errors);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error("Validation failed")
+                .details(errors)
+                .build());
     }
 
     @ExceptionHandler(BadCredentialsException.class)
@@ -168,37 +126,37 @@ public class ControllerAdvisor {
         List<String> details = new ArrayList<>();
         details.add("Wrong login information, recheck phone number or password");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 
     @ExceptionHandler(InvalidEnumValueException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
 
         List<String> details = new ArrayList<>();
-        details.add("Recheck status value");
+        details.add("Recheck spelling of enum");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<ErrorResponse> handlePasswordMismatchException(PasswordMismatchException ex) {
 
         List<String> details = new ArrayList<>();
-        details.add("Retype password does not match, please try again");
+        details.add("Retyped password does not match, please try again");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 
     @ExceptionHandler(InvalidRequestException.class)
@@ -209,15 +167,61 @@ public class ControllerAdvisor {
     // KEYCLOAK ==============
     @ExceptionHandler(KeycloakAccountCreationException.class)
     public ResponseEntity<ErrorResponse> handleKeycloakAccountCreationException(KeycloakAccountCreationException ex) {
-
         List<String> details = new ArrayList<>();
-        details.add("Cause: " + ex.getCause());
         details.add("Check the account creation request information before sending to Keycloak");
 
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
+    }
 
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    @ExceptionHandler(KeycloakRoleNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakRoleNotFoundException(KeycloakRoleNotFoundException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Check the role name in account creation request again");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
+    }
+
+    @ExceptionHandler(KeycloakUserCreationException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakUserCreationException(KeycloakUserCreationException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Recheck data sending to Keycloak");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
+    }
+
+    @ExceptionHandler(KeycloakGroupNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakGroupNotFoundException(KeycloakRoleNotFoundException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Check the group name again");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
+    }
+
+    @ExceptionHandler(InvalidContentTypeException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidContentTypeException(InvalidContentTypeException ex) {
+        List<String> details = new ArrayList<>();
+        details.add("Check the request body again");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(details)
+                .build());
     }
 }
