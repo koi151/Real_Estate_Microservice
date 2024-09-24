@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
+import java.math.BigDecimal;
 import java.util.UUID;
 
 @Entity(name = "client_account")
@@ -17,7 +18,8 @@ import java.util.UUID;
 public class ClientAccount {
 
     @Id
-    private UUID accountId;
+    @Column(name = "account_id", columnDefinition = "VARCHAR(36)", nullable = false)
+    private String accountId;
 
     @OneToOne
     @MapsId
@@ -26,5 +28,5 @@ public class ClientAccount {
 
     @PositiveOrZero(message = "Balance must be non-negative value")
     @NotNull(message = "Account balance cannot be null")
-    private Double balance;
+    private BigDecimal balance;
 }

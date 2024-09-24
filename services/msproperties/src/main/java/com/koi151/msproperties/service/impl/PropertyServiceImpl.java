@@ -126,15 +126,14 @@ public class PropertyServiceImpl implements PropertiesService {
     @Override
     public DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles) {
         return propertyRepository.findByPropertyIdAndDeleted(id, false)
-                .map(existingProperty -> {
-                    updatePropertyDetails(existingProperty, request);
-                    updateImages(existingProperty, request, imageFiles);
+            .map(existingProperty -> {
+                updatePropertyDetails(existingProperty, request);
+                updateImages(existingProperty, request, imageFiles);
 
-                    return propertyRepository.save(existingProperty);
-                })
-                .map(propertyMapper::toDetailedPropertyDTO)
-                .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
-
+                return propertyRepository.save(existingProperty);
+            })
+            .map(propertyMapper::toDetailedPropertyDTO)
+            .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
     }
 
     @Transactional(readOnly = true)

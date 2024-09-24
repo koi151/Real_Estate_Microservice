@@ -1,15 +1,13 @@
 package com.example.msaccount.mapper;
 
-//import com.example.msaccount.entity.Account;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.model.dto.AccountDTO;
+import com.example.msaccount.model.dto.KeycloakUserDTO;
+import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.utils.StringUtil;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
-
-import java.util.UUID;
+import org.keycloak.representations.idm.UserRepresentation;
+import org.mapstruct.*;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         imports = {StringUtil.class})
@@ -22,15 +20,20 @@ public interface AccountMapper {
 //
 //    @Mapping(source = "role.name", target = "role")
 //    AccountWithNameAndRoleDTO toAccountWithNameAndRoleDTO(Account account);
-//
-//    @Mapping(target = "role", source = "role.name")
-//    @Mapping(target = "accountStatus", source = "accountStatus.status")
-//    @Mapping(target = "accountType", source = "role.accountType.accountType")
-    @Mapping(target = "avatarUrl", source = "avatarUrl")
-    @Mapping(target = "isAdmin", source = "account.isAdmin")
-    AccountDTO toAccountDTO(AccountCreateRequest account, String avatarUrl);
 
-    @Mapping(target = "userId", source = "id")
+
+    @Mapping(target = "avatarUrl", source = "account.avatarUrl")
+    @Mapping(target = "accountEnable", source = "account.accountEnable")
+    AccountDTO requestToAccountDTO(Account account, KeycloakUserDTO kcUserDTO);
+
+    @Mapping(target = "avatarUrl", source = "account.avatarUrl")
+    @Mapping(target = "accountEnable", source = "account.accountEnable")
+    AccountDTO entityToAccountDTO(Account account, KeycloakUserDTO kcDTO);
+
+    @Mapping(target = "accountId", source = "id")
     Account toAccountEntity(AccountCreateRequest request, String id);
 
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,
+        nullValueCheckStrategy = NullValueCheckStrategy.ALWAYS)
+    void updateAccountFromRequest(AccountUpdateRequest request, @MappingTarget Account account);
 }

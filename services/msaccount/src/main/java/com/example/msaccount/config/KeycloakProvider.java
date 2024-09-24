@@ -8,6 +8,7 @@ import lombok.NoArgsConstructor;
 import org.keycloak.OAuth2Constants;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.KeycloakBuilder;
+import org.keycloak.admin.client.resource.RealmResource;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 
@@ -30,7 +31,6 @@ public class KeycloakProvider {
 
     private static final Keycloak keycloak = null;
 
-
     public Keycloak getInstance() {
         return KeycloakBuilder.builder()
             .realm(realm)
@@ -39,6 +39,11 @@ public class KeycloakProvider {
             .clientSecret(clientSecret)
             .grantType(OAuth2Constants.CLIENT_CREDENTIALS)
             .build();
+    }
+
+    public RealmResource getRealmResource() {
+        Keycloak keycloak = getInstance();
+        return keycloak.realm(realm);
     }
 
 
@@ -62,4 +67,5 @@ public class KeycloakProvider {
             .field("grant_type", "refresh_token")
             .asJson().getBody();
     }
+
 }

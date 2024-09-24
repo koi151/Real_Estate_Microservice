@@ -14,6 +14,6 @@ public interface AccountRepository extends JpaRepository<Account, Long> {
 //    boolean existsByAccountIdAndDeleted(Long id, boolean deleted);
 //    boolean existsByAccountName(String accountName);
 //    boolean existsByPhone(String phone);
-//    Optional<Account> findByAccountIdAndAccountStatusAndDeleted(Long id, AccountStatusEnum status, boolean deleted);
+    Optional<Account> findByAccountIdAndAccountEnableAndDeleted(String id, boolean isEnable, boolean deleted);
 //    Page<Account> findByAccountStatus(AccountStatusEnum se, PageRequest pageRequest);
 }

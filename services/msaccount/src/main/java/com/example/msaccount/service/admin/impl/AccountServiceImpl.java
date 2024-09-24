@@ -1,14 +1,19 @@
 package com.example.msaccount.service.admin.impl;
 
-import com.example.msaccount.config.KeycloakProvider;
+import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
+import com.example.msaccount.customExceptions.EntityNotFoundException;
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.entity.admin.AdminAccount;
+import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.*;
+import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.repository.AccountRepository;
 
 import com.example.msaccount.service.KeycloakUserService;
 import com.example.msaccount.service.admin.AccountService;
+import com.example.msaccount.service.converter.AccountConverter;
 import com.example.msaccount.utils.CloudinaryUploadUtil;
 import com.example.msaccount.validator.AccountValidator;
 import jakarta.transaction.Transactional;
@@ -16,15 +21,11 @@ import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
-import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.GroupRepresentation;
 import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.util.List;
-import java.util.UUID;
+import java.math.BigDecimal;
 
 @Service
 @RequiredArgsConstructor
@@ -34,10 +35,8 @@ public class AccountServiceImpl implements AccountService {
 //    private final PasswordEncoder passwordEncoder;
 //    private final AccountRepository accountRepository;
 //    private final AdminAccountRepository adminAccountRepository;
-//    private final CloudinaryServiceImpl cloudinaryServiceImpl;
-//    private final AdminAccountConverter adminAccountConverter;
-//    private final AuthenticationManager authenticationManager;
-//    private final JwtTokenUtil jwtTokenUtil;
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
+    private final AccountConverter accountConverter;
 //    private final PropertiesClient propertiesClient;
 
     private final AccountRepository accountRepository;
@@ -46,7 +45,7 @@ public class AccountServiceImpl implements AccountService {
     private final CloudinaryUploadUtil cloudinaryUploadUtil;
 
     private final AccountMapper accountMapper;
-//    private final ObjectMapper objectMapper;
+
 
 //    @Override
 //    public List<AdminAccountDTO> findAllAdminAccounts() {
@@ -106,42 +105,41 @@ public class AccountServiceImpl implements AccountService {
 //    }
 
 
-//    @Override
-//    @Transactional
-//    public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
-//        accountValidator.validateAccountCreateRequest(request);
-//        Account newAccount = accountConverter.toAccountEntity(request, avatar);
-//        accountRepository.save(newAccount);
-//        return accountConverter.toAccountDTO(newAccount);
-//    }
-
     @Override
     @Transactional
     public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         accountValidator.validateAccountCreateRequest(request);
-        String avatarUrl = cloudinaryUploadUtil.avatarCloudinaryUpdate(avatar);
 
-        Response keycloakRes = keycloakUserService.createUser(request);
-        String userId =  CreatedResponseUtil.getCreatedId(keycloakRes);
+        KeycloakUserDTO kcUserDTO = keycloakUserService.createUser(request);
 
-        Account entity = accountMapper.toAccountEntity(request, userId);
-        accountRepository.save(entity);
+        Account account = accountConverter.toEntity(request, kcUserDTO.id(), avatar);
+        accountRepository.save(account);
 
-        return accountMapper.toAccountDTO(request, avatarUrl);
+        return accountMapper.requestToAccountDTO(account, kcUserDTO);
     }
 
-//    @Override
-//    public AccountDTO updateAccount(Long id, AccountUpdateRequest request, MultipartFile avatarFile) {
-//        return accountRepository.findByAccountIdAndAccountStatusAndDeleted(id, AccountStatusEnum.ACTIVE, false) // del
-//            .map(existingAccountEntity -> {
-//                updateAccountDetails(existingAccountEntity, request);
-//                updateAvatar(existingAccountEntity, avatarFile);
-//
-//                return accountRepository.save(existingAccountEntity);
-//            })
-//            .map(this::convertToAccountDTO)
-//                .orElseThrow(() -> new AccountNotFoundException("Cannot find account with id: " + id));
-//    }
+    @Override
+    @Transactional
+    public AccountDTO updateAccount(AccountUpdateRequest request, MultipartFile avatarFile) {
+        KeycloakUserDTO kcDTO =  keycloakUserService.updateUser(request);
+        return accountRepository.findByAccountIdAndAccountEnableAndDeleted(request.accountId(), true, false)
+            .map(existingEntity -> {
+                accountMapper.updateAccountFromRequest(request, existingEntity);
+                return accountRepository.save(existingEntity);
+            })
+            .map(entity -> accountMapper.entityToAccountDTO(entity, kcDTO))
+            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + request.accountId()));
+    }
+
+    private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
+        if (avatarFile != null && !avatarFile.isEmpty()) {
+            String uploadedAvatarUrl = cloudinaryServiceImpl.uploadFile(avatarFile, "real_estate_account");
+            if (uploadedAvatarUrl == null || uploadedAvatarUrl.isEmpty()) {
+                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
+            }
+            existingAccount.setAvatarUrl(uploadedAvatarUrl);
+        }
+    }
 
 
 //    @Override ===================================
@@ -181,15 +179,6 @@ public class AccountServiceImpl implements AccountService {
 //        accountRepository.save(account);
 //    }
 
-//    private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
-//        if (avatarFile != null && !avatarFile.isEmpty()) {
-//            String uploadedAvatarUrl = cloudinaryServiceImpl.uploadFile(avatarFile, "real_estate_account");
-//            if (uploadedAvatarUrl == null || uploadedAvatarUrl.isEmpty()) {
-//                throw new CloudinaryUploadFailedException("Failed to upload images to Cloudinary");
-//            }
-//            existingAccount.setAvatarUrl(uploadedAvatarUrl);
-//        }
-//    }
 
 //    private void updateAccountDetails(Account existingAccount, AccountUpdateRequest request) {
 //        if (request != null) {
@@ -218,7 +207,6 @@ public class AccountServiceImpl implements AccountService {
 
 //    private AccountDTO convertToAccountDTO(Account savedAccount) {
 //        return AccountDTO.builder()
-//            .accountId(savedAccount.getAccountId())
 //            .accountName(savedAccount.getAccountName())
 //            .firstName(savedAccount.getFirstName())
 //            .lastName(savedAccount.getLastName())

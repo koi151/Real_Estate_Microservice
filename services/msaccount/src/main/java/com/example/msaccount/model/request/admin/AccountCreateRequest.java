@@ -2,13 +2,15 @@ package com.example.msaccount.model.request.admin;
 
 import jakarta.validation.constraints.*;
 
+import java.util.List;
+
 public record AccountCreateRequest (
 
     @NotNull(message = "Account type is mandatory")
     Boolean isAdmin,
 
-    @NotBlank(message = "Role name is mandatory")
-    String roleName,
+    @NotNull(message = "One or more role name are mandatory")
+    List<String> roleNames,
 
     @NotBlank(message = "Account name is mandatory")
     @Size(min = 5, max = 30, message = "Account name length must be between {min} and {max} characters")

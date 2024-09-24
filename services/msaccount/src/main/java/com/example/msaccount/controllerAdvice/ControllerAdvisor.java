@@ -5,6 +5,8 @@ import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.model.response.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.core.Response;
 import org.apache.tomcat.util.http.fileupload.impl.InvalidContentTypeException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,10 +16,13 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
+import lombok.extern.slf4j.Slf4j;
 
 @RestControllerAdvice
+@Slf4j
 public class ControllerAdvisor {
 
     //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
@@ -37,78 +42,59 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(EmptyFileException.class)
     public ResponseEntity<Object> handleEmptyFileException(EmptyFileException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Images file is empty, recheck file value again");
-
         return ResponseEntity.badRequest()
             .body(ErrorResponse.builder()
                 .error("Validation Error")
-                .details(details)
+                .details(Collections.singletonList("Images file is empty, recheck file value again"))
                 .build());
     }
 
     @ExceptionHandler(CloudinaryUploadFailedException.class)
     public ResponseEntity<Object> handleCloudinaryUploadFailedException(CloudinaryUploadFailedException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Unexpected error appeared in Cloudinary API, cannot upload image Cloudinary");
-
         return ResponseEntity.status(HttpStatus.SERVICE_UNAVAILABLE)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Unexpected error appeared in Cloudinary API, cannot upload image Cloudinary"))
                 .build());
     }
 
     @ExceptionHandler(PhoneAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handlePhoneAlreadyExistsException(PhoneAlreadyExistsException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Phone number already existed, please choose another one");
-
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Phone number already existed, please choose another one"))
                 .build());
     }
 
     @ExceptionHandler(EntityAlreadyExistsException.class)
     public ResponseEntity<ErrorResponse> handleEntityAlreadyExistsException(EntityAlreadyExistsException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Entity already existed, cannot duplicate");
-
         return ResponseEntity.status(HttpStatus.CONFLICT)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Entity already existed, cannot duplicate"))
                 .build());
     }
 
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleEntityNotFoundException(EntityNotFoundException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Entity not existed or might be deleted");
-
         return new ResponseEntity<>(ErrorResponse.builder()
             .error(ex.getMessage())
-            .details(details)
+            .details(Collections.singletonList("Entity not existed or might be deleted"))
             .build()
         , HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler(UnauthorizedActionException.class)
     public ResponseEntity<Object> handleUnauthorizedActionException(UnauthorizedActionException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Current account do not have permission to create new account.");
-
         return new ResponseEntity<>(ErrorResponse.builder()
             .error(ex.getMessage())
-            .details(details)
+            .details(Collections.singletonList("Current account do not have permission to create new account."))
             .build()
         , HttpStatus.FORBIDDEN);
     }
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-
         List<String> errors = ex.getBindingResult().getFieldErrors()
             .stream()
             .map(FieldError::getDefaultMessage)
@@ -123,57 +109,86 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<Object> handleBadCredentialsException(BadCredentialsException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Wrong login information, recheck phone number or password");
-
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Wrong login information, recheck phone number or password"))
                 .build());
     }
 
     @ExceptionHandler(InvalidEnumValueException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Recheck spelling of enum");
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Recheck spelling of enum"))
                 .build());
     }
 
     @ExceptionHandler(PasswordMismatchException.class)
     public ResponseEntity<ErrorResponse> handlePasswordMismatchException(PasswordMismatchException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Retyped password does not match, please try again");
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Retyped password does not match, please try again"))
                 .build());
     }
 
     @ExceptionHandler(InvalidRequestException.class)
     public ResponseEntity<String> handleInvalidRequestException(InvalidRequestException ex) {
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ex.getMessage());
     }
 
     // KEYCLOAK ==============
     @ExceptionHandler(KeycloakAccountCreationException.class)
     public ResponseEntity<ErrorResponse> handleKeycloakAccountCreationException(KeycloakAccountCreationException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Check the account creation request information before sending to Keycloak");
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Check the account creation request information before sending to Keycloak"))
+                .build());
+    }
+
+    @ExceptionHandler(KeycloakUserUpdateException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakUserUpdateException(KeycloakUserUpdateException ex) {
+        String errorMessage = "Bad request";
+        String errorDetails;
+
+        Throwable cause = ex.getCause();
+        if (cause instanceof BadRequestException) {
+            Response response = ((BadRequestException) cause).getResponse();
+            if (response != null && response.hasEntity()) {
+                try {
+                    errorDetails = response.readEntity(String.class);
+                } catch (Exception e) {
+                    log.error("Failed to read error details from BadRequestException", e);
+                    errorDetails = "Failed to read error details.";
+                }
+            } else {
+                errorDetails = cause.getMessage();
+            }
+        } else {
+            errorDetails = ex.getMessage();
+        }
+
+        ErrorResponse errorResponse = ErrorResponse.builder()
+            .error(errorMessage)
+            .details(Collections.singletonList(errorDetails))
+            .build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(errorResponse);
+    }
+
+
+
+    @ExceptionHandler(KeycloakUserNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakUserNotFoundException(KeycloakUserNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .error("User not found")
+                .details(Collections.singletonList(ex.getMessage()))
                 .build());
     }
 
@@ -191,37 +206,28 @@ public class ControllerAdvisor {
 
     @ExceptionHandler(KeycloakUserCreationException.class)
     public ResponseEntity<ErrorResponse> handleKeycloakUserCreationException(KeycloakUserCreationException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Recheck data sending to Keycloak");
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse.builder()
-                .error(ex.getMessage())
-                .details(details)
+                .error("Failed to create Keycloak account")
+                .details(Collections.singletonList(ex.getMessage()))
                 .build());
     }
 
     @ExceptionHandler(KeycloakGroupNotFoundException.class)
     public ResponseEntity<ErrorResponse> handleKeycloakGroupNotFoundException(KeycloakRoleNotFoundException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Check the group name again");
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Check the group name again"))
                 .build());
     }
 
     @ExceptionHandler(InvalidContentTypeException.class)
     public ResponseEntity<ErrorResponse> handleInvalidContentTypeException(InvalidContentTypeException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Check the request body again");
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
-                .details(details)
+                .details(Collections.singletonList("Check the request body again"))
                 .build());
     }
 }

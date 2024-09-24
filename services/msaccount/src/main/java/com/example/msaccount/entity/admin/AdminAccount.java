@@ -13,7 +13,8 @@ import lombok.*;
 public class AdminAccount {
 
     @Id
-    private Long accountId;
+    @Column(name = "account_id", columnDefinition = "VARCHAR(36)", nullable = false)
+    private String accountId;
 
     @OneToOne
     @MapsId

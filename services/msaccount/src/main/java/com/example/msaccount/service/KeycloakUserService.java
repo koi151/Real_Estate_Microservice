@@ -4,29 +4,35 @@ import com.example.msaccount.config.KeycloakProvider;
 import com.example.msaccount.customExceptions.KeycloakGroupNotFoundException;
 import com.example.msaccount.customExceptions.KeycloakRoleNotFoundException;
 import com.example.msaccount.customExceptions.KeycloakUserCreationException;
+import com.example.msaccount.customExceptions.KeycloakUserUpdateException;
+import com.example.msaccount.mapper.KeycloakMapper;
+import com.example.msaccount.model.dto.KeycloakUserDTO;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
+import com.example.msaccount.model.request.admin.AccountUpdateRequest;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.BadRequestException;
+import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
-import org.keycloak.admin.client.resource.ClientsResource;
-import org.keycloak.admin.client.resource.GroupsResource;
-import org.keycloak.admin.client.resource.RolesResource;
-import org.keycloak.admin.client.resource.UsersResource;
-import org.keycloak.representations.idm.CredentialRepresentation;
-import org.keycloak.representations.idm.GroupRepresentation;
-import org.keycloak.representations.idm.RoleRepresentation;
-import org.keycloak.representations.idm.UserRepresentation;
+import lombok.extern.slf4j.Slf4j;
+import org.keycloak.admin.client.resource.*;
+import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.net.URI;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
+@Slf4j
 @RequiredArgsConstructor
 public class KeycloakUserService {
 
     private final KeycloakProvider keycloakProvider;
+    private final KeycloakMapper keycloakMapper;
 
     @Value("${KEYCLOAK_REALM}")
     private String realm;
@@ -34,28 +40,293 @@ public class KeycloakUserService {
     @Value("${KEYCLOAK_CLIENT_ID}")
     private String clientId;
 
-    public Response createUser(AccountCreateRequest request) {
+    private UsersResource getUsersResource() {
+        return keycloakProvider.getInstance().realm(realm).users();
+    }
+
+    private ClientResource getClientResource(String clientUUID) {
+        return keycloakProvider.getInstance()
+            .realm(realm)
+            .clients()
+            .get(clientUUID);
+    }
+
+    private String getClientUUID() {
+        return getClientsResource().findByClientId(clientId).get(0).getId();
+    }
+
+    private ClientsResource getClientsResource() {
+        return keycloakProvider.getInstance().realm(realm).clients();
+    }
+
+    private RolesResource getRolesResource() {
+        String clientUUID = getClientUUID();
+        return getClientsResource().get(clientUUID).roles();
+    }
+
+    private List<RoleRepresentation> filterValidClientRoles(RolesResource rolesResource, List<String> roleNames) {
+        List<RoleRepresentation> validRoles = new ArrayList<>();
+        for (String roleName : roleNames) {
+            RoleRepresentation roleRep = getClientRoleRepresentation(rolesResource, roleName);
+            if (roleRep != null) {
+                validRoles.add(roleRep);
+            }
+        }
+        return validRoles;
+    }
+
+//    private boolean isValidUserUpdatedInfo(UsersResource usersResource, String username) {
+//        List<UserRepresentation> users = usersResource.search(username, true);
+//        return !users.isEmpty();
+//    }
+
+    private RoleRepresentation getClientRoleRepresentation(RolesResource clientRolesResource, String roleName) {
+        try {
+            RoleResource roleResource = clientRolesResource.get(roleName);
+            RoleRepresentation roleRep = roleResource.toRepresentation();
+            if (roleRep == null) {
+                log.warn("Role '{}' does not exist in client '{}'", roleName, clientId);
+                return null;
+            }
+            return roleRep;
+        } catch (NotFoundException e) {
+            log.warn("Role '{}' not found in client '{}'. Skipping this role.", roleName, clientId);
+            return null;
+        } catch (Exception e) {
+            log.error("Error retrieving role '{}' from client '{}': {}", roleName, clientId, e.getMessage(), e);
+            return null;
+        }
+    }
+
+
+    public KeycloakUserDTO createUser(AccountCreateRequest request) {
         UsersResource usersResource = getUsersResource();
         UserRepresentation kcUser = buildUserRepresentation(request);
 
         Response response = usersResource.create(kcUser);
         checkResponse(response);
 
-        String userId = getUserIdFromResponse(response);
+        String userUUID = getUserUUIDFromResponse(response);
 
-        assignClientRoleToUser(userId, request.roleName());
-        assignGroupToUser(userId, getUserGroup(request.isAdmin()));
+        List<RoleRepresentation> roleRep = assignClientRolesToUser(userUUID, request.roleNames());
+        List<String> roleNamesAssigned = roleRep.stream()
+            .map(RoleRepresentation::getName)
+            .toList();
 
-        return response;
+        return keycloakMapper.toKeycloakUserDTO(kcUser, roleNamesAssigned, userUUID);
     }
 
-    public String getUserGroup(boolean isAdmin) {
-        return isAdmin ? "Admin accounts" : "Client accounts";
+    public boolean isAdminUser() {
+        Set<String> roleNames = getRolesResource().list().stream()
+            .map(RoleRepresentation::getName)
+            .collect(Collectors.toSet());
+        return roleNames.contains("Admin");
     }
 
-    private UsersResource getUsersResource() {
-        return keycloakProvider.getInstance().realm(realm).users();
+//    String clientUUID = getClientUUID();
+//    List<GroupRepresentation> groups = getGroupsByRoleRepresentation(roleRepresentations, clientUUID);
+//        if (!groups.isEmpty()) {
+//        System.out.println("Groups found:");
+//        for (GroupRepresentation group : groups) {
+//            System.out.println(group.getName());
+//        }
+//    } else {
+//        System.out.println("No groups found for the given roles.");
+//    }
+
+
+    public List<GroupRepresentation> getGroupsByRoleRepresentation(List<RoleRepresentation> roleRepresentations, String clientUUID) {
+        RealmResource realmResource = keycloakProvider.getRealmResource();
+        GroupsResource groupsResource = realmResource.groups();
+
+        List<GroupRepresentation> matchingGroups = new ArrayList<>();
+
+        try {
+            // Retrieve all basic group information
+            List<GroupRepresentation> allGroups = groupsResource.groups();
+
+            // Extract role names from roleRepresentations for comparison
+            List<String> roleNames = roleRepresentations.stream()
+                .map(RoleRepresentation::getName)
+                .toList();
+
+            // Iterate over each group and fetch detailed information including roles
+            for (GroupRepresentation group : allGroups) {
+                // Fetch the detailed group representation, including roles
+                GroupRepresentation detailedGroup = groupsResource.group(group.getId()).toRepresentation();
+
+                // Get client roles assigned to the group (if any)
+                Map<String, List<String>> clientRolesMap = detailedGroup.getClientRoles();
+
+                if (clientRolesMap != null) {
+                    // Check if the group has roles assigned under any client that match the role names in roleRepresentations
+                    boolean hasMatchingRole = clientRolesMap.values().stream()
+                        .flatMap(List::stream)  // Flatten the list of role names
+                        .anyMatch(roleNames::contains);  // Check if any role name matches
+
+                    if (hasMatchingRole) {
+                        matchingGroups.add(detailedGroup);  // Add the group to the matching list
+                    }
+                }
+            }
+
+            // Return the list of matching groups
+            return matchingGroups;
+        } catch (Exception ex) {
+            throw new RuntimeException("Error retrieving groups by role representations", ex);
+        }
     }
+
+    private List<RoleRepresentation> assignClientRolesToUser(String userId, List<String> roleNames) {
+        if (roleNames == null || roleNames.isEmpty())
+            return null;
+
+        UsersResource usersResource = getUsersResource();
+        UserResource userResource = usersResource.get(userId);
+
+        try {
+            // Retrieve or cache the client UUID
+            String clientUUID = getClientUUID();
+            RolesResource clientRolesResource = getRolesResource();
+
+            // Fetch all RoleRepresentations for the specified role names
+            List<RoleRepresentation> rolesToAssign = roleNames.stream()
+                .map(roleName -> getClientRoleRepresentation(clientRolesResource, roleName))
+                .filter(Objects::nonNull)
+                .collect(Collectors.toList());
+
+            // Identify missing roles
+            List<String> missingRoles = roleNames.stream()
+                .filter(roleName -> rolesToAssign.stream()
+                    .noneMatch(role -> role.getName().equals(roleName))
+                )
+                .collect(Collectors.toList());
+
+            if (!missingRoles.isEmpty()) {
+                log.warn("Roles not found in client '{}': {}", clientId, missingRoles);
+                throw new KeycloakRoleNotFoundException("Roles not found in client '" + clientId + "': " + missingRoles);
+            }
+
+            // Assign all roles in a single batch operation
+            if (!rolesToAssign.isEmpty()) {
+                userResource.roles().clientLevel(clientUUID).add(rolesToAssign);
+                log.info("Assigned roles {} to user {}", roleNames, userId);
+            }
+
+            return rolesToAssign;
+
+        } catch (Exception e) {
+            log.error("Unexpected error during role assignment: {}", e.getMessage(), e);
+            throw new RuntimeException("An unexpected error occurred while assigning roles to the user.", e);
+        }
+    }
+
+    public KeycloakUserDTO updateUser(AccountUpdateRequest request) {
+        try {
+            // Fetch the user resource from Keycloak
+            UserResource userResource = getUsersResource().get(request.accountId());
+
+            // Fetch existing user representation
+            UserRepresentation existingUser = userResource.toRepresentation();
+            if (existingUser == null) { // x
+                log.error("User not found with ID: {}", request.accountId());
+                throw new KeycloakUserCreationException("User not found with ID: " + request.accountId());
+            }
+
+            updateUserAttributes(existingUser, request);
+
+            RolesResource clientRolesResource = getRolesResource();
+            List<RoleRepresentation> validClientRoles = filterValidClientRoles(clientRolesResource, request.roleNames());
+            List<String> validRoleNames = getRoleNames(validClientRoles);
+            updateUserRoles(existingUser, validRoleNames);
+
+            // Send the update request to Keycloak
+            userResource.update(existingUser);
+            log.info("Successfully updated user with ID: {}", request.accountId());
+
+            UserRepresentation updatedUser = userResource.toRepresentation();
+            return keycloakMapper.toKeycloakUserDTO(updatedUser, validRoleNames, existingUser.getId());
+
+        } catch (NotFoundException ex) {
+            log.error("Cannot found Keycloak user with id: {}", request.accountId());
+            throw new KeycloakUserUpdateException("Cannot found Keycloak user with id: " + request.accountId());
+        } catch (BadRequestException ex) {
+            String details = extractMessageFromKeycloakResponse(ex.getResponse());
+            log.error("Failed to update Keycloak user with id: {}. Error message: {}", request.accountId(), details);
+            throw new KeycloakUserUpdateException("Bad request: " + details);
+        }
+    }
+
+    private void updateUserAttributes(UserRepresentation user, AccountUpdateRequest request) {
+        user.setUsername(request.username());
+        user.setFirstName(request.firstName());
+        user.setLastName(request.lastName());
+        user.setEmail(request.email());
+        user.setEnabled(request.accountEnable());
+    }
+
+    private void updateUserRoles(UserRepresentation userRep, List<String> validRoleNames) {
+        Map<String, List<String>> clientRolesMap = new HashMap<>();
+        clientRolesMap.put(getClientUUID(), validRoleNames);
+        userRep.setClientRoles(clientRolesMap); // update
+    }
+
+    private List<String> getRoleNames(List<RoleRepresentation> roleReps) {
+        return roleReps.stream()
+            .map(RoleRepresentation::getName)
+            .collect(Collectors.toList());
+    }
+
+
+//    private void updateUserRoles(List<String> roleNames) {
+//        UsersResource usersResource = getUsersResource();
+//        UserResource userResource = usersResource.get(getClientUUID());
+//
+//        MappingsRepresentation roles = userResource.roles().getAll();
+//
+//        // Remove all existing client-level roles
+//        List<RoleRepresentation> existingClientRoles = clientRolesResource.list();
+//        if (!existingClientRoles.isEmpty()) {
+//            existingClientRoles.forEach(role -> {
+////                    clientRolesResource.deleteRole(role.getName());
+//                    log.info("Removed existing client-level roles for client '{}'. Roles: {}", clientId, role.getName()); // test
+//                }
+//            );
+//            log.info("Removed existing client-level roles for client '{}'. Roles: {}", clientId, existingClientRoles); // test
+//        }
+//
+//        // filter valid role names
+//        List<RoleRepresentation> validRoles = filterValidRoles(clientRolesResource, roleNames);
+//
+//        // Retrieve RoleRepresentations for all valid provided roles
+//        List<RoleRepresentation> newClientRoles = new ArrayList<>(validRoles);
+//
+//        newClientRoles.forEach(role -> {
+//            clientRolesResource.create(role);
+//            log.info("Assigned new client-level roles '{}' to client '{}'", role.getName(), clientId);
+//        });
+//    }
+
+
+
+//    private void assignClientRolesToUser(String userId, List<String> roleNames) {
+//        UsersResource usersResource = getUsersResource();
+//        ClientsResource clientsResource = keycloakProvider.getInstance().realm(realm).clients();
+//
+//        // Retrieve client by clientId
+//        String clientUUID = clientsResource.findByClientId(clientId).get(0).getId();
+//        RolesResource clientRoles = clientsResource.get(clientUUID).roles();
+//
+//        // Fetch client role by name
+//        RoleRepresentation role = clientRoles.get(roleName).toRepresentation();
+//        if (role == null) {
+//            throw new KeycloakRoleNotFoundException("Client role not found: " + roleName);
+//        }
+//
+//        // Assign client-level role to the user
+//        usersResource.get(userId).roles().clientLevel(clientUUID).add(Collections.singletonList(role));
+//    }
+
 
     private CredentialRepresentation createPasswordCredentials(String password) {
         CredentialRepresentation credentials = new CredentialRepresentation();
@@ -80,53 +351,67 @@ public class KeycloakUserService {
         return kcUser;
     }
 
+//    private void checkResponse(Response response) {
+//        if (response.getStatus() != 201) {
+//            String errorJson = response.readEntity(String.class); // read the entire response body and convert it into a String
+//            throw new KeycloakUserCreationException(errorJson);
+//        }
+//    }
+
     private void checkResponse(Response response) {
         if (response.getStatus() != 201) {
-            throw new KeycloakUserCreationException("Failed to create user");
+            String errorJson = response.readEntity(String.class); // Read response body as String
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            try {
+                // Parse JSON into JsonNode
+                JsonNode rootNode = objectMapper.readTree(errorJson);
+
+                // Extract the errorMessage field
+                String errorMessage = rootNode.path("errorMessage")
+                    .asText("Unknown error occurred");
+
+                throw new KeycloakUserCreationException(errorMessage);
+            } catch (IOException ex) {
+                throw new KeycloakUserCreationException("Failed to parse error response from Keycloak");
+            }
         }
     }
 
-    private String getUserIdFromResponse(Response response) {
+    private String getUserUUIDFromResponse(Response response) {
         URI location = response.getLocation();
         if (location == null) {
-            throw new RuntimeException("User ID not found in response");
+            throw new RuntimeException("User ID not found in Keycloak response");
         }
         String path = location.getPath();
         return path.substring(path.lastIndexOf('/') + 1);
     }
 
-    private void assignClientRoleToUser(String userId, String roleName) {
-        UsersResource usersResource = getUsersResource();
-        ClientsResource clientsResource = keycloakProvider.getInstance().realm(realm).clients();
+    private String extractMessageFromKeycloakResponse(Response response) {
+        String errorJson = "";
+        ObjectMapper objectMapper = new ObjectMapper();
+        String errorMessage = "Unknown error occurred";
 
-        // Retrieve client by clientId
-        String clientUUID = clientsResource.findByClientId(clientId).get(0).getId();
-        RolesResource clientRoles = clientsResource.get(clientUUID).roles();
+        if (response != null && response.hasEntity()) {
+            try {
+                errorJson = response.readEntity(String.class);
+                // Parse JSON vào JsonNode
+                JsonNode rootNode = objectMapper.readTree(errorJson);
 
-        // Fetch client role by name
-        RoleRepresentation role = clientRoles.get(roleName).toRepresentation();
-        if (role == null) {
-            throw new KeycloakRoleNotFoundException("Client role not found: " + roleName);
+                // extract field: errorMessage
+                if (rootNode.has("errorMessage")) {
+                    errorMessage = rootNode.get("errorMessage").asText();
+                } else {
+                    errorMessage = rootNode.toString();
+                }
+            } catch (IOException e) {
+                log.error("Failed to parse error response from Keycloak: {}", e.getMessage(), e);
+                errorMessage = "Failed to parse error response from Keycloak.";
+            }
         }
 
-        // Assign client-level role to the user
-        usersResource.get(userId).roles().clientLevel(clientUUID).add(Collections.singletonList(role));
+        return errorMessage;
     }
 
-    private void assignGroupToUser(String userId, String groupName) {
-        UsersResource usersResource = getUsersResource();
-        GroupsResource groupsResource = keycloakProvider.getInstance().realm(realm).groups();
 
-        // Retrieve the group by name
-        List<GroupRepresentation> groups = groupsResource.groups(groupName, 0, 1);
-        if (groups.isEmpty()) {
-            throw new KeycloakGroupNotFoundException("Cannot not found group in Keycloak with name: " + groupName);
-        }
-
-        // Get the group ID from the first group matching the name
-        String groupId = groups.get(0).getId();
-
-        // Assign group to the user
-        usersResource.get(userId).joinGroup(groupId);
-    }
 }

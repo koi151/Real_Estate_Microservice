@@ -16,9 +16,9 @@ public class ResponseData extends AbstractDTO<Object> {
     @Serial
     private static final long serialVersionUID = -7145586484567833095L;
 
-    private short status = 200;
+//    private short status = 200;
     private Object data;
     private String desc;
-    private boolean isSuccess = true;
+//    private boolean isSuccess = true;
     private PageMeta meta;
 }

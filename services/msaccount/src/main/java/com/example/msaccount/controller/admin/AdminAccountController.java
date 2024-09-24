@@ -1,6 +1,7 @@
 package com.example.msaccount.controller.admin;
 
 import com.example.msaccount.mapper.ResponseDataMapper;
+import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.service.admin.AccountService;
@@ -8,6 +9,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -106,20 +108,19 @@ public class AdminAccountController {
             , HttpStatus.CREATED);
     }
 
-//    @PatchMapping("/{id}")
+    @PatchMapping("/{id}")
 //    @PreAuthorize("hasAuthority('SCOPE_accounts_update')")
-//    public ResponseEntity<ResponseData> updateAccount(
-//            @PathVariable(name = "id") Long id,
-//            @RequestPart(required = false) AccountUpdateRequest account,
-//            @RequestPart(required = false) MultipartFile avatar
-//    ){
-//        return ResponseEntity.ok(
-//            ResponseData.builder()
-//                .data(accountService.updateAccount(id, account, avatar))
-//                .desc("Account updated successfully")
-//                .build()
-//        );
-//    }
+    public ResponseEntity<ResponseData> updateAccount(
+        @RequestPart(required = false) @Valid AccountUpdateRequest account,
+        @RequestPart(required = false) MultipartFile avatar
+    ){
+        return ResponseEntity.ok(
+            ResponseData.builder()
+                .data(accountService.updateAccount(account, avatar))
+                .desc("Account updated successfully")
+                .build()
+        );
+    }
 
 //    @GetMapping("/status/{status}")
 //    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
