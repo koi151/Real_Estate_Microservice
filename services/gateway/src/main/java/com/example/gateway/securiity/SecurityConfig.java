@@ -5,15 +5,19 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
 import org.springframework.security.web.server.SecurityWebFilterChain;
+import lombok.extern.slf4j.Slf4j;
+import reactor.core.publisher.Mono;
 
 @Configuration
 @EnableWebFluxSecurity
 @EnableMethodSecurity
+@Slf4j
 public class SecurityConfig {
 
     @Value("${api.prefix}")
@@ -25,13 +29,28 @@ public class SecurityConfig {
             .csrf(ServerHttpSecurity.CsrfSpec::disable)
             .authorizeExchange(exchange -> exchange
                 .pathMatchers("(/eureka/**").permitAll()
-                .pathMatchers(HttpMethod.POST, apiPrefix + "/admin/accounts/").permitAll()
+                .pathMatchers(HttpMethod.POST,"api/v1/accounts/auth/login").permitAll()
                 .anyExchange()
                 .authenticated()
             )
-            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+            .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()))
+            .exceptionHandling(exceptionHandling -> exceptionHandling
+                .authenticationEntryPoint((exchange, ex) -> {
+                    log.error("Authentication error: ", ex);
+                    exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
+                    return Mono.empty();
+                })
+                .accessDeniedHandler((exchange, ex) -> {
+                    log.error("Access denied: ", ex);
+                    exchange.getResponse().setStatusCode(HttpStatus.FORBIDDEN);
+                    return Mono.empty();
+                })
+            );
+
         return serverHttpSecurity.build();
     }
+
+
 
 //    @Bean
 //    public Converter<Jwt, Mono<AbstractAuthenticationToken>> jwtAuthenticationConverterReactive() {

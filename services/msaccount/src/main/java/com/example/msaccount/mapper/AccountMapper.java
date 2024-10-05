@@ -2,6 +2,7 @@ package com.example.msaccount.mapper;
 
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.model.dto.AccountDTO;
+import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
 import com.example.msaccount.model.dto.KeycloakUserDTO;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
@@ -19,7 +20,7 @@ public interface AccountMapper {
 //    AccountWithPropertiesDTO toAccountWithPropertiesDTO(Account account, List<PropertyDTO> properties);
 //
 //    @Mapping(source = "role.name", target = "role")
-//    AccountWithNameAndRoleDTO toAccountWithNameAndRoleDTO(Account account);
+    AccountWithNameAndRoleDTO toAccountWithNameAndRoleDTO(Account account);
 
 
     @Mapping(target = "avatarUrl", source = "account.avatarUrl")

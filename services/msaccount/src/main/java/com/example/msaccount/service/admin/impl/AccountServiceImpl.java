@@ -2,11 +2,13 @@ package com.example.msaccount.service.admin.impl;
 
 import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
 import com.example.msaccount.customExceptions.EntityNotFoundException;
+import com.example.msaccount.customExceptions.KeycloakResourceNotFoundException;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.entity.admin.AdminAccount;
 import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.*;
+import com.example.msaccount.model.request.LoginRequest;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.repository.AccountRepository;
@@ -17,12 +19,17 @@ import com.example.msaccount.service.converter.AccountConverter;
 import com.example.msaccount.utils.CloudinaryUploadUtil;
 import com.example.msaccount.validator.AccountValidator;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.keycloak.admin.client.CreatedResponseUtil;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -42,7 +49,6 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
     private final AccountValidator accountValidator;
     private final KeycloakUserService keycloakUserService;
-    private final CloudinaryUploadUtil cloudinaryUploadUtil;
 
     private final AccountMapper accountMapper;
 
@@ -62,12 +68,15 @@ public class AccountServiceImpl implements AccountService {
 //        );
 //    }
 
-//    @Override
-//    public AccountWithNameAndRoleDTO findAccountNameAndRoleById(Long id) {
-//        return accountRepository.findByAccountIdAndAccountStatusAndDeleted(id, AccountStatusEnum.ACTIVE, false)
-//            .map(accountMapper::toAccountWithNameAndRoleDTO)
-//            .orElseThrow(() -> new AccountNotFoundException("Account not found with id:" + id));
-//    }
+
+
+    @Override
+    public AccountWithNameAndRoleDTO findAccountNameAndRoleById(String uuid) {
+        var kc = keycloakUserService.retrieveRoleNamesById(uuid);
+        return accountRepository.findByAccountIdAndAccountEnableAndDeleted(uuid, true, false)
+            .map(accountMapper::toAccountWithNameAndRoleDTO)
+            .orElseThrow(() -> new KeycloakResourceNotFoundException("Account not found with id:" + uuid));
+    }
 
 //    @Override
 //    public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
@@ -118,18 +127,18 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.requestToAccountDTO(account, kcUserDTO);
     }
 
-    @Override
-    @Transactional
-    public AccountDTO updateAccount(AccountUpdateRequest request, MultipartFile avatarFile) {
-        KeycloakUserDTO kcDTO =  keycloakUserService.updateUser(request);
-        return accountRepository.findByAccountIdAndAccountEnableAndDeleted(request.accountId(), true, false)
-            .map(existingEntity -> {
-                accountMapper.updateAccountFromRequest(request, existingEntity);
-                return accountRepository.save(existingEntity);
-            })
-            .map(entity -> accountMapper.entityToAccountDTO(entity, kcDTO))
-            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + request.accountId()));
-    }
+//    @Override
+//    @Transactional
+//    public AccountDTO updateAccount(AccountUpdateRequest request, MultipartFile avatarFile) {
+//        KeycloakUserDTO kcDTO =  keycloakUserService.updateUser(request);
+//        return accountRepository.findByAccountIdAndAccountEnableAndDeleted(request.accountId(), true, false)
+//            .map(existingEntity -> {
+//                accountMapper.updateAccountFromRequest(request, existingEntity);
+//                return accountRepository.save(existingEntity);
+//            })
+//            .map(entity -> accountMapper.entityToAccountDTO(entity, kcDTO))
+//            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + request.accountId()));
+//    }
 
     private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {
@@ -140,26 +149,6 @@ public class AccountServiceImpl implements AccountService {
             existingAccount.setAvatarUrl(uploadedAvatarUrl);
         }
     }
-
-
-//    @Override ===================================
-//    public String login(String accountName, String password) {
-//        Account existingAccount = accountRepository.findByAccountName(accountName) // del
-//                .orElseThrow(() -> new AccountNotFoundException("Wrong account name or password"));
-//
-//        if (existingAccount.getFacebookAccountId() == 0 && existingAccount.getGoogleAccountId() == 0) {
-//            if (!passwordEncoder.matches(password, existingAccount.getPassword()))
-//                throw new BadCredentialsException("Wrong phone number or password");
-//        }
-//
-//        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-//                accountName, password, existingAccount.getAuthorities()
-//        );
-//
-//        // authentication with Java Spring security
-//        authenticationManager.authenticate(authenticationToken);
-//        return jwtTokenUtil.generateToken(existingAccount);
-//    }
 
 //    public List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
 ////        PageRequest pageRequest = PageRequest.of(0, pageSize, Sort.by("accountId")); tempo cmt

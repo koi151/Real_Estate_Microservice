@@ -181,13 +181,29 @@ public class ControllerAdvisor {
             .body(errorResponse);
     }
 
-
-
-    @ExceptionHandler(KeycloakUserNotFoundException.class)
-    public ResponseEntity<ErrorResponse> handleKeycloakUserNotFoundException(KeycloakUserNotFoundException ex) {
+    @ExceptionHandler(KeycloakRoleRetrievalException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakRoleRetrievalException(KeycloakRoleRetrievalException ex) {
         return ResponseEntity.status(HttpStatus.NOT_FOUND)
             .body(ErrorResponse.builder()
-                .error("User not found")
+                .error("Failed to retrieve roles of user")
+                .details(Collections.singletonList(ex.getMessage()))
+                .build());
+    }
+
+    @ExceptionHandler(KeycloakResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakResourceNotFoundException(KeycloakResourceNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .error("Keycloak resource not found")
+                .details(Collections.singletonList(ex.getMessage()))
+                .build());
+    }
+
+    @ExceptionHandler(KeycloakLoginFailedException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakLoginFailedException(KeycloakLoginFailedException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.builder()
+                .error("Keycloak login failed")
                 .details(Collections.singletonList(ex.getMessage()))
                 .build());
     }

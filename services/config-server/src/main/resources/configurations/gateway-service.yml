@@ -38,4 +38,5 @@ spring:
             - Path=/api/v1/listing-services/**
 
 api:
-  prefix: api/v1/admin/accounts
+  prefix: api/v1/accounts
+
