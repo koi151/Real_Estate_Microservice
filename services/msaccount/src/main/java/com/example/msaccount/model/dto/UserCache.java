@@ -15,7 +15,14 @@ public class UserCache implements Serializable {
     @Serial
     private static final long serialVersionUID = 4514816687469018078L;
 
-    private String userId;
+    private String accountId;
+    private String username;
+    private Boolean isAdmin;
+    private String phone;
+    private String firstName;
+    private String lastName;
     private String email;
+    private Set<String> roleNames;
     private Set<String> scopes;
+    private Boolean emailVerified;
 }

@@ -246,4 +246,13 @@ public class ControllerAdvisor {
                 .details(Collections.singletonList("Check the request body again"))
                 .build());
     }
+
+    @ExceptionHandler(RedisDataNotFound.class)
+    public ResponseEntity<ErrorResponse> handleRedisDataNotFound(RedisDataNotFound ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .error("Failed to get data from redis")
+                .details(Collections.singletonList(ex.getMessage()))
+                .build());
+    }
 }

@@ -8,6 +8,7 @@ import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotAuthorizedException;
 import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
@@ -59,10 +60,12 @@ public class KeycloakUserService {
             Keycloak keycloak = getKeycloakInstanceWithCredentials(username, password);
             return keycloak.tokenManager().getAccessToken();
         } catch (NotAuthorizedException ex) {
-            log.info("Failed to login with username: {}, password: {}", username, password);
             throw new KeycloakLoginFailedException("Login failed, wrong username or password");
+        } catch (BadRequestException ex) {
+            throw new KeycloakLoginFailedException("Login failed, account might already disabled");
+        } finally {
+            log.info("Failed to login with username: {}, password: {}", username, password);
         }
-
     }
 
     private String getClientUUID() {
@@ -162,24 +165,14 @@ public class KeycloakUserService {
         return keycloakMapper.toKeycloakUserDTO(kcUser, roleNamesAssigned, userUUID);
     }
 
-    public boolean isAdminUser() {
-        Set<String> roleNames = getClientRolesResource().list().stream()
+    public boolean isAdminUser(String uuid) {
+        UserResource userResource = getUsersResource().get(uuid);
+
+        Set<String> roleNames = userResource.roles().clientLevel(getClientUUID()).listAll().stream()
             .map(RoleRepresentation::getName)
             .collect(Collectors.toSet());
         return roleNames.contains("Admin");
     }
-
-//    String clientUUID = getClientUUID();
-//    List<GroupRepresentation> groups = getGroupsByRoleRepresentation(roleRepresentations, clientUUID);
-//        if (!groups.isEmpty()) {
-//        System.out.println("Groups found:");
-//        for (GroupRepresentation group : groups) {
-//            System.out.println(group.getName());
-//        }
-//    } else {
-//        System.out.println("No groups found for the given roles.");
-//    }
-
 
     public List<GroupRepresentation> getGroupsByRoleRepresentation(List<RoleRepresentation> roleRepresentations, String clientUUID) {
         RealmResource realmResource = keycloakProvider.getRealmResource();
@@ -216,7 +209,6 @@ public class KeycloakUserService {
                 }
             }
 
-            // Return the list of matching groups
             return matchingGroups;
         } catch (Exception ex) {
             throw new RuntimeException("Error retrieving groups by role representations", ex);

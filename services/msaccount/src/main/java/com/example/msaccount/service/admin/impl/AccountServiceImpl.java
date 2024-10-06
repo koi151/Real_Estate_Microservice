@@ -3,11 +3,13 @@ package com.example.msaccount.service.admin.impl;
 import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
 import com.example.msaccount.customExceptions.EntityNotFoundException;
 import com.example.msaccount.customExceptions.KeycloakResourceNotFoundException;
+import com.example.msaccount.customExceptions.RedisDataNotFound;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.entity.admin.AdminAccount;
 import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.*;
+import com.example.msaccount.model.dto.admin.AdminDatabaseAccountDTO;
 import com.example.msaccount.model.request.LoginRequest;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
@@ -18,6 +20,9 @@ import com.example.msaccount.service.admin.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
 import com.example.msaccount.utils.CloudinaryUploadUtil;
 import com.example.msaccount.validator.AccountValidator;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -25,6 +30,7 @@ import org.keycloak.admin.client.CreatedResponseUtil;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.UserRepresentation;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -33,6 +39,10 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
+import java.util.LinkedHashMap;
+import java.util.Optional;
+
+import static com.example.msaccount.service.admin.impl.AuthServiceImpl.extractToken;
 
 @Service
 @RequiredArgsConstructor
@@ -44,14 +54,16 @@ public class AccountServiceImpl implements AccountService {
 //    private final AdminAccountRepository adminAccountRepository;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final AccountConverter accountConverter;
+
 //    private final PropertiesClient propertiesClient;
 
     private final AccountRepository accountRepository;
     private final AccountValidator accountValidator;
     private final KeycloakUserService keycloakUserService;
-
     private final AccountMapper accountMapper;
 
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final ObjectMapper objectMapper;
 
 //    @Override
 //    public List<AdminAccountDTO> findAllAdminAccounts() {
@@ -67,7 +79,6 @@ public class AccountServiceImpl implements AccountService {
 //                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId))
 //        );
 //    }
-
 
 
     @Override
@@ -126,6 +137,30 @@ public class AccountServiceImpl implements AccountService {
 
         return accountMapper.requestToAccountDTO(account, kcUserDTO);
     }
+
+    @Override
+    public AccountDTO getCurrentAccountInfo(String authorizationHeader) {
+        String token = extractToken(authorizationHeader);
+        String key = "access_token:" + token;
+        try {
+            Object redisData = redisTemplate.opsForValue().get(key);
+            AccountDTO accDTOFromRedis = objectMapper.convertValue(redisData, AccountDTO.class);
+            String accountId = accDTOFromRedis.getAccountId();
+
+            return accDTOFromRedis.getIsAdmin()
+                ? accountRepository.findAdminAccountInfoFromDB(accountId)
+                    .map(dbDto -> accountMapper.mapAdminDatabaseAccountDTO(dbDto, accDTOFromRedis))
+                    .orElseThrow(() -> new EntityNotFoundException("Cannot found admin account information in database with id: " + accountId))
+
+                : accountRepository.findClientAccountInfoFromDB(accountId)
+                    .map(dbDto -> accountMapper.mapClientDatabaseAccountDTO(dbDto, accDTOFromRedis))
+                    .orElseThrow(() -> new EntityNotFoundException("Cannot found client account information in database with id: " + accountId));
+
+        } catch (ClassCastException ex) { // temp
+            throw new RedisDataNotFound("Data not exists or incorrect key");
+        }
+    }
+
 
 //    @Override
 //    @Transactional

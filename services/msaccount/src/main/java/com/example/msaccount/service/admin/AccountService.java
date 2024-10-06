@@ -18,6 +18,8 @@ public interface AccountService {
     AccountWithNameAndRoleDTO findAccountNameAndRoleById(String uuid);
 //    Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
     AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
+
+    AccountDTO getCurrentAccountInfo(String authorizationHeader);
 //    ===String login(String userName, String password) throws Exception;
 //    AccountDTO updateAccount(AccountUpdateRequest request, MultipartFile avatar);
 //    List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize);

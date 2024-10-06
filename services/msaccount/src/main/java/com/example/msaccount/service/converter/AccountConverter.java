@@ -33,7 +33,7 @@ public class AccountConverter {
         Account account = accountMapper.toAccountEntity(request, userId);
         account.setAvatarUrl(avatarUrl);
 
-        if (keycloakUserService.isAdminUser()) {
+        if (keycloakUserService.isAdminUser(userId)) {
             AdminAccount adminAccount = createAdminAccount(account);
             account.setAdminAccount(adminAccount);
         } else {

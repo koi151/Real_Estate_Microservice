@@ -28,52 +28,40 @@ public class AuthServiceImpl implements AuthService {
     @Value("${KEYCLOAK_SERVER_URL}")
     public String serverURL;
 
-    @Value("${KEYCLOAK_AUTH_SERVER_URL}")
-    private String authServerUrl;
-
     private final KeycloakUserService kcUserService;
     private final RedisTemplate<String, Object> redisTemplate;
 
 
-//    public String extractUserIdFromAccessToken(String accessToken) {
-//        Claims claims = Jwts.parserBuilder()
-//            .setSigningKey(getKeycloakPublicKey())
-//            .build()
-//            .parseClaimsJws(accessToken)
-//            .getBody();
-//
-//        return claims.getSubject();
-//    }
-
-//    private PublicKey getKeycloakPublicKey() {
-//        try {
-//            String publicKeyPEM = getKeycloakPublicKey();
-//            publicKeyPEM = publicKeyPEM.replace("-----BEGIN PUBLIC KEY-----", "")
-//                .replace("-----END PUBLIC KEY-----", "")
-//                .replaceAll("\\s", "");
-//
-//            byte[] publicKeyDER = Base64.getDecoder().decode(publicKeyPEM);
-//
-//            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-//            return keyFactory.generatePublic(new X509EncodedKeySpec(publicKeyDER));
-//        } catch (Exception e) {
-//            throw new RuntimeException("Failed to get Keycloak public key", e);
-//        }
-//    }
-
     @Override
     public AccessTokenResponse login(LoginRequest request) {
         AccessTokenResponse tokenResponse = kcUserService.getAccessToken(request.username(), request.password());
-
         UserCache userCache = extractUserInfoFromAccessToken(tokenResponse.getToken());
 
         cacheUserData(userCache, tokenResponse.getToken(), Duration.ofSeconds(tokenResponse.getExpiresIn()));
-        cacheRefreshToken(tokenResponse.getRefreshToken(), userCache.getUserId(),
+        cacheRefreshToken(tokenResponse.getRefreshToken(), userCache.getAccountId(),
             Duration.ofSeconds(tokenResponse.getRefreshExpiresIn()));
 
         return tokenResponse;
     }
 
+    private Set<String> extractRolesFromResourceAccess(JWTClaimsSet claims) {
+        Map<String, Object> resourceAccess = (Map<String, Object>) claims.getClaim("resource_access");
+        Set<String> allRoles = new HashSet<>();
+
+        for (Map.Entry<String, Object> entry : resourceAccess.entrySet()) {
+            if (entry.getValue() instanceof Map) {
+                Map<String, Object> serviceAccess = (Map<String, Object>) entry.getValue();
+
+                // Check if the roles field exists and is a List
+                Object rolesObj = serviceAccess.get("roles");
+                if (rolesObj instanceof List) {
+                    List<String> roles = (List<String>) rolesObj;
+                    allRoles.addAll(roles);
+                }
+            }
+        }
+        return allRoles;
+    }
 
     private UserCache extractUserInfoFromAccessToken(String accessToken) {
         try {
@@ -81,16 +69,23 @@ public class AuthServiceImpl implements AuthService {
             JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
 
             String userId = claims.getSubject();
-            String email = claims.getStringClaim("email"); // need to adjust Keycloak setup
             Set<String> scopes = Arrays.stream(claims.getStringClaim("scope")
                     .split(" "))
                     .collect(Collectors.toSet());
+            Set<String> roleNames = extractRolesFromResourceAccess(claims);
 
             return UserCache.builder()
-                .userId(userId)
-                .email(email)
+                .accountId(userId)
+                .username(claims.getStringClaim("preferred_username"))
+                .firstName(claims.getStringClaim("firstName"))
+                .lastName(claims.getStringClaim("lastName"))
+                .roleNames(roleNames)
+                .email(claims.getStringClaim("email"))
+                .emailVerified(claims.getBooleanClaim("email_verified"))
                 .scopes(scopes)
+                .isAdmin(kcUserService.isAdminUser(userId))
                 .build();
+
         } catch (Exception e) {
             throw new RuntimeException("Failed to parse access token", e);
         }
@@ -101,14 +96,15 @@ public class AuthServiceImpl implements AuthService {
         redisTemplate.opsForValue().set(key, userCache, ttl);
     }
 
-    public UserCache getCachedUserData(String accessToken) {
-        String key = "user:token:" + accessToken;
-        return (UserCache) redisTemplate.opsForValue().get(key);
-    }
-
     private void cacheRefreshToken(String refreshToken, String userId, Duration ttl) {
         String key = "refresh_token:" + refreshToken;
         redisTemplate.opsForValue().set(key, userId, ttl);
     }
 
+    public static String extractToken(String authorizationHeader) {
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
+            return authorizationHeader.substring(7);
+        }
+        throw new RuntimeException("Invalid Authorization header");
+    }
 }
