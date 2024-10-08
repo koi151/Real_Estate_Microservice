@@ -135,9 +135,11 @@ public class ControllerAdvisor {
     }
 
     @ExceptionHandler(InvalidRequestException.class)
-    public ResponseEntity<String> handleInvalidRequestException(InvalidRequestException ex) {
+    public ResponseEntity<ErrorResponse> handleInvalidRequestException(InvalidRequestException ex) {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-            .body(ex.getMessage());
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .build());
     }
 
     // KEYCLOAK ==============
@@ -253,6 +255,15 @@ public class ControllerAdvisor {
             .body(ErrorResponse.builder()
                 .error("Failed to get data from redis")
                 .details(Collections.singletonList(ex.getMessage()))
+                .build());
+    }
+
+    @ExceptionHandler(TokenParsingException.class)
+    public ResponseEntity<ErrorResponse> handleTokenParsingException(TokenParsingException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(Collections.singletonList(ex.getCause() != null ? ex.getCause().getMessage() : "No additional details"))
                 .build());
     }
 }

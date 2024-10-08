@@ -60,11 +60,11 @@ public class KeycloakUserService {
             Keycloak keycloak = getKeycloakInstanceWithCredentials(username, password);
             return keycloak.tokenManager().getAccessToken();
         } catch (NotAuthorizedException ex) {
+            log.info("Failed to login with username: {}, password: {}", username, password);
             throw new KeycloakLoginFailedException("Login failed, wrong username or password");
         } catch (BadRequestException ex) {
-            throw new KeycloakLoginFailedException("Login failed, account might already disabled");
-        } finally {
             log.info("Failed to login with username: {}, password: {}", username, password);
+            throw new KeycloakLoginFailedException("Login failed, account might already disabled");
         }
     }
 
@@ -259,41 +259,41 @@ public class KeycloakUserService {
         }
     }
 
-//    public KeycloakUserDTO updateUser(AccountUpdateRequest request) {
-//        try {
-//            // Fetch the user resource from Keycloak
-//            UserResource userResource = getUsersResource().get(r);
-//
-//            // Fetch existing user representation
-//            UserRepresentation existingUser = userResource.toRepresentation();
-//            if (existingUser == null) { // x
-//                log.error("User not found with ID: {}", request.accountId());
-//                throw new KeycloakResourceNotFoundException("User not found with ID: " + request.accountId());
-//            }
-//
-//            updateUserAttributes(existingUser, request);
-//
-//            RolesResource clientRolesResource = getClientRolesResource();
-//            List<RoleRepresentation> validClientRoles = filterValidClientRoles(clientRolesResource, request.roleNames());
-//            List<String> validRoleNames = getRoleNames(validClientRoles);
-//            updateUserRoles(existingUser, validRoleNames);
-//
-//            // Send the update request to Keycloak
-//            userResource.update(existingUser);
-//            log.info("Successfully updated user with ID: {}", request.accountId());
-//
-//            UserRepresentation updatedUser = userResource.toRepresentation();
-//            return keycloakMapper.toKeycloakUserDTO(updatedUser, validRoleNames, existingUser.getId());
-//
-//        } catch (NotFoundException ex) {
-//            log.error("Cannot found Keycloak user with id: {}", request.accountId());
-//            throw new KeycloakUserUpdateException("Cannot found Keycloak user with id: " + request.accountId());
-//        } catch (BadRequestException ex) {
-//            String details = extractMessageFromKeycloakResponse(ex.getResponse());
-//            log.error("Failed to update Keycloak user with id: {}. Error message: {}", request.accountId(), details);
-//            throw new KeycloakUserUpdateException("Bad request: " + details);
-//        }
-//    }
+    public KeycloakUserDTO updateAccount(AccountUpdateRequest request, String accountId) {
+        try {
+            // Fetch the user resource from Keycloak
+            UserResource userResource = getUsersResource().get(accountId);
+
+            // Fetch existing user representation
+            UserRepresentation existingUser = userResource.toRepresentation();
+            if (existingUser == null) { // x
+                log.error("User not found with ID: {}", accountId);
+                throw new KeycloakResourceNotFoundException("User not found with ID: " + accountId);
+            }
+
+            updateUserAttributes(existingUser, request);
+
+            RolesResource clientRolesResource = getClientRolesResource();
+            List<RoleRepresentation> validClientRoles = filterValidClientRoles(clientRolesResource, request.roleNames());
+            List<String> validRoleNames = getRoleNames(validClientRoles);
+            updateUserRoles(existingUser, validRoleNames);
+
+            // Send the update request to Keycloak
+            userResource.update(existingUser);
+            log.info("Successfully updated user with ID: {}", accountId);
+
+            UserRepresentation updatedUser = userResource.toRepresentation();
+            return keycloakMapper.toKeycloakUserDTO(updatedUser, validRoleNames, existingUser.getId());
+
+        } catch (NotFoundException ex) {
+            log.error("Cannot found Keycloak user with id: {}", accountId);
+            throw new KeycloakUserUpdateException("Cannot found Keycloak user with id: " + accountId);
+        } catch (BadRequestException ex) {
+            String details = extractMessageFromKeycloakResponse(ex.getResponse());
+            log.error("Failed to update Keycloak user with id: {}. Error message: {}", accountId, details);
+            throw new KeycloakUserUpdateException("Bad request: " + details);
+        }
+    }
 
     private void updateUserAttributes(UserRepresentation user, AccountUpdateRequest request) {
         user.setUsername(request.username());

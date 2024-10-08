@@ -1,7 +1,7 @@
 package com.example.msaccount.utils;
 
 import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
-import com.example.msaccount.service.admin.impl.CloudinaryServiceImpl;
+import com.example.msaccount.service.impl.CloudinaryServiceImpl;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Component;
 import org.springframework.web.multipart.MultipartFile;

@@ -1,48 +1,28 @@
-package com.example.msaccount.service.admin.impl;
+package com.example.msaccount.service.impl;
 
 import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
 import com.example.msaccount.customExceptions.EntityNotFoundException;
 import com.example.msaccount.customExceptions.KeycloakResourceNotFoundException;
 import com.example.msaccount.customExceptions.RedisDataNotFound;
 import com.example.msaccount.entity.Account;
-import com.example.msaccount.entity.admin.AdminAccount;
-import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.mapper.AccountMapper;
-import com.example.msaccount.model.dto.*;
-import com.example.msaccount.model.dto.admin.AdminDatabaseAccountDTO;
-import com.example.msaccount.model.request.LoginRequest;
-import com.example.msaccount.model.request.admin.AccountUpdateRequest;
+import com.example.msaccount.model.dto.AccountDetailDTO;
+import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
+import com.example.msaccount.model.dto.KeycloakUserDTO;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
+import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.repository.AccountRepository;
-
 import com.example.msaccount.service.KeycloakUserService;
-import com.example.msaccount.service.admin.AccountService;
+import com.example.msaccount.service.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
-import com.example.msaccount.utils.CloudinaryUploadUtil;
 import com.example.msaccount.validator.AccountValidator;
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.keycloak.admin.client.CreatedResponseUtil;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.representations.AccessTokenResponse;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.multipart.MultipartFile;
-
-import java.math.BigDecimal;
-import java.util.LinkedHashMap;
-import java.util.Optional;
-
-import static com.example.msaccount.service.admin.impl.AuthServiceImpl.extractToken;
 
 @Service
 @RequiredArgsConstructor
@@ -61,6 +41,7 @@ public class AccountServiceImpl implements AccountService {
     private final AccountValidator accountValidator;
     private final KeycloakUserService keycloakUserService;
     private final AccountMapper accountMapper;
+    private final AuthServiceImpl authServiceImpl;
 
     private final RedisTemplate<String, Object> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -79,6 +60,23 @@ public class AccountServiceImpl implements AccountService {
 //                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId))
 //        );
 //    }
+
+    @Override
+    @Transactional
+    public AccountDetailDTO updateCurrentAccount(String authorizationHeader, AccountUpdateRequest request, MultipartFile avatarFile) {
+        accountValidator.validateAccountUpdateRequest(request, avatarFile);;
+
+        String accountId = authServiceImpl.extractUserIDFromAuthHeader(authorizationHeader);
+
+        KeycloakUserDTO kcDTO =  keycloakUserService.updateAccount(request, accountId); // keycloak update
+        return accountRepository.findByAccountIdAndAccountEnableAndDeleted(accountId, true, false)
+            .map(existingEntity -> {
+                accountMapper.updateAccountFromRequest(request, existingEntity); // db update
+                return accountRepository.save(existingEntity);
+            })
+            .map(entity -> accountMapper.entityToAccountDTO(entity, kcDTO))
+            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + accountId));
+    }
 
 
     @Override
@@ -127,7 +125,7 @@ public class AccountServiceImpl implements AccountService {
 
     @Override
     @Transactional
-    public AccountDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
+    public AccountDetailDTO createAccount(AccountCreateRequest request, MultipartFile avatar)  {
         accountValidator.validateAccountCreateRequest(request);
 
         KeycloakUserDTO kcUserDTO = keycloakUserService.createUser(request);
@@ -138,42 +136,34 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.requestToAccountDTO(account, kcUserDTO);
     }
 
-    @Override
-    public AccountDTO getCurrentAccountInfo(String authorizationHeader) {
-        String token = extractToken(authorizationHeader);
-        String key = "access_token:" + token;
+    public AccountDetailDTO getAccountDataFromHeader(String authorizationHeader) {
+        String userId = AuthServiceImpl.extractUserIdFromToken(authorizationHeader);
+        String key = "userId:" + userId;
         try {
             Object redisData = redisTemplate.opsForValue().get(key);
-            AccountDTO accDTOFromRedis = objectMapper.convertValue(redisData, AccountDTO.class);
-            String accountId = accDTOFromRedis.getAccountId();
+            return objectMapper.convertValue(redisData, AccountDetailDTO.class);
 
-            return accDTOFromRedis.getIsAdmin()
-                ? accountRepository.findAdminAccountInfoFromDB(accountId)
-                    .map(dbDto -> accountMapper.mapAdminDatabaseAccountDTO(dbDto, accDTOFromRedis))
-                    .orElseThrow(() -> new EntityNotFoundException("Cannot found admin account information in database with id: " + accountId))
-
-                : accountRepository.findClientAccountInfoFromDB(accountId)
-                    .map(dbDto -> accountMapper.mapClientDatabaseAccountDTO(dbDto, accDTOFromRedis))
-                    .orElseThrow(() -> new EntityNotFoundException("Cannot found client account information in database with id: " + accountId));
-
-        } catch (ClassCastException ex) { // temp
+        } catch (ClassCastException ex) {
             throw new RedisDataNotFound("Data not exists or incorrect key");
         }
     }
 
+    @Override
+    public AccountDetailDTO getCurrentAccountInfo(String authorizationHeader) {
+        String accessToken = authServiceImpl.extractAccessTokenFromAuthHeader(authorizationHeader);
+        AccountDetailDTO accountDTO = authServiceImpl.extractUserInfoFromAccessToken(accessToken);
+        String accountId = accountDTO.getAccountId();
 
-//    @Override
-//    @Transactional
-//    public AccountDTO updateAccount(AccountUpdateRequest request, MultipartFile avatarFile) {
-//        KeycloakUserDTO kcDTO =  keycloakUserService.updateUser(request);
-//        return accountRepository.findByAccountIdAndAccountEnableAndDeleted(request.accountId(), true, false)
-//            .map(existingEntity -> {
-//                accountMapper.updateAccountFromRequest(request, existingEntity);
-//                return accountRepository.save(existingEntity);
-//            })
-//            .map(entity -> accountMapper.entityToAccountDTO(entity, kcDTO))
-//            .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + request.accountId()));
-//    }
+        return accountDTO.getIsAdmin()
+            ? accountRepository.findAdminAccountInfoFromDB(accountId)
+                .map(dbDto -> accountMapper.mapAdminDatabaseAccountDTO(dbDto, accountDTO))
+                .orElseThrow(() -> new EntityNotFoundException("Cannot found admin account information in database with id: " + accountId))
+
+            : accountRepository.findClientAccountInfoFromDB(accountId)
+                .map(dbDto -> accountMapper.mapClientDatabaseAccountDTO(dbDto, accountDTO))
+                .orElseThrow(() -> new EntityNotFoundException("Cannot found client account information in database with id: " + accountId));
+    }
+
 
     private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {

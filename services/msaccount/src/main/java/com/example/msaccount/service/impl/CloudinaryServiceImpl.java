@@ -1,4 +1,4 @@
-package com.example.msaccount.service.admin.impl;
+package com.example.msaccount.service.impl;
 
 import com.cloudinary.Cloudinary;
 import com.example.msaccount.service.admin.CloudinaryService;

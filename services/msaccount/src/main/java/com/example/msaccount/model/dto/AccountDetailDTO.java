@@ -2,17 +2,18 @@ package com.example.msaccount.model.dto;
 
 import lombok.*;
 
-import java.util.List;
+import java.util.Set;
 
 @Builder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class AccountDTO {
+public class AccountDetailDTO {
     private String accountId;
     private Boolean isAdmin;
     private String username;
-    private List<String> roleNames;
+    private Set<String> roleNames;
+    private Set<String> scopes;
     private String firstName;
     private String lastName;
     private String email;

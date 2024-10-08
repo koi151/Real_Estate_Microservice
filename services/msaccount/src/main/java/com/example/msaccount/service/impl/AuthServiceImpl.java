@@ -1,6 +1,8 @@
-package com.example.msaccount.service.admin.impl;
+package com.example.msaccount.service.impl;
 
-import com.example.msaccount.model.dto.UserCache;
+import com.example.msaccount.customExceptions.InvalidAuthorizationHeaderException;
+import com.example.msaccount.customExceptions.TokenParsingException;
+import com.example.msaccount.model.dto.AccountDetailDTO;
 import com.example.msaccount.model.request.LoginRequest;
 import com.example.msaccount.service.AuthService;
 import com.example.msaccount.service.KeycloakUserService;
@@ -12,6 +14,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+
+import java.text.ParseException;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -22,11 +26,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AuthServiceImpl implements AuthService {
 
-    @Value("${KEYCLOAK_REALM}")
-    private String realm;
+    @Value("${USER_CACHE_TTL}")
+    private long userCacheTtl;
 
-    @Value("${KEYCLOAK_SERVER_URL}")
-    public String serverURL;
+    @Value("${CACHE_REFRESH_THRESHOLD_PERCENT}")
+    private int cacheRefreshThresholdPercent;
 
     private final KeycloakUserService kcUserService;
     private final RedisTemplate<String, Object> redisTemplate;
@@ -35,10 +39,9 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public AccessTokenResponse login(LoginRequest request) {
         AccessTokenResponse tokenResponse = kcUserService.getAccessToken(request.username(), request.password());
-        UserCache userCache = extractUserInfoFromAccessToken(tokenResponse.getToken());
-
-        cacheUserData(userCache, tokenResponse.getToken(), Duration.ofSeconds(tokenResponse.getExpiresIn()));
-        cacheRefreshToken(tokenResponse.getRefreshToken(), userCache.getAccountId(),
+        AccountDetailDTO accDTO = extractUserInfoFromAccessToken(tokenResponse.getToken());
+        cacheUserData(accDTO);
+        cacheRefreshToken(tokenResponse.getRefreshToken(), accDTO.getAccountId(),
             Duration.ofSeconds(tokenResponse.getRefreshExpiresIn()));
 
         return tokenResponse;
@@ -52,7 +55,6 @@ public class AuthServiceImpl implements AuthService {
             if (entry.getValue() instanceof Map) {
                 Map<String, Object> serviceAccess = (Map<String, Object>) entry.getValue();
 
-                // Check if the roles field exists and is a List
                 Object rolesObj = serviceAccess.get("roles");
                 if (rolesObj instanceof List) {
                     List<String> roles = (List<String>) rolesObj;
@@ -63,7 +65,7 @@ public class AuthServiceImpl implements AuthService {
         return allRoles;
     }
 
-    private UserCache extractUserInfoFromAccessToken(String accessToken) {
+    public AccountDetailDTO extractUserInfoFromAccessToken(String accessToken) {
         try {
             SignedJWT signedJWT = SignedJWT.parse(accessToken);
             JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
@@ -74,7 +76,7 @@ public class AuthServiceImpl implements AuthService {
                     .collect(Collectors.toSet());
             Set<String> roleNames = extractRolesFromResourceAccess(claims);
 
-            return UserCache.builder()
+            return AccountDetailDTO.builder()
                 .accountId(userId)
                 .username(claims.getStringClaim("preferred_username"))
                 .firstName(claims.getStringClaim("firstName"))
@@ -86,14 +88,35 @@ public class AuthServiceImpl implements AuthService {
                 .isAdmin(kcUserService.isAdminUser(userId))
                 .build();
 
-        } catch (Exception e) {
-            throw new RuntimeException("Failed to parse access token", e);
+        } catch (ParseException ex) {
+            throw new TokenParsingException("Failed to parse access token", ex);
         }
     }
 
-    private void cacheUserData(UserCache userCache, String accessToken, Duration ttl) {
-        String key = "access_token:" + accessToken;
-        redisTemplate.opsForValue().set(key, userCache, ttl);
+    public String extractAccessTokenFromAuthHeader(String authorizationHeader) {
+        return authorizationHeader.substring(7);
+    }
+
+    public String extractUserIDFromAuthHeader(String authorizationHeader) {
+        String accessToken = extractAccessTokenFromAuthHeader(authorizationHeader);
+        JWTClaimsSet claims = getJWTClaimsSet(accessToken);
+        return claims.getSubject();
+    }
+
+    public JWTClaimsSet getJWTClaimsSet(String accessToken) {
+        try {
+            SignedJWT signedJWT = SignedJWT.parse(accessToken);
+            return signedJWT.getJWTClaimsSet();
+        } catch (ParseException ex) {
+            throw new TokenParsingException("Failed to parse access token", ex);
+        }
+    }
+
+
+
+    private void cacheUserData(AccountDetailDTO accDTO) {
+        String key = "userId:" + accDTO.getAccountId();
+        redisTemplate.opsForValue().set(key, accDTO, Duration.ofSeconds(userCacheTtl));
     }
 
     private void cacheRefreshToken(String refreshToken, String userId, Duration ttl) {
@@ -101,10 +124,18 @@ public class AuthServiceImpl implements AuthService {
         redisTemplate.opsForValue().set(key, userId, ttl);
     }
 
-    public static String extractToken(String authorizationHeader) {
+    public static String extractUserIdFromToken(String authorizationHeader) {
         if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
-            return authorizationHeader.substring(7);
+            String accessToken = authorizationHeader.substring(7);
+            try {
+                SignedJWT signedJWT = SignedJWT.parse(accessToken);
+                JWTClaimsSet claims = signedJWT.getJWTClaimsSet();
+                return claims.getSubject();
+
+            } catch (ParseException ex) {
+                throw new TokenParsingException("Failed to parse access token", ex);
+            }
         }
-        throw new RuntimeException("Invalid Authorization header");
+        throw new InvalidAuthorizationHeaderException("Invalid Authorization header");
     }
 }

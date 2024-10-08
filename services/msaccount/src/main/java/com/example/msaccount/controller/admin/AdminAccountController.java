@@ -5,13 +5,13 @@ import com.example.msaccount.mapper.ResponseDataMapper;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
-import com.example.msaccount.service.admin.AccountService;
+import com.example.msaccount.service.AccountService;
+import com.example.msaccount.service.admin.AccountAdminService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -20,7 +20,7 @@ import org.springframework.web.multipart.MultipartFile;
 @RequiredArgsConstructor
 public class AdminAccountController {
 
-    private final AccountService accountService;
+    private final AccountAdminService accountAdminService;
     private final ResponseDataMapper responseDataMapper;
     private  final KeycloakProvider kcProvider;
 
@@ -74,9 +74,9 @@ public class AdminAccountController {
 //    }
 
     @GetMapping("/{account-id}/name-and-role")
-    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
+//    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
     public ResponseEntity<ResponseData> getAccountNameAndRole(@PathVariable(name = "account-id") String accountId) {
-        var account = accountService.findAccountNameAndRoleById(accountId);
+        var account = accountAdminService.findAccountNameAndRoleById(accountId);
         return ResponseEntity.ok(
             ResponseData.builder()
                 .data(account)
@@ -90,7 +90,7 @@ public class AdminAccountController {
             @RequestPart @Valid AccountCreateRequest account,
             @RequestPart(required = false) MultipartFile avatar
     ) {
-        var accountCreated = accountService.createAccount(account, avatar);
+        var accountCreated = accountAdminService.createAccountAdmin(account, avatar);
         return new ResponseEntity<>(
             ResponseData.builder()
                 .data(accountCreated)
@@ -99,19 +99,19 @@ public class AdminAccountController {
             , HttpStatus.CREATED);
     }
 
-//    @PatchMapping("/")
-//    @PreAuthorize("hasAuthority('SCOPE_accounts_update')")
-//    public ResponseEntity<ResponseData> updateAccount(
-//        @RequestPart(required = false) @Valid AccountUpdateRequest account,
-//        @RequestPart(required = false) MultipartFile avatar
-//    ){
-//        return ResponseEntity.ok(
-//            ResponseData.builder()
-//                .data(accountService.updateAccount(account, avatar))
-//                .desc("Account updated successfully")
-//                .build()
-//        );
-//    }
+    @PatchMapping("/")
+    public ResponseEntity<ResponseData> updateAccount(
+        @RequestHeader("Authorization") String authorizationHeader,
+        @RequestPart(required = false) @Valid AccountUpdateRequest request,
+        @RequestPart(required = false) MultipartFile avatar
+    ){
+        return ResponseEntity.ok(
+            ResponseData.builder()
+                .data(accountAdminService.updateAccount(authorizationHeader ,request, avatar))
+                .desc("Account updated successfully")
+                .build()
+        );
+    }
 
 //    @GetMapping("/status/{status}")
 //    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")

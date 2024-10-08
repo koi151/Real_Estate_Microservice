@@ -1,4 +1,4 @@
-package com.example.msaccount.service.admin.impl;
+package com.example.msaccount.service.impl;
 
 import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.data.redis.core.RedisTemplate;
