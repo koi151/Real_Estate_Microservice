@@ -1,16 +1,17 @@
 package com.example.msaccount.service.impl.admin;
 
-import com.example.msaccount.customExceptions.CloudinaryUploadFailedException;
-import com.example.msaccount.customExceptions.EntityNotFoundException;
-import com.example.msaccount.customExceptions.KeycloakResourceNotFoundException;
-import com.example.msaccount.customExceptions.RedisDataNotFound;
+import com.example.msaccount.client.PropertiesClient;
+import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.entity.Account;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.*;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
+import com.example.msaccount.model.response.ResponseData;
 import com.example.msaccount.repository.AccountRepository;
 
+import com.example.msaccount.repository.admin.AdminAccountRepository;
+import com.example.msaccount.repository.client.ClientAccountRepository;
 import com.example.msaccount.service.admin.AccountAdminService;
 import com.example.msaccount.service.KeycloakUserService;
 import com.example.msaccount.service.converter.AccountConverter;
@@ -18,37 +19,44 @@ import com.example.msaccount.service.impl.AuthServiceImpl;
 import com.example.msaccount.service.impl.CloudinaryServiceImpl;
 import com.example.msaccount.validator.AccountValidator;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import feign.FeignException;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.util.List;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AccountAdminServiceImpl implements AccountAdminService {
 
-//    private final PasswordEncoder passwordEncoder;
-//    private final AccountRepository accountRepository;
-//    private final AdminAccountRepository adminAccountRepository;
-    private final CloudinaryServiceImpl cloudinaryServiceImpl;
-    private final AccountConverter accountConverter;
-
-//    private final PropertiesClient propertiesClient;
-
     private final AccountRepository accountRepository;
-    private final AccountValidator accountValidator;
-    private final KeycloakUserService keycloakUserService;
-    private final AccountMapper accountMapper;
+    private final AdminAccountRepository adminAccountRepository;
+    private final ClientAccountRepository clientAccountRepository;
 
-    private final RedisTemplate<String, Object> redisTemplate;
+    private final CloudinaryServiceImpl cloudinaryServiceImpl;
+    private final KeycloakUserService keycloakUserService;
+
+    private final AccountMapper accountMapper;
     private final ObjectMapper objectMapper;
+
+    private final AccountConverter accountConverter;
+    private final AccountValidator accountValidator;
+    private final RedisTemplate<String, Object> redisTemplate;
+    private final PropertiesClient propertiesClient;
+
 
 //    @Override
 //    public List<AdminAccountDTO> findAllAdminAccounts() {
-//        return adminAccountRepository.findAllByAccountDeleted(false, Sort.by("accountId")).stream()
+//        return adminAccountRepository.findAll(false, Sort.by("accountId")).stream()
 //            .map(adminAccountConverter::toAdminAccountDTO)
 //            .collect(Collectors.toList());
 //    }
@@ -69,41 +77,6 @@ public class AccountAdminServiceImpl implements AccountAdminService {
             .map(accountMapper::toAccountWithNameAndRoleDTO)
             .orElseThrow(() -> new KeycloakResourceNotFoundException("Account not found with id:" + uuid));
     }
-
-//    @Override
-//    public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
-//
-//        Account account = accountRepository.findByAccountIdAndAccountStatusAndDeleted(accountId, AccountStatusEnum.ACTIVE, false)
-//                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
-//
-//        // Fetch Properties using Feign Client
-//        ResponseEntity<ResponseData> responseData = propertiesClient.findAllPropertiesByAccount(accountId, pageable.getPageNumber(), pageable.getPageSize());
-//
-//        if (responseData.getStatusCode().is2xxSuccessful() && responseData.getBody() != null) {
-//            try {
-//                ResponseData responseBody = responseData.getBody();
-//                Object dataObject = responseBody.getData();
-//
-//                if (dataObject instanceof List<?> dataList) {
-//                    // Convert to List<PropertyDTO> using ObjectMapper
-//                    List<PropertyDTO> properties = dataList.stream()
-//                            .map(item -> objectMapper.convertValue(item, PropertyDTO.class))
-//                            .toList();
-//
-//                    AccountWithPropertiesDTO accountWithPropertiesDTO = accountMapper.toAccountWithPropertiesDTO(account, properties);
-//
-//                    // Wrap the result in a Page object
-//                    return new PageImpl<>(List.of(accountWithPropertiesDTO), pageable, responseBody.getTotalItems()); // total properties count
-//                } else {
-//                    throw new RuntimeException("Unexpected data format (not a list) received from properties service");
-//                }
-//            } catch (Exception ex) {
-//                throw new RuntimeException("Error parsing property data: " + ex.getMessage(), ex);
-//            }
-//        } else {
-//            throw new RuntimeException("Failed to fetch properties from properties service");
-//        }
-//    }
 
 
     @Override
@@ -161,6 +134,42 @@ public class AccountAdminServiceImpl implements AccountAdminService {
             .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + accountId));
     }
 
+    @Override
+    public Page<AccountWithPropertiesDTO> findAccountWithProperties(String accountId, Pageable pageable) {
+
+        Account account = accountRepository.findByAccountIdAndAccountEnableAndDeleted(accountId, true , false)
+                .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + accountId));
+
+        // Fetch Properties using Feign Client
+        try {
+            ResponseEntity<ResponseData> responseData = propertiesClient.findAllPropertiesByAccount(accountId, pageable.getPageNumber(), pageable.getPageSize());
+
+            if (responseData.getStatusCode().is2xxSuccessful() && responseData.getBody() != null) {
+                ResponseData responseBody = responseData.getBody();
+                Object dataObject = responseBody.getData();
+
+                if (dataObject instanceof List<?> dataList) {
+                    List<PropertyDTO> properties = dataList.stream()
+                        .map(item -> objectMapper.convertValue(item, PropertyDTO.class))
+                        .toList();
+
+                    AccountWithPropertiesDTO accountWithPropertiesDTO = accountMapper.toAccountWithPropertiesDTO(account, properties);
+                    String username = keycloakUserService.retrieveUsernameByID(accountId);
+                    accountWithPropertiesDTO.setAccountName(username);
+
+                    return new PageImpl<>(List.of(accountWithPropertiesDTO), pageable, responseBody.getTotalItems()); // total properties count
+                } else {
+                    throw new RuntimeException("Unexpected data format (not a list) received from properties service");
+                }
+            } else {
+                throw new RuntimeException("Failed to fetch properties from properties service");
+            }
+        } catch (FeignException ex) {
+            log.error("Error occurred while fetching data from Property Service");
+            throw new RemoteServiceException("Error occurred while fetching data from Property Service", ex);
+        }
+    }
+
     private void updateAvatar(Account existingAccount, MultipartFile avatarFile) {
         if (avatarFile != null && !avatarFile.isEmpty()) {
             String uploadedAvatarUrl = cloudinaryServiceImpl.uploadFile(avatarFile, "real_estate_account");
@@ -169,6 +178,24 @@ public class AccountAdminServiceImpl implements AccountAdminService {
             }
             existingAccount.setAvatarUrl(uploadedAvatarUrl);
         }
+    }
+
+    @Override
+    @Transactional
+    public void deleteAccount(String id) {
+        int updatedRows = accountRepository.softDeleteAccountById(id);
+        if (updatedRows == 0) {
+            throw new EntityNotFoundException("Cannot find account with id " + id);
+        }
+
+        int updatedAdminRows = adminAccountRepository.softDeleteAdminAccountById(id);
+        int updatedClientRows = clientAccountRepository.softDeleteClientAccountByAccountId(id);
+
+        if (updatedAdminRows == 0 && updatedClientRows == 0) {
+            throw new EntityNotFoundException("No linked AdminAccount or ClientAccount found for account id " + id);
+        }
+
+        keycloakUserService.disableUserWithId(id);
     }
 
 //    public List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize) {
@@ -180,50 +207,4 @@ public class AccountAdminServiceImpl implements AccountAdminService {
 //                .collect(Collectors.toList());
 //    }
 
-//    @Override
-//    public void deleteAdminAccount(Long id) {
-//        Account account = accountRepository.findById(id)
-//                .orElseThrow(() -> new AccountNotFoundException("Admin account with id " + id + " not found"));
-//
-//        account.setDeleted(true);
-//        accountRepository.save(account);
-//    }
-
-
-//    private void updateAccountDetails(Account existingAccount, AccountUpdateRequest request) {
-//        if (request != null) {
-//            if (request.getPhone() != null && accountRepository.existsByPhone(request.getPhone()))
-//                throw new PhoneAlreadyExistsException("Phone number already exists");
-//
-//            if (request.getAccountName() != null && accountRepository.existsByAccountName(request.getAccountName()))
-//                throw new AccountAlreadyExistsException("Account name already exists");
-//
-//            // Use Optional for Null check
-//            Optional.ofNullable(request.getAccountName()).ifPresent(existingAccount::setAccountName);
-//            Optional.ofNullable(request.getFirstName()).ifPresent(existingAccount::setFirstName);
-//            Optional.ofNullable(request.getLastName()).ifPresent(existingAccount::setLastName);
-//            Optional.ofNullable(request.getPhone()).ifPresent(existingAccount::setPhone);
-//            Optional.ofNullable(request.getEmail()).ifPresent(existingAccount::setEmail);
-//            Optional.ofNullable(request.getStatus()).ifPresent(existingAccount::setAccountStatus);
-//            Optional.ofNullable(request.getPassword())
-//                    .map(passwordEncoder::encode)
-//                    .ifPresent(existingAccount::setPassword);
-//
-//            if (request.getAvatarUrlRemove()) {
-//                existingAccount.setAvatarUrl(null);
-//            }
-//        }
-//    }
-
-//    private AccountDTO convertToAccountDTO(Account savedAccount) {
-//        return AccountDTO.builder()
-//            .accountName(savedAccount.getAccountName())
-//            .firstName(savedAccount.getFirstName())
-//            .lastName(savedAccount.getLastName())
-//            .email(savedAccount.getEmail())
-//            .phone(savedAccount.getPhone())
-//            .accountStatus(savedAccount.getAccountStatus().getStatus())
-//            .avatarUrl(savedAccount.getAvatarUrl())
-//            .build();
-//    }
 }

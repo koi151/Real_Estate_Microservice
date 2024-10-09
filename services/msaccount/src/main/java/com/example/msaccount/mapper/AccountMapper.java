@@ -1,24 +1,22 @@
 package com.example.msaccount.mapper;
 
 import com.example.msaccount.entity.Account;
-import com.example.msaccount.model.dto.AccountDetailDTO;
-import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
-import com.example.msaccount.model.dto.ClientDatabaseAccountDTO;
-import com.example.msaccount.model.dto.KeycloakUserDTO;
+import com.example.msaccount.model.dto.*;
 import com.example.msaccount.model.dto.admin.AdminDatabaseAccountDTO;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.utils.StringUtil;
 import org.mapstruct.*;
 
+import java.util.List;
+
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         imports = {StringUtil.class})
 public interface AccountMapper {
-//    @Mapping(source = "account.accountId", target = "accountId")
-//    @Mapping(source = "account.accountName", target = "accountName")
-//    @Mapping(source = "account.avatarUrl", target = "avatarUrl")
-//    @Mapping(source = "properties", target = "properties")
-//    AccountWithPropertiesDTO toAccountWithPropertiesDTO(Account account, List<PropertyDTO> properties);
+    @Mapping(source = "account.accountId", target = "accountId")
+    @Mapping(source = "account.avatarUrl", target = "avatarUrl")
+    @Mapping(source = "properties", target = "properties")
+    AccountWithPropertiesDTO toAccountWithPropertiesDTO(Account account, List<PropertyDTO> properties);
 //
 //    @Mapping(source = "role.name", target = "role")
     AccountWithNameAndRoleDTO toAccountWithNameAndRoleDTO(Account account);

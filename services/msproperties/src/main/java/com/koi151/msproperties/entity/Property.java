@@ -75,7 +75,7 @@ public class Property extends BaseEntity {
 
     @Column(name = "account_id", nullable = false)
     @NotNull(message = "Account id is mandatory")
-    private long accountId;
+    private String accountId;
 
     @Column(name = "available_from", nullable = false, columnDefinition = "DATE")
     @NotNull(message = "Property available date is mandatory")

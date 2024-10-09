@@ -27,8 +27,8 @@ public record PropertyCreateRequest(
     @NotNull(message = "Category id is mandatory")
     Long categoryId,
 
-    @NotNull(message = "Account id is mandatory")
-    Long accountId,
+    @NotBlank(message = "String of account id is mandatory")
+    String accountId,
 
     @Valid
     PropertyForSaleCreateRequest propertyForSale,

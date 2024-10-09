@@ -1,17 +1,16 @@
 package com.example.msaccount.model.dto.admin;
 
 import lombok.Builder;
-import lombok.Data;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.Set;
 
 @Setter
 @Getter
 @Builder
 public class AdminAccountDTO {
-
     private Long accountId;
     private String accountName;
     private String phone;
@@ -20,6 +19,6 @@ public class AdminAccountDTO {
     private String lastName;
     private String email;
     private String avatarUrl;
-    private String role;
+    private Set<String> roles;
     private LocalDateTime createdAt;
 }

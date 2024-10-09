@@ -1,8 +1,11 @@
 package com.example.msaccount.entity.admin;
 
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.entity.BaseEntity;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.io.Serial;
 
 @Entity(name = "admin_account")
 @Getter
@@ -10,7 +13,10 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class AdminAccount {
+public class AdminAccount extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = -6707294041383577522L;
 
     @Id
     @Column(name = "account_id", columnDefinition = "VARCHAR(36)", nullable = false)

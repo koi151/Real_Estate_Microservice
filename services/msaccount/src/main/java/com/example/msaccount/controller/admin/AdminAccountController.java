@@ -1,6 +1,7 @@
 package com.example.msaccount.controller.admin;
 
 import com.example.msaccount.config.KeycloakProvider;
+import com.example.msaccount.mapper.PaginationContext;
 import com.example.msaccount.mapper.ResponseDataMapper;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.model.response.ResponseData;
@@ -8,10 +9,13 @@ import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.service.AccountService;
 import com.example.msaccount.service.admin.AccountAdminService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import lombok.RequiredArgsConstructor;
 
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -40,26 +44,26 @@ public class AdminAccountController {
 //        );
 //    }
 
-//    @GetMapping("/{id}/properties")
+    @GetMapping("/{id}/properties")
 //    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
-//    public ResponseEntity<ResponseData> findAccountWithProperties (
-//        @PathVariable(name = "id") Long id,
-//        @RequestParam(name = "page", defaultValue = "1") Integer page,
-//        @RequestParam(name = "limit", defaultValue = "10") Integer limit)
-//    {
-//        Pageable pageable = PageRequest.of(page - 1, limit);
-//        var accountPage = accountService.findAccountWithProperties(id, pageable);
-//        var accountProperties = accountPage.getContent().get(0).getProperties();
-//
-//        PaginationContext paginationContext = new PaginationContext(page, limit);
-//
-//        return ResponseEntity.ok(ResponseData.builder()
-//            .data(responseDataMapper.toResponseData(accountPage, paginationContext))
-//            .desc(accountPage.hasContent() && !accountProperties.isEmpty()
-//                ? "Account with properties found."
-//                : "Account has no property post.")
-//            .build());
-//    }
+    public ResponseEntity<ResponseData> findAccountWithProperties (
+        @PathVariable(name = "id") String id,
+        @RequestParam(name = "page", defaultValue = "1") Integer page,
+        @RequestParam(name = "limit", defaultValue = "10") Integer limit)
+    {
+        Pageable pageable = PageRequest.of(page - 1, limit);
+        var accountPage = accountAdminService.findAccountWithProperties(id, pageable);
+        var accountProperties = accountPage.getContent().get(0).getProperties();
+
+        PaginationContext paginationContext = new PaginationContext(page, limit);
+
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(responseDataMapper.toResponseData(accountPage, paginationContext))
+            .desc(accountPage.hasContent() && !accountProperties.isEmpty()
+                ? "Account with properties found."
+                : "Account has no property post.")
+            .build());
+    }
 
 //    @GetMapping("/{account-id}")
 //    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
@@ -130,14 +134,14 @@ public class AdminAccountController {
 //        );
 //    }
 
-//    @DeleteMapping("/{id}")
-//    @PreAuthorize("hasAuthority('SCOPE_accounts_delete')")
-//    public ResponseEntity<ResponseData> deleteAdminAccount(@PathVariable(name = "id") Long id) {
-//        accountService.deleteAdminAccount(id);
-//        return ResponseEntity.ok(
-//            ResponseData.builder()
-//                .desc("Account deleted successful")
-//                .build()
-//        );
-//    }
+    @DeleteMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_delete')")
+    public ResponseEntity<ResponseData> deleteAdminAccount(@PathVariable(name = "id") String id) {
+        accountAdminService.deleteAccount(id);
+        return ResponseEntity.ok(
+            ResponseData.builder()
+                .desc("Account deleted successful")
+                .build()
+        );
+    }
 }

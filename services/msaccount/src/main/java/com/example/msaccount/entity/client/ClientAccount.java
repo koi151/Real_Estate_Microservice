@@ -1,11 +1,13 @@
 package com.example.msaccount.entity.client;
 
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.entity.BaseEntity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.PositiveOrZero;
 import lombok.*;
 
+import java.io.Serial;
 import java.math.BigDecimal;
 import java.util.UUID;
 
@@ -15,7 +17,10 @@ import java.util.UUID;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class ClientAccount {
+public class ClientAccount extends BaseEntity {
+
+    @Serial
+    private static final long serialVersionUID = 510311925625241455L;
 
     @Id
     @Column(name = "account_id", columnDefinition = "VARCHAR(36)", nullable = false)

@@ -154,7 +154,7 @@ public class PropertyController {
                     .propertyForSale(propertyForSale)
                     .propertyForRent(propertyForRent)
                     .propertyPostService(postServiceCreate)
-                    .accountId((long) faker.number().numberBetween(1, 7))
+                    .accountId(String.valueOf(faker.number().numberBetween(1, 7)))
                     .address(address)
                     .rooms(rooms)
                     .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
@@ -221,8 +221,8 @@ public class PropertyController {
     }
 
     @GetMapping("/account/{account-id}")
-    public ResponseEntity<ResponseData> findPropertiesByAccount(
-        @PathVariable(name = "account-id") Long accountId,
+    public ResponseEntity<ResponseData> findAllPropertiesByAccount(
+        @PathVariable(name = "account-id") String accountId,
         @RequestParam(required = false, defaultValue = "0") int page,
         @RequestParam(required = false, defaultValue = "10") int limit
     ) {
@@ -260,6 +260,7 @@ public class PropertyController {
     }
 
     @PostMapping("/")
+    @PreAuthorize("hasAuthority('SCOPE_properties_create')")
     public ResponseEntity<ResponseData> createProperty(
             @RequestPart @Valid PropertyCreateRequest property,
             @RequestPart(required = false) List<MultipartFile> images

@@ -87,41 +87,6 @@ public class AccountServiceImpl implements AccountService {
             .orElseThrow(() -> new KeycloakResourceNotFoundException("Account not found with id:" + uuid));
     }
 
-//    @Override
-//    public Page<AccountWithPropertiesDTO> findAccountWithProperties(Long accountId, Pageable pageable) {
-//
-//        Account account = accountRepository.findByAccountIdAndAccountStatusAndDeleted(accountId, AccountStatusEnum.ACTIVE, false)
-//                .orElseThrow(() -> new AccountNotFoundException("Account not found with id: " + accountId));
-//
-//        // Fetch Properties using Feign Client
-//        ResponseEntity<ResponseData> responseData = propertiesClient.findAllPropertiesByAccount(accountId, pageable.getPageNumber(), pageable.getPageSize());
-//
-//        if (responseData.getStatusCode().is2xxSuccessful() && responseData.getBody() != null) {
-//            try {
-//                ResponseData responseBody = responseData.getBody();
-//                Object dataObject = responseBody.getData();
-//
-//                if (dataObject instanceof List<?> dataList) {
-//                    // Convert to List<PropertyDTO> using ObjectMapper
-//                    List<PropertyDTO> properties = dataList.stream()
-//                            .map(item -> objectMapper.convertValue(item, PropertyDTO.class))
-//                            .toList();
-//
-//                    AccountWithPropertiesDTO accountWithPropertiesDTO = accountMapper.toAccountWithPropertiesDTO(account, properties);
-//
-//                    // Wrap the result in a Page object
-//                    return new PageImpl<>(List.of(accountWithPropertiesDTO), pageable, responseBody.getTotalItems()); // total properties count
-//                } else {
-//                    throw new RuntimeException("Unexpected data format (not a list) received from properties service");
-//                }
-//            } catch (Exception ex) {
-//                throw new RuntimeException("Error parsing property data: " + ex.getMessage(), ex);
-//            }
-//        } else {
-//            throw new RuntimeException("Failed to fetch properties from properties service");
-//        }
-//    }
-
 
     @Override
     @Transactional

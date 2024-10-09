@@ -48,6 +48,7 @@ public interface PropertyMapper {
     @Mapping(target = "address", expression = "java(getFullAddressStringFromEntity(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     @Mapping(target = "status", source = "status.statusName")
+    @Mapping(target = "rooms", expression = "java(toRoomNameQuantityDTOs(entity.getRooms()))")
 //    @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
 //    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     DetailedPropertyDTO toDetailedPropertyDTO(Property entity);
@@ -58,7 +59,6 @@ public interface PropertyMapper {
     @Mapping(target = "rentalPrice", source = "propertyForRent.rentalPrice")
     @Mapping(target = "salePrice", source = "propertyForSale.salePrice")
     @Mapping(target = "status", source = "status.statusName")
-//    @Mapping(target = "rooms", source = "rooms", qualifiedByName = "toRoomNameQuantityDTOs")
     @Mapping(target = "address", expression = "java(getFullAddressString(entity.getAddress()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     PropertySearchDTO toPropertySearchDTO(Property entity);
@@ -67,12 +67,12 @@ public interface PropertyMapper {
     @Mapping(target = "status", source = "status.statusName")
     @Mapping(target = "address", expression = "java(getFullAddressString(projection.address()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(projection.imageUrls(), \",\"))")
-    @Mapping(target = "rooms", expression = "java(toRoomNameQuantityDTOs(projection.rooms()))")
+    @Mapping(target = "rooms", expression = "java(projectionToRoomNameQuantityDTOs(projection.rooms()))")
 //    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     PropertySearchDTO toPropertySearchDTO(PropertySearchProjection projection);
 
     // Helper function to map rooms
-    default List<RoomNameQuantityDTO> toRoomNameQuantityDTOs(List<RoomSearchProjection> rooms) {
+    default List<RoomNameQuantityDTO> projectionToRoomNameQuantityDTOs(List<RoomSearchProjection> rooms) {
         return (rooms == null) ? null
             : rooms.stream()
                 .map(room -> RoomNameQuantityDTO.builder()
@@ -82,6 +82,15 @@ public interface PropertyMapper {
                 .collect(Collectors.toList());
     }
 
+    default List<RoomNameQuantityDTO> toRoomNameQuantityDTOs(List<Rooms> rooms) {
+        return (rooms == null) ? null
+            : rooms.stream()
+            .map(room -> RoomNameQuantityDTO.builder()
+                .roomType(room.getRoomType().getName())
+                .quantity(room.getQuantity())
+                .build())
+            .collect(Collectors.toList());
+    }
 
 
     @Mapping(target = "status", source = "status.statusName")

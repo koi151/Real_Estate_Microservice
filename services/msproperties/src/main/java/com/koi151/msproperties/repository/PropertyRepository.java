@@ -21,7 +21,7 @@ public interface PropertyRepository extends JpaRepository<Property, Integer>, Pr
     boolean existsByPropertyIdAndDeletedAndStatus(Long propertyId, boolean deleted, StatusEnum status);
     Page<Property> findByDeleted(boolean deleted, Pageable pageable);
     Page<Property> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, Pageable pageable);
-    Page<Property> findByAccountIdAndDeleted(Long accountId, boolean deleted, Pageable pageable);
+    Page<Property> findByAccountIdAndDeleted(String accountId, boolean deleted, Pageable pageable);
     Page<Property> findByStatus(StatusEnum status, Pageable pageRequest);
     Optional<Property> findByPropertyIdAndDeleted(Long propertyId, boolean deleted);
 }

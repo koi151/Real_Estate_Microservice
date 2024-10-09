@@ -55,6 +55,14 @@ public class KeycloakUserService {
         return keycloakProvider.newKeycloakBuilderWithPasswordCredentials(username, password)
             .build();
     }
+
+    public void disableUserWithId(String accountId) {
+        UserResource userResource = getUsersResource().get(accountId);
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        userRepresentation.setEnabled(false);
+        userResource.update(userRepresentation);
+    }
+
     public AccessTokenResponse getAccessToken(String username, String password) {
         try {
             Keycloak keycloak = getKeycloakInstanceWithCredentials(username, password);
@@ -92,11 +100,6 @@ public class KeycloakUserService {
         return validRoles;
     }
 
-//    private boolean isValidUserUpdatedInfo(UsersResource usersResource, String username) {
-//        List<UserRepresentation> users = usersResource.search(username, true);
-//        return !users.isEmpty();
-//    }
-
     private RoleRepresentation getClientRoleRepresentation(RolesResource clientRolesResource, String roleName) {
         try {
             RoleResource roleResource = clientRolesResource.get(roleName);
@@ -117,26 +120,18 @@ public class KeycloakUserService {
 
     public List<String> retrieveRoleNamesById(String uuid) {
         try {
-            // Step 1: Fetch the user resource from Keycloak
             UserResource userResource = getUsersResource().get(uuid);
 
-            // Step 2: Verify if the user exists
             UserRepresentation userRepresentation = userResource.toRepresentation();
             if (userRepresentation == null) {
                 throw new KeycloakResourceNotFoundException("User not found with UUID: " + uuid);
             }
 
-            // Step 3: Fetch RoleMappingResource for the user
-            RoleMappingResource roleMappingResource = userResource.roles();
-
-            // Step 4: Retrieve client-level roles for the specified client
             List<RoleRepresentation> clientRoles = getClientRolesResource().list()
                 .stream()
                 .toList();
 //                .orElseThrow(() -> new KeycloakClientNotFoundException("Client not found with id: " + clientId));
 
-
-            // Step 6: Extract role names from RoleRepresentation
             return clientRoles.stream()
                 .map(RoleRepresentation::getName)
                 .toList();
@@ -147,6 +142,18 @@ public class KeycloakUserService {
             throw new KeycloakRoleRetrievalException("Error retrieving roles for user: " +  ex.getMessage());
         }
     }
+
+    public String retrieveUsernameByID(String uuid) {
+        try {
+            UserResource userResource = getUsersResource().get(uuid);
+            UserRepresentation userRepresentation = userResource.toRepresentation();
+            return userRepresentation.getUsername();
+        } catch (NotFoundException ex) {
+            log.info("Cannot found Keycloak user with id: " + uuid);
+            throw new KeycloakResourceNotFoundException("Cannot found Keycloak user with id: " + uuid);
+        }
+    }
+
 
     public KeycloakUserDTO createUser(AccountCreateRequest request) {
         UsersResource usersResource = getUsersResource();
@@ -174,46 +181,6 @@ public class KeycloakUserService {
         return roleNames.contains("Admin");
     }
 
-    public List<GroupRepresentation> getGroupsByRoleRepresentation(List<RoleRepresentation> roleRepresentations, String clientUUID) {
-        RealmResource realmResource = keycloakProvider.getRealmResource();
-        GroupsResource groupsResource = realmResource.groups();
-
-        List<GroupRepresentation> matchingGroups = new ArrayList<>();
-
-        try {
-            // Retrieve all basic group information
-            List<GroupRepresentation> allGroups = groupsResource.groups();
-
-            // Extract role names from roleRepresentations for comparison
-            List<String> roleNames = roleRepresentations.stream()
-                .map(RoleRepresentation::getName)
-                .toList();
-
-            // Iterate over each group and fetch detailed information including roles
-            for (GroupRepresentation group : allGroups) {
-                // Fetch the detailed group representation, including roles
-                GroupRepresentation detailedGroup = groupsResource.group(group.getId()).toRepresentation();
-
-                // Get client roles assigned to the group (if any)
-                Map<String, List<String>> clientRolesMap = detailedGroup.getClientRoles();
-
-                if (clientRolesMap != null) {
-                    // Check if the group has roles assigned under any client that match the role names in roleRepresentations
-                    boolean hasMatchingRole = clientRolesMap.values().stream()
-                        .flatMap(List::stream)  // Flatten the list of role names
-                        .anyMatch(roleNames::contains);  // Check if any role name matches
-
-                    if (hasMatchingRole) {
-                        matchingGroups.add(detailedGroup);  // Add the group to the matching list
-                    }
-                }
-            }
-
-            return matchingGroups;
-        } catch (Exception ex) {
-            throw new RuntimeException("Error retrieving groups by role representations", ex);
-        }
-    }
 
     private List<RoleRepresentation> assignClientRolesToUser(String userId, List<String> roleNames) {
         if (roleNames == null || roleNames.isEmpty())

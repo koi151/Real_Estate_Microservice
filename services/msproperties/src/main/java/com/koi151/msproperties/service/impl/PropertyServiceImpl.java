@@ -90,7 +90,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Override
     @Transactional(readOnly = true)
-    public Page<PropertySearchDTO> findAllPropertiesByAccount(Long accountId, Pageable pageable) {
+    public Page<PropertySearchDTO> findAllPropertiesByAccount(String accountId, Pageable pageable) {
         Page<Property> properties = propertyRepository.findByAccountIdAndDeleted(accountId, false, pageable);
         return properties.map(propertyMapper::toPropertySearchDTO);
     }

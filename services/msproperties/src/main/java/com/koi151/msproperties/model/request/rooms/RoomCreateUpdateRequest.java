@@ -7,8 +7,7 @@ import lombok.Builder;
 @Builder
 public record RoomCreateUpdateRequest(
     Long roomId,
-    @NotEmpty(message = "Room type is mandatory")
-    @Size(max = 50, message = "Room type cannot exceed 50 characters")
+    @NotNull(message = "Room type is mandatory")
     RoomTypeEnum roomType,
 
     @NotNull(message = "Room quantity is mandatory")

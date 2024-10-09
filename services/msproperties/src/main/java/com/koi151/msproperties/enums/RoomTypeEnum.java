@@ -15,7 +15,7 @@ public enum RoomTypeEnum {
     KITCHEN("Kitchen");
 
     private final String name;
-    private static final RoomTypeEnum[] VALUES = values(); // Cache enum values for performance
+    private static final RoomTypeEnum[] VALUES = values();
 
     @JsonCreator(mode = JsonCreator.Mode.DELEGATING)
     public static RoomTypeEnum fromString(String s) {

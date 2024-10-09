@@ -266,4 +266,13 @@ public class ControllerAdvisor {
                 .details(Collections.singletonList(ex.getCause() != null ? ex.getCause().getMessage() : "No additional details"))
                 .build());
     }
+
+    @ExceptionHandler(RemoteServiceException.class)
+    public ResponseEntity<ErrorResponse> handleRemoteServiceException(RemoteServiceException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(Collections.singletonList(ex.getCause() != null ? ex.getCause().getMessage() : "No additional details"))
+                .build());
+    }
 }

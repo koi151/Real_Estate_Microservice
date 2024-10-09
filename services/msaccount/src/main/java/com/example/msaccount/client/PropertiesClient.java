@@ -12,7 +12,7 @@ public interface PropertiesClient {
 
     @GetMapping("/account/{account-id}")
     ResponseEntity<ResponseData> findAllPropertiesByAccount(
-            @PathVariable("account-id") Long accountId,
+            @PathVariable("account-id") String accountId,
             @RequestParam(required = false, defaultValue = "0") int page,
             @RequestParam(required = false, defaultValue = "10") int limit
     );
