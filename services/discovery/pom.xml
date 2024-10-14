@@ -8,11 +8,13 @@
 		<version>3.2.5</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
-	<groupId>com.example</groupId>
+
+	<groupId>com.koi151</groupId>
 	<artifactId>discovery</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>discovery</name>
 	<description>Demo project for Spring Boot</description>
+
 	<properties>
 		<java.version>17</java.version>
 		<spring-cloud.version>2023.0.1</spring-cloud.version>
@@ -52,8 +54,16 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.2.1</version> <configuration>
+				<from>
+					<image>eclipse-temurin:17.0.4.1_1-jre</image>
+				</from>
+				<to>
+					<image>docker.io/b2113335/discovery</image>
+				</to>
+			</configuration>
 			</plugin>
 		</plugins>
 	</build>

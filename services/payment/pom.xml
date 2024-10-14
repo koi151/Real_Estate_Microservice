@@ -8,11 +8,12 @@
 		<version>3.3.2</version>
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
+
 	<groupId>com.koi151</groupId>
 	<artifactId>payment</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>payment</name>
-	<description>Demo project for Spring Boot</description>
+
 	<url/>
 	<licenses>
 		<license/>
@@ -100,16 +101,16 @@
 	<build>
 		<plugins>
 			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<configuration>
-					<excludes>
-						<exclude>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-						</exclude>
-					</excludes>
-				</configuration>
+				<groupId>com.google.cloud.tools</groupId>
+				<artifactId>jib-maven-plugin</artifactId>
+				<version>3.2.1</version> <configuration>
+				<from>
+					<image>eclipse-temurin:17.0.4.1_1-jre</image>
+				</from>
+				<to>
+					<image>docker.io/b2113335/payment</image>
+				</to>
+			</configuration>
 			</plugin>
 		</plugins>
 	</build>
