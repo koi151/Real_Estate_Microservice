@@ -9,7 +9,7 @@ src/test/
 .env
 services/.env
 .env.*
-services/local.env
+local.env
 
 # Maven specific
 pom.xml.tag

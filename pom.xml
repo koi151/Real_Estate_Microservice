@@ -20,12 +20,12 @@
         <module>services/config-server</module>
         <module>services/discovery</module>
         <module>services/gateway</module>
-        <module>services/listing-services</module>
-        <module>services/account</module>
-        <module>services/property</module>
-        <module>services/notification</module>
-        <module>services/payment</module>
-        <module>services/property-submissions</module>
+        <module>services/listing-service</module>
+        <module>services/account-service</module>
+        <module>services/property-service</module>
+        <module>services/notification-service</module>
+        <module>services/payment-service</module>
+        <module>services/property-submission-service</module>
     </modules>
 
     <properties>

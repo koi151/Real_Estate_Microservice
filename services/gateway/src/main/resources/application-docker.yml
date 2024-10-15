@@ -1,0 +1,24 @@
+server:
+  port: 9090
+
+eureka:
+  client:
+    serviceUrl:
+      defaultZone: http://eureka:password@discovery-server:8761/eureka
+
+spring:
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://keycloak:8080/realms/spring-boot-microservices-realm
+  config:
+    import: optional:configserver:http://config-server:8888
+
+management:
+  zipkin:
+    tracing:
+      endpoint: http://zipkin:9411
+
+app:
+  eureka-server: discovery-server

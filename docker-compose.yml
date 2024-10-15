@@ -53,9 +53,9 @@ services:
     networks:
       - microservices-net
 
-  kafka:
+  broker:
     image: confluentinc/cp-kafka:latest
-    container_name: ms_kafka
+    container_name: kafka
     ports:
       - 9092:9092
     depends_on:
@@ -91,6 +91,18 @@ services:
     depends_on:
       - mysql
 
+#  ## Prometheus
+#  prometheus:
+#    image: prom/prometheus:v2.37.1
+#    container_name: prometheus
+#    restart: always
+#    ports:
+#      - "9090:9090"
+#    volumes:
+#      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+#    depends_on:
+
+
   zipkin:
     container_name: zipkin
     image: openzipkin/zipkin
@@ -107,9 +119,145 @@ services:
       - 1080:1080
       - 1025:1025
 
+  config-server:
+    container_name: config-server
+    image: b2113335/config-server:latest
+    pull_policy: always
+    ports:
+      - "8888:8888"
+    env_file:
+      - .env
+      - local.env
+
+  ## Eureka Server
+  discovery-server:
+    image: b2113335/discovery:latest
+    container_name: discovery-server
+    pull_policy: always
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - zipkin
+    env_file:
+      - .env
+      - local.env
+
+  gateway:
+    image: b2113335/gateway:latest
+    container_name: gateway
+    pull_policy: always
+    ports:
+      - "8181:8080"
+    expose:
+      - "8181"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - LOGGING_LEVEL_ORG_SPRINGFRAMEWORK_SECURITY=TRACE
+    depends_on:
+      - zipkin
+      - config-server
+      - discovery-server
+      - keycloak
+    env_file:
+      - .env
+      - local.env
+
+  property-service:
+    container_name: property-service
+    image: b2113335/property-service:latest
+    ports:
+      - "8050:8050"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - mysql
+      - discovery-server
+      - gateway
+      - zipkin
+      - keycloak
+    env_file:
+      - .env
+      - local.env
+
+  account-service:
+    container_name: account-service
+    image: b2113335/account-service:latest
+    ports:
+      - "8060:8060"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - mysql
+      - discovery-server
+      - gateway
+      - zipkin
+      - keycloak
+    env_file:
+      - .env
+      - local.env
+
+  listing-service:
+    container_name: listing-service
+    image: b2113335/listing-service:latest
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - mysql
+      - discovery-server
+      - gateway
+      - zipkin
+      - keycloak
+    env_file:
+      - .env
+      - local.env
+
+  property-submission-service:
+    container_name: property-submission-service
+    image: b2113335/property-submission-service:latest
+    ports:
+      - "8070:8070"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - broker
+      - mysql
+      - discovery-server
+      - gateway
+      - zipkin
+      - keycloak
+    env_file:
+      - .env
+      - local.env
+
+  notification-service:
+    container_name: notification-service
+    image: b2113335/notification-service:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+    depends_on:
+      - config-server
+      - broker
+      - discovery-server
+      - gateway
+      - zipkin
+    env_file:
+      - .env
+      - local.env
+
 networks:
   microservices-net:
     driver: bridge
 
 volumes:
   mysql_data:
+
+
