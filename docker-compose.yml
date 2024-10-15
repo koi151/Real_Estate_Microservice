@@ -118,6 +118,8 @@ services:
     ports:
       - 1080:1080
       - 1025:1025
+    networks:
+      - microservices-net
 
   config-server:
     container_name: config-server
@@ -125,6 +127,8 @@ services:
     pull_policy: always
     ports:
       - "8888:8888"
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -141,6 +145,8 @@ services:
     depends_on:
       - config-server
       - zipkin
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -161,6 +167,8 @@ services:
       - config-server
       - discovery-server
       - keycloak
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -179,6 +187,8 @@ services:
       - gateway
       - zipkin
       - keycloak
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -197,13 +207,15 @@ services:
       - gateway
       - zipkin
       - keycloak
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
 
-  listing-service:
-    container_name: listing-service
-    image: b2113335/listing-service:latest
+  listing-service-service:
+    container_name: listing-service-service
+    image: b2113335/listing-service-service:latest
     ports:
       - "8090:8090"
     environment:
@@ -215,6 +227,8 @@ services:
       - gateway
       - zipkin
       - keycloak
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -234,6 +248,8 @@ services:
       - gateway
       - zipkin
       - keycloak
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -249,6 +265,8 @@ services:
       - discovery-server
       - gateway
       - zipkin
+    networks:
+      - microservices-net
     env_file:
       - .env
       - local.env
@@ -259,5 +277,3 @@ networks:
 
 volumes:
   mysql_data:
-
-
