@@ -20,7 +20,7 @@
         <module>services/config-server</module>
         <module>services/discovery</module>
         <module>services/gateway</module>
-        <module>services/listing-service</module>
+        <module>services/listing-service-service</module>
         <module>services/account-service</module>
         <module>services/property-service</module>
         <module>services/notification-service</module>
