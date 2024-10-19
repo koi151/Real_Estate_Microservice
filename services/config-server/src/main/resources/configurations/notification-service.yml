@@ -3,17 +3,13 @@ server:
 spring:
   data:
     mongodb:
-#      username:
-#      password:
-#      host: localhost
       database: ${MONGO_DATABASE_NAME}
       uri: ${MONGO_URL}
-#      authentication-database: admin
 
   kafka:
     consumer:
-      bootstrap-servers: localhost:9092
-      group-id: paymentGroup,orderGroup # Consumer belong to 1 of these
+      bootstrap-servers: kafka:9092
+      group-id: paymentGroup,orderGroup # Consumer belongs to one of these
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
@@ -21,8 +17,11 @@ spring:
         spring.json.trusted.packages: '*'
         spring.json.type.mapping: submissionConfirmation:com.koi151.notification.kafka.submission.SubmissionConfirmation,paymentConfirmation:com.koi151.notification.kafka.payment.PaymentConfirmation
 
+  zipkin:
+    base-url: http://zipkin:9411
+
   mail:
-    host: localhost
+    host: mail-dev
     port: 1025
     username: ${MAIL_USERNAME}
     password: ${MAIL_PASSWORD}

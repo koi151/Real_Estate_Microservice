@@ -1,10 +1,6 @@
 spring:
   application:
-    name: listing-services-service
-  config:
-    import: optional:configserver:http://localhost:8888
-  #  profiles:
-  #    active: dev
+    name: listing-service-service
   jpa:
     show-sql: true
     properties:

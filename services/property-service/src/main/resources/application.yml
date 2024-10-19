@@ -1,18 +1,8 @@
 spring:
   application:
-    name: properties-service
-  config:
-    import: optional:configserver:http://localhost:8888
-#  profiles:
-#    active: dev
-  jpa:
-    show-sql: true
-    properties:
-      hibernate:
-        format_sql: true
-        use_sql_comments: true
-logging:
-  level:
-    org.hibernate.SQL: DEBUG
-    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
-    org.springframework.security: DEBUG
+    name: property-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://keycloak:8080/realms/real-estate-microservice/protocol/openid-connect/certs"

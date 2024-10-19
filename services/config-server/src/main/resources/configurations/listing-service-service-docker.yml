@@ -1,0 +1,53 @@
+server:
+  port: 8090
+spring:
+  application:
+    name: listing-service-service
+    jpa:
+      show-sql: true
+      properties:
+        hibernate:
+          format_sql: true
+          use_sql_comments: true
+
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+  jpa:
+    generate-ddl: false
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+  flyway:
+    baseline-on-migrate: true
+    enabled: true
+    baseline-description: "init"
+    baseline-version: 0
+    user: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+
+application:
+  config:
+    properties-url: http://gateway-service:9090/api/v1/properties
+
+api:
+  prefix: api/v1/listing-services
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true

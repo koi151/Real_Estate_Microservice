@@ -1,5 +1,6 @@
 package com.koi151.listing_services.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
@@ -14,14 +15,14 @@ import java.time.Duration;
 @Configuration
 public class RedisConfig {
 
+    @Value("${REDIS_PORT}")
+    private int redisPort;
+
     @Bean
     public LettuceConnectionFactory redisConnection () {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-        configuration.setHostName("localhost");
-        configuration.setPort(6380);
-//        configuration.setDatabase(0);
-//        configuration.setUsername();
-//        configuration.setPassword();
+        configuration.setHostName("ms-redis");
+        configuration.setPort(redisPort);
         return new LettuceConnectionFactory(configuration);
     }
 

@@ -1,0 +1,52 @@
+server:
+  port: 8040
+spring:
+  data:
+    mongodb:
+      database: ${MONGO_DATABASE_NAME}
+      uri: ${MONGO_URL}
+
+  kafka:
+    consumer:
+      bootstrap-servers: kafka:9092
+      group-id: paymentGroup,orderGroup # Consumer belongs to one of these
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: '*'
+        spring.json.type.mapping: submissionConfirmation:com.koi151.notification.kafka.submission.SubmissionConfirmation,paymentConfirmation:com.koi151.notification.kafka.payment.PaymentConfirmation
+
+  zipkin:
+    base-url: http://zipkin:9411
+
+  mail:
+    host: mail-dev
+    port: 1025
+    username: ${MAIL_USERNAME}
+    password: ${MAIL_PASSWORD}
+    properties:
+      mail:
+        smtp:
+          trust: "*"
+        auth: true
+        starttls:
+          enabled: true
+        connectiontimeout: 5000
+        timeout: 3000
+        writetimeout: 5000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true

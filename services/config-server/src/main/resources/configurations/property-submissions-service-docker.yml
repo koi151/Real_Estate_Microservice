@@ -1,0 +1,62 @@
+server:
+  port: 8070
+spring:
+  zipkin:
+    base-url: http://zipkin:9411
+  datasource:
+    url: ${DATABASE_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+
+  jpa:
+    show-sql: true
+    generate-ddl: false
+    hibernate:
+      ddl-auto: create
+      format_sql: true
+      use_sql_comments: true
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQLDialect
+
+  kafka:
+    producer:
+      bootstrap-servers: kafka:9092
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+#     when a consumer receive a message, it will check if type of the object matched submissionConfirmation type or not
+#     if MATCHED, it will be deserialized into a SubmissionConfirmation instance and accepted for processing
+#     else reject
+      properties:
+        spring.json.type.mapping: submissionConfirmation:com.koi151.property_submissions.kafka.SubmissionConfirmation
+
+api:
+  prefix: api/v1/property-submissions
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  endpoint:
+    health:
+      probes:
+        enabled: true
+
+application:
+  config:
+    property-url: http://gateway-service:9090/api/v1/properties
+    payment-url: http://gateway-service:9090/api/v1/payment
+    admin-account-url: http://gateway-service:9090/api/v1/admin/accounts
+    listing-services-url: http://gateway-service:9090/api/v1/listing-services

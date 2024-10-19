@@ -1,25 +1,35 @@
 server:
   port: 8050
 spring:
-#  profile:
-#    active: dev
+  zipkin:
+    base-url: http://zipkin:9411
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATABASE_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
+    show-sql: true #
     generate-ddl: false
     hibernate:
       ddl-auto: update
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQLDialect
+        format_sql: true #
+        use_sql_comments: true #
+
+logging:
+  level:
+    org.hibernate.SQL: DEBUG
+    org.hibernate.type.descriptor.sql.BasicBinder: TRACE
+    org.springframework.security: DEBUG
+
   security:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: http://localhost:9098/realms/real-estate-microservice/protocol/openid-connect/certs
+          jwk-set-uri: "http://keycloak:8080/realms/real-estate-microservice/protocol/openid-connect/certs"
   flyway:
     baseline-on-migrate: true
     enabled: true
@@ -27,6 +37,13 @@ spring:
     baseline-version: 0
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+jpa:
+  show-sql: true
+  properties:
+    hibernate:
+      format_sql: true
+      use_sql_comments: true
 
 api:
   prefix: api/v1/properties
