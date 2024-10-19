@@ -14,6 +14,13 @@ jobs:
       run: sudo apt-get update && sudo apt-get install -y docker-compose
     
     - name: Start services using Docker Compose
+      env:
+        MYSQL_ROOT_PASSWORD: ${{ secrets.MYSQL_ROOT_PASSWORD }}
+        MYSQL_USER: ${{ secrets.MYSQL_USER }}
+        MYSQL_USER_PASSWORD: ${{ secrets.MYSQL_USER_PASSWORD }}
+        MONGO_URL: ${{ secrets.MONGO_URL }}
+        KEYCLOAK_ADMIN: ${{ secrets.KEYCLOAK_ADMIN }}
+        KEYCLOAK_ADMIN_PASSWORD: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
       run: docker-compose up -d --build
     
     - name: Set up JDK 17
@@ -28,8 +35,31 @@ jobs:
     - name: Login to Docker Hub
       uses: docker/login-action@v3
       with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
+        MYSQL_ROOT_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        MYSQL_USER: ${{ secrets.MYSQL_USER }}
+        MYSQL_USER_PASSWORD: ${{ secrets.DB_PASSWORD }}
+        MONGO_URL: ${{ secrets.MONGO_URL }}
+        MONGO_DATABASE_NAME: ${{ secrets.MONGO_DATABASE_NAME }}
+        KEYCLOAK_ADMIN: ${{ secrets.KEYCLOAK_ADMIN }}
+        KEYCLOAK_ADMIN_PASSWORD: ${{ secrets.KEYCLOAK_ADMIN_PASSWORD }}
+        KEYCLOAK_AUTH_SERVER_URL: ${{ secrets.KEYCLOAK_AUTH_SERVER_URL }}
+        KEYCLOAK_CLIENT_ID: ${{ secrets.KEYCLOAK_CLIENT_ID }}
+        KEYCLOAK_CLIENT_SECRET: ${{ secrets.KEYCLOAK_CLIENT_SECRET }}
+        KEYCLOAK_REALM: ${{ secrets.KEYCLOAK_REALM }}
+        KEYCLOAK_RESOURCE: ${{ secrets.KEYCLOAK_RESOURCE }}
+        KEYCLOAK_SERVER_URL: ${{ secrets.KEYCLOAK_SERVER_URL }}
+        MAIL_USERNAME: ${{ secrets.MAIL_USERNAME }}
+        MAIL_PASSWORD: ${{ secrets.MAIL_PASSWORD }}
+        CLOUDINARY_API_KEY: ${{ secrets.CLOUDINARY_API_KEY }}
+        CLOUDINARY_API_SECRET: ${{ secrets.CLOUDINARY_API_SECRET }}
+        CLOUDINARY_NAME: ${{ secrets.CLOUDINARY_NAME }}
+        CLOUDINARY_SECURE: ${{ secrets.CLOUDINARY_SECURE }}
+        JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+        JWT_SECRET_KEY: ${{ secrets.JWT_SECRET_KEY }}
+        REDIS_PORT: ${{ secrets.REDIS_PORT }}
+        USER_CACHE_TTL: ${{ secrets.USER_CACHE_TTL }}
+        CACHE_REFRESH_THRESHOLD_PERCENT: ${{ secrets.CACHE_REFRESH_THRESHOLD_PERCENT }}
+        API_PREFIX: ${{ secrets.API_PREFIX }}
     
     - name: Build and push Docker image
       env:
