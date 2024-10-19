@@ -154,9 +154,9 @@ services:
       retries: 10
 #    environment:
 #      - LOGGING_LEVEL_ROOT=DEBUG
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   ## Eureka Server
   discovery-server:
@@ -175,9 +175,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   gateway:
     image: b2113335/gateway:latest
@@ -201,9 +201,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   listing-service-service:
     container_name: listing-service-service
@@ -229,9 +229,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   property-service:
     container_name: property-service
@@ -257,9 +257,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   account-service:
     container_name: account-service
@@ -285,9 +285,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   property-submission-service:
     container_name: property-submission-service
@@ -315,9 +315,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
   notification-service:
     container_name: notification-service
@@ -341,9 +341,9 @@ services:
         condition: service_started
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
+#    env_file:
+#      - .env
+#      - local.env
 
 networks:
   microservices-net:
