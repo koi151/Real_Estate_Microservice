@@ -2,7 +2,7 @@ server:
   port: 8080
 spring:
   zipkin:
-    base-url: http://zipkin:9411
+    base-url: http://zipkin-service:9411
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATABASE_URL}

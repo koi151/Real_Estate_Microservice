@@ -1,6 +1,8 @@
 server:
   port: 8090
 spring:
+  zipkin:
+    base-url: http://zipkin-service:9411
   application:
     name: listing-service-service
     jpa:

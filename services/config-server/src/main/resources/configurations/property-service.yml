@@ -25,11 +25,7 @@ logging:
     org.hibernate.type.descriptor.sql.BasicBinder: TRACE
     org.springframework.security: DEBUG
 
-  security:
-    oauth2:
-      resourceserver:
-        jwt:
-          jwk-set-uri: "http://keycloak:8080/realms/real-estate-microservice/protocol/openid-connect/certs"
+
   flyway:
     baseline-on-migrate: true
     enabled: true

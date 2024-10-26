@@ -2,7 +2,7 @@ server:
   port: 8070
 spring:
   zipkin:
-    base-url: http://zipkin:9411
+    base-url: http://zipkin-service:9411
   datasource:
     url: ${DATABASE_URL}
     username: ${DB_USERNAME}

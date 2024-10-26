@@ -18,7 +18,7 @@ spring:
         spring.json.type.mapping: submissionConfirmation:com.koi151.notification.kafka.submission.SubmissionConfirmation,paymentConfirmation:com.koi151.notification.kafka.payment.PaymentConfirmation
 
   zipkin:
-    base-url: http://zipkin:9411
+    base-url: http://zipkin-service:9411
 
   mail:
     host: mail-dev

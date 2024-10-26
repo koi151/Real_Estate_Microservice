@@ -1,14 +1,9 @@
-eureka:
-  client:
-    register-with-eureka: false
-
 server:
-  port: 9090
+  port: 9011
 
 spring:
   application:
-    name: gateway-service
-
+    name: gateway
   cloud:
     gateway:
       discovery:
@@ -16,7 +11,7 @@ spring:
           enabled: true
       routes:
         - id: properties
-          uri: http://properties-service:8050/
+          uri: http://property-service:8050/
           predicates:
             - Path=/api/v1/properties/**
 
@@ -40,12 +35,12 @@ spring:
           predicates:
             - Path=/api/v1/listing-services/**
 
-#  security:
-#    oauth2:
-#      resourceserver:
-#        jwt:
-#          issuer-uri: "http://keycloak:8080/realms/real-estate-microservice"
-#          jwk-set-uri: "http://keycloak:8080/realms/real-estate-microservice/protocol/openid-connect/certs"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: "http://keycloak:8080/realms/real-estate-microservice"
+          jwk-set-uri: "http://keycloak:8080/realms/real-estate-microservice/protocol/openid-connect/certs"
 
 app:
   eureka-server: discovery-server
@@ -53,7 +48,16 @@ app:
 api:
   prefix: api/v1/accounts
 
+# Zipkin
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    zipkin:
+      tracing:
+        endpoint: "http://zipkin:9411/api/v2/spans"
+
+# Actuator Endpoint
   endpoints:
     web:
       exposure:
@@ -67,3 +71,8 @@ management:
     health:
       probes:
         enabled: true
+
+# Eureka
+eureka:
+  client:
+    register-with-eureka: false

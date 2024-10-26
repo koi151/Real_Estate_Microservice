@@ -1,8 +1,6 @@
 server:
   port: 8050
 spring:
-  zipkin:
-    base-url: http://zipkin:9411
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
     url: ${DATABASE_URL}
@@ -18,7 +16,6 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
         format_sql: true #
         use_sql_comments: true #
-
 logging:
   level:
     org.hibernate.SQL: DEBUG
@@ -49,6 +46,12 @@ api:
   prefix: api/v1/properties
 
 management:
+  tracing:
+    sampling:
+      probability: 1.0
+    zipkin:
+      tracing:
+        endpoint: "http://zipkin:9411/api/v2/spans"
   endpoints:
     web:
       exposure:
@@ -60,5 +63,6 @@ management:
       enabled: true
   endpoint:
     health:
+      show-details: always
       probes:
         enabled: true

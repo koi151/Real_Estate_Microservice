@@ -10,6 +10,8 @@ import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoder;
+import org.springframework.security.oauth2.jwt.ReactiveJwtDecoders;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import lombok.extern.slf4j.Slf4j;
 import reactor.core.publisher.Mono;
@@ -49,6 +51,12 @@ public class SecurityConfig {
 
         return serverHttpSecurity.build();
     }
+
+//    @Bean
+//    public ReactiveJwtDecoder jwtDecoder() {
+//        return ReactiveJwtDecoders.fromOidcIssuerLocation(
+//            "http://keycloak-ms:8080/realms/real-estate-microservice");
+//    }
 
 
 
