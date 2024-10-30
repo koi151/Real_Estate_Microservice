@@ -1,0 +1,24 @@
+@import '../../../../App.scss';
+
+.slick-wrapper {
+  position: sticky;
+  top: 6.35rem;
+  display: flex;
+  align-items: center;
+  z-index: 99;
+  padding: .5rem 3rem;
+
+  .client-bg {
+    background-color: #fff;
+  }
+
+  .slick {
+    width: 100%;
+    // margin-left: 3rem;
+    .slick-arrow {
+      &::before {
+        color: $color-highlight !important;
+      }
+    }
+  }
+}

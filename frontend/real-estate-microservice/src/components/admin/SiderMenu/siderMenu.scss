@@ -1,0 +1,127 @@
+@use '../../../styles/variables' as vars;
+
+@import 'slick-carousel/slick/slick.css';
+@import 'slick-carousel/slick/slick-theme.css';
+
+.sider-menu .ant-menu-item-selected {
+  background-color: vars.$main-content-bg;
+  color: vars.$color-highlight;
+  font-weight: 600;
+  border-radius: 20px;
+}
+
+.sider-menu {
+  font-size: 1.3rem;
+  color: rgb(106, 94, 109);
+  font-family: vars.$open-sans;
+  margin-top: 2rem;
+  z-index: 9;
+}
+
+.sider-icon svg {
+  font-size: 2rem;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  font-size: 10px;
+}
+
+body {
+  font-size: 1.6rem;
+}
+
+// short hand
+.h-100 {
+  height: 100%;
+}
+
+.main-content-title {
+  color: vars.$main-content-title;
+  font-size: 2.2rem;
+  font-weight: 500;
+}
+
+// custom button
+.custom-btn-main {
+  margin-top: 0.5rem;
+  background-color: vars.$color-highlight;
+  color: #fff;
+
+  &:hover {
+    background-color: vars.$color-highlight-lighter;
+    color: #fff !important;
+  }
+}
+
+// status button
+.active-btn {
+  background-color: #58c965;
+}
+
+.inactive-btn {
+  background-color: vars.$color-error;
+}
+
+// Buttons
+@mixin button-style($color, $hover-color) {
+  border-color: $color !important;
+  transition: all 0.2s;
+  width: 3rem;
+  height: 3rem;
+  background-color: #fff;
+
+  a {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  svg {
+    color: $color !important;
+  }
+
+  &:hover {
+    border-color: $hover-color !important;
+    transform: scale(1.2);
+
+    span {
+      color: $hover-color;
+    }
+  }
+}
+
+.detail-btn-2 {
+  @include button-style(#595050, #8d8383);
+}
+
+.edit-btn-2 {
+  @include button-style(#ffb702, #ffc942);
+}
+
+.delete-btn-2 {
+  @include button-style(#f42024, #ff4d4f);
+}
+
+// Margin classes
+@for $i from 1 through 5 {
+  .ml-#{$i} {
+    margin-left: #{$i}rem;
+  }
+  .mr-#{$i} {
+    margin-right: #{$i}rem;
+  }
+  .mb-#{$i} {
+    margin-bottom: #{$i}rem;
+  }
+  .mt-#{$i} {
+    margin-top: #{$i}rem;
+  }
+}
+
+// And so on...
