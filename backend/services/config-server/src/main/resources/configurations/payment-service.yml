@@ -2,10 +2,10 @@ server:
   port: 8080
 spring:
   zipkin:
-    base-url: http://zipkin-service:9411
+    base-url: http://localhost:9411
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: ${DATABASE_URL}
+    url: ${DATABASE_LOCAL_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
   jpa:
@@ -17,7 +17,7 @@ spring:
         dialect: org.hibernate.dialect.MySQLDialect
   kafka:
     producer:
-      bootstrap-servers: kafka:9092
+      bootstrap-servers: localhost:9092
       key-serializer: org.apache.kafka.common.serialization.StringSerializer
       value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
       #     when a consumer receive a message, it will check if type of the object matched submissionConfirmation type or not
@@ -32,6 +32,11 @@ spring:
     baseline-version: 0
     user: ${DB_USERNAME}
     password: ${DB_PASSWORD}
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka/
 
 api:
   prefix: api/v1/payment

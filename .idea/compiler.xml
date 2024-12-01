@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <annotationProcessing>
+      <profile default="true" name="Default" enabled="true" />
+      <profile name="Maven default annotation processors profile" enabled="true">
+        <sourceOutputDir name="target/generated-sources/annotations" />
+        <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
+        <outputRelativeToContentRoot value="true" />
+        <module name="config-server" />
+        <module name="discovery-server" />
+        <module name="payment-service" />
+        <module name="property-service" />
+        <module name="account-service" />
+        <module name="listing-service-service" />
+        <module name="gateway" />
+        <module name="notification-service" />
+        <module name="property-submission-service" />
+      </profile>
+    </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="account-service (1)" target="17" />
+    </bytecodeTargetLevel>
+  </component>
+  <component name="JavacSettings">
+    <option name="ADDITIONAL_OPTIONS_OVERRIDE">
+      <module name="account-service" options="-parameters" />
+      <module name="account-service (1)" options="-parameters" />
+      <module name="config-server" options="-parameters" />
+      <module name="discovery-server" options="-parameters" />
+      <module name="gateway" options="-parameters" />
+      <module name="listing-service-service" options="-parameters" />
+      <module name="notification-service" options="-parameters" />
+      <module name="payment-service" options="-parameters" />
+      <module name="property-service" options="-parameters" />
+      <module name="property-submission-service" options="-parameters" />
+    </option>
+  </component>
+</project>

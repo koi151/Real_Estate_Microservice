@@ -3,6 +3,7 @@ package com.koi151.msproperty.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 import org.springframework.data.redis.cache.RedisCacheConfiguration;
 import org.springframework.data.redis.connection.RedisStandaloneConfiguration;
 import org.springframework.data.redis.connection.lettuce.LettuceConnectionFactory;
@@ -11,20 +12,28 @@ import org.springframework.data.redis.serializer.GenericJackson2JsonRedisSeriali
 import org.springframework.data.redis.serializer.RedisSerializationContext;
 
 import java.time.Duration;
+
 @Configuration
 public class RedisConfig {
 
     @Value("${REDIS_PORT}")
     private int redisPort;
 
+    @Value("${spring.profiles.active:default}")
+    private String activeProfile;
+
     @Bean
-    public LettuceConnectionFactory redisConnection () {
+    public LettuceConnectionFactory redisConnection() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-        configuration.setHostName("ms-redis");
-        configuration.setPort(redisPort);
-//        configuration.setDatabase(0);
-//        configuration.setUsername();
-//        configuration.setPassword();
+
+        if ("docker".equalsIgnoreCase(activeProfile)) {
+            configuration.setHostName("ms-redis");
+            configuration.setPort(redisPort);
+        } else {
+            configuration.setHostName("localhost");
+            configuration.setPort(6380);
+        }
+
         return new LettuceConnectionFactory(configuration);
     }
 

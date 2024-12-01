@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: payment-service
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://keycloak:8080/realms/real-estate-microservice/protocol/openid-connect/certs"

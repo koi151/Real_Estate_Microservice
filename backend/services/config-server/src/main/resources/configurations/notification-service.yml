@@ -8,7 +8,7 @@ spring:
 
   kafka:
     consumer:
-      bootstrap-servers: kafka:9092
+      bootstrap-servers: localhost:9092
       group-id: paymentGroup,orderGroup # Consumer belongs to one of these
       auto-offset-reset: earliest
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
@@ -18,7 +18,7 @@ spring:
         spring.json.type.mapping: submissionConfirmation:com.koi151.notification.kafka.submission.SubmissionConfirmation,paymentConfirmation:com.koi151.notification.kafka.payment.PaymentConfirmation
 
   zipkin:
-    base-url: http://zipkin-service:9411
+    base-url: http://localhost:9411
 
   mail:
     host: mail-dev
@@ -35,3 +35,8 @@ spring:
         connectiontimeout: 5000
         timeout: 3000
         writetimeout: 5000
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/

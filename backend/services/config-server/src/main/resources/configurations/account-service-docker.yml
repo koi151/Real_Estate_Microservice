@@ -2,7 +2,7 @@ server:
   port: 8060
 spring:
   datasource:
-    url: ${DATABASE_LOCAL_URL}
+    url: ${DATABASE_URL}
     username: ${DB_USERNAME}
     password: ${DB_PASSWORD}
     driver-class-name: com.mysql.cj.jdbc.Driver
@@ -16,13 +16,13 @@ spring:
 
 application:
   config:
-    properties-url: http://localhost:9090/api/v1/properties
-
-api:
-  admin-acc-prefix: api/v1/admin/accounts
-  acc-prefix: api/v1/accounts
+    properties-url: http://gateway-service:9090/api/v1/properties
 
 eureka:
   client:
     service-url:
       defaultZone: http://localhost:8761/eureka/
+
+api:
+  admin-acc-prefix: api/v1/admin/accounts
+  acc-prefix: api/v1/accounts

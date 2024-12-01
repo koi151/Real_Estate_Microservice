@@ -1,0 +1,297 @@
+include:
+  - docker-compose-common.yml
+services:
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:25.0.4
+    container_name: keycloak
+    ports:
+      - "9098:8080"
+    environment:
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+      KC_DB: mysql
+      KC_DB_URL_HOST: mysql-db
+      KC_DB_URL_DATABASE: auth
+      KC_DB_USERNAME: ${MYSQL_USER}
+      KC_DB_PASSWORD: ${MYSQL_USER_PASSWORD}
+      KC_HOSTNAME: http://keycloak:8080/
+      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
+    networks:
+      - microservices-net
+    command:
+      - "start-dev"
+    depends_on:
+      - mysql
+    env_file:
+      - local.env
+      - .env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  kafka:
+    image: confluentinc/cp-kafka:7.3.0
+    container_name: kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9092:9092"
+    environment:
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://host.docker.internal:9093
+      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
+    networks:
+      - microservices-net
+    profiles:
+      - docker
+#    restart: unless-stopped
+
+  config-server:
+    container_name: config-server
+    image: b2113335/config-server:latest
+    pull_policy: always
+    ports:
+      - "8888:8888"
+    networks:
+      - microservices-net
+    healthcheck:
+      test: ["CMD", "curl", "--fail", "--silent", "http://localhost:8888/actuator/health/readiness"]
+      interval: 20s
+      timeout: 5s
+      retries: 10
+    environment:
+      - LOGGING_LEVEL_ROOT=DEBUG
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  discovery-server:
+    image: b2113335/discovery:latest
+    pull_policy: always
+    container_name: discovery-server
+    ports:
+      - "8761:8761"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - EUREKA_INSTANCE_HOSTNAME=discovery-server
+    depends_on:
+      config-server:
+        condition: service_healthy
+      zipkin:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  # === Docker-Specific Microservices (Run Only with Docker Profile) ===
+
+  gateway:
+    image: b2113335/gateway:latest
+    pull_policy: always
+    container_name: gateway
+    ports:
+      - "9011:9011"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      config-server:
+        condition: service_healthy
+      keycloak:
+        condition: service_started
+      zipkin:
+        condition: service_started
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  property-service:
+    container_name: property-service
+    image: b2113335/property-service:latest
+    pull_policy: always
+    ports:
+      - "8050:8050"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      gateway:
+        condition: service_started
+      keycloak:
+        condition: service_started
+      zipkin:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  listing-service-service:
+    container_name: listing-service-service
+    image: b2113335/listing-service-service:latest
+    pull_policy: always
+    ports:
+      - "8090:8090"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      config-server:
+        condition: service_healthy
+      zipkin:
+        condition: service_started
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      gateway:
+        condition: service_started
+      keycloak:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  account-service:
+    container_name: account-service
+    image: b2113335/account-service:latest
+    pull_policy: always
+    ports:
+      - "8060:8060"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      config-server:
+        condition: service_healthy
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      gateway:
+        condition: service_started
+      keycloak:
+        condition: service_started
+      zipkin:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  property-submission-service:
+    container_name: property-submission-service
+    image: b2113335/property-submission-service:latest
+    pull_policy: always
+    ports:
+      - "8070:8070"
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      gateway:
+        condition: service_started
+      keycloak:
+        condition: service_started
+      zipkin:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+  notification-service:
+    container_name: notification-service
+    image: b2113335/notification-service:latest
+    pull_policy: always
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - KEYCLOAK_URL=http://keycloak:8080
+    depends_on:
+      config-server:
+        condition: service_healthy
+      kafka:
+        condition: service_started
+      mysql:
+        condition: service_started
+      discovery-server:
+        condition: service_started
+      keycloak:
+        condition: service_started
+      zipkin:
+        condition: service_started
+    networks:
+      - microservices-net
+    env_file:
+      - .env
+      - local.env
+    profiles:
+      - docker
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  mysql_data:

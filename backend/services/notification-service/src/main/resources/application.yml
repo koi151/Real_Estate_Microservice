@@ -1,3 +1,10 @@
 spring:
   application:
     name: notification-service
+  config:
+    import: "optional:configserver:http://localhost:8888"
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          jwk-set-uri: "http://localhost:8080/realms/real-estate-microservice/protocol/openid-connect/certs"

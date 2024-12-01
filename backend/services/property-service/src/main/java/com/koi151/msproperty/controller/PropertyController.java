@@ -3,7 +3,7 @@ package com.koi151.msproperty.controller;
 import com.github.javafaker.Faker;
 import com.koi151.msproperty.enums.*;
 import com.koi151.msproperty.mapper.ResponseDataMapper;
-import com.koi151.msproperty.model.reponse.ResponseData;
+import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.model.request.address.AddressCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertySearchRequest;

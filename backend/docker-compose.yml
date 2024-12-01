@@ -1,92 +1,6 @@
+include:
+  - docker-compose-common.yml
 services:
-  mysql:
-    container_name: mysql-db
-    image: mysql
-    environment:
-      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
-      MYSQL_DATABASE: real_estate
-      MYSQL_USER: ${MYSQL_USER}
-      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
-    volumes:
-      - mysql_data:/var/lib/mysql
-    ports:
-      - "3307:3306"
-    networks:
-      - microservices-net
-    restart: unless-stopped
-
-  mongodb:
-    image: mongo
-    container_name: mongodb
-    environment:
-      - MONGO_URI=${MONGO_URL}
-    networks:
-      - microservices-net
-
-  redis:
-    container_name: ms-redis
-    image: redis:latest
-    ports:
-      - "6380:6379"
-    restart: unless-stopped
-    networks:
-      - microservices-net
-
-  redis-insight:
-    container_name: redis-insight
-    image: redis/redisinsight:latest
-    restart: always
-    ports:
-      - "5540:5540"
-    networks:
-      - microservices-net
-
-#  broker:
-#    image: confluentinc/cp-kafka:latest
-#    container_name: kafka
-#    ports:
-#      - 9092:9092
-#    depends_on:
-#      - zookeeper
-#    environment:
-#        KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-#        KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-#        KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-#        KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-#        KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-#        KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
-#    networks:
-#      - microservices-net
-  zookeeper:
-    image: confluentinc/cp-zookeeper:latest
-    container_name: zookeeper
-    environment:
-      ZOOKEEPER_SERVER_ID: 1
-      ZOOKEEPER_CLIENT_PORT: 2181
-      ZOOKEEPER_TICK_TIME: 2000
-    ports:
-      - "22181:2181"  # Host port to Zookeeper client port
-    networks:
-      - microservices-net
-    restart: always
-
-  broker:
-    image: confluentinc/cp-kafka:latest
-    container_name: kafka
-    depends_on:
-      - zookeeper
-    ports:
-      - "9092:9092"
-    environment:
-      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
-      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
-      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
-      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092,PLAINTEXT_HOST://host.docker.internal:9093
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,PLAINTEXT_HOST://0.0.0.0:9093
-    networks:
-      - microservices-net
 
   keycloak:
     image: quay.io/keycloak/keycloak:25.0.4
@@ -101,9 +15,8 @@ services:
       KC_DB_URL_DATABASE: auth
       KC_DB_USERNAME: ${MYSQL_USER}
       KC_DB_PASSWORD: ${MYSQL_USER_PASSWORD}
-      KC_HOSTNAME: http://keycloak:8080/
-      KC_HOSTNAME_BACKCHANNEL_DYNAMIC: true
-
+#      KC_LOG_LEVEL: DEBUG
+#      KC_LOG_CONSOLE_COLOR: true
     networks:
       - microservices-net
     command:
@@ -112,241 +25,30 @@ services:
       - mysql
     env_file:
       - local.env
-#  ## Prometheus
-#  prometheus:
-#    image: prom/prometheus:v2.37.1
-#    container_name: prometheus
-#    restart: always
-#    ports:
-#      - "9090:9090"
-#    volumes:
-#      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
-#    depends_on:
-
-  zipkin:
-    container_name: zipkin
-    image: openzipkin/zipkin
-    ports:
-      - "9411:9411"
-    networks:
-      - microservices-net
+    profiles:
+      - default
     restart: unless-stopped
 
-  mail-dev:
-    container_name: mail-dev
-    image: maildev/maildev
-    ports:
-      - 1080:1080
-      - 1025:1025
-    networks:
-      - microservices-net
 
-  config-server:
-    container_name: config-server
-    image: b2113335/config-server:latest
-    pull_policy: always
+  kafka:
+    image: confluentinc/cp-kafka:latest
+    container_name: kafka
     ports:
-      - "8888:8888"
-    networks:
-      - microservices-net
-    healthcheck:
-      test: "curl --fail --silent http://localhost:8888/actuator/health/readiness | grep UP || exit 1"
-      interval: 20s
-      timeout: 5s
-      retries: 10
-    environment:
-      - LOGGING_LEVEL_ROOT=DEBUG
-    env_file:
-      - .env
-      - local.env
-
-  ## Eureka Server
-  discovery-server:
-    image: b2113335/discovery:latest
-    container_name: discovery-server
-    pull_policy: always
-    ports:
-      - "8761:8761"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+      - "9092:9092"
     depends_on:
-      config-server:
-        condition: service_healthy
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-
-  gateway:
-    image: b2113335/gateway:latest
-    container_name: gateway
-    pull_policy: always
-    ports:
-      - "9011:9011"
+      - zookeeper
     environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-#      - LOGGING_LEVEL_ROOT=DEBUG
-    depends_on:
-      config-server:
-        condition: service_healthy
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
     networks:
       - microservices-net
-    env_file:
-      - .env
-      - local.env
-
-  property-service:
-    container_name: property-service
-    image: b2113335/property-service:latest
-    pull_policy: always
-    ports:
-      - "8050:8050"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-    depends_on:
-      config-server:
-        condition: service_healthy
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      gateway:
-        condition: service_started
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-
-  listing-service-service:
-    container_name: listing-service-service
-    image: b2113335/listing-service-service:latest
-    pull_policy: always
-    ports:
-      - "8090:8090"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-    depends_on:
-      config-server:
-        condition: service_healthy
-      zipkin:
-        condition: service_started
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      gateway:
-        condition: service_started
-      keycloak:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-
-  account-service:
-    container_name: account-service
-    image: b2113335/account-service:latest
-    pull_policy: always
-    ports:
-      - "8060:8060"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-    depends_on:
-      config-server:
-        condition: service_healthy
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      gateway:
-        condition: service_started
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-
-  property-submission-service:
-    container_name: property-submission-service
-    image: b2113335/property-submission-service:latest
-    pull_policy: always
-    ports:
-      - "8070:8070"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-    depends_on:
-      config-server:
-        condition: service_healthy
-      broker:
-        condition: service_started
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      gateway:
-        condition: service_started
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-
-  notification-service:
-    container_name: notification-service
-    image: b2113335/notification-service:latest
-    pull_policy: always
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-    depends_on:
-      config-server:
-        condition: service_healthy
-      broker:
-        condition: service_started
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
+    profiles:
+      - default
+#    restart: unless-stopped
 
 networks:
   microservices-net:

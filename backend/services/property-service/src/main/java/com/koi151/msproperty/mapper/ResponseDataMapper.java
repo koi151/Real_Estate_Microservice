@@ -1,6 +1,6 @@
 package com.koi151.msproperty.mapper;
 
-import com.koi151.msproperty.model.reponse.ResponseData;
+import com.koi151.msproperty.model.response.ResponseData;
 import org.mapstruct.*;
 import org.springframework.data.domain.Page;
 

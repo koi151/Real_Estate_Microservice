@@ -1,8 +1,11 @@
+server:
+  port: 8181
+
 eureka:
   client:
     register-with-eureka: false
-#server:
-#  port: 9090
+    service-url:
+      defaultZone: http://localhost:8761/eureka
 spring:
   application:
     name: gateway-service
@@ -36,7 +39,3 @@ spring:
           uri: http://localhost:8090/
           predicates:
             - Path=/api/v1/listing-services/**
-
-api:
-  prefix: api/v1/accounts
-

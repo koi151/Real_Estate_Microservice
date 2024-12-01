@@ -1,4 +1,4 @@
-package com.koi151.msproperty.model.reponse;
+package com.koi151.msproperty.model.response;
 
 import lombok.Getter;
 import lombok.Setter;

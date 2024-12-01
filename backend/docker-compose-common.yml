@@ -1,0 +1,114 @@
+services:
+  mysql:
+    container_name: mysql-db
+    image: mysql:9.1
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: real_estate
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_USER_PASSWORD}
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3307:3306"
+    networks:
+      - microservices-net
+    #    healthcheck:
+    #      test: [ "CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p${MYSQL_ROOT_PASSWORD}" ]
+    #      interval: 10s
+    #      timeout: 20s
+    #      retries: 10
+    #    deploy:
+    #      resources:
+    #        limits:
+    #          memory: 4G
+    #        reservations:
+    #          memory: 2G
+    restart: unless-stopped
+    profiles:
+      - default
+      - docker
+
+  mongodb:
+    image: mongo:latest # temp
+    container_name: mongodb
+    environment:
+      - MONGO_URI=${MONGO_URL}
+    networks:
+      - microservices-net
+    profiles:
+      - default
+      - docker
+    restart: unless-stopped
+
+  redis:
+    container_name: ms-redis
+    image: redis:latest
+    ports:
+      - "6380:6379"
+    restart: unless-stopped
+    profiles:
+      - default
+      - docker
+    networks:
+      - microservices-net
+
+  redis-insight:
+    container_name: redis-insight
+    image: redis/redisinsight:latest
+    restart: always
+    ports:
+      - "5540:5540"
+    profiles:
+      - default
+      - docker
+    networks:
+      - microservices-net
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.3.0
+    container_name: zookeeper
+    environment:
+      ZOOKEEPER_SERVER_ID: 1
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "22181:2181"
+    profiles:
+      - default
+      - docker
+    networks:
+      - microservices-net
+    restart: always
+
+  zipkin:
+    container_name: zipkin
+    image: openzipkin/zipkin:2.23.2
+    ports:
+      - "9411:9411"
+    networks:
+      - microservices-net
+    profiles:
+      - default
+      - docker
+    restart: unless-stopped
+
+  mail-dev:
+    container_name: mail-dev
+    image: maildev/maildev:latest
+    ports:
+      - "1080:1080"
+      - "1025:1025"
+    networks:
+      - microservices-net
+    profiles:
+      - default
+      - docker
+    restart: unless-stopped
+
+networks:
+  microservices-net:
+    driver: bridge
+
+volumes:
+  mysql_data:

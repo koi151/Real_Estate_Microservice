@@ -1,4 +1,4 @@
-package com.koi151.msproperty.model.reponse;
+package com.koi151.msproperty.model.response;
 
 import com.koi151.msproperty.model.dto.AbstractDTO;
 import lombok.AllArgsConstructor;

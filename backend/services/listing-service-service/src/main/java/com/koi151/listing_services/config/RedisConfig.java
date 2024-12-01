@@ -18,11 +18,21 @@ public class RedisConfig {
     @Value("${REDIS_PORT}")
     private int redisPort;
 
+    @Value("${spring.profiles.active:default}")
+    private String activeProfile;
+
     @Bean
-    public LettuceConnectionFactory redisConnection () {
+    public LettuceConnectionFactory redisConnection() {
         RedisStandaloneConfiguration configuration = new RedisStandaloneConfiguration();
-        configuration.setHostName("ms-redis");
-        configuration.setPort(redisPort);
+
+        if ("docker".equalsIgnoreCase(activeProfile)) {
+            configuration.setHostName("ms-redis");
+            configuration.setPort(redisPort);
+        } else {
+            configuration.setHostName("localhost");
+            configuration.setPort(6380);
+        }
+
         return new LettuceConnectionFactory(configuration);
     }
 

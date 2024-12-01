@@ -1,7 +1,7 @@
 package com.koi151.msproperty.controller;
 
 import com.koi151.msproperty.model.dto.RoomDTO;
-import com.koi151.msproperty.model.reponse.ResponseData;
+import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperty.service.RoomService;
 import org.springframework.beans.factory.annotation.Autowired;

@@ -1,7 +1,7 @@
 package com.koi151.msproperty.controllerAdvice;
 
 import com.koi151.msproperty.customExceptions.*;
-import com.koi151.msproperty.model.reponse.ErrorResponse;
+import com.koi151.msproperty.model.response.ErrorResponse;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import jakarta.validation.UnexpectedTypeException;

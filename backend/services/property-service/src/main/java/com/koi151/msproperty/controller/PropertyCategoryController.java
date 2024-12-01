@@ -2,7 +2,7 @@ package com.koi151.msproperty.controller;
 
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.mapper.ResponseDataMapper;
-import com.koi151.msproperty.model.reponse.ResponseData;
+import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategorySearchRequest;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryUpdateRequest;
