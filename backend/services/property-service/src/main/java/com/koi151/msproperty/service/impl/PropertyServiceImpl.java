@@ -28,6 +28,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+
 import java.util.*;
 
 @Service
@@ -44,8 +45,7 @@ public class PropertyServiceImpl implements PropertiesService {
     private final ObjectMapper objectMapper;
     private static final Logger logger = LoggerFactory.getLogger(PropertyRepositoryImpl.class);
 
-    public Page<PropertySearchDTO> findAllProperties(PropertySearchRequest request, Pageable pageable) {
-
+    public Page<PropertySearchDTO> findProperties(PropertySearchRequest request, Pageable pageable) {
         String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
         String redisData = redisTemplate.opsForValue().get(redisKey);
         try {

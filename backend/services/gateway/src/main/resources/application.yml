@@ -5,11 +5,32 @@ spring:
     import: "optional:configserver:http://localhost:8888"
   security:
     oauth2:
+      client:
+        provider:
+          keycloak:
+            issuer-uri: ${KEYCLOAK_ISSUER_URI}
+            authorization-uri: ${KEYCLOAK_AUTH_SERVER_URL}
+            token-uri: ${KEYCLOAK_TOKEN_URI}
+            user-info-uri: ${KEYCLOAK_USER_INFO_URI}
+            jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
+        registration:
+          keycloak:
+            client-id: ${KEYCLOAK_CLIENT_ID}
+            client-secret: ${KEYCLOAK_CLIENT_SECRET}
+            authorization-grant-type: authorization_code
+            redirect-uri: ${KEYCLOAK_REDIRECT_URI}
+            scope:
+              - openid
+              - profile
+              - email
       resourceserver:
         jwt:
-          issuer-uri: "http://localhost:8080/realms/real-estate-microservice"
-          jwk-set-uri: "http://localhost:8080/realms/real-estate-microservice/protocol/openid-connect/certs"
-#eureka:
-#  client:
-#    service-url:
-#      defaultZone: http://localhost:8761/eureka/
+          issuer-uri: ${KEYCLOAK_ISSUER_URI}
+          jwk-set-uri: ${KEYCLOAK_JWK_SET_URI}
+
+#logging:
+#  level:
+#    root: debug
+#    org.springframework.security: debug
+#    org.springframework.security.oauth2: DEBUG
+#    org.springframework.security.authentication: DEBUG

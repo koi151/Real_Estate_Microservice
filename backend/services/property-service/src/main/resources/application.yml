@@ -7,4 +7,5 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          jwk-set-uri: "http://localhost:8080/realms/real-estate-microservice/protocol/openid-connect/certs"
+          jwk-set-uri: "http://localhost:9098/realms/real-estate-microservice/protocol/openid-connect/certs"
+

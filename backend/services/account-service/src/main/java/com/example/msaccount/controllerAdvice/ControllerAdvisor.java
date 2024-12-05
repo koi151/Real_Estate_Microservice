@@ -275,4 +275,22 @@ public class ControllerAdvisor {
                 .details(Collections.singletonList(ex.getCause() != null ? ex.getCause().getMessage() : "No additional details"))
                 .build());
     }
+
+    @ExceptionHandler(InvalidTokenException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidTokenException(RemoteServiceException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.builder()
+                .error("Invalid token")
+                .details(Collections.singletonList(ex.getMessage()))
+                .build());
+    }
+
+    @ExceptionHandler(KeycloakTokenExchangeException.class)
+    public ResponseEntity<ErrorResponse> handleKeycloakTokenExchangeException(KeycloakTokenExchangeException ex) {
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+            .body(ErrorResponse.builder()
+                .error("Keycloak failed to exchange token")
+                .details(Collections.singletonList(ex.getMessage()))
+                .build());
+    }
 }

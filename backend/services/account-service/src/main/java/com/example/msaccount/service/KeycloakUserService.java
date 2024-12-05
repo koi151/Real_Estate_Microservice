@@ -14,6 +14,13 @@ import jakarta.ws.rs.NotFoundException;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.message.BasicNameValuePair;
+import org.apache.http.util.EntityUtils;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.*;
 import org.keycloak.representations.AccessTokenResponse;
@@ -23,6 +30,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.net.URI;
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -39,6 +47,12 @@ public class KeycloakUserService {
 
     @Value("${KEYCLOAK_CLIENT_ID}")
     private String clientId;
+
+    @Value("${KEYCLOAK_TOKEN_URI}")
+    private String tokenUri;
+
+    @Value("${KEYCLOAK_CLIENT_SECRET}")
+    private String clientSecret;
 
     private UsersResource getUsersResource() {
         return keycloakProvider.getInstance().realm(realm).users();
@@ -61,6 +75,44 @@ public class KeycloakUserService {
         UserRepresentation userRepresentation = userResource.toRepresentation();
         userRepresentation.setEnabled(false);
         userResource.update(userRepresentation);
+    }
+
+    public String refreshAccessToken(String refreshToken) throws IOException {
+        try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
+            HttpPost post = new HttpPost(tokenUri);
+
+            // Request parameters
+            List<BasicNameValuePair> params = new ArrayList<>();
+            params.add(new BasicNameValuePair("grant_type", "refresh_token"));
+            params.add(new BasicNameValuePair("client_id", clientId));
+            params.add(new BasicNameValuePair("refresh_token", refreshToken));
+
+            // Include client_secret if necessary
+            if (clientSecret != null && !clientSecret.isEmpty()) {
+                params.add(new BasicNameValuePair("client_secret", clientSecret));
+            }
+
+            post.setEntity(new UrlEncodedFormEntity(params, StandardCharsets.UTF_8));
+            post.setHeader("Content-Type", "application/x-www-form-urlencoded");
+
+            // Execute the request
+            try (CloseableHttpResponse response = httpClient.execute(post)) {
+                int statusCode = response.getStatusLine().getStatusCode();
+
+                if (statusCode == 200) {
+                    String jsonResponse = EntityUtils.toString(response.getEntity());
+                    JsonNode tokenJson = new ObjectMapper().readTree(jsonResponse);
+
+                    if (tokenJson.has("access_token")) {
+                        return tokenJson.get("access_token").asText();
+                    } else {
+                        throw new RuntimeException("Invalid response: Missing access token");
+                    }
+                } else {
+                    throw new RuntimeException("Failed to refresh token: " + statusCode);
+                }
+            }
+        }
     }
 
     public AccessTokenResponse getAccessToken(String username, String password) {

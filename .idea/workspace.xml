@@ -5,507 +5,54 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7c9ca5a-462f-47a3-a067-1c926319cdcf" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/docker-compose-common.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/docker-compose-docker.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/docker-compose-test.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/CookieAttributes.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/response/LoginResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/response/UserInfoResponse.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/PKCEUtil.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/resources/application-docker.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/resources/application-docker.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/resources/application-docker.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/payment-service/src/main/resources/application-docker.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/resources/application-docker.yml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/resources/application-docker.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.github/workflows/main.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/LICENSE" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/docker-compose.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/docker-compose.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/MsaccountApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/client/PropertiesClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/component/JwtTokenUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/CloudinaryConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/CustomJwtAuthenticationConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/FeignClientConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/KeycloakProvider.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/RedisConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/WebSecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/AccountController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/AuthController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/admin/AdminAccountController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controllerAdvice/ControllerAdvisor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/BadCredentialsException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/CloudinaryUploadFailedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/EmptyFileException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/EntityAlreadyExistsException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/EntityNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/InvalidAuthorizationHeaderException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/InvalidEnumValueException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/InvalidRequestException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakAccountCreationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakGroupNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakLoginFailedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakResourceNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakRoleNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakRoleRetrievalException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakUserCreationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakUserUpdateException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/PasswordMismatchException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/PhoneAlreadyExistsException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/RedisDataNotFound.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/RemoteServiceException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/TokenParsingException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/UnauthorizedActionException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/entity/Account.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/entity/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/entity/Permission.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/entity/Role.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/entity/admin/AdminAccount.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/entity/client/ClientAccount.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/enums/AccountStatusEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/enums/AccountTypeEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/enums/PermissionEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/filters/JwtTokenFilter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/AccountMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/AdminAccountMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/KeycloakMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/PaginationContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/ResponseDataMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AbstractDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccountDetailDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccountSearchDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccountWithNameAndRoleDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccountWithPropertiesDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/ClientDatabaseAccountDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/CommonDatabaseAccountDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/KeycloakUserDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/PropertyDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/admin/AdminAccountDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/admin/AdminDatabaseAccountDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/request/AccountLoginRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/request/LoginRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/request/admin/AccountCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/request/admin/AccountUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/response/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/response/PageMeta.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/response/ResponseData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/repository/AccountRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/repository/admin/AdminAccountRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/repository/admin/RoleRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/repository/client/ClientAccountRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/AccountService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/AuthService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/KeycloakUserService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/admin/AccountAdminService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/admin/CloudinaryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/converter/AccountConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/converter/LocalDateTimeConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/converter/PropertyConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/converter/admin/AdminAccountConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/converter/client/ClientAccountConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AccountServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AuthServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/CloudinaryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/TokenStorageService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/admin/AccountAdminServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/CloudinaryUploadUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/ResponseUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/StringUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/validator/AccountValidator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/java/com/example/configserver/ConfigServerApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/account-service.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/account-service-docker.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/application-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/discovery-server-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/discovery-server.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/gateway-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/gateway.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/listing-service-service-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/listing-service-service.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/notification-service-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/notification-service.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/payment-service-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/payment-service.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-service-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-service.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-submissions-service-docker.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-submissions-service.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/discovery-server/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/discovery-server/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/discovery-server/src/main/java/com/example/discovery/DiscoveryApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/discovery-server/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/Dockerfile" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/Dockerfile.layered" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/GatewayApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/securiity/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/ListingServicesApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/client/PropertyClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/config/RedisConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/controller/PostServiceCategoryController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/controller/PostServicesController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/controller/PropertyServicePackageController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/controllerAdvice/ControllerAdvisor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/DuplicatePostServiceCategoryException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/DuplicatePostServiceException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/DuplicatedPropertyPostPackageException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/EntityNotFoundCustomException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/FailedToDeserializingData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/InvalidEnumValueException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/PostServiceNotExistedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/ServiceUnavailableException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/customExceptions/ValidationFailedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/PostService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/PostServiceCategory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/PostServicePackage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/PostServicePricing.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/Promotion.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/PropertyServicePackage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/entity/keys/PostServicePackageKey.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/enums/PackageType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/enums/Status.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/mapper/PostServiceCategoryMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/mapper/PostServiceMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/mapper/PropertyServicePackageMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/AbstractDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PostServiceBasicInfoDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PostServiceCategoryCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PostServiceCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PostServicePackageCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PostServicePricingCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PromotionCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PropertyServicePackageCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/dto/PropertyServicePackageSummaryDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/request/PostServiceCategoryCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/request/PostServiceCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/request/PostServicePricingCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/request/PromotionCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/request/PropertyServicePackageCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/request/PropertyServicePackageSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/response/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/model/response/ResponseData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PostServiceCategoryRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PostServicePackageRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PostServicePricingRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PostServiceRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PromotionRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PropertyPostPackageRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/PropertyServicePackageRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/custom/PostServiceRepositoryCustom.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/custom/PropertyServicePackageRepositoryCustom.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/custom/impl/PostServiceRepositoryCustomImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/repository/custom/impl/PropertyServicePackageRepositoryCustomImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/PostServiceCategoryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/PostServiceService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/PropertyServicePackageService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/converter/PostServiceConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/impl/PostServiceCategoryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/impl/PostServiceServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/service/impl/PropertyServicePackageServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/validator/PostServiceValidate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/java/com/koi151/listing_services/validator/PropertyServicePackageSearchValidate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/listing-service-service/src/test/java/com/koi151/listing_services/ListingServicesApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/NotificationApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/controllerAdvice/ControllerAdvisor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/customExceptions/InvalidEnumValueException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/email/EmailService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/entity/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/entity/Notification.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/enums/EmailTemplates.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/enums/NotificationType.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/enums/PaymentMethod.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/kafka/NotificationConsumer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/kafka/payment/PaymentConfirmation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/kafka/submission/Customer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/kafka/submission/PostServiceBasicInfo.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/kafka/submission/PropertyServicePackage.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/kafka/submission/SubmissionConfirmation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/model/dto/AbstractDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/model/response/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/model/response/PageMeta.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/model/response/ResponseData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/java/com/koi151/notification/repository/NotificationRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/notification-service/src/main/resources/application-docker.yml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/resources/templates/payment-confirmation.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/resources/templates/submission-confirmation.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/test/java/com/koi151/notification/NotificationApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/PaymentApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/config/KafkaConfiguration.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/config/KafkaPaymentTopicConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/controller/PaymentController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/controllerAdvice/ControllerAdvisor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/customExceptions/InvalidEnumValueException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/entity/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/entity/Payment.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/enums/PaymentMethod.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/enums/Status.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/mapper/PaymentMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/dto/AbstractDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/dto/PaymentCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/request/AddressRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/request/CustomerRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/request/PaymentCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/response/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/response/PageMeta.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/model/response/ResponseData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/notification/NotificationProducer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/notification/PaymentNotificationRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/repository/PaymentRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/service/PaymentService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/java/com/koi151/payment/service/impl/PaymentServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/test/java/com/koi151/payment/PaymentApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/MspropertiesApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/annotation/PriceRangeConstraint.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/CloudinaryConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/KeycloakJwtTokenConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/ModelMapperConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/RedisConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/SecurityConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyCategoryController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyPostServiceController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/RoomController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controllerAdvice/ControllerAdvisor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/AccountNotFound.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/CategoryNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/EmptyFileException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/InvalidDateFormatException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/InvalidEnumValueException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/MaxImagesExceededException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/PaymentScheduleNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/PropertyNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/Address.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PostServicePricing.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/Property.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PropertyCategory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PropertyForRent.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PropertyForSale.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PropertyPostService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/Rooms.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/DaysPostedEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/DirectionEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/PaymentScheduleEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/PostingPackageEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/PropertyTypeEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/QueryFieldOptionEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/RoomTypeEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/StatusEnum.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/mapper/PropertyCategoryMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/mapper/PropertyMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/mapper/PropertyPostServiceMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/mapper/ResponseDataMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/AbstractDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/AddressDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/DetailedPropertyDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertiesHomeDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyCategory/PropertyCategoryDetailDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyCategory/PropertyCategoryHomeDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyCategory/PropertyCategoryTitleDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyForRentCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyForSaleCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyPostServiceDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertyPostServiceSearchDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertySearchDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/RoomDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/RoomNameQuantityDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/projection/PropertyPostServiceProjection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/projection/PropertySearchProjection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/projection/RoomSearchProjection.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/reponse/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/reponse/PropertyCategorySearchResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/reponse/ResponseData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/address/AddressCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/address/AddressSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/address/AddressUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertySearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyCategory/PropertyCategoryCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyCategory/PropertyCategorySearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyCategory/PropertyCategoryUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForRent/PropertyForRentCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForRent/PropertyForRentSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForRent/PropertyForRentUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForSale/PropertyForSaleCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForSale/PropertyForSaleSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForSale/PropertyForSaleUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyPostService/PropertyPostServiceCreateUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/rooms/RoomCreateUpdateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/rooms/RoomSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/PropertyCategoryRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/PropertyPostServiceRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/PropertyRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/RoomRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/PropertyCategoryRepositoryCustom.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/PropertyRepositoryCustom.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyCategoryRepositoryImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyRepositoryImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/CloudinaryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertiesService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertyCategoryService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertyPostService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/RoomService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/converter/LocalDateTimeConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/converter/PropertyConverter.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/CloudinaryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyCategoryServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyPostServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/RoomServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/CustomRepositoryUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/ListUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/NumberUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/QueryContext/QueryConditionContextPropertyCategory.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/QueryContext/QueryContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/RequestUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/utils/StringUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/validator/PriceRangeValidator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/pom.xml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/PropertySubmissionApplication.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/client/AccountClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/client/ListingServicesClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/client/PaymentClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/client/PropertyClient.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/config/KafkaSubmissionTopicConfig.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/controller/PropertySubmissionController.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/controllerAdvice/ControllerAdvisor.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/AccountServiceCommunicationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/AccountServiceResponseException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/DuplicatePropertySubmissionException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/DuplicateReferenceCodeException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/EntityNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/InvalidEnumValueException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/ProductServiceCommunicationException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/PropertyServiceResponseException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/ResourceNotFoundException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/ServiceUnavailableException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/customExceptions/ValidationFailedException.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/entity/BaseEntity.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/entity/PropertySubmission.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/enums/PaymentMethod.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/enums/PostStatus.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/enums/QueryFieldOption.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/kafka/SubmissionConfirmation.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/kafka/SubmissionProducer.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/mapper/PaginationContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/mapper/PropertySubmissionMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/mapper/ResponseDataMapper.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/dto/AbstractDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/dto/AccountWithNameAndRoleDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/dto/AccountWithSubmissionDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/dto/PropertySubmissionCreateDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/dto/PropertySubmissionDetailedDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/dto/PropertySubmissionsDetailsDTO.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/request/PaymentCreateRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/request/PropertyServicePackageSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/request/PropertySubmissionCreate.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/request/PropertySubmissionSearchRequest.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/response/CustomerResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/response/ErrorResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/response/PageMeta.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/response/PostServiceBasicInfoResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/response/PropertyServicePackageResponse.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/model/response/ResponseData.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/repository/PropertySubmissionRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/repository/custom/CustomPropertySubmissionRepository.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/repository/custom/impl/CustomPropertySubmissionRepositoryImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/service/PropertySubmissionService.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/service/impl/PropertySubmissionServiceImpl.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/utils/CustomRepositoryUtils.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/utils/QueryContext.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/utils/ValidationUtil.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/validator/PropertySubmissionValidator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/java/com/koi151/property_submissions/validator/ServiceResponseValidator.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/resources/application.yml" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/test/java/com/koi151/property_submissions/DuplicatePropertySubmissionsDetailsDTOExceptionApplicationTests.java" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/.gitignore" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/README.md" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/package-lock.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/package.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/public/favicon.ico" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/public/index.html" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/public/logo192.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/public/logo512.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/public/manifest.json" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/public/robots.txt" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/App.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/App.test.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/App.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/astronaut.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/logo-dark.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/logo-fold.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/logo.png" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/planet.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/vnpay-logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/assets/images/zalo-seeklogo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/commonTypes.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/AllRouters/allRouters.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/CardItem/cardItem.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/CardItem/cardItem.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/Layouts/layoutDefault.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/Layouts/layoutDefault.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/NoPermission/noPermission.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/Properties/properties.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/Properties/properties.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/SiderMenu/siderMenu.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/SiderMenu/siderMenu.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/admin/StatusButton/statusButton.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/Counters/ViewCount/viewCount.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/FilterComponents/Direction/direction.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/FilterComponents/Direction/direction.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/FilterComponents/FilterBoxSlide/filterBoxSlide.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/FilterComponents/FilterBoxSlide/filterBoxSlide.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/FilterComponents/Rooms/roomFilter.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/PageNotFound/pageNotFound.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/PageNotFound/pageNotFound.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/components/shared/ProtectedRoute/protectedRoute.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/helpers/filterOptions.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/images.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/index.css" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/index.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/logo.svg" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/pages/admin/RegisterAndLogin/adminRegisterLogin.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/pages/admin/RegisterAndLogin/adminRegisterLogin.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/redux/reduxSlices/adminUserSlice.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/redux/reduxSlices/clientUserSlice.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/redux/reduxSlices/filtersSlice.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/redux/reduxSlices/propertyPostSlice.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/redux/stores/index.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/reportWebVitals.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/routes/admin.routes.tsx" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/scss.d.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/services/admin/admin-accounts.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/services/admin/authorization.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/services/admin/properties.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/services/api.service.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/setupTests.ts" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/src/styles/_variables.scss" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/frontend/real-estate-microservice/tsconfig.json" beforeDir="false" />
+      <change afterPath="$PROJECT_DIR$/.idea/uiDesigner.xml" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/RestTemplateConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/InvalidTokenException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/customExceptions/KeycloakTokenExchangeException.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccessTokenResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/TokenResponseDTO.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/CookieUtil.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/AuthorizedClientManagerConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/AuthorizedClientServiceConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/ClientRegistrationConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CookieToAuthorizationHeaderFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CookieToBearerFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CustomAuthenticationWebFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CustomBearerTokenAuthenticationConverter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CustomSecurityContextRepository.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/LoggingFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/RedisConfig.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityWebFilterChain.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/TokenRefreshWebFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/TokenRelayWebFilter.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/LoggingFilter.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/AuthController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/AuthController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controllerAdvice/ControllerAdvisor.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controllerAdvice/ControllerAdvisor.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/AccountMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/mapper/AccountMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccountDetailDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/AccountDetailDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/response/LoginResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/model/dto/LoginResponseDTO.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/AuthService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/AuthService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/KeycloakUserService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/KeycloakUserService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AccountServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AccountServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AuthServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AuthServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/PKCEUtil.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/utils/PKCEUtil.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/account-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/account-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/gateway.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/gateway.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-service.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-service.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/gateway/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/gateway/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/notification-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/notification-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/resources/application-docker.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/payment-service/src/main/resources/application-docker.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/payment-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/payment-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyController.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertiesService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertiesService.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/resources/application.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-submission-service/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -552,6 +99,7 @@
     "RequestMappingsPanelWidth1": "75",
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
+    "SHARE_PROJECT_CONFIGURATION_FILES": "true",
     "Spring Boot.ConfigServerApplication.executor": "Run",
     "Spring Boot.DiscoveryApplication.executor": "Run",
     "Spring Boot.GatewayApplication.executor": "Run",
@@ -590,6 +138,9 @@
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\Users\antho\Documents\GitHub\Web\BACK END\RealEstateMicroservice\backend\real-estate-microservice\Real_Estate_Microservice\backend" />
       <recent name="C:\Users\antho\Documents\GitHub\Web\BACK END\RealEstateMicroservice\backend\real-estate-microservice\Real_Estate_Microservice\backend\services\notification-service\src\main\resources" />
+    </key>
+    <key name="CopyClassDialog.RECENTS_KEY">
+      <recent name="com.example.gateway.security" />
     </key>
   </component>
   <component name="RunDashboard">
@@ -885,12 +436,86 @@
       <workItem from="1732508660887" duration="6623000" />
       <workItem from="1732852888652" duration="10346000" />
       <workItem from="1732864686424" duration="2818000" />
-      <workItem from="1732934439814" duration="33183000" />
+      <workItem from="1732934439814" duration="33623000" />
+      <workItem from="1733070406611" duration="11489000" />
+      <workItem from="1733146313954" duration="112853000" />
+      <workItem from="1733381762569" duration="4832000" />
     </task>
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/AuthorizedClientManagerConfig.java</url>
+          <line>14</line>
+          <option name="timeStamp" value="3" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/AuthorizedClientServiceConfig.java</url>
+          <line>13</line>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/ClientRegistrationConfig.java</url>
+          <line>42</line>
+          <option name="timeStamp" value="5" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/ClientRegistrationConfig.java</url>
+          <line>38</line>
+          <option name="timeStamp" value="6" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/TokenRefreshWebFilter.java</url>
+          <line>147</line>
+          <option name="timeStamp" value="32" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CustomSecurityContextRepository.java</url>
+          <line>15</line>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/AuthController.java</url>
+          <line>90</line>
+          <option name="timeStamp" value="48" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/service/impl/AuthServiceImpl.java</url>
+          <line>368</line>
+          <option name="timeStamp" value="50" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java</url>
+          <line>63</line>
+          <option name="timeStamp" value="83" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CookieToBearerFilter.java</url>
+          <line>44</line>
+          <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CookieToBearerFilter.java</url>
+          <line>31</line>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/CookieToBearerFilter.java</url>
+          <line>42</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/account-service/src/main/java/com/example/msaccount/controller/AuthController.java</url>
+          <line>110</line>
+          <option name="timeStamp" value="88" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
   </component>
   <component name="XSLT-Support.FileAssociations.UIState">
     <expand />

@@ -1,21 +1,18 @@
 package com.example.msaccount.service.impl;
 
-import com.example.msaccount.customExceptions.InvalidAuthorizationHeaderException;
-import com.example.msaccount.customExceptions.KeycloakLoginFailedException;
-import com.example.msaccount.customExceptions.TokenParsingException;
+import com.example.msaccount.customExceptions.*;
 import com.example.msaccount.model.dto.AccountDetailDTO;
 import com.example.msaccount.model.dto.CookieAttributes;
-import com.example.msaccount.model.request.LoginRequest;
-import com.example.msaccount.model.response.LoginResponse;
-import com.example.msaccount.model.response.UserInfoResponse;
+import com.example.msaccount.model.dto.LoginResponseDTO;
+import com.example.msaccount.model.dto.TokenResponseDTO;
 import com.example.msaccount.service.AuthService;
 import com.example.msaccount.service.KeycloakUserService;
-import com.example.msaccount.utils.PKCEUtil;
+import com.example.msaccount.utils.CookieUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
-import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.io.Charsets;
@@ -26,18 +23,25 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.keycloak.representations.AccessTokenResponse;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import lombok.RequiredArgsConstructor;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.net.URLEncoder;
 import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
 import java.text.ParseException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
@@ -57,8 +61,8 @@ public class AuthServiceImpl implements AuthService {
     @Value(("${KEYCLOAK_CLIENT_ID}"))
     private String clientId;
 
-    @Value("${KEYCLOAK_TOKEN_URL}")
-    private String tokenUrl;
+    @Value("${KEYCLOAK_TOKEN_URI}")
+    private String tokenUri;
 
     @Value("${KEYCLOAK_REDIRECT_URI}")
     private String redirectUri;
@@ -72,103 +76,253 @@ public class AuthServiceImpl implements AuthService {
     @Value("${KEYCLOAK_ADMIN_HOME_URL}")
     private String adminHomeUrl;
 
-    @Value("${KEYCLOAK_ACCESS_TOKEN_LIFESPAN}")
-    private String accessTokenLifespan;
+    @Value("${KEYCLOAK_TOKEN_URI}")
+    private String keycloakTokenUrl;
 
     @Value("${KEYCLOAK_REFRESH_TOKEN_LIFESPAN}")
     private String refreshTokenLifespan;
 
+    @Value("${KEYCLOAK_ACCESS_TOKEN_LIFESPAN}")
+    private String accessTokenLifespan;
+
+    private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
     private final KeycloakUserService kcUserService;
 
-//    @Override
-//    public LoginResponse login(LoginRequest request) {
-//        AccessTokenResponse tokenResponse = kcUserService.getAccessToken(request.username(), request.password());
-//        AccountDetailDTO accDTO = extractUserInfoFromAccessToken(tokenResponse.getToken());
-//        cacheUserData(accDTO);
-//        cacheRefreshToken(
-//            tokenResponse.getRefreshToken(),
-//            accDTO.getAccountId(),
-//            Duration.ofSeconds(tokenResponse.getRefreshExpiresIn())
-//        );
-//
-//        UserInfoResponse userInfoResponse = UserInfoResponse.builder()
-//            .username(accDTO.getUsername())
-//            .email(accDTO.getEmail())
-//            .fullName(accDTO.getFirstName() + " " + accDTO.getLastName())
-//            .build();
-//
-//        return LoginResponse.builder()
-//            .accessToken(tokenResponse)
-//            .userInfo(userInfoResponse)
-//            .build();
-//    }
 
     @Override
-    public String redirectToLogin() {
-        String codeVerifier = PKCEUtil.generateCodeVerifier();
-        String codeChallenge = PKCEUtil.generateCodeChallenge(codeVerifier);
+    public String redirectToLogin(String codeChallenge,String codeChallengeMethod,String state) {
 
-        // Generate a random state
-        String state = UUID.randomUUID().toString();
+        redisTemplate.opsForValue().set("pkce:state:" + state, state, 10, TimeUnit.MINUTES);
+        redisTemplate.opsForValue().set("pkce:challenge:" + state, codeChallenge, 10, TimeUnit.MINUTES);
 
-        redisTemplate.opsForValue().set("pkce:" + state, codeVerifier, 10, TimeUnit.MINUTES);
-
-        // Build Keycloak authorization URL
+        // Xây dựng URL login Keycloak
         return String.format(
             "%s/realms/%s/protocol/openid-connect/auth" +
                 "?response_type=code" +
                 "&client_id=%s" +
                 "&redirect_uri=%s" +
                 "&code_challenge=%s" +
-                "&code_challenge_method=S256" +
+                "&code_challenge_method=%s" +
                 "&state=%s",
             authorizationUrl,
             realm,
             URLEncoder.encode(clientId, StandardCharsets.UTF_8),
             URLEncoder.encode(redirectUri, StandardCharsets.UTF_8),
             URLEncoder.encode(codeChallenge, StandardCharsets.UTF_8),
+            URLEncoder.encode(codeChallengeMethod, StandardCharsets.UTF_8),
             URLEncoder.encode(state, StandardCharsets.UTF_8)
         );
     }
 
-    @Override
-    public AccountDetailDTO handleOAuthCallback(String authCode, String state, HttpServletResponse response) {
+    //  * Tính toán code_challenge từ code_verifier
+    private String computeCodeChallenge(String codeVerifier) {
         try {
-            String codeVerifier = (String) redisTemplate.opsForValue().get("pkce:" + state);
+            // Sử dụng thuật toán SHA-256 để băm code_verifier
+            MessageDigest digest = MessageDigest.getInstance("SHA-256");
+            byte[] hash = digest.digest(codeVerifier.getBytes(StandardCharsets.UTF_8));
 
-            if (codeVerifier == null) {
-                log.error("Invalid code_verifier - value: " + codeVerifier);
-                throw new KeycloakLoginFailedException("Invalid or expired code_verifier");
-            }
-
-            String tokenResponse = exchangeCodeForToken(authCode, codeVerifier);
-
-            // Parse JSON response
-            JsonNode tokenJson = objectMapper.readTree(tokenResponse);
-            if (tokenJson.has("error")) {
-                // error -> redirect back to login page
-                response.sendRedirect("/api/auth/login");
-                throw new KeycloakLoginFailedException("Error occurred while parsing token");
-            }
-
-            String accessToken = tokenJson.get("access_token").asText();
-            String refreshToken = tokenJson.get("refresh_token").asText();
-            storeHttpOnlyCookies(accessToken, refreshToken, response);
-
-            response.sendRedirect(adminHomeUrl);
-            return extractUserInfoFromAccessToken(accessToken);
-
-        } catch (Exception e) {
-            log.error("Error processing authentication: " + e.getMessage());
-            throw new KeycloakLoginFailedException("Error processing authentication");
+            // Chuyển đổi sang Base64 URL
+            return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
+        } catch (NoSuchAlgorithmException e) {
+            throw new RuntimeException("Error computing code challenge", e);
         }
     }
 
+
+//    @Override
+//    public LoginResponseDTO handleOAuthCallback(String authCode, String state, HttpServletResponse response) {
+//        try {
+//            String codeVerifier = (String) redisTemplate.opsForValue().get("pkce:" + state);
+//
+//            if (codeVerifier == null) {
+//                log.error("Invalid code_verifier - value: " + codeVerifier);
+//                throw new KeycloakLoginFailedException("Invalid or expired code_verifier");
+//            }
+//
+//            String tokenResponse = exchangeCodeForToken(authCode, codeVerifier);
+//
+//            // Parse JSON response
+//            JsonNode tokenJson = objectMapper.readTree(tokenResponse);
+//            if (tokenJson.has("error")) {
+//                throw new KeycloakLoginFailedException("Error occurred while parsing token");
+//            }
+//
+//            String accessToken = tokenJson.get("access_token").asText();
+//            String refreshToken = tokenJson.get("refresh_token").asText();
+//
+//            CookieUtil.addCookie(response, CookieAttributes.builder()
+//                .name("refresh_token")
+//                .value(refreshToken)
+//                .maxAge(Integer.parseInt(refreshTokenLifespan))
+//                .build());
+//
+//            response.addCookie(new Cookie("refresh_token", refreshToken));
+//
+//
+//            AccountDetailDTO accountInfo = extractUserInfoFromAccessToken(accessToken);
+//            response.sendRedirect(adminHomeUrl);
+//
+//            return LoginResponseDTO.builder()
+//                .accountInfo(accountInfo)
+//                .tokenResponses(  TokenResponseDTO.builder()
+//                    .accessToken(accessToken)
+//                    .refreshToken(refreshToken)
+//                    .expiresIn(tokenJson.get("expires_in").asInt()) // ttl access token
+//                    .build())
+//                .build();
+//
+//        } catch (Exception e) {
+//            log.error("Error processing authentication: " + e.getMessage());
+//            throw new KeycloakLoginFailedException("Error processing authentication");
+//        }
+//    }
+
+    @Override
+    public TokenResponseDTO refreshToken(HttpServletRequest request) {
+        try {
+            String refreshToken = CookieUtil.getCookieValue(request, "refresh_token");
+
+            if (refreshToken == null || refreshToken.isEmpty()) {
+                throw new InvalidTokenException("Refresh token is missing or invalid");
+            }
+
+            String newAccessToken = kcUserService.refreshAccessToken(refreshToken);
+            JsonNode tokenJson = new ObjectMapper().readTree(newAccessToken);
+            int expiresIn = tokenJson.get("expires_in").asInt();
+
+            if (newAccessToken == null || newAccessToken.isEmpty()) {
+                throw new InvalidTokenException("Failed to retrieve a new access token");
+            }
+
+            return TokenResponseDTO.builder()
+                .accessToken(newAccessToken)
+                .expiresIn(expiresIn)
+                .build();
+
+        } catch (InvalidTokenException ex) {
+            log.error("Token validation error: {}", ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, ex.getMessage());
+
+        } catch (Exception ex) {
+            log.error("Unexpected error during token refresh: {}", ex.getMessage());
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Unable to refresh access token");
+        }
+    }
+
+    @Override
+    public void exchangeToken(MultiValueMap<String, String> requestBody, HttpServletResponse httpServletResponse) {
+        String code = requestBody.getFirst("code");
+        String state = requestBody.getFirst("state");
+        String codeVerifier = requestBody.getFirst("code_verifier");
+
+        if (code == null || state == null || codeVerifier == null) {
+            throw new IllegalArgumentException("Missing required parameters.");
+        }
+
+        // check state from Redis
+        String storedState = (String) redisTemplate.opsForValue().get("pkce:state:" + state);
+        if (storedState == null || !storedState.equals(state)) {
+            throw new SecurityException("Invalid state or session expired.");
+        }
+
+        String storedCodeChallenge = (String) redisTemplate.opsForValue().get("pkce:challenge:" + state);
+        if (storedCodeChallenge == null) {
+            throw new SecurityException("Code challenge is missing or expired.");
+        }
+
+        // compare code_verifier & code_challenge
+        String computedCodeChallenge = computeCodeChallenge(codeVerifier);
+        if (!computedCodeChallenge.equals(storedCodeChallenge)) {
+            throw new SecurityException("Code verifier does not match the code challenge.");
+        }
+
+        redisTemplate.delete("pkce:state:" + state);
+        redisTemplate.delete("pkce:challenge:" + state);
+
+        // Exchange token with Keycloak
+        MultiValueMap<String, String> tokenRequest = new LinkedMultiValueMap<>();
+        tokenRequest.add("grant_type", "authorization_code");
+        tokenRequest.add("code", code);
+        tokenRequest.add("redirect_uri", redirectUri);
+        tokenRequest.add("client_id", clientId);
+        tokenRequest.add("code_verifier", codeVerifier);
+        tokenRequest.add("client_secret", clientSecret);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_FORM_URLENCODED);
+
+        HttpEntity<MultiValueMap<String, String>> requestEntity = new HttpEntity<>(tokenRequest, headers);
+
+        try {
+            // Send request to Keycloak to exchange token
+            ResponseEntity<Map> response = restTemplate.postForEntity(keycloakTokenUrl, requestEntity, Map.class);
+
+            // Parse the token response
+            Map<String, Object> tokenResponse = response.getBody();
+            if (tokenResponse == null || !tokenResponse.containsKey("access_token")) {
+                throw new RuntimeException("Invalid response from Keycloak during token exchange.");
+            }
+
+            String accessToken = (String) tokenResponse.get("access_token");
+            String refreshToken = (String) tokenResponse.get("refresh_token");
+
+            // Save refresh token in Redis with expiration (match the expiration of the refresh token)
+            if (refreshToken != null) {
+                long refreshTokenExpiry = parseTokenExpiry(refreshToken);
+                redisTemplate.opsForValue().set("refresh_token", refreshToken, refreshTokenExpiry, TimeUnit.SECONDS);
+            }
+
+            ResponseCookie cookie = ResponseCookie.from("access_token", accessToken)
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .value(accessToken)
+                .maxAge(300)
+                .build();
+
+            redisTemplate.opsForValue().set("access_token", accessToken, Long.parseLong(accessTokenLifespan), TimeUnit.SECONDS);
+
+            log.info("Set cookie: {}", cookie);
+            httpServletResponse.addHeader("Set-Cookie", cookie.toString());
+            log.info("Headers after set: {}", Arrays.toString(httpServletResponse.getHeaderNames().toArray()));
+
+
+        } catch (HttpClientErrorException ex) {
+            log.error("Error during token exchange: " + ex.getMessage());
+            throw new KeycloakTokenExchangeException("Error during token exchange: " + ex.getCause());
+        }
+    }
+
+    private long parseTokenExpiry(String refreshToken) {
+        try {
+            String[] tokenParts = refreshToken.split("\\.");
+            if (tokenParts.length < 2) {
+                throw new IllegalArgumentException("Invalid refresh token format.");
+            }
+
+            String payload = new String(Base64.getDecoder().decode(tokenParts[1]), StandardCharsets.UTF_8);
+            Map payloadMap = new ObjectMapper().readValue(payload, Map.class);
+
+            long exp = ((Number) payloadMap.get("exp")).longValue();
+            long currentTime = Instant.now().getEpochSecond();
+
+            // calculate ttl in seconds
+            return exp - currentTime;
+
+        } catch (Exception e) {
+            log.error("Failed to parse refresh token expiration: " + e.getMessage());
+            throw new TokenParsingException("Failed to parse refresh token expiration.", e);
+        }
+    }
+
+
+
+
     private String exchangeCodeForToken(String code, String codeVerifier) throws Exception {
         try (CloseableHttpClient httpClient = HttpClients.createDefault()) {
-            HttpPost post = new HttpPost(tokenUrl);
+            HttpPost post = new HttpPost(tokenUri);
 
             // req parameters
             List<BasicNameValuePair> params = new ArrayList<>();
@@ -191,30 +345,6 @@ public class AuthServiceImpl implements AuthService {
         }
     }
 
-    private void storeHttpOnlyCookies(String accessToken, String refreshToken, HttpServletResponse response){
-        log.debug(accessTokenLifespan);
-
-        addCookie(response, CookieAttributes.builder()
-            .name("access_token")
-            .value(accessToken)
-            .maxAge(Integer.parseInt(accessTokenLifespan))
-            .build());
-
-        addCookie(response, CookieAttributes.builder()
-            .name("refresh_token")
-            .value(refreshToken)
-            .maxAge(Integer.parseInt(refreshTokenLifespan))
-            .build());
-    }
-
-    private void addCookie(HttpServletResponse response, CookieAttributes attributes) {
-        Cookie cookie = new Cookie(attributes.name(), attributes.value());
-        cookie.setHttpOnly(true);
-        cookie.setSecure(true);
-        cookie.setPath("/");
-        cookie.setMaxAge(attributes.maxAge());
-        response.addCookie(cookie);
-    }
 
     private Set<String> extractRolesFromResourceAccess(JWTClaimsSet claims) {
         Map<String, Object> resourceAccess = (Map<String, Object>) claims.getClaim("resource_access");
@@ -254,7 +384,7 @@ public class AuthServiceImpl implements AuthService {
                 .email(claims.getStringClaim("email"))
                 .emailVerified(claims.getBooleanClaim("email_verified"))
                 .scopes(scopes)
-                .isAdmin(kcUserService.isAdminUser(userId))
+//                .isAdmin(kcUserService.isAdminUser(userId))
                 .build();
 
         } catch (ParseException ex) {

@@ -23,9 +23,12 @@ public class SecurityConfig {
         http
             .csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/auth/callback").permitAll()
+//                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/auth/callback").permitAll()
+//                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/auth/login").permitAll()
+//                .requestMatchers(HttpMethod.POST, "/api/v1/accounts/auth/token").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/v1/oauth/callback").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/v1/accounts/auth/login").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/v1/accounts/auth/callback").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/v1/accounts/auth/token").permitAll()
                 .anyRequest().authenticated()
             )
             .oauth2ResourceServer((oauth2) -> oauth2.jwt(Customizer.withDefaults()));

@@ -121,12 +121,12 @@ public class AccountServiceImpl implements AccountService {
 
         return accountDTO.getIsAdmin()
             ? accountRepository.findAdminAccountInfoFromDB(accountId)
-                .map(dbDto -> accountMapper.mapAdminDatabaseAccountDTO(dbDto, accountDTO))
-                .orElseThrow(() -> new EntityNotFoundException("Cannot found admin account information in database with id: " + accountId))
+            .map(dbDto -> accountMapper.mapAdminDatabaseAccountDTO(dbDto, accountDTO))
+            .orElseThrow(() -> new EntityNotFoundException("Cannot found admin account information in database with id: " + accountId))
 
             : accountRepository.findClientAccountInfoFromDB(accountId)
-                .map(dbDto -> accountMapper.mapClientDatabaseAccountDTO(dbDto, accountDTO))
-                .orElseThrow(() -> new EntityNotFoundException("Cannot found client account information in database with id: " + accountId));
+            .map(dbDto -> accountMapper.mapClientDatabaseAccountDTO(dbDto, accountDTO))
+            .orElseThrow(() -> new EntityNotFoundException("Cannot found client account information in database with id: " + accountId));
     }
 
 

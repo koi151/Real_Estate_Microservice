@@ -26,6 +26,7 @@ public interface AccountMapper {
     @Mapping(target = "accountEnabled", source = "account.accountEnable")
     AccountDetailDTO requestToAccountDTO(Account account, KeycloakUserDTO kcUserDTO);
 
+
     @Mapping(target = "avatarUrl", source = "account.avatarUrl")
     @Mapping(target = "accountEnabled", source = "account.accountEnable")
     AccountDetailDTO entityToAccountDTO(Account account, KeycloakUserDTO kcDTO);

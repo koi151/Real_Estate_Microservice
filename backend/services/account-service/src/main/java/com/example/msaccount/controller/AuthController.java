@@ -6,6 +6,7 @@ import com.example.msaccount.utils.PKCEUtil;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.Cookie;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.BadRequestException;
@@ -25,6 +26,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.*;
 
 import java.net.URLEncoder;
@@ -71,22 +73,47 @@ public class AuthController {
 //    }
 
     @GetMapping("/login")
-    public ResponseEntity<?> redirectToLogin() {
-        String authUrl = authService.redirectToLogin();
+    public ResponseEntity<?> redirectToLogin(
+        @RequestParam("code_challenge") String codeChallenge,
+        @RequestParam("code_challenge_method") String codeChallengeMethod,
+        @RequestParam("state") String state
+    ) {
+        String authUrl = authService.redirectToLogin(codeChallenge,codeChallengeMethod, state);
         return ResponseEntity.ok(Map.of("loginUrl", authUrl));  // Return URL as json
     }
 
-    @GetMapping("/callback")
-    public ResponseEntity<?> handleOAuthCallback(
-        @RequestParam("code") String authCode,
-        @RequestParam("state") String state,
-        HttpServletResponse response
-    ) {
-        var loginResponse = authService.handleOAuthCallback(authCode, state, response);
+//    @GetMapping("/callback")
+//    public ResponseEntity<?> handleOAuthCallback(
+//        @RequestParam("code") String authCode,
+//        @RequestParam("state") String state,
+//        HttpServletResponse response
+//    ) {
+//        var loginResponse = authService.handleOAuthCallback(authCode, state, response);
+//        return ResponseEntity.status(HttpStatus.OK)
+//            .body(ResponseData.builder()
+//            .data(loginResponse)
+//            .desc("Login successful")
+//            .build());
+//    }
+
+    @PostMapping("/token")
+    public ResponseEntity<?> exchangeToken(@RequestBody MultiValueMap<String, String> requestBody, HttpServletResponse httpServletResponse) {
+        authService.exchangeToken(requestBody, httpServletResponse);
+        return ResponseEntity.status(HttpStatus.OK)
+            .header("Access-Control-Allow-Credentials", "true")
+            .body(ResponseData.builder()
+                .desc("Exchange token successful")
+                .build());
+    }
+
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        var refreshResponse = authService.refreshToken(request);
         return ResponseEntity.status(HttpStatus.OK)
             .body(ResponseData.builder()
-            .data(loginResponse)
-            .desc("Login successful")
-            .build());
+                .data(refreshResponse)
+                .desc("Refresh token successful")
+                .build());
     }
+
 }

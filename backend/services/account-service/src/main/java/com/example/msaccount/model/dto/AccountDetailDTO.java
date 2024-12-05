@@ -1,10 +1,11 @@
 package com.example.msaccount.model.dto;
 
 import lombok.*;
+import lombok.experimental.SuperBuilder;
 
 import java.util.Set;
 
-@Builder
+@SuperBuilder
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
