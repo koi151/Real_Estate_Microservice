@@ -1,5 +1,6 @@
 package com.koi151.msproperty.model.dto.PropertyCategory;
 
+import com.koi151.msproperty.enums.CategoryStatusEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import lombok.*;
 
@@ -14,6 +15,6 @@ public class PropertyCategoryDetailDTO {
 
     private String title;
     private String description;
-    private StatusEnum status;
+    private CategoryStatusEnum status;
     private List<String> imageUrls;
 }

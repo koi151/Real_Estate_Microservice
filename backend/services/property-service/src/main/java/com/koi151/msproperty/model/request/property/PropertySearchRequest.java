@@ -28,7 +28,6 @@ public record PropertySearchRequest (
     StatusEnum status,
     @PositiveOrZero(message = "Min area must be non-negative value")
     BigDecimal areaFrom,
-
     @PositiveOrZero(message = "Area searching value must be non-negative value")
     @DecimalMax(value = "99999999.99", message = "Area searching value cannot exceed 99,999,999.99")
     BigDecimal areaTo,
@@ -39,6 +38,10 @@ public record PropertySearchRequest (
     @PositiveOrZero(message = "Total floor searching request must be non-negative value")
     @Max(value = 999, message = "Total floor search value cannot exceed 999")
     Short totalFloor,
+
+    @PositiveOrZero(message = "Total view searching request must be non-negative value")
+    @Max(value = 9999999, message = "View searching value cannot exceed 999")
+    Integer view,
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     String availableFrom,

@@ -28,7 +28,7 @@ public class PropertyCategoryRepositoryImpl implements PropertyCategoryRepositor
 
     private static boolean isExcludedField(String fieldName, Set<String> excludedFields) {
         return excludedFields.contains(fieldName) ||
-                excludedFields.stream().anyMatch(fieldName::startsWith);
+            excludedFields.stream().anyMatch(fieldName::startsWith);
     }
 
     @Override

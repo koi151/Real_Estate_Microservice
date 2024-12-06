@@ -68,7 +68,6 @@ public interface PropertyMapper {
     @Mapping(target = "address", expression = "java(getFullAddressString(projection.address()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(projection.imageUrls(), \",\"))")
     @Mapping(target = "rooms", expression = "java(projectionToRoomNameQuantityDTOs(projection.rooms()))")
-//    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     PropertySearchDTO toPropertySearchDTO(PropertySearchProjection projection);
 
     // Helper function to map rooms
@@ -111,9 +110,9 @@ public interface PropertyMapper {
     void updatePropertyFromDto(PropertyUpdateRequest request, @MappingTarget Property entity);
 
     default String getFullAddressString(Address entity) {
-        List<String> addressList = Stream.of(entity.getStreetAddress(), entity.getWard(), entity.getDistrict(), entity.getCity())
+        List<String> addressList = Stream.of(entity.getCity(), entity.getDistrict(), entity.getWard(), entity.getStreetAddress())
                 .filter(Objects::nonNull)  // Filter out null values
-                .toList();  // Java 16+ or .collect(Collectors.toList())
+                .toList();
         return StringUtil.toStringSeparateByRegex(addressList, ", ");
     }
 

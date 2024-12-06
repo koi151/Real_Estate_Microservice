@@ -18,6 +18,7 @@ public record PropertySearchProjection (
      BigDecimal area,
      BigDecimal rentalPrice,
      BigDecimal salePrice,
+     Integer view,
      String description,
      Short totalFloor,
      StatusEnum status,

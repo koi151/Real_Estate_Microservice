@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
@@ -53,7 +54,7 @@ public class PropertyServiceImpl implements PropertiesService {
                 Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
                 Page<PropertySearchDTO> result = propertyPage.map(propertyMapper::toPropertySearchDTO);
                 String jsonData = objectMapper.writeValueAsString(result);
-                redisTemplate.opsForValue().set(redisKey, jsonData);
+                redisTemplate.opsForValue().set(redisKey, jsonData, 5, TimeUnit.MINUTES);
                 return result;
             } else {
                 JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, PropertySearchDTO.class);

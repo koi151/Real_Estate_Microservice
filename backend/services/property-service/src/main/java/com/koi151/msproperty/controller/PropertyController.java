@@ -3,6 +3,7 @@ package com.koi151.msproperty.controller;
 import com.github.javafaker.Faker;
 import com.koi151.msproperty.enums.*;
 import com.koi151.msproperty.mapper.ResponseDataMapper;
+import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryStatusUpdateRequest;
 import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.model.request.address.AddressCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
@@ -44,7 +45,7 @@ public class PropertyController {
     private static final int MAX_PAGE_SIZE = 20;
 
     @GetMapping("/")
-//    @PreAuthorize("hasAuthority('SCOPE_properties_view')")
+    @PreAuthorize("hasAuthority('SCOPE_properties_view')")
     public ResponseEntity<ResponseData> findProperties (
         @RequestParam(required = false, defaultValue = "1")
         @Min(value = 1, message = "Page number must be at least 1") int page,
@@ -84,7 +85,8 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
-    @GetMapping("/detail/{id}")
+    @GetMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_properties_view')")
     public ResponseEntity<ResponseData> findPropertyById(@PathVariable(name = "id") Long id) {
         return ResponseEntity.ok(ResponseData.builder()
             .data(propertiesService.getPropertyById(id))
@@ -115,6 +117,11 @@ public class PropertyController {
         Faker faker = new Faker();
         int numberOfFakeProperties = 20000;
 
+        // Define the distribution
+        int forSaleOnly = 10000;
+        int forRentOnly = 8000;
+        int bothSaleAndRent = 2000;
+
         propertiesService.createFakeProperties(IntStream.range(0, numberOfFakeProperties)
             .mapToObj(i -> {
                 // property
@@ -125,18 +132,14 @@ public class PropertyController {
                 StatusEnum[] statuses = StatusEnum.values();
                 int randomStatusIndex = faker.number().numberBetween(0, statuses.length);
 
-                // propertyForRent
                 PaymentScheduleEnum[] paymentSchedules = PaymentScheduleEnum.values();
-
-                // propertyPostService
                 PostingPackageEnum[] postingPackages = PostingPackageEnum.values();
                 int randomPostPackageIndex = faker.number().numberBetween(0, postingPackages.length);
 
                 DaysPostedEnum[] daysPostedEnums = DaysPostedEnum.values();
                 int randomDaysPostedIndex = faker.number().numberBetween(0, daysPostedEnums.length);
 
-
-                // Generate fake data directly in the stream
+                // Generate address
                 AddressCreateRequest address = AddressCreateRequest.builder()
                     .city(faker.address().city())
                     .district(faker.address().cityName())
@@ -146,20 +149,36 @@ public class PropertyController {
 
                 String realEstateTitle = faker.commerce().material() + " " + faker.commerce().department();
 
-                // Ensure at least one property type is present
-                boolean createForSale = faker.bool().bool();
-                boolean createForRent = faker.bool().bool() || !createForSale;
+                // Determine property type based on index
+                PropertyForSaleCreateRequest propertyForSale = null;
+                PropertyForRentCreateRequest propertyForRent = null;
 
-                PropertyForSaleCreateRequest propertyForSale = createForSale ? PropertyForSaleCreateRequest.builder()
-                    .salePrice(BigDecimal.valueOf(faker.number().randomDouble(2, 5000, 20_000_000)))
-                    .saleTerm(faker.lorem().sentence())
-                    .build() : null;
+                if (i < forSaleOnly) {
+                    // For sale only
+                    propertyForSale = PropertyForSaleCreateRequest.builder()
+                        .salePrice(BigDecimal.valueOf(faker.number().randomDouble(2, 5000, 20_000_000)))
+                        .saleTerm(faker.lorem().sentence())
+                        .build();
+                } else if (i < forSaleOnly + forRentOnly) {
+                    // For rent only
+                    propertyForRent = PropertyForRentCreateRequest.builder()
+                        .rentalPrice(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 300000)))
+                        .rentalTerm(faker.lorem().sentence())
+                        .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
+                        .build();
+                } else {
+                    // Both for sale and rent
+                    propertyForSale = PropertyForSaleCreateRequest.builder()
+                        .salePrice(BigDecimal.valueOf(faker.number().randomDouble(2, 5000, 20_000_000)))
+                        .saleTerm(faker.lorem().sentence())
+                        .build();
 
-                PropertyForRentCreateRequest propertyForRent = createForRent ? PropertyForRentCreateRequest.builder()
-                    .rentalPrice(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 300000)))
-                    .rentalTerm(faker.lorem().sentence())
-                    .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
-                    .build() : null;
+                    propertyForRent = PropertyForRentCreateRequest.builder()
+                        .rentalPrice(BigDecimal.valueOf(faker.number().randomDouble(2, 500, 300000)))
+                        .rentalTerm(faker.lorem().sentence())
+                        .paymentSchedule(paymentSchedules[faker.number().numberBetween(0, paymentSchedules.length)])
+                        .build();
+                }
 
                 LocalDateTime postingDate = LocalDateTime.now().plusDays(faker.number().numberBetween(1, 30));
 
@@ -172,7 +191,7 @@ public class PropertyController {
 
                 // rooms
                 RoomTypeEnum[] roomTypes = RoomTypeEnum.values();
-                Set<RoomTypeEnum> usedRoomTypes = new HashSet<>(); // Track used room types
+                Set<RoomTypeEnum> usedRoomTypes = new HashSet<>();
                 List<RoomCreateUpdateRequest> rooms = new ArrayList<>();
 
                 int numRooms = faker.number().numberBetween(1, 4);
@@ -208,7 +227,7 @@ public class PropertyController {
                     .area(BigDecimal.valueOf(faker.number().randomDouble(2, 10, 1200)))
                     .description(faker.lorem().paragraph())
                     .totalFloor((short) faker.number().numberBetween(0, 20))
-                    .categoryId((long) faker.number().numberBetween(1, 5))
+                    .categoryId((long) faker.number().numberBetween(1, 6))
                     .houseDirection(directions[randomDir1Index])
                     .balconyDirection(directions[randomDir2Index])
                     .status(statuses[randomStatusIndex])
@@ -218,9 +237,14 @@ public class PropertyController {
             .collect(Collectors.toList()));
 
         ResponseData responseData = new ResponseData();
-        responseData.setDesc("Fake properties created successfully. Total " + numberOfFakeProperties + " properties created.");
+        responseData.setDesc("Fake properties created successfully with distribution: " +
+            forSaleOnly + " for sale only, " +
+            forRentOnly + " for rent only, " +
+            bothSaleAndRent + " both.");
         return ResponseEntity.ok(responseData);
     }
+
+
 
     @GetMapping("/account/{account-id}")
     public ResponseEntity<ResponseData> findAllPropertiesByAccount(
@@ -295,6 +319,7 @@ public class PropertyController {
             .desc("Property updated successfully")
             .build());
     }
+
 
     @GetMapping("/{id}/active") // used for other domains application request
     public ResponseEntity<ResponseData> propertyActiveCheck(@PathVariable(name = "id") Long id) {

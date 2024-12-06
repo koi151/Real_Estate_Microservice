@@ -21,6 +21,7 @@ public class PropertySearchDTO {
     private Integer totalFloor;
     private String houseDirection;
     private String balconyDirection;
+    private Integer view;
     private String status;
     private String availableFrom;
     private String address;

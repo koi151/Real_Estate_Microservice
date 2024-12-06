@@ -61,10 +61,6 @@ public class Property extends BaseEntity {
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private Address address;
 
-//    @OneToOne(mappedBy = "property",  fetch = FetchType.LAZY,
-//            cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
-//    private PropertyPostService propertyPostService;
-
     @OneToMany(mappedBy = "property",
             cascade = {CascadeType.PERSIST, CascadeType.MERGE}, orphanRemoval = true)
     private List<Rooms> rooms;

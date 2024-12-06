@@ -1,5 +1,6 @@
 package com.koi151.msproperty.model.request.propertyCategory;
 
+import com.koi151.msproperty.enums.CategoryStatusEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
@@ -13,6 +14,6 @@ public record PropertyCategoryUpdateRequest (
     String title,
     @Size(max = 2000, message = "Property category description cannot exceed 2000 characters")
     String description,
-    StatusEnum status,
+    CategoryStatusEnum status,
     Set<String> imageUrlsRemove
 ) {}

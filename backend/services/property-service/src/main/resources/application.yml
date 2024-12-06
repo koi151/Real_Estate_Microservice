@@ -3,9 +3,26 @@ spring:
     name: property-service
   config:
     import: "optional:configserver:http://localhost:8888"
+  servlet:
+    multipart:
+      enabled: true
+      max-file-size: 10MB
+      max-request-size: 50MB
   security:
     oauth2:
       resourceserver:
         jwt:
           jwk-set-uri: "http://localhost:9098/realms/real-estate-microservice/protocol/openid-connect/certs"
 
+logging:
+  level:
+    org.springframework.web: DEBUG
+
+server:
+  port: 8181
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"

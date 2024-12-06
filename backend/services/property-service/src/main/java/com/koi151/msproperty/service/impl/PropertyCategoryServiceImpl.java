@@ -3,16 +3,21 @@ package com.koi151.msproperty.service.impl;
 import com.koi151.msproperty.customExceptions.CategoryNotFoundException;
 import com.koi151.msproperty.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperty.entity.PropertyCategory;
+import com.koi151.msproperty.enums.CategoryStatusEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.mapper.PropertyCategoryMapper;
 import com.koi151.msproperty.model.dto.PropertyCategory.PropertyCategoryDetailDTO;
 import com.koi151.msproperty.model.dto.PropertyCategory.PropertyCategoryHomeDTO;
 import com.koi151.msproperty.model.dto.PropertyCategory.PropertyCategoryTitleDTO;
+import com.koi151.msproperty.model.dto.PropertyCategory.PropertyCategoryTreeDTO;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategorySearchRequest;
+import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryStatusUpdateRequest;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryUpdateRequest;
 import com.koi151.msproperty.repository.PropertyCategoryRepository;
 import com.koi151.msproperty.service.PropertyCategoryService;
+import com.koi151.msproperty.validator.CategoryValidator;
+import com.koi151.property_submissions.customExceptions.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -31,6 +36,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     private final PropertyCategoryRepository propertyCategoryRepository;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final PropertyCategoryMapper propertyCategoryMapper;
+    private final CategoryValidator categoryValidator;
 
     @Override
     public Page<PropertyCategoryHomeDTO> getCategoriesHomePage(PropertyCategorySearchRequest request,Pageable pageable) {
@@ -44,8 +50,14 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
         Page<PropertyCategory> categories = propertyCategoryRepository.findByStatus(status, pageRequest);
 
         return categories.stream()
-                .map(category -> new PropertyCategoryHomeDTO(category.getTitle(), category.getDescription(), category.getImageUrls()))
-                .collect(Collectors.toList());
+            .map(category -> PropertyCategoryHomeDTO.builder()
+                .categoryId(category.getCategoryId())
+                .title(category.getTitle())
+                .status(category.getStatus().getStatusName())
+                .imageUrls(category.getImageUrls())
+                .description(category.getDescription())
+                .build())
+            .collect(Collectors.toList());
     }
 
     @Override
@@ -61,13 +73,15 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
         return new PropertyCategoryTitleDTO(category.getTitle());
     }
 
-    public PropertyCategory createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) { // throws CloudinaryUploadException
+    public PropertyCategoryHomeDTO createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) {
+        PropertyCategory parentCategory = categoryValidator.isValidParentCategory(request.getParentCategoryId());
 
         PropertyCategory propertyCategory = PropertyCategory.builder()
-                .title(request.getTitle())
-                .description(request.getDescription())
-                .status(request.getStatus())
-                .build();
+            .title(request.getTitle())
+            .description(request.getDescription())
+            .status(request.getStatus())
+            .parentCategory(parentCategory)
+            .build();
 
         if (imageFiles != null && !imageFiles.isEmpty()) {
             String imageUrls = cloudinaryServiceImpl.uploadFiles(imageFiles, "real_estate_categories");
@@ -77,9 +91,8 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
             propertyCategory.setImageUrls(imageUrls);
         }
 
-        propertyCategoryRepository.save(propertyCategory);
-
-        return propertyCategory;
+        PropertyCategory savedCategory = propertyCategoryRepository.save(propertyCategory);
+        return propertyCategoryMapper.toPropertyCategoryHomeDTO(savedCategory);
     }
 
     @Override
@@ -152,12 +165,38 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     }
 
     @Override
-    public void deleteCategory(Integer id) {
+    public void deleteCategory(Long id) {
         propertyCategoryRepository.findById(id)
-                .map(existingCategory -> {
-                    existingCategory.setDeleted(true);
-                    return propertyCategoryRepository.save(existingCategory);
-                })
-                .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
+            .map(existingCategory -> {
+                existingCategory.setDeleted(true);
+                return propertyCategoryRepository.save(existingCategory);
+            })
+            .orElseThrow(() -> new CategoryNotFoundException("Category not found with id: " + id));
+    }
+
+    @Override
+    public void updateCategoryStatus(Long id, PropertyCategoryStatusUpdateRequest request) {
+        PropertyCategory existedCategory = propertyCategoryRepository.findById(id)
+            .orElseThrow(() -> new EntityNotFoundException("Property category not existed with id: " + id));
+
+        existedCategory.setStatus(request.status());
+        propertyCategoryRepository.save(existedCategory);
+    }
+
+    @Override
+    public List<PropertyCategoryTreeDTO> getCategoryTree() {
+        List<PropertyCategory> rootCategories = propertyCategoryRepository.findAllRootCategories();
+        return buildCategoryTree(rootCategories);
+    }
+
+    private List<PropertyCategoryTreeDTO> buildCategoryTree(List<PropertyCategory> categories) {
+        return categories.stream()
+            .map(category -> {
+                PropertyCategoryTreeDTO dto = propertyCategoryMapper.toPropertyCategoryTreeDTO(category);
+                List<PropertyCategoryTreeDTO> children = buildCategoryTree(new ArrayList<>(category.getChildCategories()));
+                dto.setChildren(children);
+                return dto;
+            })
+            .toList();
     }
 }

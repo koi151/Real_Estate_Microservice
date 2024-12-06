@@ -51,9 +51,9 @@ public class CookieToBearerFilter implements WebFilter {
 
                 return chain.filter(exchange.mutate().request(modifiedRequest).build());
             }
-            log.info("No access token cookie found");
         }
 
+        log.info("No access token cookie found");
         return chain.filter(exchange);
     }
 }

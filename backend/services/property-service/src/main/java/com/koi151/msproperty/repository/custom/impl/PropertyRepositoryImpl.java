@@ -199,6 +199,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
         root.get("area").alias("area"),
         cb.coalesce(root.get("propertyForRent").get("rentalPrice"), cb.literal(BigDecimal.ZERO)).alias("rentalPrice"),
         cb.coalesce(root.get("propertyForSale").get("salePrice"), cb.literal(BigDecimal.ZERO)).alias("salePrice"),
+        root.get("view").alias("view"),
         root.get("description").alias("description"),
         root.get("totalFloor").alias("totalFloor"),
         root.get("status").alias("status"),
@@ -207,8 +208,6 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
         root.get("imageUrls").alias("imageUrls"),
         roomJoin.get("roomType").alias("roomType"),
         roomJoin.get("quantity").alias("quantity")
-//        postServiceJoin.get("postingPackage").alias("postingPackage"),
-//        postServiceJoin.get("postingDate").alias("postingDate")
     );
 
     TypedQuery<Tuple> query = entityManager.createQuery(cq);
@@ -251,6 +250,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
                     .area(tuple.get("area", BigDecimal.class))
                     .rentalPrice(tuple.get("rentalPrice", BigDecimal.class))
                     .salePrice(tuple.get("salePrice", BigDecimal.class))
+                    .view(tuple.get("view", Integer.class))
                     .description(tuple.get("description", String.class))
                     .totalFloor(tuple.get("totalFloor", Short.class))
                     .status(tuple.get("status", StatusEnum.class))
@@ -258,7 +258,6 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
                     .address(tuple.get("address", Address.class))
                     .imageUrls(tuple.get("imageUrls", String.class))
                     .rooms(propertyRooms)
-//                    .propertyPostService(postServiceProjection)
                     .build();
             })
             .collect(Collectors.toList());
