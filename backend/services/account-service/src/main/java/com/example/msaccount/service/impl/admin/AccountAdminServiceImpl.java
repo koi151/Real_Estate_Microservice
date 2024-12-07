@@ -57,10 +57,28 @@ public class AccountAdminServiceImpl implements AccountAdminService {
     private final PropertiesClient propertiesClient;
 
 
-    @Override
     public List<AdminAccountDTO> findAllAdminAccounts(Pageable pageable) {
         Page<AdminAccount> adminAccounts = adminAccountRepository.findAllByDeletedFalse(pageable);
-        return adminAccountMapper.toAdminAccountDTOs(adminAccounts);
+        return adminAccounts.stream()
+            .map(this::convertToAdminAccountDTO)
+            .toList();
+    }
+
+    private AdminAccountDTO convertToAdminAccountDTO(AdminAccount account) {
+        KeycloakUserDTO keycloakUser = keycloakUserService.fetchUserDetailsFromKeycloak(account.getAccountId());
+
+        return AdminAccountDTO.builder()
+            .accountId(account.getAccountId())
+            .accountName(keycloakUser.firstName() + " " + keycloakUser.lastName())
+            .phone(account.getAccount().getPhone())
+            .status(account.getAccount().isAccountEnable() ? "Active" : "Inactive")
+            .firstName(keycloakUser.firstName())
+            .lastName(keycloakUser.lastName())
+            .email(keycloakUser.email())
+            .avatarUrl(account.getAccount().getAvatarUrl())
+            .roles(keycloakUser.roleNames())
+            .createdAt(account.getCreatedDate())
+            .build();
     }
 
 //    @Override
@@ -82,7 +100,7 @@ public class AccountAdminServiceImpl implements AccountAdminService {
 
 
     @Override
-    @Transactional
+//    @Transactional
     public AccountDetailDTO createAccountAdmin(AccountCreateRequest request, MultipartFile avatar)  {
         accountValidator.validateAccountCreateRequest(request);
 

@@ -380,7 +380,7 @@ public class AuthServiceImpl implements AuthService {
                 .username(claims.getStringClaim("preferred_username"))
                 .firstName(claims.getStringClaim("firstName"))
                 .lastName(claims.getStringClaim("lastName"))
-                .roleNames(roleNames)
+                .roleNames((List<String>) roleNames)
                 .email(claims.getStringClaim("email"))
                 .emailVerified(claims.getBooleanClaim("email_verified"))
                 .scopes(scopes)

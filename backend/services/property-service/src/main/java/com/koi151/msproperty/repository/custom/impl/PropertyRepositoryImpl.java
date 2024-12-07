@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.repository.query.QueryUtils;
 import org.springframework.stereotype.Repository;
 
@@ -44,26 +45,32 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         Join<Property, ?> saleJoin = context.getJoins().get("propertyForSale");
         Join<Property, ?> rentJoin = context.getJoins().get("propertyForRent");
 
-        // Check for overall price filtering
+        // Overall price range filter
         if (request.overallPriceFrom() != null || request.overallPriceTo() != null) {
-            if (request.overallPriceFrom() != null) {
-                predicates.add(cb.or(
-                    cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.overallPriceFrom()),
-                    cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.overallPriceFrom())
-                ));
-            }
-            if (request.overallPriceTo() != null) {
-                predicates.add(cb.or(
-                    cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.overallPriceTo()),
-                    cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.overallPriceTo())
-                ));
-            }
-            return; // skip specific price filters if overallPrice is applied
+            Predicate overallPredicate = cb.or(
+                cb.and(
+                    saleJoin != null && request.overallPriceFrom() != null
+                        ? cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.overallPriceFrom())
+                        : cb.conjunction(),
+                    saleJoin != null && request.overallPriceTo() != null
+                        ? cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.overallPriceTo())
+                        : cb.conjunction()
+                ),
+                cb.and(
+                    rentJoin != null && request.overallPriceFrom() != null
+                        ? cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.overallPriceFrom())
+                        : cb.conjunction(),
+                    rentJoin != null && request.overallPriceTo() != null
+                        ? cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.overallPriceTo())
+                        : cb.conjunction()
+                )
+            );
+            predicates.add(overallPredicate);
+            return;
         }
 
-        //  sale price filtering
-        if (request.propertyForSale() != null &&
-            (request.propertyForSale().priceFrom() != null || request.propertyForSale().priceTo() != null)) {
+        // Specific sale price filtering
+        if (request.propertyForSale() != null) {
             if (saleJoin != null) {
                 if (request.propertyForSale().priceFrom() != null) {
                     predicates.add(cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.propertyForSale().priceFrom()));
@@ -75,8 +82,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         }
 
         // Specific rent price filtering
-        if (request.propertyForRent() != null &&
-            (request.propertyForRent().priceFrom() != null || request.propertyForRent().priceTo() != null)) {
+        if (request.propertyForRent() != null) {
             if (rentJoin != null) {
                 if (request.propertyForRent().priceFrom() != null) {
                     predicates.add(cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.propertyForRent().priceFrom()));
@@ -87,8 +93,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             }
         }
     }
-
-
 
     private static void addRoomConditions(PropertySearchRequest request, QueryContext<Property> context) {
         if (request.rooms() != null && !request.rooms().isEmpty()) {
@@ -158,9 +162,43 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         context.addJoin("rooms", context.root().join("rooms", JoinType.LEFT));
     }
 
+    private static void applySorting(CriteriaQuery<Tuple> cq, QueryContext<Property> context, Sort sort) {
+        if (sort.isSorted()) {
+            CriteriaBuilder cb = context.criteriaBuilder();
+            Root<Property> root = context.root();
+
+            List<Order> orderList = sort.stream()
+                .map(order -> {
+                    String property = order.getProperty();
+                    Expression<?> expression = switch (property) {
+                        case "rentalPrice" -> context.joins().get("propertyForRent").get("rentalPrice");
+                        case "salePrice" -> context.joins().get("propertyForSale").get("salePrice");
+                        case "view" -> root.get("view");
+                        case "createdDate" -> root.get("createdDate");
+                        case "propertyId" -> root.get("propertyId");
+                        default -> throw new IllegalArgumentException("Unsupported sorting property: " + property);
+                    };
+
+                    // handle null values for proper sorting
+                    expression = property.equals("rentalPrice") || property.equals("salePrice")
+                        ? cb.coalesce(expression, 0)
+                        : expression;
+
+                    return order.getDirection() == Sort.Direction.ASC ?
+                        cb.asc(expression) :
+                        cb.desc(expression);
+                })
+                .collect(Collectors.toList());
+
+            cq.orderBy(orderList);
+        }
+    }
+
     @Override
     public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
         CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        Long totalCount = getDistinctPropertyCount(request, cb);
+
         CriteriaQuery<Tuple> cq = cb.createTupleQuery();
         Root<Property> root = cq.from(Property.class);
         List<Predicate> predicates = new ArrayList<>();
@@ -183,6 +221,11 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
 
         predicates.add(cb.equal(root.get("deleted"), false));
         cq.where(predicates.toArray(new Predicate[0]));
+
+        // Add distinct to the main query
+        cq.distinct(true);
+
+        applySorting(cq, context, pageable.getSort());
 
         if (pageable.getSort().isSorted()) {
             cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb));
@@ -221,7 +264,45 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         query.setMaxResults(pageable.getPageSize());
         List<Tuple> resultList = query.getResultList();
 
+        // process results and create projections
+        List<PropertySearchProjection> properties = processQueryResults(resultList);
+        return new PageImpl<>(properties, pageable, totalCount);
+    }
+
+    private Long getDistinctPropertyCount(PropertySearchRequest request, CriteriaBuilder cb) {
+        CriteriaQuery<Long> countQuery = cb.createQuery(Long.class);
+        Root<Property> countRoot = countQuery.from(Property.class);
+        List<Predicate> countPredicates = new ArrayList<>();
+        Map<String, Join<Property, ?>> countJoins = new HashMap<>();
+
+        QueryContext<Property> countContext = new QueryContext<>(cb, countQuery, countRoot, countPredicates, countJoins);
+
+        if (request != null) {
+            joinColumns(request, countContext);
+
+            Set<String> excludedFields = new HashSet<>(Set.of(
+                "propertyForRent", "propertyForSale", "propertyCategory", "areaFrom", "areaTo",
+                "priceFrom", "priceTo", "address", "rooms"
+            ));
+
+            Map<String, QueryFieldOptionEnum> queryOptions = buildQueryOptions(request, excludedFields);
+            CustomRepositoryUtils.appendNormalQueryConditions(request, countContext, queryOptions);
+            applySpecialQueryConditions(request, countContext);
+        }
+
+        countPredicates.add(cb.equal(countRoot.get("deleted"), false));
+        countQuery.where(countPredicates.toArray(new Predicate[0]));
+
+        // Count distinct property IDs
+        countQuery.select(cb.countDistinct(countRoot.get("propertyId")));
+
+        return entityManager.createQuery(countQuery).getSingleResult();
+    }
+
+    private List<PropertySearchProjection> processQueryResults(List<Tuple> resultList) {
         Map<Long, List<RoomSearchProjection>> roomsByPropertyId = new HashMap<>();
+
+        // Group rooms by property ID
         for (Tuple tuple : resultList) {
             Long propertyId = tuple.get("propertyId", Long.class);
             RoomSearchProjection room = new RoomSearchProjection(
@@ -231,7 +312,8 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             roomsByPropertyId.computeIfAbsent(propertyId, k -> new ArrayList<>()).add(room);
         }
 
-        List<PropertySearchProjection> properties = resultList.stream()
+        // Create property projections
+        return resultList.stream()
             .collect(Collectors.groupingBy(tuple -> tuple.get("propertyId", Long.class)))
             .entrySet().stream()
             .map(entry -> {
@@ -259,8 +341,6 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                     .build();
             })
             .collect(Collectors.toList());
-
-        return new PageImpl<>(properties, pageable, properties.size());
     }
 
     private Map<String, QueryFieldOptionEnum> buildQueryOptions(PropertySearchRequest request, Set<String> excludedFields) {

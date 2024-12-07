@@ -12,7 +12,7 @@ public interface AccountService {
     AccountWithNameAndRoleDTO findAccountNameAndRoleById(String uuid);
 //    Page<AccountWithPropertiesDTO> findAccountWithProperties(Long id, Pageable pageable);
     AccountDetailDTO createAccount(AccountCreateRequest request, MultipartFile avatar);
-
+    AccountDetailDTO findAccountDetails(String uuid);
     AccountDetailDTO getCurrentAccountInfo(String authorizationHeader);
 //    ===String login(String userName, String password) throws Exception;
     AccountDetailDTO updateCurrentAccount(String authorizationHeader, AccountUpdateRequest request, MultipartFile avatar);

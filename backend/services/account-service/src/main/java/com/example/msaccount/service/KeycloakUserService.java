@@ -27,6 +27,7 @@ import org.keycloak.representations.AccessTokenResponse;
 import org.keycloak.representations.idm.*;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.IOException;
 import java.net.URI;
@@ -115,18 +116,43 @@ public class KeycloakUserService {
         }
     }
 
-    public AccessTokenResponse getAccessToken(String username, String password) {
+    public KeycloakUserDTO fetchUserDetailsFromKeycloak(String accountId) {
         try {
-            Keycloak keycloak = getKeycloakInstanceWithCredentials(username, password);
-            return keycloak.tokenManager().getAccessToken();
-        } catch (NotAuthorizedException ex) {
-            log.info("Failed to login with username: {}, password: {}", username, password);
-            throw new KeycloakLoginFailedException("Login failed, wrong username or password");
-        } catch (BadRequestException ex) {
-            log.info("Failed to login with username: {}, password: {}", username, password);
-            throw new KeycloakLoginFailedException("Login failed, account might already disabled");
+            // get UsersResource from KeycloakProvider
+            UsersResource usersResource = keycloakProvider.getInstance().realm(realm).users();
+
+            UserRepresentation user = usersResource.get(accountId).toRepresentation();
+            String clientUUID = getClientUUID();
+
+            List<String> roles = usersResource.get(accountId)
+                .roles()
+                .clientLevel(clientUUID)
+                .listAll()
+                .stream()
+                .map(RoleRepresentation::getName)
+                .toList();
+
+            return KeycloakUserDTO.builder()
+                .id(user.getId())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .email(user.getEmail())
+                .roleNames(List.copyOf(roles))
+                .build();
+
+        } catch (NotFoundException e) {
+            log.error("User with ID {} not found in Keycloak", accountId, e);
+            throw new KeycloakResourceNotFoundException("User not found in Keycloak for ID: " + accountId);
+        } catch (NotAuthorizedException e) {
+            log.error("Unauthorized access while fetching user details from Keycloak for ID: {}", accountId, e);
+            throw new UnauthorizedActionException("Unauthorized access to Keycloak for user ID: " + accountId);
+        } catch (Exception e) {
+            log.error("Unexpected error fetching user details from Keycloak for ID: {}", accountId, e);
+            throw new RuntimeException("Error fetching user details from Keycloak for ID: " + accountId, e);
         }
     }
+
+
 
     private String getClientUUID() {
         return getClientsResource().findByClientId(clientId).get(0).getId();
@@ -207,6 +233,7 @@ public class KeycloakUserService {
     }
 
 
+    @Transactional
     public KeycloakUserDTO createUser(AccountCreateRequest request) {
         UsersResource usersResource = getUsersResource();
         UserRepresentation kcUser = buildUserRepresentation(request);

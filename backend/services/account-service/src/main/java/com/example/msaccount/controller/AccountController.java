@@ -30,6 +30,18 @@ public class AccountController {
                 .build());
     }
 
+    @GetMapping("/{accountId}")
+    @PreAuthorize("hasAuthority('SCOPE_accounts_view')")
+    public ResponseEntity<ResponseData> findAccountDetails(@PathVariable String accountId) {
+        var accountDetails = accountService.findAccountDetails(accountId);
+        return ResponseEntity.ok(
+            ResponseData.builder()
+                .data(accountDetails)
+                .desc(accountDetails != null ? "Success" : "Account not found")
+                .build()
+        );
+    }
+
     @PatchMapping("/")
     public ResponseEntity<ResponseData> updateCurrentAccount(
         @RequestHeader("Authorization") String authorizationHeader,

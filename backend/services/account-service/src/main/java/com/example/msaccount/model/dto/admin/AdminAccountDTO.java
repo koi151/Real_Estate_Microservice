@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.List;
 import java.util.Set;
 
 @Setter
@@ -19,6 +20,6 @@ public class AdminAccountDTO {
     private String lastName;
     private String email;
     private String avatarUrl;
-    private Set<String> roles;
+    private List<String> roles;
     private LocalDateTime createdAt;
 }

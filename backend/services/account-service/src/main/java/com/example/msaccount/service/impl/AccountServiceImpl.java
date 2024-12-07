@@ -101,6 +101,31 @@ public class AccountServiceImpl implements AccountService {
         return accountMapper.requestToAccountDTO(account, kcUserDTO);
     }
 
+    @Override
+    public AccountDetailDTO findAccountDetails(String uuid) {
+        Account existedAcc = accountRepository.findById(uuid)
+            .orElseThrow(() -> new EntityNotFoundException("Account cannot be found with id: " + uuid));
+
+        KeycloakUserDTO keycloakUser = keycloakUserService.fetchUserDetailsFromKeycloak(existedAcc.getAccountId());
+
+        return AccountDetailDTO.builder()
+            .accountId(existedAcc.getAccountId())
+            .phone(existedAcc.getPhone())
+            .avatarUrl(existedAcc.getAvatarUrl())
+            .accountEnabled(existedAcc.isAccountEnable())
+            .firstName(keycloakUser.firstName())
+            .lastName(keycloakUser.lastName())
+            .email(keycloakUser.email())
+            .roleNames(keycloakUser.roleNames())
+            .accountType(existedAcc.getAdminAccount() != null ? "Admin" : "Client")
+            .balance(existedAcc.getClientAccount() != null ? existedAcc.getClientAccount().getBalance() : null)
+            .createdDate(existedAcc.getAdminAccount() != null
+                ? existedAcc.getAdminAccount().getCreatedDate()
+                : existedAcc.getClientAccount().getCreatedDate())
+            .build();
+    }
+
+
     public AccountDetailDTO getAccountDataFromHeader(String authorizationHeader) {
         String userId = AuthServiceImpl.extractUserIdFromToken(authorizationHeader);
         String key = "userId:" + userId;

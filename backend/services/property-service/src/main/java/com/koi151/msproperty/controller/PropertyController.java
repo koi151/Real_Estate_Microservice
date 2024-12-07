@@ -47,15 +47,25 @@ public class PropertyController {
 
     @GetMapping("/")
     @PreAuthorize("hasAuthority('SCOPE_properties_view')")
-    public ResponseEntity<ResponseData> findProperties (
+    public ResponseEntity<ResponseData> findProperties(
         @RequestParam(required = false, defaultValue = "1")
         @Min(value = 1, message = "Page number must be at least 1") int page,
+
         @RequestParam(required = false, defaultValue = "10")
         @Min(value = 1, message = "Page size must be at least 1") int limit,
-        @ModelAttribute @Valid PropertySearchRequest request)
-    {
+
+        @RequestParam(required = false) String[] sort,
+
+        @ModelAttribute @Valid PropertySearchRequest request
+    ) {
         int pageSize = Math.min(limit, MAX_PAGE_SIZE);
-        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate"));
+
+        // Create sort orders from the sort parameter
+        Sort sorting = createSortOrders(sort);
+
+        // Create pageable with dynamic sorting
+        Pageable pageable = PageRequest.of(page - 1, pageSize, sorting);
+
         var propertiesPage = propertiesService.findProperties(request, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
@@ -65,6 +75,32 @@ public class PropertyController {
 
         return ResponseEntity.ok(responseData);
     }
+
+    private Sort createSortOrders(String[] sortParams) {
+        List<Sort.Order> orders = new ArrayList<>();
+
+        if (sortParams != null) {
+            for (String sortParam : sortParams) {
+                String[] parts = sortParam.split("-");
+                if (parts.length > 0) {
+                    String property = parts[0].trim();
+                    Sort.Direction direction = parts.length > 1 && "desc".equalsIgnoreCase(parts[1])
+                        ? Sort.Direction.DESC
+                        : Sort.Direction.ASC;
+
+                    orders.add(Sort.Order.by(property).with(direction));
+                }
+            }
+        }
+
+        // Add default sort by createdDate if not present
+        if (orders.stream().noneMatch(order -> order.getProperty().equals("createdDate"))) {
+            orders.add(Sort.Order.desc("createdDate"));
+        }
+
+        return Sort.by(orders);
+    }
+
 
     @GetMapping("/home")
     @PreAuthorize("hasAuthority('SCOPE_properties_view')")
