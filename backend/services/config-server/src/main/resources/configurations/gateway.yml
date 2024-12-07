@@ -20,7 +20,6 @@ spring:
           predicates:
             - Path=/api/v1/properties/**
 
-
         - id: account
           uri: http://localhost:8060/
           predicates:

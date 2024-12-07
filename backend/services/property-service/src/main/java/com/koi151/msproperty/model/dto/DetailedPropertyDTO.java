@@ -14,6 +14,8 @@ public class DetailedPropertyDTO {
     private String houseDirection;
     private String balconyDirection;
     private String status;
+    private String legalDocument;
+    private String furniture;
     private String availableFrom;
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;

@@ -2,6 +2,8 @@ package com.koi151.msproperty.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.koi151.msproperty.enums.DirectionEnum;
+import com.koi151.msproperty.enums.FurnitureEnum;
+import com.koi151.msproperty.enums.LegalDocumentEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.model.request.propertyForRent.PropertyForRentCreateRequest;
 import com.koi151.msproperty.model.request.propertyForSale.PropertyForSaleCreateRequest;
@@ -57,6 +59,8 @@ public record PropertyCreateRequest(
     DirectionEnum houseDirection,
     DirectionEnum balconyDirection,
     StatusEnum status,
+    FurnitureEnum furniture,
+    LegalDocumentEnum legalDocument,
     @NotNull(message = "Property available date is mandatory")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     LocalDate availableFrom

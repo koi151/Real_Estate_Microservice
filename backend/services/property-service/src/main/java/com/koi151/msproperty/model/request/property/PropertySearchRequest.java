@@ -46,11 +46,18 @@ public record PropertySearchRequest (
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     String availableFrom,
 
-    @Size(max = 1000, message = "Term searching cannot exceed 1000 characters long")
+    @Size(max = 1000, message = "Term searching cannot exceed {max} characters long")
     String term,
+
+    @PositiveOrZero(message = "Overall price must be non-negative")
+    BigDecimal overallPriceFrom,
+
+    @PositiveOrZero(message = "Overall price must be non-negative")
+    BigDecimal overallPriceTo,
 
     @Valid
     AddressSearchRequest address,
+
     @Valid
     List<RoomSearchRequest> rooms
 ){}

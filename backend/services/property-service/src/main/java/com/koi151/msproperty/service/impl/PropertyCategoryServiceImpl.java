@@ -98,14 +98,14 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     @Override
     public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
         return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
-                .map(existingCategory -> {
-                    updateCategoryDetails(existingCategory, request);
-                    updateImages(existingCategory, request, imageFiles);
+            .map(existingCategory -> {
+                updateCategoryDetails(existingCategory, request);
+                updateImages(existingCategory, request, imageFiles);
 
-                    return propertyCategoryRepository.save(existingCategory);
-                })
-                .map(savedProperty -> convertToPropertyCategoryDTO(savedProperty, request))
-                .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
+                return propertyCategoryRepository.save(existingCategory);
+            })
+            .map(savedProperty -> convertToPropertyCategoryDTO(savedProperty, request))
+            .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
 
     private void updateImages(PropertyCategory existingProperty, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {

@@ -11,6 +11,7 @@ import com.koi151.msproperty.model.dto.*;
 import com.koi151.msproperty.model.projection.PropertySearchProjection;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertySearchRequest;
+import com.koi151.msproperty.model.request.property.PropertyStatusUpdateRequest;
 import com.koi151.msproperty.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperty.repository.*;
@@ -19,6 +20,8 @@ import com.koi151.msproperty.service.PropertiesService;
 import com.koi151.msproperty.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperty.customExceptions.PropertyNotFoundException;
 import com.koi151.msproperty.service.converter.PropertyConverter;
+import com.koi151.msproperty.validator.PropertyValidator;
+import com.koi151.property_submissions.customExceptions.EntityNotFoundException;
 import lombok.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,6 +44,7 @@ public class PropertyServiceImpl implements PropertiesService {
     private final PropertyRepository propertyRepository;
     private final PropertyConverter propertyConverter;
     private final PropertyMapper propertyMapper;
+    private final PropertyValidator propertyValidator;
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
@@ -105,6 +109,7 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional
     @Override
     public DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+        propertyValidator.checkValidPropertyCreateRequest(request);
         Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
         propertyRepository.save(property);
         return propertyMapper.toDetailedPropertyDTO(property);
@@ -218,11 +223,20 @@ public class PropertyServiceImpl implements PropertiesService {
     @Transactional
     public void deleteProperty(Long id) throws PropertyNotFoundException {
         propertyRepository.findById(Math.toIntExact(id))
-                .map(existingProperty -> {
-                    existingProperty.setDeleted(true);
-                    return propertyRepository.save(existingProperty);
-                })
-                .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
+            .map(existingProperty -> {
+                existingProperty.setDeleted(true);
+                return propertyRepository.save(existingProperty);
+            })
+            .orElseThrow(() -> new PropertyNotFoundException("Property not found with id: " + id));
+    }
+
+    @Override
+    public void updatePropertyStatus(Long id, PropertyStatusUpdateRequest request) {
+        Property existedCategory = propertyRepository.findByPropertyIdAndDeleted(id, false)
+            .orElseThrow(() -> new EntityNotFoundException("Property category not existed with id: " + id));
+
+        existedCategory.setStatus(request.status());
+        propertyRepository.save(existedCategory);
     }
 
     @Override

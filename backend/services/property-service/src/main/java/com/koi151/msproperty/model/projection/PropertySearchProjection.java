@@ -1,6 +1,8 @@
 package com.koi151.msproperty.model.projection;
 
 import com.koi151.msproperty.entity.Address;
+import com.koi151.msproperty.enums.FurnitureEnum;
+import com.koi151.msproperty.enums.LegalDocumentEnum;
 import com.koi151.msproperty.enums.PropertyTypeEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import lombok.Builder;
@@ -25,6 +27,8 @@ public record PropertySearchProjection (
      LocalDate availableFrom,
      Address address,
      String imageUrls,
+     LegalDocumentEnum legalDocument,
+     FurnitureEnum furniture,
      List<RoomSearchProjection> rooms
 //     PropertyPostServiceProjection propertyPostService
 ) {}

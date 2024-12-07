@@ -1,6 +1,8 @@
 package com.koi151.msproperty.entity;
 
 import com.koi151.msproperty.enums.DirectionEnum;
+import com.koi151.msproperty.enums.FurnitureEnum;
+import com.koi151.msproperty.enums.LegalDocumentEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
@@ -13,7 +15,6 @@ import java.util.List;
 
 @NamedEntityGraph(name = "property-with-details",
     attributeNodes = {
-//        @NamedAttributeNode("propertyPostService"),
         @NamedAttributeNode("propertyForRent"),
         @NamedAttributeNode("propertyForSale")
     })
@@ -26,7 +27,9 @@ import java.util.List;
         @Index(name = "idx_available_from", columnList = "available_from"),
         @Index(name = "idx_status", columnList = "status"),
         @Index(name = "idx_house_direction", columnList = "house_direction"),
-        @Index(name = "idx_balcony_direction", columnList = "balcony_direction")
+        @Index(name = "idx_balcony_direction", columnList = "balcony_direction"),
+        @Index(name = "idx_legal_document", columnList = "legal_document"),
+        @Index(name = "idx_furnitures", columnList = "balcony_direction")
 
         // Composite Indexes
 //        @Index(name = "idx_title_area_category", columnList = "title, area, category_id"),
@@ -114,4 +117,12 @@ public class Property extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "balcony_direction", length = 20)
     private DirectionEnum balconyDirection;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "legal_document")
+    private LegalDocumentEnum legalDocument;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "furnitures", length = 20)
+    private FurnitureEnum furniture;
 }

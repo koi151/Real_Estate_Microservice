@@ -12,7 +12,6 @@ import org.springframework.validation.FieldError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 import java.time.DateTimeException;
 import java.util.ArrayList;
@@ -23,146 +22,119 @@ import java.util.stream.Collectors;
 public class ControllerAdvisor {
 
     @ExceptionHandler(PropertyNotFoundException.class)
-    public ResponseEntity<Object> handlePropertyNotFoundException(PropertyNotFoundException ex, WebRequest request) {
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError(ex.getMessage());
-
-        List<String> details = new ArrayList<>();
-        details.add("Property not existed or might be deleted");
-        errorResponseDTO.setDetails(details);
-
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.NOT_FOUND);
+    public ResponseEntity<Object> handlePropertyNotFoundException(PropertyNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Property not existed or might be deleted"))
+                .build());
     }
 
     @ExceptionHandler(PaymentScheduleNotFoundException.class)
     public ResponseEntity<Object> handlePaymentScheduleNotFoundException(PaymentScheduleNotFoundException ex) {
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError(ex.getMessage());
-
-        List<String> details = new ArrayList<>();
-        details.add("Please add valid payment schedule for property");
-        errorResponseDTO.setDetails(details);
-
-        return new ResponseEntity<>(errorResponseDTO, HttpStatus.BAD_GATEWAY);
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Please add valid payment schedule for property"))
+                .build());
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleMethodArgumentNotValidException(MethodArgumentNotValidException ex) {
-
         List<String> errors = ex.getBindingResult().getFieldErrors()
-            .stream() // create new stream
+            .stream()
             .map(FieldError::getDefaultMessage)
-            .collect(Collectors.toList()); // convert to list
+            .collect(Collectors.toList());
 
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError("Validation failed");
-        errorResponseDTO.setDetails(errors);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponseDTO);
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorResponse.builder()
+                .error("Validation failed")
+                .details(errors)
+                .build());
     }
 
-    //handleConstraintViolationException > MethodArgumentNotValidException > Binding...
-    // The below error type occurred when violated @NotNull validation
     @ExceptionHandler(ConstraintViolationException.class)
-    public ResponseEntity<Object> handleConstraintViolationException(
-            ConstraintViolationException ex) {
-
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         List<String> constraintViolations = ex.getConstraintViolations()
-                .stream()
-                .map(ConstraintViolation::getMessage)
-                .collect(Collectors.toList());
+            .stream()
+            .map(ConstraintViolation::getMessage)
+            .collect(Collectors.toList());
 
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError("Validation errors occurred");
-        errorResponseDTO.setDetails(constraintViolations);
-
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error("Validation errors occurred")
+                .details(constraintViolations)
+                .build());
     }
 
     @ExceptionHandler(CategoryNotFoundException.class)
-    public ResponseEntity<Object> handleCategoryNotFoundException
-            (CategoryNotFoundException ex, WebRequest request) {
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        List<String> details = new ArrayList<>();
-        details.add("Property category not existed or might be deleted");
-        errorResponse.setDetails(details);
-
-        return new ResponseEntity<>(errorResponse, HttpStatus.BAD_GATEWAY);
+    public ResponseEntity<Object> handleCategoryNotFoundException(CategoryNotFoundException ex) {
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY)
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Property category not existed or might be deleted"))
+                .build());
     }
 
-    @ExceptionHandler(UnexpectedTypeException.class) // Occurs when enumerate value validation fails.
+    @ExceptionHandler(UnexpectedTypeException.class)
     public ResponseEntity<Object> handleUnexpectedTypeException(UnexpectedTypeException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("UnexpectedTypeException occurred");
-
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("UnexpectedTypeException occurred"))
+                .build());
     }
 
     @ExceptionHandler(EmptyFileException.class)
     public ResponseEntity<Object> handleEmptyFileException(EmptyFileException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Images file is empty, recheck file value again");
-
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Images file is empty, recheck file value again"))
+                .build());
     }
 
     @ExceptionHandler(MaxImagesExceededException.class)
     public ResponseEntity<Object> handleMaxImagesExceededException(MaxImagesExceededException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Maximum 8 images allow reached, cannot add more images");
-
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Maximum 8 images allow reached, cannot add more images"))
+                .build());
     }
 
     @ExceptionHandler(InvalidContentTypeException.class)
     public ResponseEntity<Object> handleInvalidContentTypeException(InvalidContentTypeException ex) {
-        List<String> details = new ArrayList<>();
-        details.add("Invalid Content-Type value, recheck again.");
-
-        ErrorResponse errorResponseDTO = new ErrorResponse();
-        errorResponseDTO.setError(ex.getMessage());
-        errorResponseDTO.setDetails(details);
-
-        return ResponseEntity.badRequest().body(errorResponseDTO);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Invalid Content-Type value, recheck again."))
+                .build());
     }
 
     @ExceptionHandler(InvalidEnumValueException.class)
     public ResponseEntity<ErrorResponse> handleInvalidEnumValueException(InvalidEnumValueException ex) {
-
-        List<String> details = new ArrayList<>();
-        details.add("Recheck status value");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Recheck status value"))
+                .build());
     }
 
-    @ExceptionHandler(DateTimeException.class) // for validation and other purposes
+    @ExceptionHandler(DateTimeException.class)
     public ResponseEntity<ErrorResponse> handleDateTimeException(DateTimeException ex) {
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .details(List.of("Recheck date time in request"))
+                .build());
+    }
 
-        List<String> details = new ArrayList<>();
-        details.add("Recheck date time in request");
-
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setError(ex.getMessage());
-        errorResponse.setDetails(details);
-
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    @ExceptionHandler(InvalidRequestException.class)
+    public ResponseEntity<ErrorResponse> handleInvalidRequestException(InvalidRequestException ex) {
+        return ResponseEntity.badRequest()
+            .body(ErrorResponse.builder()
+                .error(ex.getMessage())
+                .build());
     }
 }

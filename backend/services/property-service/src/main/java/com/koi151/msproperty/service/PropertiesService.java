@@ -6,6 +6,7 @@ import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.model.dto.PropertySearchDTO;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertySearchRequest;
+import com.koi151.msproperty.model.request.property.PropertyStatusUpdateRequest;
 import com.koi151.msproperty.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperty.customExceptions.PropertyNotFoundException;
 import org.springframework.data.domain.Page;
@@ -27,6 +28,7 @@ public interface PropertiesService {
     void createFakeProperties(List<PropertyCreateRequest> fakeProperties);
     DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;
+    void updatePropertyStatus(Long id, PropertyStatusUpdateRequest request);
 
     boolean propertyActiveCheck(Long id);
 }

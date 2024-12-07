@@ -31,22 +31,40 @@ import java.util.stream.Collectors;
 
 @Repository
 @RequiredArgsConstructor
-@Primary // need this to use custom repository instead of Spring Data JPA automatically generate queries based on method names
+@Primary // use custom repository instead of Spring Data JPA auto gen
 public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
-    @PersistenceContext // used to inject an EntityManager into a class
+
+    @PersistenceContext
     private EntityManager entityManager;
 
     private static void applyPriceFilters(PropertySearchRequest request, QueryContext<Property> context) {
-        // Check if any price filtering is actually needed
-        if (request.propertyForSale() != null &&
-                (request.propertyForSale().priceFrom() != null || request.propertyForSale().priceTo() != null)
-        ) {
-            // Sale price filtering is needed
-            Join<Property, ?> saleJoin = context.getJoins().get("propertyForSale");
-            if (saleJoin != null) {
-                CriteriaBuilder cb = context.criteriaBuilder();
-                List<Predicate> predicates = context.predicates();
+        CriteriaBuilder cb = context.criteriaBuilder();
+        List<Predicate> predicates = context.predicates();
 
+        Join<Property, ?> saleJoin = context.getJoins().get("propertyForSale");
+        Join<Property, ?> rentJoin = context.getJoins().get("propertyForRent");
+
+        // Check for overall price filtering
+        if (request.overallPriceFrom() != null || request.overallPriceTo() != null) {
+            if (request.overallPriceFrom() != null) {
+                predicates.add(cb.or(
+                    cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.overallPriceFrom()),
+                    cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.overallPriceFrom())
+                ));
+            }
+            if (request.overallPriceTo() != null) {
+                predicates.add(cb.or(
+                    cb.lessThanOrEqualTo(saleJoin.get("salePrice"), request.overallPriceTo()),
+                    cb.lessThanOrEqualTo(rentJoin.get("rentalPrice"), request.overallPriceTo())
+                ));
+            }
+            return; // skip specific price filters if overallPrice is applied
+        }
+
+        //  sale price filtering
+        if (request.propertyForSale() != null &&
+            (request.propertyForSale().priceFrom() != null || request.propertyForSale().priceTo() != null)) {
+            if (saleJoin != null) {
                 if (request.propertyForSale().priceFrom() != null) {
                     predicates.add(cb.greaterThanOrEqualTo(saleJoin.get("salePrice"), request.propertyForSale().priceFrom()));
                 }
@@ -56,15 +74,10 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             }
         }
 
+        // Specific rent price filtering
         if (request.propertyForRent() != null &&
-                (request.propertyForRent().priceFrom() != null || request.propertyForRent().priceTo() != null)
-        ) {
-            // Rent price filtering is needed
-            Join<Property, ?> rentJoin = context.getJoins().get("propertyForRent");
+            (request.propertyForRent().priceFrom() != null || request.propertyForRent().priceTo() != null)) {
             if (rentJoin != null) {
-                CriteriaBuilder cb = context.criteriaBuilder();
-                List<Predicate> predicates = context.predicates();
-
                 if (request.propertyForRent().priceFrom() != null) {
                     predicates.add(cb.greaterThanOrEqualTo(rentJoin.get("rentalPrice"), request.propertyForRent().priceFrom()));
                 }
@@ -74,6 +87,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             }
         }
     }
+
 
 
     private static void addRoomConditions(PropertySearchRequest request, QueryContext<Property> context) {
@@ -95,28 +109,30 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         CriteriaBuilder cb = context.criteriaBuilder();
         Root<Property> root = context.root();
 
-        Join<?, ?> addressJoin = context.joins().get("address");
+        if (request.propertyForSale() != null) {
+            predicates.add(cb.isNotNull(context.getJoins().get("propertyForSale")));
+            predicates.add(cb.isNull(context.getJoins().get("propertyForRent")));
+        } else if (request.propertyForRent() != null) {
+            predicates.add(cb.isNotNull(context.getJoins().get("propertyForRent")));
+            predicates.add(cb.isNull(context.getJoins().get("propertyForSale")));
+        } else {
+            predicates.add(cb.or(
+                cb.isNotNull(context.getJoins().get("propertyForSale")),
+                cb.isNotNull(context.getJoins().get("propertyForRent"))
+            ));
+        }
 
-        if (request.areaFrom() != null)
+        if (request.areaFrom() != null) {
             predicates.add(cb.greaterThanOrEqualTo(root.get("area"), request.areaFrom()));
-        if (request.areaTo() != null)
+        }
+        if (request.areaTo() != null) {
             predicates.add(cb.lessThanOrEqualTo(root.get("area"), request.areaTo()));
-
-        if (request.propertyForRent() != null && request.propertyForRent().paymentSchedule() != null)
-            predicates.add(cb.equal(context.joins().get("rentJoin").get("paymentSchedule"), request.propertyForRent().paymentSchedule()));
-
-        if (StringUtil.checkString(request.term())) {
-            if (request.propertyForRent() != null) {
-                predicates.add(cb.like(context.joins().get("rentJoin").get("rentalTerm"), "%" + request.term() + "%"));
-
-            } else if (request.propertyForSale() != null) {
-                predicates.add(cb.like(context.joins().get("saleJoin").get("saleTerm"), "%" + request.term() + "%"));
-            }
         }
 
         var addressRequest = request.address();
-        if (addressRequest != null && addressJoin != null) {
-            // address queries
+        if (addressRequest != null) {
+            Join<?, ?> addressJoin = context.joins().get("address");
+
             if (StringUtil.checkString(addressRequest.city())) {
                 predicates.add(cb.like(addressJoin.get("city"), "%" + addressRequest.city() + "%"));
             }
@@ -127,7 +143,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                 predicates.add(cb.like(addressJoin.get("ward"), "%" + addressRequest.ward() + "%"));
             }
             if (StringUtil.checkString(addressRequest.streetAddress())) {
-                predicates.add((cb.like(addressJoin.get("streetAddress"), "%" + addressRequest.streetAddress() + "%")));
+                predicates.add(cb.like(addressJoin.get("streetAddress"), "%" + addressRequest.streetAddress() + "%"));
             }
         }
 
@@ -136,111 +152,91 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     }
 
     public static void joinColumns(PropertySearchRequest request, QueryContext<Property> context) {
-        // Using LEFT JOIN ensures that all properties are included in the search results, even if they do not have associated sale, rental, ..etc records
-        if (request.propertyForRent() != null) {
-            context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
-        }
-        if (request.propertyForSale() != null) {
-            context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
-        }
-
-        // Always need these joins since it require in property response
+        context.addJoin("propertyForSale", context.root().join("propertyForSale", JoinType.LEFT));
+        context.addJoin("propertyForRent", context.root().join("propertyForRent", JoinType.LEFT));
         context.addJoin("address", context.root().join("address", JoinType.LEFT));
         context.addJoin("rooms", context.root().join("rooms", JoinType.LEFT));
     }
 
-@Override
-//@Cacheable(value = "properties", key = "#request.toString() + '-' + #pageable.toString()")
-public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
-    CriteriaBuilder cb = entityManager.getCriteriaBuilder();
-    CriteriaQuery<Tuple> cq = cb.createTupleQuery();
-    Root<Property> root = cq.from(Property.class);
-    List<Predicate> predicates = new ArrayList<>();
-    Map<String, Join<Property, ?>> joins = new HashMap<>();
+    @Override
+    public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable) {
+        CriteriaBuilder cb = entityManager.getCriteriaBuilder();
+        CriteriaQuery<Tuple> cq = cb.createTupleQuery();
+        Root<Property> root = cq.from(Property.class);
+        List<Predicate> predicates = new ArrayList<>();
+        Map<String, Join<Property, ?>> joins = new HashMap<>();
 
-    QueryContext<Property> context = new QueryContext<>(cb, cq, root, predicates, joins);
+        QueryContext<Property> context = new QueryContext<>(cb, cq, root, predicates, joins);
 
-    if (request != null) {
-        joinColumns(request, context);
+        if (request != null) {
+            joinColumns(request, context);
 
-        Set<String> excludedFields = new HashSet<>(Set.of(
+            Set<String> excludedFields = new HashSet<>(Set.of(
                 "propertyForRent", "propertyForSale", "propertyCategory", "areaFrom", "areaTo",
                 "priceFrom", "priceTo", "address", "rooms"
-        ));
+            ));
 
-        Map<String, QueryFieldOptionEnum> queryOptions = buildQueryOptions(request, excludedFields);
-        CustomRepositoryUtils.appendNormalQueryConditions(request, context, queryOptions);
-        applySpecialQueryConditions(request, context);
-    }
+            Map<String, QueryFieldOptionEnum> queryOptions = buildQueryOptions(request, excludedFields);
+            CustomRepositoryUtils.appendNormalQueryConditions(request, context, queryOptions);
+            applySpecialQueryConditions(request, context);
+        }
 
-    predicates.add(cb.equal(root.get("deleted"), false));
-    cq.where(predicates.toArray(new Predicate[0]));
+        predicates.add(cb.equal(root.get("deleted"), false));
+        cq.where(predicates.toArray(new Predicate[0]));
 
-    if (pageable.getSort().isSorted()) {
-        cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb));
-    }
+        if (pageable.getSort().isSorted()) {
+            cq.orderBy(QueryUtils.toOrders(pageable.getSort(), root, cb));
+        }
 
-    // get existed join
-    Join<Property, ?> roomJoin = joins.get("rooms");
-    Join<Property, ?> addressJoin = joins.get("address");
-//    Join<Property, ?> postServiceJoin = joins.get("propertyPostService");
+        Join<Property, ?> roomJoin = joins.get("rooms");
+        Join<Property, ?> addressJoin = joins.get("address");
 
-    // Create a projection query
-    cq.multiselect(
-        root,
-        root.get("propertyId").alias("propertyId"),
-        root.get("title").alias("title"),
-        cb.selectCase(root.get("propertyForSale"))
-            .when(cb.isNotNull(root.get("propertyForSale")), PropertyTypeEnum.SALE)
-            .when(cb.isNotNull(root.get("propertyForRent")), PropertyTypeEnum.RENT)
-            .when(cb.and(cb.isNotNull(root.get("propertyForSale")), cb.isNotNull(root.get("propertyForRent"))), PropertyTypeEnum.RENT_SALE)
-            .as(PropertyTypeEnum.class).alias("type"),
-        root.get("categoryId").alias("categoryId"),
-        root.get("area").alias("area"),
-        cb.coalesce(root.get("propertyForRent").get("rentalPrice"), cb.literal(BigDecimal.ZERO)).alias("rentalPrice"),
-        cb.coalesce(root.get("propertyForSale").get("salePrice"), cb.literal(BigDecimal.ZERO)).alias("salePrice"),
-        root.get("view").alias("view"),
-        root.get("description").alias("description"),
-        root.get("totalFloor").alias("totalFloor"),
-        root.get("status").alias("status"),
-        root.get("availableFrom").alias("availableFrom"),
-        addressJoin.alias("address"),
-        root.get("imageUrls").alias("imageUrls"),
-        roomJoin.get("roomType").alias("roomType"),
-        roomJoin.get("quantity").alias("quantity")
-    );
+        cq.multiselect(
+            root,
+            root.get("propertyId").alias("propertyId"),
+            root.get("title").alias("title"),
+            cb.selectCase()
+                .when(cb.isNotNull(context.joins().get("propertyForSale")), PropertyTypeEnum.SALE)
+                .when(cb.isNotNull(context.joins().get("propertyForRent")), PropertyTypeEnum.RENT)
+                .as(PropertyTypeEnum.class).alias("type"),
+            root.get("categoryId").alias("categoryId"),
+            root.get("area").alias("area"),
+            cb.coalesce(context.joins().get("propertyForRent").get("rentalPrice"), cb.literal(BigDecimal.ZERO)).alias("rentalPrice"),
+            cb.coalesce(context.joins().get("propertyForSale").get("salePrice"), cb.literal(BigDecimal.ZERO)).alias("salePrice"),
+            root.get("view").alias("view"),
+            root.get("description").alias("description"),
+            root.get("totalFloor").alias("totalFloor"),
+            root.get("status").alias("status"),
+            root.get("furniture").alias("furniture"),
+            root.get("legalDocument").alias("legalDocument"),
+            root.get("availableFrom").alias("availableFrom"),
+            addressJoin.alias("address"),
+            root.get("imageUrls").alias("imageUrls"),
+            roomJoin.get("roomType").alias("roomType"),
+            roomJoin.get("quantity").alias("quantity")
+        );
 
-    TypedQuery<Tuple> query = entityManager.createQuery(cq);
-    query.setHint("jakarta.persistence.loadgraph", entityManager.getEntityGraph("property-with-details"));
+        TypedQuery<Tuple> query = entityManager.createQuery(cq);
+        query.setFirstResult((int) pageable.getOffset());
+        query.setMaxResults(pageable.getPageSize());
+        List<Tuple> resultList = query.getResultList();
 
-    query.setFirstResult((int) pageable.getOffset());
-    query.setMaxResults(pageable.getPageSize());
-    List<Tuple> resultList = query.getResultList();
-
-    // Group rooms by property ID
-    Map<Long, List<RoomSearchProjection>> roomsByPropertyId = new HashMap<>();
-    for (Tuple tuple : resultList) {
-        Long propertyId = tuple.get("propertyId", Long.class);
-        RoomSearchProjection room = new RoomSearchProjection(
+        Map<Long, List<RoomSearchProjection>> roomsByPropertyId = new HashMap<>();
+        for (Tuple tuple : resultList) {
+            Long propertyId = tuple.get("propertyId", Long.class);
+            RoomSearchProjection room = new RoomSearchProjection(
                 tuple.get("roomType", RoomTypeEnum.class),
                 tuple.get("quantity", Short.class)
-        );
-        roomsByPropertyId.computeIfAbsent(propertyId, k -> new ArrayList<>()).add(room);
-    }
+            );
+            roomsByPropertyId.computeIfAbsent(propertyId, k -> new ArrayList<>()).add(room);
+        }
 
-    // Combine properties and rooms
-    List<PropertySearchProjection> properties = resultList.stream()
+        List<PropertySearchProjection> properties = resultList.stream()
             .collect(Collectors.groupingBy(tuple -> tuple.get("propertyId", Long.class)))
             .entrySet().stream()
             .map(entry -> {
                 Tuple tuple = entry.getValue().get(0);
                 List<RoomSearchProjection> propertyRooms = roomsByPropertyId.getOrDefault(entry.getKey(), new ArrayList<>());
-
-                // Extract PropertyPostService data from the tuple
-//                PropertyPostServiceProjection postServiceProjection = new PropertyPostServiceProjection(
-//                    tuple.get("postingPackage", PostingPackageEnum.class),
-//                    tuple.get("postingDate", LocalDateTime.class)
-//                );
 
                 return PropertySearchProjection.builder()
                     .propertyId(tuple.get("propertyId", Long.class))
@@ -254,6 +250,8 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
                     .description(tuple.get("description", String.class))
                     .totalFloor(tuple.get("totalFloor", Short.class))
                     .status(tuple.get("status", StatusEnum.class))
+                    .furniture(tuple.get("furniture", FurnitureEnum.class))
+                    .legalDocument(tuple.get("legalDocument", LegalDocumentEnum.class))
                     .availableFrom(tuple.get("availableFrom", LocalDate.class))
                     .address(tuple.get("address", Address.class))
                     .imageUrls(tuple.get("imageUrls", String.class))
@@ -262,10 +260,9 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
             })
             .collect(Collectors.toList());
 
-    return new PageImpl<>(properties, pageable, properties.size());
-}
+        return new PageImpl<>(properties, pageable, properties.size());
+    }
 
-    // Helper method to build query options
     private Map<String, QueryFieldOptionEnum> buildQueryOptions(PropertySearchRequest request, Set<String> excludedFields) {
         Map<String, QueryFieldOptionEnum> queryOptions = new HashMap<>();
         for (Field field : request.getClass().getDeclaredFields()) {
@@ -284,6 +281,7 @@ public Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchReq
         return queryOptions;
     }
 }
+
 
 
 //  JDBC with JPA
