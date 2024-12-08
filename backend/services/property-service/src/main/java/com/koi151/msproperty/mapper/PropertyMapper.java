@@ -51,8 +51,6 @@ public interface PropertyMapper {
     @Mapping(target = "legalDocument", source = "legalDocument.legalDocumentName")
     @Mapping(target = "furniture", source = "furniture.furnitureName")
     @Mapping(target = "rooms", expression = "java(toRoomNameQuantityDTOs(entity.getRooms()))")
-//    @Mapping(target = "propertyPostService.daysPosted", source = "propertyPostService.daysPosted.day")
-//    @Mapping(target = "propertyPostService.postingPackage", source = "propertyPostService.postingPackage.packageName")
     DetailedPropertyDTO toDetailedPropertyDTO(Property entity);
 
     @Mapping(target = "balconyDirection", source = "balconyDirection.directionName")
@@ -76,16 +74,17 @@ public interface PropertyMapper {
     @Mapping(target = "rooms", expression = "java(projectionToRoomNameQuantityDTOs(projection.rooms()))")
     PropertySearchDTO toPropertySearchDTO(PropertySearchProjection projection);
 
-    // Helper function to map rooms
     default List<RoomNameQuantityDTO> projectionToRoomNameQuantityDTOs(List<RoomSearchProjection> rooms) {
-        return (rooms == null) ? null
+        return (rooms == null || rooms.isEmpty()) ? null
             : rooms.stream()
-                .map(room -> RoomNameQuantityDTO.builder()
-                    .roomType(room.roomType().getName())
-                    .quantity(room.quantity())
-                    .build())
-                .collect(Collectors.toList());
+            .filter(room -> room != null && room.roomType() != null && room.quantity() != null)
+            .map(room -> RoomNameQuantityDTO.builder()
+                .roomType(room.roomType().getName())
+                .quantity(room.quantity())
+                .build())
+            .collect(Collectors.toList());
     }
+
 
     default List<RoomNameQuantityDTO> toRoomNameQuantityDTOs(List<Rooms> rooms) {
         return (rooms == null) ? null

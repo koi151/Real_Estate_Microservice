@@ -18,7 +18,6 @@ import java.util.Map;
 public class PropertyServicePackageController {
 
     private final PropertyServicePackageService propertyServicePackageService;
-
     @GetMapping("/")
     public ResponseEntity<ResponseData> findPropertyServicePackageByCriteria(
             @RequestParam Map<String, String> params

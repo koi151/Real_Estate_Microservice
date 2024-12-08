@@ -2,15 +2,13 @@ package com.koi151.msproperty.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.koi151.msproperty.enums.DirectionEnum;
-import com.koi151.msproperty.enums.FurnitureEnum;
-import com.koi151.msproperty.enums.LegalDocumentEnum;
-import com.koi151.msproperty.enums.StatusEnum;
+import com.koi151.msproperty.enums.*;
 import com.koi151.msproperty.model.request.propertyForRent.PropertyForRentCreateRequest;
 import com.koi151.msproperty.model.request.propertyForSale.PropertyForSaleCreateRequest;
 import com.koi151.msproperty.model.request.propertyPostService.PropertyPostServiceCreateUpdateRequest;
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperty.model.request.address.AddressCreateRequest;
+import jakarta.persistence.Column;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
@@ -60,6 +58,12 @@ public record PropertyCreateRequest(
     DirectionEnum balconyDirection,
     StatusEnum status,
     FurnitureEnum furniture,
-    LegalDocumentEnum legalDocument
+    LegalDocumentEnum legalDocument,
+
+
+    // for other service
+    PackageType packageType,
+    @NotNull(message = "Post service ids used for that property service package is mandatory")
+    List<Long> postServiceIds
 ) {}
 

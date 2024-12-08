@@ -52,11 +52,74 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
 
     private final RedisTemplate<String, String> redisTemplate;
 
+//    @Override
+//    @Transactional
+//    public PropertyServicePackageCreateDTO createPropertyServicePackage(PropertyServicePackageCreateRequest request) {
+//        // Validate the request
+//        postServiceValidate.postServiceCreateValidate(request);
+//
+//        // Create and save PropertyServicePackage entity from request
+//        PropertyServicePackage propertyServicePackage = propertyServicePackageMapper.toPropertyServicePackageEntity(request);
+//        var savedPropertyServicePackage = propertyServicePackageRepository.save(propertyServicePackage);
+//
+//        // Fetch PostServices with NAME and ID in one go based on request service IDs
+//        List<PostServiceBasicInfoDTO> postServices = postServiceRepository.getPostServiceBasicInfoById(request.postServiceIds());
+//
+//        // Map PostServices info to PostServicePackage entities
+//        List<PostServicePackage> postServicePackagesEntities = postServices.stream()
+//            .map(postService -> {
+//                Optional<Tuple> discountInfo = promotionRepository.findPromotionInfoByPostServiceIdAndPackageType(postService.postServiceId(), request.packageType());
+//
+//                // Initialize discount values
+//                BigDecimal discountPercentage = BigDecimal.ZERO;
+//                BigDecimal priceDiscount = BigDecimal.ZERO;
+//
+//                if (discountInfo.isPresent()) {
+//                    Tuple tuple = discountInfo.get();
+//                    discountPercentage = tuple.get(0, BigDecimal.class);
+//                    priceDiscount = tuple.get(1, BigDecimal.class);
+//                }
+//
+//                return PostServicePackage.builder() // Use builder instead of MapStruct to reduce code complexity in this case
+//                    .postServicePackageKey(PostServicePackageKey.builder()
+//                        .postServiceId(postService.postServiceId())
+//                        .propertyServicePackageId(savedPropertyServicePackage.getPropertyServicePackageId())
+//                        .build())
+//                    .postService(postServiceMapper.toPostServiceEntity(postService))
+//                    .propertyServicePackage(savedPropertyServicePackage)
+//                    .unitsRemaining(postService.availableUnits())
+//                    .priceAtCreation(postServicePricingRepository
+//                        .findPriceByPostServiceIdAndPackageType(postService.postServiceId(), request.packageType())
+//                        .orElseThrow(() -> new EntityNotFoundCustomException(
+//                            "Price not found for post service ID: " + postService.postServiceId() + " and package type: " + request.packageType()
+//                        )))
+//                .priceDiscountAtCreation(priceDiscount)
+//                .discountPercentageAtCreation(discountPercentage)
+//                .build();
+//            })
+//            .toList();
+//
+//        // Save PostServicePackages in batch
+//        postServicePackageRepository.saveAll(postServicePackagesEntities);
+//
+//        BigDecimal totalFee = postServicePackagesEntities.stream()
+//            .map(postServicePackage -> {
+//                BigDecimal standardPrice = postServicePackage.getPriceAtCreation();
+//                BigDecimal discountPercentage = postServicePackage.getDiscountPercentageAtCreation();
+//
+//                // Calculate final price after applying discounts and ensure no negative values
+//                return standardPrice
+//                    .subtract(standardPrice.multiply(discountPercentage.divide(new BigDecimal(100), RoundingMode.HALF_EVEN)))
+//                    .subtract(postServicePackage.getPriceDiscountAtCreation())
+//                    .max(BigDecimal.ZERO);
+//            }).reduce(BigDecimal.ZERO, BigDecimal::add);
+//
+//        return propertyServicePackageMapper.toPropertyServicePackageCreateDTO(propertyServicePackage, postServices, totalFee);
+//    }
+
     @Override
     @Transactional
     public PropertyServicePackageCreateDTO createPropertyServicePackage(PropertyServicePackageCreateRequest request) {
-        // Validate the request
-        postServiceValidate.postServiceCreateValidate(request);
 
         // Create and save PropertyServicePackage entity from request
         PropertyServicePackage propertyServicePackage = propertyServicePackageMapper.toPropertyServicePackageEntity(request);
@@ -93,9 +156,9 @@ public class PropertyServicePackageServiceImpl implements PropertyServicePackage
                         .orElseThrow(() -> new EntityNotFoundCustomException(
                             "Price not found for post service ID: " + postService.postServiceId() + " and package type: " + request.packageType()
                         )))
-                .priceDiscountAtCreation(priceDiscount)
-                .discountPercentageAtCreation(discountPercentage)
-                .build();
+                    .priceDiscountAtCreation(priceDiscount)
+                    .discountPercentageAtCreation(discountPercentage)
+                    .build();
             })
             .toList();
 
