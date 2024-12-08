@@ -1,6 +1,7 @@
 package com.koi151.msproperty.model.request.property;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.koi151.msproperty.enums.DirectionEnum;
 import com.koi151.msproperty.enums.FurnitureEnum;
 import com.koi151.msproperty.enums.LegalDocumentEnum;
@@ -13,14 +14,13 @@ import com.koi151.msproperty.model.request.address.AddressCreateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 import lombok.*;
-import lombok.extern.jackson.Jacksonized;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Builder(builderClassName = "PropertyCreateRequestBuilder", toBuilder = true)
-@Jacksonized // for working with Jackson annotation - @JsonFormat
+@JsonIgnoreProperties(ignoreUnknown = true)
+//@Jacksonized // for working with Jackson annotation - @JsonFormat
 public record PropertyCreateRequest(
     @NotBlank(message = "Title cannot be empty")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
@@ -60,9 +60,6 @@ public record PropertyCreateRequest(
     DirectionEnum balconyDirection,
     StatusEnum status,
     FurnitureEnum furniture,
-    LegalDocumentEnum legalDocument,
-    @NotNull(message = "Property available date is mandatory")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate availableFrom
+    LegalDocumentEnum legalDocument
 ) {}
 

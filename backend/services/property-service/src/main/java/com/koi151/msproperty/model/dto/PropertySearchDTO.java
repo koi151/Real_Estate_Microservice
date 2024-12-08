@@ -3,6 +3,7 @@ package com.koi151.msproperty.model.dto;
 import lombok.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Data
@@ -25,9 +26,9 @@ public class PropertySearchDTO {
     private String legalDocument;
     private Integer view;
     private String status;
-    private String availableFrom;
     private String address;
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
+    private LocalDateTime createdDate;
 //    private PropertyPostServiceSearchDTO propertyPostService;
 }

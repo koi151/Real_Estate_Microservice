@@ -29,9 +29,8 @@ public class PropertyForRent {
     @DecimalMax(value = "99999999999", message = "Rental price cannot exceed 99,999,999,999")
     private BigDecimal rentalPrice;
 
-    @Column(name = "payment_schedule", nullable = false)
+    @Column(name = "payment_schedule")
     @Enumerated(EnumType.STRING)
-    @NotNull(message = "Payment schedule is mandatory")
     private PaymentScheduleEnum paymentSchedule;
 
     @Column(name = "rental_terms", columnDefinition = "TEXT")

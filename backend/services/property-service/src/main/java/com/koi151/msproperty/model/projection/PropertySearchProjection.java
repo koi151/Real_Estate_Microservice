@@ -9,6 +9,7 @@ import lombok.Builder;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
@@ -24,12 +25,12 @@ public record PropertySearchProjection (
      String description,
      Short totalFloor,
      StatusEnum status,
-     LocalDate availableFrom,
      Address address,
      String imageUrls,
      LegalDocumentEnum legalDocument,
      FurnitureEnum furniture,
-     List<RoomSearchProjection> rooms
+     List<RoomSearchProjection> rooms,
+     LocalDateTime createdDate
 //     PropertyPostServiceProjection propertyPostService
 ) {}
 

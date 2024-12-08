@@ -76,10 +76,6 @@ public class Property extends BaseEntity {
     @NotNull(message = "Account id is mandatory")
     private String accountId;
 
-    @Column(name = "available_from", nullable = false, columnDefinition = "DATE")
-    @NotNull(message = "Property available date is mandatory")
-    private LocalDate availableFrom;
-
     @Column(name = "title", nullable = false, length = 100)
     @NotBlank(message = "Property post title is mandatory")
     @Size(min = 5, max = 100, message = "Title length must be between {min} and {max} characters")
@@ -98,7 +94,7 @@ public class Property extends BaseEntity {
     @Column(name = "images", columnDefinition = "TEXT")
     private String imageUrls;
 
-    @Column(name = "view", columnDefinition = "INT UNSIGNED", nullable = false)
+    @Column(name = "view", columnDefinition = "INT UNSIGNED")
     private int view = 0;
 
     @Column(name = "total_floor", columnDefinition = "SMALLINT UNSIGNED")

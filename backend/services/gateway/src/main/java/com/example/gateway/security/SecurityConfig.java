@@ -17,6 +17,7 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 import reactor.core.publisher.Mono;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 @Configuration
@@ -44,6 +45,8 @@ public class SecurityConfig {
                 .pathMatchers(HttpMethod.GET, "/api/v1/oauth/callback").permitAll()
                 .pathMatchers(HttpMethod.GET, "/api/v1/accounts/auth/login").permitAll()
                 .pathMatchers(HttpMethod.POST, "/api/v1/accounts/auth/token").permitAll()
+                .pathMatchers(HttpMethod.GET, "https://vapi.vnappmob.com/api/province/").permitAll()
+                .pathMatchers("/api/v1/province/**").permitAll()
                 .anyExchange().authenticated()
             )
             .addFilterAt(cookieToBearerFilter(), SecurityWebFiltersOrder.AUTHENTICATION)
@@ -73,11 +76,16 @@ public class SecurityConfig {
             "Content-Type",
             "Accept",
             "Access-Control-Allow-Credentials",
-            "Access-Control-Allow-Origin"
+            "Access-Control-Allow-Origin",
+            "Origin"
         ));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
+
         configuration.setExposedHeaders(Arrays.asList(
+            "Authorization",
             "Set-Cookie",
-            "Access-Control-Allow-Credentials"
+            "Access-Control-Allow-Credentials",
+            "Access-Control-Allow-Origin"
         ));
         configuration.setAllowCredentials(true);
         configuration.setMaxAge(3600L); // Cache preflight request

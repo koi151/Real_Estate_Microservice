@@ -5,28 +5,27 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="a7c9ca5a-462f-47a3-a067-1c926319cdcf" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/customExceptions/InvalidRequestException.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/FurnitureEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/enums/LegalDocumentEnum.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyStatusUpdateRequest.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/validator/PropertyValidator.java" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/controller/ProvinceProxyController.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/gateway.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/gateway.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-service.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/config-server/src/main/resources/configurations/property-service.yml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/GatewayApplication.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/GatewayApplication.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/pom.xml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/pom.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/KeycloakJwtTokenConverter.java" beforeDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/SecurityConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/config/SecurityConfig.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyController.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controllerAdvice/ControllerAdvisor.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controllerAdvice/ControllerAdvisor.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/Property.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/Property.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/mapper/PropertyMapper.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/mapper/PropertyMapper.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PropertyForRent.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/entity/PropertyForRent.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/DetailedPropertyDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/DetailedPropertyDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertySearchDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/dto/PropertySearchDTO.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/projection/PropertySearchProjection.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/projection/PropertySearchProjection.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyCreateRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertySearchRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertySearchRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/response/ErrorResponse.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/response/ErrorResponse.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyUpdateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/property/PropertyUpdateRequest.java" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForRent/PropertyForRentCreateRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/model/request/propertyForRent/PropertyForRentCreateRequest.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyRepositoryImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyRepositoryImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertiesService.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/PropertiesService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyCategoryServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyCategoryServiceImpl.java" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/services/property-service/src/main/resources/application.yml" beforeDir="false" afterPath="$PROJECT_DIR$/backend/services/property-service/src/main/resources/application.yml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -37,8 +36,8 @@
     <option name="RECENT_TEMPLATES">
       <list>
         <option value="package.json" />
-        <option value="Class" />
         <option value="Enum" />
+        <option value="Class" />
       </list>
     </option>
   </component>
@@ -418,7 +417,9 @@
       <workItem from="1733070406611" duration="11489000" />
       <workItem from="1733146313954" duration="112853000" />
       <workItem from="1733381762569" duration="4832000" />
-      <workItem from="1733406340065" duration="60174000" />
+      <workItem from="1733406340065" duration="96158000" />
+      <workItem from="1733626935374" duration="10784000" />
+      <workItem from="1733645036959" duration="3013000" />
     </task>
     <servers />
   </component>
@@ -470,7 +471,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java</url>
-          <line>63</line>
+          <line>66</line>
           <option name="timeStamp" value="83" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -495,7 +496,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/backend/services/gateway/src/main/java/com/example/gateway/security/SecurityConfig.java</url>
-          <line>56</line>
+          <line>59</line>
           <option name="timeStamp" value="100" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
@@ -504,9 +505,44 @@
           <option name="timeStamp" value="101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyRepositoryImpl.java</url>
+          <line>172</line>
+          <option name="timeStamp" value="123" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyRepositoryImpl.java</url>
+          <line>187</line>
+          <option name="timeStamp" value="124" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/repository/custom/impl/PropertyRepositoryImpl.java</url>
+          <line>166</line>
+          <option name="timeStamp" value="125" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java</url>
+          <line>112</line>
+          <option name="timeStamp" value="126" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java</url>
+          <line>133</line>
+          <option name="timeStamp" value="127" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/controller/PropertyController.java</url>
-          <line>251</line>
-          <option name="timeStamp" value="105" />
+          <line>299</line>
+          <option name="timeStamp" value="128" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java</url>
+          <line>185</line>
+          <option name="timeStamp" value="129" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="java-line">
+          <url>file://$PROJECT_DIR$/backend/services/property-service/src/main/java/com/koi151/msproperty/service/impl/PropertyServiceImpl.java</url>
+          <line>138</line>
+          <option name="timeStamp" value="131" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

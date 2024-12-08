@@ -15,6 +15,13 @@ spring:
         locator:
           enabled: true
       routes:
+        - id: province-api
+          uri: http://vapi.vnappmob.com
+          predicates:
+            - Path=/api/v1/province/**
+          filters:
+            - RewritePath=/api/v1/province/(?<segment>.*), /api/province/${segment}
+
         - id: properties
           uri: http://localhost:8050/
           predicates:

@@ -12,6 +12,7 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 public record PropertySearchRequest (
@@ -43,9 +44,6 @@ public record PropertySearchRequest (
     @Max(value = 9999999, message = "View searching value cannot exceed 999")
     Integer view,
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    String availableFrom,
-
     @Size(max = 1000, message = "Term searching cannot exceed {max} characters long")
     String term,
 
@@ -59,5 +57,7 @@ public record PropertySearchRequest (
     AddressSearchRequest address,
 
     @Valid
-    List<RoomSearchRequest> rooms
+    List<RoomSearchRequest> rooms,
+
+    LocalDateTime createdDate
 ){}

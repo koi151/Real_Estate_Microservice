@@ -32,6 +32,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -58,7 +59,7 @@ public class PropertyServiceImpl implements PropertiesService {
                 Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
                 Page<PropertySearchDTO> result = propertyPage.map(propertyMapper::toPropertySearchDTO);
                 String jsonData = objectMapper.writeValueAsString(result);
-                redisTemplate.opsForValue().set(redisKey, jsonData, 5, TimeUnit.MINUTES);
+                redisTemplate.opsForValue().set(redisKey, jsonData, 20, TimeUnit.SECONDS);
                 return result;
             } else {
                 JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, PropertySearchDTO.class);
@@ -138,7 +139,7 @@ public class PropertyServiceImpl implements PropertiesService {
                 return propertyRepository.save(existingProperty);
             })
             .map(propertyMapper::toDetailedPropertyDTO)
-            .orElseThrow(() -> new PropertyNotFoundException("Cannot find account with id: " + id));
+            .orElseThrow(() -> new NoSuchElementException("Property with id " + id + " not found or has been deleted."));
     }
 
     @Transactional(readOnly = true)
@@ -179,13 +180,65 @@ public class PropertyServiceImpl implements PropertiesService {
         existingProperty.setImageUrls(updatedImageUrls.isEmpty() ? null : updatedImageUrls);
     }
 
+//    @Transactional
+//    protected void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {
+//        if (request != null) {
+//            updateExistingPropertyRooms(existingProperty, request.rooms()); // update rooms info separately
+//            propertyMapper.updatePropertyFromDto(request, existingProperty);
+//        }
+//    }
+
     @Transactional
     protected void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {
         if (request != null) {
-            updateExistingPropertyRooms(existingProperty, request.rooms()); // update rooms info separately
-            propertyMapper.updatePropertyFromDto(request, existingProperty);
+            updateExistingPropertyRooms(existingProperty, request.rooms());
+
+            PropertyForRent propertyForRent = null;
+            PropertyForSale propertyForSale = null;
+
+            if (request.propertyForRent() != null) {
+                propertyForRent = PropertyForRent.builder()
+                    .property(existingProperty)
+                    .propertyId(existingProperty.getPropertyId())
+                    .rentalPrice(request.propertyForRent().rentalPrice())
+                    .paymentSchedule(request.propertyForRent().paymentSchedule())
+                    .rentalTerms(request.propertyForRent().rentalTerms())
+                    .build();
+            }
+
+            if (request.propertyForSale() != null) {
+                propertyForSale = PropertyForSale.builder()
+                    .property(existingProperty)
+                    .propertyId(existingProperty.getPropertyId())
+                    .salePrice(request.propertyForSale().salePrice())
+                    .saleTerms(request.propertyForSale().saleTerms())
+                    .build();
+            }
+
+            Address updatedAddress = Address.builder()
+                .property(existingProperty)
+                .id(existingProperty.getAddress() != null ? existingProperty.getAddress().getId() : null)
+                .city(request.address().city())
+                .district(request.address().district())
+                .ward(request.address().ward())
+                .streetAddress(request.address().streetAddress())
+                .build();
+
+            existingProperty.setTitle(request.title());
+            existingProperty.setCategoryId(Math.toIntExact(request.categoryId()));
+            existingProperty.setAccountId(request.accountId());
+            existingProperty.setArea(BigDecimal.valueOf(request.area()));
+            existingProperty.setDescription(request.description());
+            existingProperty.setTotalFloor(request.totalFloor() != null ? request.totalFloor().shortValue() : null);
+            existingProperty.setStatus(request.status());
+            existingProperty.setHouseDirection(request.houseDirection());
+            existingProperty.setBalconyDirection(request.balconyDirection());
+            existingProperty.setPropertyForRent(propertyForRent);
+            existingProperty.setPropertyForSale(propertyForSale);
+            existingProperty.setAddress(updatedAddress);
         }
     }
+
 
     private void updateExistingPropertyRooms(Property existingProperty, List<RoomCreateUpdateRequest> updatedRooms) {
         List<Rooms> currentRooms = existingProperty.getRooms();

@@ -1,6 +1,6 @@
 package com.koi151.msproperty.model.request.property;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.koi151.msproperty.enums.DirectionEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.model.request.propertyForRent.PropertyForRentUpdateRequest;
@@ -10,17 +10,19 @@ import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperty.model.request.address.AddressUpdateRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
+import lombok.Builder;
 
-import java.time.LocalDate;
 import java.util.List;
 
+@Builder(builderClassName = "PropertyCreateRequestBuilder", toBuilder = true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 public record PropertyUpdateRequest (
 
     @Size(min = 5, max = 100, message = "Title length must between {min} and {max} characters")
     String title,
 
     Long categoryId,
-    Long accountId,
+    String accountId,
 
     @Valid
     PropertyForSaleUpdateRequest propertyForSale,
@@ -41,14 +43,11 @@ public record PropertyUpdateRequest (
 
     @PositiveOrZero(message = "Total floor must be positive or zero")
     @Max(value = 999, message = "Total floors cannot exceed 999")
-    Integer totalFloor,
+    Short totalFloor,
 
     DirectionEnum houseDirection,
     DirectionEnum balconyDirection,
     StatusEnum status,
-
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    LocalDate availableFrom,
 
     List<String> imageUrlsRemove
 ) {}

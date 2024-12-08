@@ -26,6 +26,7 @@ import org.springframework.stereotype.Repository;
 import java.lang.reflect.Field;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -250,9 +251,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             root.get("description").alias("description"),
             root.get("totalFloor").alias("totalFloor"),
             root.get("status").alias("status"),
+            root.get("createdDate").alias("createdDate"),
             root.get("furniture").alias("furniture"),
             root.get("legalDocument").alias("legalDocument"),
-            root.get("availableFrom").alias("availableFrom"),
             addressJoin.alias("address"),
             root.get("imageUrls").alias("imageUrls"),
             roomJoin.get("roomType").alias("roomType"),
@@ -332,9 +333,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
                     .description(tuple.get("description", String.class))
                     .totalFloor(tuple.get("totalFloor", Short.class))
                     .status(tuple.get("status", StatusEnum.class))
+                    .createdDate(tuple.get("createdDate", LocalDateTime.class))
                     .furniture(tuple.get("furniture", FurnitureEnum.class))
                     .legalDocument(tuple.get("legalDocument", LegalDocumentEnum.class))
-                    .availableFrom(tuple.get("availableFrom", LocalDate.class))
                     .address(tuple.get("address", Address.class))
                     .imageUrls(tuple.get("imageUrls", String.class))
                     .rooms(propertyRooms)

@@ -1,9 +1,12 @@
 package com.koi151.msproperty.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import com.koi151.msproperty.enums.*;
 import com.koi151.msproperty.mapper.ResponseDataMapper;
 import com.koi151.msproperty.model.request.property.PropertyStatusUpdateRequest;
+import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryCreateRequest;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryStatusUpdateRequest;
 import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.model.request.address.AddressCreateRequest;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -43,6 +47,7 @@ public class PropertyController {
     private final PropertiesService propertiesService;
     private final ResponseDataMapper responseDataMapper;
 
+
     private static final int MAX_PAGE_SIZE = 20;
 
     @GetMapping("/")
@@ -60,10 +65,7 @@ public class PropertyController {
     ) {
         int pageSize = Math.min(limit, MAX_PAGE_SIZE);
 
-        // Create sort orders from the sort parameter
         Sort sorting = createSortOrders(sort);
-
-        // Create pageable with dynamic sorting
         Pageable pageable = PageRequest.of(page - 1, pageSize, sorting);
 
         var propertiesPage = propertiesService.findProperties(request, pageable);
@@ -187,12 +189,6 @@ public class PropertyController {
                         .build();
                 }
 
-                LocalDate availableFrom = LocalDate.of(
-                    2024,
-                    faker.number().numberBetween(7, 9),
-                    faker.number().numberBetween(1, 28)
-                );
-
                 RoomTypeEnum[] roomTypes = RoomTypeEnum.values();
                 Set<RoomTypeEnum> usedRoomTypes = new HashSet<>();
                 List<RoomCreateUpdateRequest> rooms = new ArrayList<>();
@@ -227,7 +223,6 @@ public class PropertyController {
                     .houseDirection(directions[randomDir1Index])
                     .balconyDirection(directions[randomDir2Index])
                     .status(statuses[randomStatusIndex])
-                    .availableFrom(availableFrom)
                     .legalDocument(legalDocuments[faker.number().numberBetween(0, legalDocuments.length)])
                     .furniture(furnitures[faker.number().numberBetween(0, furnitures.length)])
                     .build();
@@ -279,12 +274,15 @@ public class PropertyController {
         );
     }
 
-    @PostMapping("/")
+    @PostMapping(value = "/", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasAuthority('SCOPE_properties_create')")
     public ResponseEntity<ResponseData> createProperty(
-            @RequestPart @Valid PropertyCreateRequest property,
-            @RequestPart(required = false) List<MultipartFile> images
-    ) {
+        @RequestPart("property") String propertyJson,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        PropertyCreateRequest property = objectMapper.readValue(propertyJson, PropertyCreateRequest.class);
+
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseData.builder()
                 .data(propertiesService.createProperty(property, images))
@@ -292,25 +290,29 @@ public class PropertyController {
                 .build());
     }
 
+    @PatchMapping("/{id}")
+    @PreAuthorize("hasAuthority('SCOPE_properties_update')")
+    public ResponseEntity<ResponseData> updateProperty(
+        @PathVariable(name = "id") Long id,
+        @RequestPart("property") String propertyJson,
+        @RequestPart(value = "images", required = false) List<MultipartFile> images
+    ) throws JsonProcessingException {
+        ObjectMapper objectMapper = new ObjectMapper();
+        PropertyUpdateRequest property = objectMapper.readValue(propertyJson, PropertyUpdateRequest.class);
+
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(propertiesService.updateProperty(id, property, images))
+            .desc("Updated successfully property with id: " + id)
+            .build());
+    }
+
+
     @DeleteMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_properties_delete')")
     public ResponseEntity<ResponseData> deleteProperty (@PathVariable(name = "id") Long id) {
         propertiesService.deleteProperty(id);
         return ResponseEntity.ok(ResponseData.builder()
             .desc("Property deleted successfully")
-            .build());
-    }
-
-    @PatchMapping("/{id}")
-    @PreAuthorize("hasAuthority('SCOPE_properties_update')")
-    public ResponseEntity<ResponseData> updateProperty(
-        @PathVariable(name = "id") Long id,
-        @RequestPart(required = false) @Valid PropertyUpdateRequest property,
-        @RequestPart(required = false) List<MultipartFile> images
-    ){
-        return ResponseEntity.ok(ResponseData.builder()
-            .data(propertiesService.updateProperty(id, property, images))
-            .desc("Property updated successfully")
             .build());
     }
 
