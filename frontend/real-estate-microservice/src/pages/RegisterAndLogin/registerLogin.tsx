@@ -2,10 +2,10 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Form, Col, Row, Input, Button, message } from "antd";
 import { useDispatch } from "react-redux";
-import './adminRegisterLogin.scss';
+import './registerLogin.scss';
 
-// import { setAdminUser } from "../../../redux/reduxSlices/adminUserSlice";
-import adminAuthorizationService from "../../../services/admin/authorization.service";
+import adminAuthorizationService from "../../services/authorization.service";
+// import { setClientUser, setTokenInfo } from "../../redux/reduxSlices/clientUserSlice";
 
 interface AdminRegisterLoginProps {
   isRegisterPage: boolean;
@@ -16,26 +16,46 @@ const AdminRegisterLogin: React.FC<AdminRegisterLoginProps> = ({ isRegisterPage 
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
+  const handleLoginSuccess = (response: any) => {
+    const { access_token, refresh_token, expires_in, refresh_expires_in, scope } = response.data.data.accessToken;
+    const userInfo = response.data.data.userInfo;
+
+    // dispatch(setClientUser({
+    //   ...userInfo,
+    // }));
+
+    // dispatch(setTokenInfo({
+    //   accessToken: access_token,
+    //   refreshToken: refresh_token,
+    //   expiresIn: expires_in,
+    //   refreshExpiresIn: refresh_expires_in,
+    //   scope: scope,
+    // }));
+  };
+
   const onFinishForm = async (data: any) => {
     try {
       if (!isRegisterPage) { // login
         const response = await adminAuthorizationService.submitLogin(data);
-        switch (response.code) {
-          case 200:
-            // if (response.user) {
-            //   dispatch(setAdminUser(response.user))
-            // }
+        const responseData = response.data.data
 
-            message.success(`Login successful. Welcome ${response.userInfo.username}!`, 3);
-            navigate('/admin/dashboard');
+        console.log("RES token: ", response.data.data.accessToken.access_token);
+        switch (response.status) {
+          case 200:
+            handleLoginSuccess(response);
+
+            message.success(`Login successful. Welcome ${responseData.userInfo.username}!`, 3);
+            // navigate('/admin/dashboard');
+            navigate('/admin/properties');
+
             break;
 
           case 401:
-            message.error(`${response.message}, please try again`, 3);
+            message.error(`${responseData.desc}, please try again`, 3);
             break;
 
           case 403:
-            message.error(`${response.message}, please try again`, 3);
+            message.error(`${responseData.desc}, please try again`, 3);
             break;
 
           default:
@@ -66,7 +86,7 @@ const AdminRegisterLogin: React.FC<AdminRegisterLoginProps> = ({ isRegisterPage 
 
 
     } catch (err: any) {
-      console.log('Error occurred:', err.response.status);
+      console.log('Error occurred:', err);
       if (err.response.status === 429) {
         message.error("Too many login request, please try again later!", 3)
       } else {

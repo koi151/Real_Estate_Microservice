@@ -6,12 +6,10 @@ import { useSelector } from 'react-redux';
 import { Breadcrumb, Button, Checkbox, Col, Image, InputNumber, Pagination, 
          PaginationProps, Popconfirm, Row, Skeleton, Space, Tag,  Tooltip,  message } from 'antd';
 
-// import * as standardizeData from '../../../helpers/standardizeData'
-// import getPriceUnit from '../../../helpers/getPriceUnit';
+import * as standardizeData from '../../../helpers/standardizeData'
 
 import propertiesService from '../../../services/admin/properties.service';
 
-// import { PropertyType, PaginationObject, AdminPermissions } from '../../../../../backend/commonTypes';
 import ViewCount from '../../../components/shared/Counters/ViewCount/viewCount';
 // import RoomCountTooltip from '../../../components/shared/Counters/RoomCounter/roomCount';
 // import FilterBox from '../../../components/admin/FilterBox/filterBox';
@@ -21,105 +19,88 @@ import NoPermission from '../../../components/admin/NoPermission/noPermission';
 // import { RootState } from '../../../redux/stores';
 import './properties.scss';
 import FilterBoxSlide from '../../../components/shared/FilterComponents/FilterBoxSlide/filterBoxSlide';
+// import { selectClientUser } from '../../../redux/reduxSlices/clientUserSlice';
+import FilterBox from '../../../components/FilterBox/filterBox';
+import getPriceUnit from '../../../helpers/getPriceUnit';
+import RoomCountTooltip from '../../../components/shared/Counters/RoomCounter/roomCount';
+import { RootState } from '../../../redux/stores';
+import { PaginationObj } from '../../../commonTypes';
 
 
 const Properties: React.FC = () => {
-  const navigate = useNavigate();
+  // const clientUser = useSelector(selectClientUser);
   const location = useLocation();
 
-  // const filters = useSelector((state: RootState) => state.filters);
-
+  const navigate = useNavigate();
+  // const location = useLocation();
+  const filters = useSelector((state: RootState) => state.filters);
   // const [permissions, setPermissions] = useState<AdminPermissions | undefined>(undefined);
   const [accessAllowed, setAccessAllowed] = useState(true);
   const [loading, setLoading] = useState(true);
-
   // const [propertyList, setPropertyList] = useState<PropertyType[]>([]);
   const [propertyList, setPropertyList] = useState<any[]>([]);
-
   const [error, setError] = useState<string | null>(null); 
-  const [propertyCount, setPropertyCount] = useState<number>(0);
 
-  // const { listingType, keyword, status, category, priceRange, sorting,
-  //         direction, bedrooms, bathrooms, areaRange } = filters;
+  const { listingType, keyword, status, category, priceRange, sorting,
+          direction, bedrooms, bathrooms, areaRange } = filters;
 
   const [checkedList, setCheckedList] = useState<string[]>([]);
   const [currentPage, setCurrentPage] = useState<number>(1);
   
-  // const [paginationObj, setPaginationObj] = useState<PaginationObject>({
-  //   currentPage: null,
-  //   limitItems: 4,
-  //   skip: null,
-  //   totalPage: null,
-  // })
-
-  const [paginationObj, setPaginationObj] = useState<any>({
-    currentPage: 0,
-    limitItems: 10,
-    skip: null,
-    totalPage: null,
+  const [paginationObj, setPaginationObj] = useState<PaginationObj>({
+    maxPageItems: 10, 
+    totalItems: undefined,
+    totalPages: undefined,
+    currentPage: 1,
   })
+  
 
   const onPageChange: PaginationProps['onChange'] = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  // fetch properties data
   useEffect(() => {
     const fetchData = async () => {
       try {
         setLoading(true);
-        // const response = await propertiesService.getApprovedProperties({ 
-        //   ...(keyword && { keyword }), 
-        //   ...(status && { status }), 
-        //   ...(listingType && { listingType }), 
-        //   ...(category && { category }), 
-        //   ...(direction && { direction }), 
-        //   ...(bedrooms && { bedrooms }),
-        //   ...(bathrooms && { bathrooms }), 
-        //   ...(priceRange && { priceRange }),
-        //   ...(areaRange && { areaRange }),
-        //   ...(sorting?.sortKey && { sortKey: sorting.sortKey }), 
-        //   ...(sorting?.sortValue && { sortValue: sorting.sortValue }), 
-        //   currentPage: currentPage,
-        //   pageSize: 4
-        // });
 
-        const response = await propertiesService.getAllProperties();
-  
-        if(response?.code === 200) {
-          setPropertyList(response.properties);
-          // setPaginationObj(response.paginationObject);
-          setPropertyCount(response.propertyCount);
+        const query = location.search;
 
-          // if (response.permissions) {
-          //   setPermissions(response.permissions);
-          // }
+        const response = await propertiesService.getAllProperties(query);
+        console.log('RES PROPERTIES:', response);
 
+        if (response?.status >= 200 && response?.status < 300) {
+          setPropertyList(response.data.data);
+          setPaginationObj({
+            maxPageItems: response.data.maxPageItems,
+            totalItems: response.data.totalItems,
+            totalPages: response.data.totalPages,
+            currentPage: response.data.currentPage
+          });
+          
+        } else if (response?.status === 401) {
+          message.error('Unauthorized - Please log in to access this feature.', 3);
+          navigate('/admin/auth/login');
         } else {
-          setAccessAllowed(false);
-          message.error(response.message, 4);
+          message.error(response.desc || 'Failed to fetch properties.', 4);
         }
-  
       } catch (error: any) {
         if ((error.response && error.response.status === 401) || error.message === 'Unauthorized') {
           message.error('Unauthorized - Please log in to access this feature.', 3);
           navigate('/admin/auth/login');
         } else {
-          message.error('Error occurred while fetching properties data', 2);
+          message.error('Error occurred while fetching properties data.', 2);
           setError('No property found.');
-          console.log('Error occurred:', error);
+          console.error('Error occurred:', error);
         }
       } finally {
         setLoading(false);
       }
     };
-    fetchData();
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []
-    // [keyword, status, sorting, currentPage, listingType, bedrooms, bathrooms,
-    // direction, priceRange, areaRange, category, navigate]
-  ); 
+    fetchData();
+  }, [location.search, navigate, status, keyword, priceRange]);
+ 
 
 
   // update url
@@ -186,11 +167,11 @@ const Properties: React.FC = () => {
     }
   }
 
-  // const renderTag = (value: string, colorMap: Record<string, string>) => (
-  //   <Tag className="listing-type-tag" color={colorMap[value]}>
-  //     {standardizeData.listingTypeFormatted(value)}
-  //   </Tag>
-  // );
+  const renderTag = (value: string, colorMap: Record<string, string>) => (
+    <Tag className="listing-type-tag" color={colorMap[value]}>
+      {standardizeData.listingTypeFormatted(value)}
+    </Tag>
+  );
 
   // Delete item
   // const confirmDelete = async (id?: string) => {
@@ -209,6 +190,11 @@ const Properties: React.FC = () => {
   //     message.error('Error occurred, can not delete');
   //   }
   // };
+  const formatPrice = (price: number | undefined): string => {
+    if (!price) return '0';
+    const formattedPrice = price > 1000 ? price / 1000 : price;
+    return formattedPrice.toFixed(2);
+  };
   
   return (
     <>
@@ -225,16 +211,15 @@ const Properties: React.FC = () => {
             />
           </div>
     
-          {/* <FilterBox
+          <FilterBox
             resetFilterLink='/admin/properties'
             createPostLink='/admin/properties/create' 
-            // createAllowed={permissions?.propertiesCreate} 
             priceRangeFilter
             categoryFilter
             statusFilter
             multipleChange
-            checkedList={checkedList}
-          /> */}
+            // checkedList={checkedList}
+          />
           
           <FilterBoxSlide slickWidth='100%' slideShow={5} userType='admin'/>
     
@@ -250,21 +235,21 @@ const Properties: React.FC = () => {
                       <Row className='item-wrapper__custom-row'>
                         <div className='item-wrapper__upper-content' key={index}>
                             <Col
-                              className='d-flex flex-column justify-content-center'  
-                              span={1}
+                              className='d-flex flex-column justify-content-center w-100'  
+                              span={2}
                             >
-                              {property.position ?
+                              {property.propertyId ?
                                 <Tooltip title={
                                   <span>
-                                    Property at <span style={{ color: 'orange' }}>#{property.position}</span> position
+                                    Property at <span style={{ color: 'orange' }}>#{property.propertyId}</span> position
                                   </span>
                                 }>
                                   <InputNumber
                                     min={0}
                                     className='item-wrapper__upper-content--position' 
-                                    defaultValue={property.position} 
-                                    onChange={(value) => onChangePosition(property._id, value)}
-                                    data-id={property._id}
+                                    defaultValue={property.propertyId} 
+                                    // onChange={(value) => onChangePosition(property._id, value)}
+                                    data-id={property.propertyId}
                                   />
                                 </Tooltip>
                               : <Tooltip title='Please add the position of property'>No data</Tooltip>    
@@ -272,15 +257,15 @@ const Properties: React.FC = () => {
                               
                               <Checkbox
                                 onChange={handleCheckboxChange(property._id)}
-                                className='item-wrapper__upper-content--checkbox'
+                                className='item-wrapper__upper-content--checkbox ml-2'
                                 id={property._id}
                               ></Checkbox>
                             </Col>
       
                           <Col xxl={4} xl={4} lg={4} md={4} sm={4}>
-                            {property.images?.length ? 
+                            {property.imageUrls?.length ? 
                               <Image
-                                src={property.images?.[0] ?? ""} 
+                                src={property.imageUrls?.[0] ?? ""} 
                                 alt='property img' 
                                 width={200}
                               />
@@ -295,28 +280,39 @@ const Properties: React.FC = () => {
                               <h3 className='item-wrapper__upper-content--title'>
                                 {property.title}
                               </h3>
-                              <div className='item-wrapper__upper-content--location'>
-                                {property.location ? (
-                                  <span>{property.location.city ? property.location.city : 'No info'}, {property.location.district ? property.location.district : 'no info'}</span>
-                                ) : "No information"}
+                              <div className="item-wrapper__upper-content--location">
+                                {property.address ? (
+                                  <Tooltip title={property.address}>
+                                    <span>
+                                      {property.address.split(',').slice(0, 2).join(',')}.
+                                    </span>
+                                  </Tooltip>
+                                ) : (
+                                  "No information"
+                                )}
                               </div>
+
                             </div>
                             <div>
-                              {/* {property.price ? 
-                                <span className='item-wrapper__upper-content--price'>
-                                  <span className='price-number'>
-                                    { property.price > 1000 ? property.price / 1000 : property.price }
+                              {property.rentalPrice || property.salePrice
+                                ? (
+                                  <span className="item-wrapper__upper-content--price">
+                                    <span className="price-number">
+                                      {formatPrice(property.rentalPrice || property.salePrice)}
+                                    </span>
+                                    <span className="price-unit">
+                                      {getPriceUnit(property.salePrice || property.rentalPrice)}
+                                      <span style={{ margin: '0 .85rem' }}>/</span>
+                                    </span>
                                   </span>
-                                  <span className='price-unit'>{getPriceUnit(property.price)}
-                                    <span style={{ margin: '0 .85rem' }}>/</span>
-                                  </span>
-                                </span>
-                                : <Tooltip title='No data of price'>...</Tooltip>
-                              } */}
-                              {property.area?.propertyWidth && property.area?.propertyLength ? 
+                                ) : (
+                                  <Tooltip title="No data of price">...</Tooltip>
+                                )
+                              }
+                              {property.area ? 
                                 <span className='item-wrapper__upper-content--area'>
                                   <span className='area-number'>
-                                    {property.area.propertyWidth * property.area.propertyLength}
+                                    {(property.area).toFixed(0)}
                                   </span>
                                   <span className='area-unit'>m²</span>
                                 </span>
@@ -324,41 +320,51 @@ const Properties: React.FC = () => {
                               }
                             </div>
                           </Col>
+
                           <Col xxl={3} xl={3} lg={3} md={3} sm={3}>
-                            <div className='item-wrapper__upper-content--rooms'>
-                              {property.propertyDetails?.rooms ? (
-                                <div className='d-flex flex-column justify-content-center'>
-                                  {/* <RoomCountTooltip roomList={property.propertyDetails?.rooms} type="bedrooms" />
-                                  <RoomCountTooltip roomList={property.propertyDetails?.rooms} type="bathrooms" /> */}
-                                  <ViewCount propertyView={property.view} />
+                            <div className="item-wrapper__upper-content--rooms">
+                              {property.rooms ? (
+                                <div className="d-flex flex-column justify-content-center">
+                                  {property.rooms
+                                    .filter((room: any) => room.roomType === "Bedroom" || room.roomType === "Bathroom")
+                                    .map((room: any) => (
+                                      <RoomCountTooltip
+                                        key={room.roomType}
+                                        roomType={room.roomType}
+                                        quantity={room.quantity}
+                                      />
+                                    ))}
+                                  {/* <ViewCount propertyView={property.view || 0} /> */}
                                 </div>
                               ) : (
                                 <>
-                                  {/* <RoomCountTooltip roomList={undefined} type="bedrooms" />
-                                  <RoomCountTooltip roomList={undefined} type="bathrooms" /> */}
-                                  <ViewCount propertyView={property.view} />
+                                  <RoomCountTooltip roomType="Bedroom" quantity={null} />
+                                  <RoomCountTooltip roomType="Bathroom" quantity={null} />
+                                  {/* <ViewCount propertyView={property.view || 0} /> */}
                                 </>
                               )}
                             </div>
                           </Col>
+
+                          
                           <Col
                             className='item-wrapper__custom-col-two'  
-                            xxl={6} xl={6} lg={6} md={6} sm={6}
+                            xxl={5} xl={5} lg={5} md={5} sm={5}
                           >
                             <div style={{marginLeft: "2rem"}}>
-                              {property.status && property._id ? (
-                                <StatusButton typeofChange='changePropertyStatus' itemId={property._id} status={property.status || undefined} />
+                              {property.status && property.propertyId ? (
+                                <StatusButton typeofChange='changePropertyStatus' itemId={property.propertyId} status={property.status || undefined} />
                               ) : (
-                                <Tooltip title='Please add property status or id'>No data</Tooltip>
+                                <Tooltip title='Please add property status or id'>No status data</Tooltip>
                               )}
                               <div className='item-wrapper__upper-content--listing-type'>
                                 <p className='tag-text'>Tags: </p>
-                                {/* <Space size={[0, 8]} wrap>
-                                  {(property.listingType === 'forSale' || property.listingType === 'forRent') 
-                                    && renderTag(property.listingType, { forSale: 'green', forRent: 'orange' })}
+                                <Space size={[0, 8]} wrap>
+                                  {(property.type === 'sale' || property.type === 'forRent') 
+                                    && renderTag(property.type, { forSale: 'green', forRent: 'orange' })}
                                   {property.propertyDetails?.propertyCategory === 'house' 
                                   && renderTag(property.propertyDetails.propertyCategory, { house: 'purple', apartment: 'blue' })}
-                                </Space> */}
+                                </Space>
                               </div>
                             </div>
                           </Col>
@@ -367,11 +373,11 @@ const Properties: React.FC = () => {
                             xxl={2} xl={2} lg={2} md={2} sm={2}
                           >
                             <div className='button-wrapper'>
-                              <Link to={`/admin/properties/detail/${property._id}`}> 
+                              <Link to={`/admin/properties/detail/${property.propertyId}`}> 
                                 <Button className='detail-btn'>Detail</Button> 
                               </Link>
                               {/* {permissions?.propertiesEdit && ( */}
-                                <Link to={`/admin/properties/edit/${property._id}`}> 
+                                <Link to={`/admin/properties/edit/${property.propertyId}`}> 
                                   <Button className='edit-btn'>Edit</Button> 
                                 </Link>
                               {/* )} */}
@@ -395,7 +401,7 @@ const Properties: React.FC = () => {
                         <Col span={24}>
                           <div className='item-wrapper__lower-content'>
                             <div className='item-wrapper__lower-content--date-created'>
-                              Created: {property.createdAt ? new Date(property.createdAt).toLocaleString() : 'No data'}
+                              Available from: {property.availableFrom ? new Date(property.availableFrom).toLocaleString() : 'No data'}
                             </div>
                             <div className='item-wrapper__lower-content--date-created'>
                               Expire: {property.expireTime ? new Date(property.expireTime).toLocaleString() : 'No data'}
@@ -417,10 +423,10 @@ const Properties: React.FC = () => {
           <Pagination
             // showSizeChanger
             showQuickJumper
-            pageSize={paginationObj?.limitItems || 4}
+            pageSize={paginationObj.maxPageItems}
             onChange={onPageChange}
-            defaultCurrent={paginationObj?.currentPage || 1}
-            total={propertyCount}
+            defaultCurrent={paginationObj.currentPage}
+            total={paginationObj.totalItems}
           />
         </>
       ) : (

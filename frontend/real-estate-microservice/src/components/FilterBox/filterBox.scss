@@ -1,0 +1,179 @@
+@import '../../App.scss';
+
+$filter-box-height: 20rem;
+
+
+@keyframes fadeIn {
+  0% {
+    opacity: 0;
+    height: 0;
+    padding: 0 2rem;
+
+  }
+  100% {
+    opacity: 1;
+    height: $filter-box-height;
+    padding: 2rem 3rem;
+  }
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    height: $filter-box-height;
+    padding: 2rem 3rem;
+  }
+  100% {
+    opacity: 0;
+    height: 0rem;
+    padding: 0 2rem;
+  }
+}
+
+@keyframes segmentedFadeIn {
+  0% {
+    opacity: 0;
+    height: 0;
+  }
+  100% {
+    opacity: 1;
+    height: auto;
+  }
+}
+
+@keyframes segmentedFadeOut {
+  0% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+    height: 0rem;
+  }
+}
+
+.filter-box {
+  display: flex;
+  flex-direction: column;
+
+  .custom-row {
+    width: 100%;
+    display: flex;
+    align-items: center;
+  }
+
+  &__button-wrapper {
+    &--right {
+      display: flex;
+      justify-content: flex-end;
+
+      .search-box {
+        width: 30rem;
+      }
+
+      .custom-link {
+        text-decoration: none;
+        .filter-button, .add-new-button {
+          margin-left: 1rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+
+          svg {
+            margin-left: 1rem;
+          }
+        }
+      }
+    } 
+  }
+
+  &__detail.fade-out {
+    animation: fadeOut .3s ease-in-out forwards;
+  }
+
+  &__detail {
+    display: flex;
+    height: $filter-box-height;
+    width: 100%;
+    background-color: #fff;
+    box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+    margin: .5rem 0;
+    margin-top: 0;
+    border-radius: .8rem;
+    max-height: $filter-box-height;
+    animation: fadeIn .3s ease-in-out forwards;
+
+    .sorting-items {
+
+      &__select {
+        width: 25rem;
+        margin-top: .75rem;
+      }
+    }
+    
+    .multiple-change {
+      &__select {
+        width: 25rem;
+        margin-top: .75rem;
+      }
+    }
+
+    .price-range, .category-filter {
+      position: relative;
+      display: flex;
+      flex-direction: column;
+
+      &__btn {
+        width: 80%; 
+        z-index: 9;
+      }
+    }
+
+    .clear-filters {
+      margin-top: 2rem;
+    }
+  }
+}
+
+.custom-btn {
+  margin-right: 1rem;
+  margin-top: .75rem;
+}
+
+.custom-slider {
+  width: 90% !important;
+  margin: 2rem 0;
+}
+
+.active {
+  background-color: #58c965;
+  color: #fff !important;
+  border: none;
+
+  :hover {
+    color: #fff;
+  }
+}
+
+.listing-type.fade-out {
+  animation: segmentedFadeOut .3s ease-in-out forwards;
+}
+
+.listing-type {
+  animation: segmentedFadeIn .3s ease-in-out forwards;
+
+  .ant-segmented-group {
+    .ant-segmented-item {
+      .ant-segmented-item-label {
+        font-weight: 400;
+      }
+    }
+
+    .ant-segmented-item-selected { 
+      .ant-segmented-item-label {
+        font-weight: 600;
+      }
+    }
+  }
+
+  
+}
