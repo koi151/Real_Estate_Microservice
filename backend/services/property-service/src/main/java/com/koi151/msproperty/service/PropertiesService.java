@@ -24,7 +24,7 @@ public interface PropertiesService {
     Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId, Pageable pageable);
     Page<PropertySearchDTO> findAllPropertiesByAccount(String accountId, Pageable pageable);
     Page<PropertiesHomeDTO> findPropertiesByStatus(StatusEnum status, Pageable pageable);
-    DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> images);
+    void createProperty(PropertyCreateRequest request, List<MultipartFile> images);
     void createFakeProperties(List<PropertyCreateRequest> fakeProperties);
     DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;

@@ -282,10 +282,10 @@ public class PropertyController {
     ) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         PropertyCreateRequest property = objectMapper.readValue(propertyJson, PropertyCreateRequest.class);
+        propertiesService.createProperty(property, images);
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseData.builder()
-                .data(propertiesService.createProperty(property, images))
                 .desc("Property post created successfully")
                 .build());
     }

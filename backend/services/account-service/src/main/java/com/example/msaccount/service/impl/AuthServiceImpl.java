@@ -86,7 +86,6 @@ public class AuthServiceImpl implements AuthService {
     private String accessTokenLifespan;
 
     private final RestTemplate restTemplate;
-    private final ObjectMapper objectMapper;
     private final RedisTemplate<String, Object> redisTemplate;
     private final KeycloakUserService kcUserService;
 
@@ -116,14 +115,14 @@ public class AuthServiceImpl implements AuthService {
         );
     }
 
-    //  * Tính toán code_challenge từ code_verifier
+    // compute code_challenge from code_verifier
     private String computeCodeChallenge(String codeVerifier) {
         try {
-            // Sử dụng thuật toán SHA-256 để băm code_verifier
+            // use SHA-256 algo to hash code_verifier
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             byte[] hash = digest.digest(codeVerifier.getBytes(StandardCharsets.UTF_8));
 
-            // Chuyển đổi sang Base64 URL
+            // convert to Base64 URL
             return Base64.getUrlEncoder().withoutPadding().encodeToString(hash);
         } catch (NoSuchAlgorithmException e) {
             throw new RuntimeException("Error computing code challenge", e);

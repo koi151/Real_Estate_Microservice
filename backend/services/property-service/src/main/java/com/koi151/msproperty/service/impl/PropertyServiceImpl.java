@@ -3,17 +3,21 @@ package com.koi151.msproperty.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koi151.msproperty.client.PropertyClient;
 import com.koi151.msproperty.entity.*;
 import com.koi151.msproperty.enums.RoomTypeEnum;
+import com.koi151.msproperty.enums.Status;
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.mapper.PropertyMapper;
 import com.koi151.msproperty.model.dto.*;
 import com.koi151.msproperty.model.projection.PropertySearchProjection;
+import com.koi151.msproperty.model.request.PropertyServicePackageCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertySearchRequest;
 import com.koi151.msproperty.model.request.property.PropertyStatusUpdateRequest;
 import com.koi151.msproperty.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
+import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.repository.*;
 import com.koi151.msproperty.repository.custom.impl.PropertyRepositoryImpl;
 import com.koi151.msproperty.service.PropertiesService;
@@ -49,6 +53,7 @@ public class PropertyServiceImpl implements PropertiesService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
+    private final PropertyClient propertyClient;
     private static final Logger logger = LoggerFactory.getLogger(PropertyRepositoryImpl.class);
 
     public Page<PropertySearchDTO> findProperties(PropertySearchRequest request, Pageable pageable) {
@@ -109,11 +114,35 @@ public class PropertyServiceImpl implements PropertiesService {
 
     @Transactional
     @Override
-    public DetailedPropertyDTO createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
-        propertyValidator.checkValidPropertyCreateRequest(request);
-        Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
-        propertyRepository.save(property);
-        return propertyMapper.toDetailedPropertyDTO(property);
+    public void createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+        try {
+            propertyValidator.checkValidPropertyCreateRequest(request);
+            Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
+
+            Property savedProperty;
+            try {
+                savedProperty = propertyRepository.save(property);
+                System.out.println("Property saved successfully with ID: " + savedProperty.getPropertyId());
+            } catch (Exception e) {
+                System.err.println("Error occurred while saving Property: " + e.getMessage());
+                throw new RuntimeException("Failed to save Property", e);
+            }
+
+            PropertyServicePackageCreateRequest packageRequest = PropertyServicePackageCreateRequest.builder()
+                .propertyId(savedProperty.getPropertyId())
+                .packageType(request.packageType())
+                .status(Status.ACTIVE)
+                .postServiceIds(request.postServiceIds())
+                .build();
+
+            ResponseData response = propertyClient.createPropertyServicePackage(packageRequest).getBody();
+
+            if (response == null || !response.getDesc().equals("Property service package created successfully")) {
+                throw new RuntimeException("Failed to create Property Service Package");
+            }
+        } catch (Exception e) {
+            System.err.println("Error: " + e.getMessage());
+        }
     }
 
     @Transactional
@@ -227,7 +256,9 @@ public class PropertyServiceImpl implements PropertiesService {
             existingProperty.setTitle(request.title());
             existingProperty.setCategoryId(Math.toIntExact(request.categoryId()));
             existingProperty.setAccountId(request.accountId());
-            existingProperty.setArea(BigDecimal.valueOf(request.area()));
+            existingProperty.setArea(
+                BigDecimal.valueOf(request.area() != null ? request.area() : existingProperty.getArea().doubleValue())
+            );
             existingProperty.setDescription(request.description());
             existingProperty.setTotalFloor(request.totalFloor() != null ? request.totalFloor().shortValue() : null);
             existingProperty.setStatus(request.status());

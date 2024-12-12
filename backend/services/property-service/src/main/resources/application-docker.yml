@@ -1,6 +1,8 @@
 spring:
   application:
     name: property-service
+  profiles:
+    active: docker
   security:
     oauth2:
       resourceserver:

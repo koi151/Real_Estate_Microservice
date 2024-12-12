@@ -114,6 +114,10 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         CriteriaBuilder cb = context.criteriaBuilder();
         Root<Property> root = context.root();
 
+        if (request.propertyCategory() != null && request.propertyCategory().categoryId() != null) {
+            predicates.add(cb.equal(root.get("categoryId"), request.propertyCategory().categoryId()));
+        }
+
         if (request.propertyForSale() != null) {
             predicates.add(cb.isNotNull(context.getJoins().get("propertyForSale")));
             predicates.add(cb.isNull(context.getJoins().get("propertyForRent")));

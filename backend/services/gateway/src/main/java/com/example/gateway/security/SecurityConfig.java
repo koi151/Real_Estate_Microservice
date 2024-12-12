@@ -1,5 +1,6 @@
 package com.example.gateway.security;
 
+import com.example.gateway.TokenService.TokenService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.data.redis.core.RedisTemplate;
@@ -26,14 +27,15 @@ import java.util.List;
 public class SecurityConfig {
 
     private final RedisTemplate<String, Object> redisTemplate;
+    private final TokenService tokenService;
 
-    public SecurityConfig(RedisTemplate<String, Object> redisTemplate) {
+    public SecurityConfig(RedisTemplate<String, Object> redisTemplate, TokenService tokenService) {
         this.redisTemplate = redisTemplate;
+        this.tokenService = tokenService;
     }
-
     @Bean
     public CookieToBearerFilter cookieToBearerFilter() {
-        return new CookieToBearerFilter(redisTemplate);
+        return new CookieToBearerFilter(redisTemplate, tokenService);
     }
 
     @Bean

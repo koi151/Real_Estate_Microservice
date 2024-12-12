@@ -104,7 +104,7 @@ services:
     pull_policy: always
     container_name: gateway
     ports:
-      - "9011:9011"
+      - "9090:9090"
     environment:
       - SPRING_PROFILES_ACTIVE=docker
       - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
@@ -159,7 +159,7 @@ services:
       - local.env
     profiles:
       - docker
-    restart: unless-stopped
+#    restart: unless-stopped
 
   listing-service-service:
     container_name: listing-service-service
@@ -191,7 +191,7 @@ services:
       - local.env
     profiles:
       - docker
-    restart: unless-stopped
+#    restart: unless-stopped
 
   account-service:
     container_name: account-service
@@ -223,71 +223,71 @@ services:
       - local.env
     profiles:
       - docker
-    restart: unless-stopped
+#    restart: unless-stopped
 
-  property-submission-service:
-    container_name: property-submission-service
-    image: b2113335/property-submission-service:latest
-    pull_policy: always
-    ports:
-      - "8070:8070"
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - KEYCLOAK_URL=http://keycloak:8080
-    depends_on:
-      config-server:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      gateway:
-        condition: service_started
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-    profiles:
-      - docker
-    restart: unless-stopped
+#  property-submission-service:
+#    container_name: property-submission-service
+#    image: b2113335/property-submission-service:latest
+#    pull_policy: always
+#    ports:
+#      - "8070:8070"
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+#      - KEYCLOAK_URL=http://keycloak:8080
+#    depends_on:
+#      config-server:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_started
+#      mysql:
+#        condition: service_started
+#      discovery-server:
+#        condition: service_started
+#      gateway:
+#        condition: service_started
+#      keycloak:
+#        condition: service_started
+#      zipkin:
+#        condition: service_started
+#    networks:
+#      - microservices-net
+#    env_file:
+#      - .env
+#      - local.env
+#    profiles:
+#      - docker
+#    restart: unless-stopped
 
-  notification-service:
-    container_name: notification-service
-    image: b2113335/notification-service:latest
-    pull_policy: always
-    environment:
-      - SPRING_PROFILES_ACTIVE=docker
-      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
-      - KEYCLOAK_URL=http://keycloak:8080
-    depends_on:
-      config-server:
-        condition: service_healthy
-      kafka:
-        condition: service_started
-      mysql:
-        condition: service_started
-      discovery-server:
-        condition: service_started
-      keycloak:
-        condition: service_started
-      zipkin:
-        condition: service_started
-    networks:
-      - microservices-net
-    env_file:
-      - .env
-      - local.env
-    profiles:
-      - docker
-    restart: unless-stopped
+#  notification-service:
+#    container_name: notification-service
+#    image: b2113335/notification-service:latest
+#    pull_policy: always
+#    environment:
+#      - SPRING_PROFILES_ACTIVE=docker
+#      - SPRING_CONFIG_IMPORT=optional:configserver:http://config-server:8888
+#      - KEYCLOAK_URL=http://keycloak:8080
+#    depends_on:
+#      config-server:
+#        condition: service_healthy
+#      kafka:
+#        condition: service_started
+#      mysql:
+#        condition: service_started
+#      discovery-server:
+#        condition: service_started
+#      keycloak:
+#        condition: service_started
+#      zipkin:
+#        condition: service_started
+#    networks:
+#      - microservices-net
+#    env_file:
+#      - .env
+#      - local.env
+#    profiles:
+#      - docker
+#    restart: unless-stopped
 
 networks:
   microservices-net:
