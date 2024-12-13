@@ -1,65 +1,49 @@
 import createApi from '../api.service';
-// import { GetPropertiesOptions, ValidMultiChangeType, ValidStatus } from '../../../../backend/commonTypes';
 
 class PropertiesServiceAdmin {
-  private api: any; 
+  private api: any;
 
-  constructor(baseUrl = "http://localhost:3000/api/v1/admin/properties") {
+  constructor(baseUrl = process.env.REACT_APP_API_PREFIX + "/properties") {
     this.api = createApi(baseUrl);
   }
 
-  private getAuthHeaders() {
-    const accessToken = localStorage.getItem('accessToken');
-    
-    if (!accessToken) {
-      console.log("Access token not found");
-      throw new Error('Unauthorized');
-    }
-    return {
+
+  async getAllProperties(query: string) {
+    return this.api.get(`/${query}`);
+  }
+
+
+  async getSingleProperty(id: string) {
+    return this.api.get(`/${id}`);
+  }
+
+  async changePropertyStatus(id: string, status: string) {
+    const payload = { status }; 
+    const config = {
       headers: {
-        Authorization: `Bearer ${accessToken}`
-      }
+        'Content-Type': 'application/json', 
+      },
     };
+  
+    return this.api.patch(`/${id}/status`, payload, config);
   }
 
-  private async handleRequest(request: Promise<any>): Promise<any> {
-    try {
-      const response = await request;
-      return response.data;
-
-    } catch (err: any) {      
-      if (err.message === 'Access token not found') {
-        throw new Error('Unauthorized')
-
-      } else if (err.response && err.response.status === 401) {
-
-        // Attempt to refresh the token
-        try {
-          const refreshToken = localStorage.getItem('refreshToken');
-          if (!refreshToken) {
-            throw new Error('Refresh token not found in localStorage');
-          }
-  
-          const refreshResponse = await this.api.post('/refresh', { refreshToken });
-          const newAccessToken = refreshResponse.data.accessToken;
-          localStorage.setItem('accessToken', newAccessToken);
-  
-          return await this.handleRequest(request);
-
-        } catch (refreshError) {
-          throw new Error('Unauthorized');
-        }
-
-      } else {
-        console.error('An error occurred:', err);
-        throw new Error('An unexpected error occurred. Please try again later.');
-      }
-    }
+  async createProperty(property: FormData) {
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    return this.api.post('/', property, config);
   }
 
-  async getAllProperties() {
-    const request = this.api.get(`/`);
-    return this.handleRequest(request);
+  async updateProperty(property: FormData, id: number) {
+    const config = {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    };
+    return this.api.patch(`/${id}`, property, config);
   }
 
   

@@ -1,45 +1,57 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
-import { ClientAccountType } from '../../commonTypes';
+import { RootState } from '../stores';
 
-type ClientAccountTypeLimited = Omit<
-  ClientAccountType,
-  'password' | 'token'
->;
+interface ClientAccountState {
+  userName: string;
+  avatar: string;
+  createdAt?: string;
+  deleted: boolean;
+  wallet?: number;
+  email: string;
+  fullName: string;
+  phone: string;
+  postList: any[];
+  favoritePosts: any[];
+  status?: string;
+  updatedAt?: string;
+  accountId: string;
+  scope?: string;
+}
 
-const initialState: 
-  Omit<ClientAccountTypeLimited, 'password' | 'token'> = 
-  {
-    userName: '',
-    avatar: '',
-    createdAt: undefined,
-    deleted: false,
-    wallet: undefined,
-    email: '',
-    fullName: '',
-    phone: '',
-    postList: [],
-    favoritePosts: [],
-    status: undefined,
-    updatedAt: undefined,
-    _id: '',
-  };
+const initialState: ClientAccountState = {
+  userName: '',
+  avatar: '',
+  createdAt: undefined,
+  deleted: false,
+  wallet: undefined,
+  email: '',
+  fullName: '',
+  phone: '',
+  postList: [],
+  favoritePosts: [],
+  status: undefined,
+  updatedAt: undefined,
+  accountId: '',
+  scope: undefined,
+};
 
 export const clientUserSlice = createSlice({
   name: 'clientUser',
   initialState,
   reducers: {
-    setClientUser: (_, action: PayloadAction<ClientAccountType>) => {
-      return action.payload;
+    setClientUser: (state, action: PayloadAction<Partial<ClientAccountState>>) => {
+      return { ...state, ...action.payload };
     },
     setAvatar: (state, action: PayloadAction<string>) => {
       state.avatar = action.payload;
     },
-    resetClientUserState: state => {
+    resetClientUserState: () => {
       return initialState;
-    }
+    },
   },
 });
 
 export const { setClientUser, setAvatar, resetClientUserState } = clientUserSlice.actions;
+export const selectClientUser = (state: RootState) => state.clientUser;
 
 export default clientUserSlice.reducer;

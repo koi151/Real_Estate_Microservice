@@ -7,7 +7,7 @@ interface UserState {
   deleted: boolean;
   email: string;
   fullName: string;
-  permissions: AdminPermissions | undefined;
+  permissions: any;
   phone: string;
   postList: string[],
   favoritePosts: string[],

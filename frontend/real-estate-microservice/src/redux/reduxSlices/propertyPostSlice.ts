@@ -33,6 +33,8 @@ const initialState: PropertyPostFull = {
   propertyDetails: undefined,
   postServices: undefined,
   expireTime: undefined,
+
+  categoryId: undefined,
 };
 
 export const propertyPostSlice = createSlice({
@@ -68,3 +70,5 @@ export const propertyPostSlice = createSlice({
 export const { setPost, setAllowStep2, setAllowStep3, setSubmitFirstPage, setSubmitSecondPage } = propertyPostSlice.actions;
 
 export default propertyPostSlice.reducer;
+
+

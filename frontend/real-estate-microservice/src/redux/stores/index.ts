@@ -3,6 +3,7 @@ import filtersReducer from '../reduxSlices/filtersSlice';
 import administratorUser from '../reduxSlices/adminUserSlice'
 import clientUser from '../reduxSlices/clientUserSlice'
 import propertyPost from '../reduxSlices/propertyPostSlice';
+import authReducer from '../reduxSlices/authSlice';
 
 export const store = configureStore({
   middleware: (getDefaultMiddleware) =>
@@ -23,7 +24,8 @@ export const store = configureStore({
     filters: filtersReducer,
     adminUser: administratorUser,
     clientUser: clientUser,
-    propertyPost: propertyPost
+    propertyPost: propertyPost,
+    auth: authReducer
   },
 });
 

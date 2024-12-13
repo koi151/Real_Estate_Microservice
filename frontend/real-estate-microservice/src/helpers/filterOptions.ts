@@ -57,13 +57,14 @@ export const directionValues = [
 ];
 
 export const sortingOptionsAdmin = [
-  { label: 'Descending position', value: 'position-desc' },
-  { label: 'Ascending position', value: 'position-asc' },
-  { label: 'Descending price', value: 'price-desc' },
-  { label: 'Ascending price', value: 'price-asc' },
+  { label: 'Descending position', value: 'propertyId-desc' },
+  { label: 'Ascending position', value: 'propertyId-asc' },
+  { label: 'Descending price', value: '' },
+  { label: 'Ascending price', value: '' },
   { label: 'Descending view', value: 'view-desc' },
   { label: 'Ascending view', value: 'view-asc' },
-  { label: 'Newest', value: 'createdAt-desc' },
+  { label: 'Newest', value: 'createdDate-desc' },
+  { label: 'Oldest', value: 'createdDate-asc' },
 ];
 
 export const sortingOptionsClient = [

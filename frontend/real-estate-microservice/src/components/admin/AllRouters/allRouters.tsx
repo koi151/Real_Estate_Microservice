@@ -1,12 +1,12 @@
 import { useRoutes } from 'react-router-dom';
 import { adminRoutes } from '../../../routes/admin.routes';
-// import { clientRoutes } from '../../../routes/client.routes.tsx';
 import React from 'react';
+import { clientRoutes } from '../../../routes/client.routes';
 
 const AllRouter: React.FC = () => {
   const routes = [
     ...adminRoutes,
-    // ...clientRoutes
+    ...clientRoutes
   ];
   const elements = useRoutes(routes);
 

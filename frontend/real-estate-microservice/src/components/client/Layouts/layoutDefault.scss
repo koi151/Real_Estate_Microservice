@@ -1,0 +1,53 @@
+@import '../../../App.scss';
+
+$header-left-side-width: 70%;
+
+.client-layout {
+
+  .menu-wrapper {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+
+    &__left {
+      width: $header-left-side-width;
+      display: flex;
+      flex-direction: row;
+      justify-content: flex-start;
+
+      .logo-wrapper {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-right: 3rem;
+
+        &--logo {
+          width: 15rem;
+          height: auto;
+        }
+      }
+      
+      .ant-menu-title-content {
+        a {
+          font-weight: 600;
+          font-size: 1.5rem;
+          font-family: $lexend;
+        }
+      }
+    }
+
+    &__right {
+      display: flex;
+      width: calc(100% - $header-left-side-width);
+      justify-content: flex-end;
+      align-items: center;
+
+      &--create-post {
+        a {
+          text-decoration: none;
+        }
+      }
+    }
+  }
+}

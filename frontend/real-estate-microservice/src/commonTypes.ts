@@ -1,5 +1,5 @@
-export type RoomType = "bedrooms" | "bathrooms" | "kitchens" | "livingRooms";
-export type ValidStatus = 'active' | 'inactive' | 'pending';
+export type RoomType = "Bedroom" | "Bathroom";
+
 export type ValidStatisticTypes = 'revenue' | 'posts'
 export type ValidMultiChangeType = 'active' | "inactive" | "position" | "delete" 
 
@@ -37,8 +37,13 @@ export interface PropertyDetails {
   balconyDirection?: string;
   legalDocuments?: string[];
   propertyCategoryTitle?: string;
-  rooms?: string[];
+  rooms?: Room[];
   totalFloors?: number;
+}
+
+export interface Room {
+  roomType: RoomType; 
+  quantity: number;   
 }
 
 export interface PostServices {
@@ -48,10 +53,23 @@ export interface PostServices {
   discountPercentage: number | null;
 }
 
+export interface PropertyForRent {
+  paymentSchedule: string | null
+  propertyId: number
+  rentalPrice: number
+  rentalTerms?: string | null
+}
+
+export interface PropertyForSale {
+  propertyId: number
+  salePrice: number
+  saleTerms?: string | null
+}
+
 export interface PropertyType {
-  _id?: string;
+  categoryId: number | undefined;
   title: string;
-  status?: ValidStatus;
+  status?: any;
   postType?: string;
   position?: number | null;
   description: any,
@@ -59,6 +77,8 @@ export interface PropertyType {
     propertyWidth: number | null;
     propertyLength: number | null;
   },
+  propertyForSale?: PropertyForSale;
+  propertyForRent?: PropertyForRent;
   view?: number | null;
   price?: number | null;
   images?: string[];
@@ -79,26 +99,48 @@ export interface PropertyType {
   deleted?: boolean;
 }
 
+export interface ClientProperty {
+  propertyId?: string;
+  title: string;
+  status?: any;
+  description?: any,
+  area: number,
+  categoryId: number | undefined;
+  price?: number | null;
+  imageUrls?: string[];
+  address: string;
+  rooms?: any;
+  type: "rent" | "sale";
+  postType: any; // tmp
+  rentalPrice: number;
+  salePrice: number;
+  location?: Location;
+  listingType?: string;
+  propertyDetails?: PropertyDetails;
+  createdDate: Date;  
+  slug?: string;
+}
+
 // PROPERTY CATEGORIES
 export interface PropertyCategoryType {
-  _id?: string;
+  categoryId: number;
   title: string;
-  status?: ValidStatus;
-  position?: number;
+  status?: any;
   description?: any,
   parent_id?: string,
-  images?: string[];
+  imageUrls?: string;
   slug?: string;
-  createdAt?: Date;
+  createdDate?: Date;
   expireAt?: Date;
   deleted?: boolean;
 }
 
 // ADMIN ACCOUNT
 export interface AdminAccountType {
-  _id?: string;
+  accountId?: string;
   userName: string,
-  fullName: string,
+  firstName: string,
+  lastName: string,
   password: string,
   token?: string,
   email?: string,
@@ -107,11 +149,13 @@ export interface AdminAccountType {
   avatar?: string,
   postList?: string[],
   favoriteList? : string[],
-  status?: ValidStatus,
+  status?: any,
+  accountEnabled: boolean,
   createdAt?: Date;
   expireAt?: Date;
   deleted?: boolean;
-  roleTitle?: string;
+  // roleTitle?: string;
+  roles: string[];
 }
 
 // CLIENT ACCOUNT
@@ -136,7 +180,7 @@ export interface ClientAccountType {
   favoritePosts? : string[],
   social?: SocialNetwork, 
   wallet?: AccountWalletType,
-  status?: ValidStatus,
+  status?: any,
   createdAt?: Date;
   updatedAt?: Date;
   deleted?: boolean;
@@ -217,11 +261,11 @@ export interface SortingQuery {
 }
 
 // PAGINATION 
-export interface PaginationObject {
-  currentPage: number | null; 
-  limitItems: number | null; 
-  skip: number | null;
-  totalPage: number | null;
+export interface PaginationObj {
+  maxPageItems: number | 10
+  totalItems: number | undefined
+  totalPages: number | undefined
+  currentPage: number| 1
 }
 
 // ADMIN SERVICE
@@ -270,14 +314,9 @@ export interface DepositOrderType {
   language: string
 }
 
-// export interface VnpBillType {
-//   vnp_Amount: string,
-//   vnp_BankCode: string,
-//   vnp_BankTranNo: string,
-//   vnp_CardType?: 'ATM',
-//   vnp_OrderInfo: string,
-//   vnp_PayDate: string,
-//   vnp_ResponseCode: string,
-//   vnp_TransactionNo: string,
-//   vnp_TransactionStatus: string
-// }
+// Category Tree
+export interface CategoryNode {
+  id: string | number;
+  title: string;
+  children?: CategoryNode[];
+}

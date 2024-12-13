@@ -32,11 +32,14 @@ const KeycloakLogin: React.FC = () => {
         console.log("Generated code_verifier:", codeVerifier);
 
 
+        // Generate state
         const state = generateRandomString(32);
 
+        // Lưu code_verifier và state vào sessionStorage
         sessionStorage.setItem('pkce_code_verifier', codeVerifier);
         sessionStorage.setItem('pkce_state', state);
 
+        // Gửi yêu cầu lấy URL đăng nhập Keycloak
         const response = await axios.get(
           `${process.env.REACT_APP_API_PREFIX}/accounts/auth/login`,
           {
