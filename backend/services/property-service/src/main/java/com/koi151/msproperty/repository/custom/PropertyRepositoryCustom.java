@@ -6,6 +6,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface PropertyRepositoryCustom {
-    Page<PropertySearchProjection> findPropertiesByCriteria(PropertySearchRequest request, Pageable pageable);
+    Page<PropertySearchProjection> findPropertiesForAdmin(PropertySearchRequest request, Pageable pageable);
+    Page<PropertySearchProjection> findPropertiesForClient(PropertySearchRequest request, Pageable pageable);
 }
 

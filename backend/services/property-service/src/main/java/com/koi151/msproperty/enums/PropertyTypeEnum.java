@@ -11,8 +11,7 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum PropertyTypeEnum {
     RENT("For rent"),
-    SALE("For sale"),
-    RENT_SALE("For rent and sale");
+    SALE("For sale");
 
     private final String type;
     private static final PropertyTypeEnum[] VALUES = values(); // Cache enum values for performance

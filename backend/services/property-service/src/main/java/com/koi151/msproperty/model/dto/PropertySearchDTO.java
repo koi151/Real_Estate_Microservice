@@ -30,5 +30,4 @@ public class PropertySearchDTO {
     private List<String> imageUrls;
     private List<RoomNameQuantityDTO> rooms;
     private LocalDateTime createdDate;
-//    private PropertyPostServiceSearchDTO propertyPostService;
 }

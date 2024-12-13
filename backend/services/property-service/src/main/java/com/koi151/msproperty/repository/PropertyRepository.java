@@ -6,14 +6,17 @@ import com.koi151.msproperty.repository.custom.PropertyRepositoryCustom;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
 
 @Repository
-public interface PropertyRepository extends JpaRepository<Property, Integer>, PropertyRepositoryCustom {
+public interface PropertyRepository extends JpaRepository<Property, Integer>
+                                        , PropertyRepositoryCustom
+                                        , JpaSpecificationExecutor<Property> {
 
-//    @Query("SELECT p.propertyPostService FROM property p WHERE p.propertyId = :id") // created new repository instead to adhere SRP
+//    @Query("SELECT p.propertyPostService FROM property p WHERE p.propertyId = :id")
 //    PropertyPostServiceEntity findPropertyPostServiceByPropertyId(@Param("id") Long id);
 
     boolean existsByPropertyIdAndDeletedAndStatus(Long propertyId, boolean deleted, StatusEnum status);

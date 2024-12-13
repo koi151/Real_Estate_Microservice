@@ -40,6 +40,7 @@ public interface AccountMapper {
 
     @Mapping(target = "avatarUrl", source = "clientDTO.avatarUrl")
     @Mapping(target = "phone", source = "clientDTO.phone")
+    @Mapping(target = "balance", ignore = true)
     AccountDetailDTO mapClientDatabaseAccountDTO(ClientDatabaseAccountDTO clientDTO, AccountDetailDTO accountDetailDTOFromRedis);
 
     @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE,

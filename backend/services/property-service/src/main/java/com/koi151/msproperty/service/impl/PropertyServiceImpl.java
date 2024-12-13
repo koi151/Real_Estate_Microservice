@@ -27,13 +27,17 @@ import com.koi151.msproperty.service.converter.PropertyConverter;
 import com.koi151.msproperty.validator.PropertyValidator;
 import com.koi151.property_submissions.customExceptions.EntityNotFoundException;
 import lombok.*;
+import lombok.extern.slf4j.Slf4j;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -42,6 +46,7 @@ import java.util.concurrent.TimeUnit;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PropertyServiceImpl implements PropertiesService {
 
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
@@ -54,26 +59,83 @@ public class PropertyServiceImpl implements PropertiesService {
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
     private final PropertyClient propertyClient;
-    private static final Logger logger = LoggerFactory.getLogger(PropertyRepositoryImpl.class);
 
-    public Page<PropertySearchDTO> findProperties(PropertySearchRequest request, Pageable pageable) {
-        String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
-        String redisData = redisTemplate.opsForValue().get(redisKey);
+    private static final String CACHE_KEY_PATTERN = "properties:%s:%d:%d";
+    private static final int CACHE_TTL_SECONDS = 20;
+
+//    public Page searchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
+//        String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
+//        String redisData = redisTemplate.opsForValue().get(redisKey);
+//        try {
+//            if (redisData == null) {
+//                Page<PropertySearchProjection> pages = propertyRepository.findPropertiesForAdmin(request, pageable);
+//                String jsonData = objectMapper.writeValueAsString(result);
+//                redisTemplate.opsForValue().set(redisKey, jsonData, 20, TimeUnit.SECONDS);
+//                return result;
+//            } else {
+//                JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, PropertySearchDTO.class);
+//                return objectMapper.readValue(redisData, pageType);
+//            }
+//        } catch (JsonProcessingException ex) {
+//            log.error("Json processing error occurred "  + ex.getMessage());
+//            throw new RuntimeException("Json processing error occurred");
+//        }
+//    }
+
+    public Page<PropertySearchDTO> searchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
+        String cacheKey = generateCacheKey(request, pageable);
         try {
-            if (redisData == null) {
-                Page<PropertySearchProjection> propertyPage = propertyRepository.findPropertiesByCriteria(request, pageable);
-                Page<PropertySearchDTO> result = propertyPage.map(propertyMapper::toPropertySearchDTO);
-                String jsonData = objectMapper.writeValueAsString(result);
-                redisTemplate.opsForValue().set(redisKey, jsonData, 20, TimeUnit.SECONDS);
-                return result;
-            } else {
-                JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, PropertySearchDTO.class);
-                return objectMapper.readValue(redisData, pageType);
+            String cachedData = redisTemplate.opsForValue().get(cacheKey);
+            if (cachedData != null) {
+                return deserializePageData(cachedData);
             }
-        } catch (JsonProcessingException ex) {
-            logger.error("Json processing error occurred "  + ex.getMessage());
-            throw new RuntimeException("Json processing error occurred");
+            return fetchAndCacheData(request, pageable, cacheKey);
+
+        } catch (Exception ex) {
+            log.error("Error occurred while processing property search: {}", ex.getMessage(), ex);
+            // fallback to direct database query in case of cache related err
+            return fetchPropertiesForAdmin(request, pageable);
         }
+    }
+
+    private String generateCacheKey(PropertySearchRequest request, Pageable pageable) {
+        return String.format(CACHE_KEY_PATTERN,
+            request.toString(),
+            pageable.getPageNumber(),
+            pageable.getPageSize());
+    }
+
+    private Page<PropertySearchDTO> deserializePageData(String cachedData) throws JsonProcessingException {
+        JavaType pageType = objectMapper.getTypeFactory()
+            .constructParametricType(Page.class, PropertySearchDTO.class);
+        return objectMapper.readValue(cachedData, pageType);
+    }
+
+    private Page<PropertySearchDTO> fetchAndCacheData(
+        PropertySearchRequest request,
+        Pageable pageable,
+        String cacheKey) throws JsonProcessingException
+    {
+        Page<PropertySearchDTO> result = fetchPropertiesForAdmin(request, pageable);
+
+        // Cache res
+        String jsonData = objectMapper.writeValueAsString(result);
+        redisTemplate.opsForValue().set(cacheKey, jsonData, CACHE_TTL_SECONDS, TimeUnit.SECONDS);
+        return result;
+    }
+
+    private Page<PropertySearchDTO> fetchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
+        return propertyRepository.findPropertiesForAdmin(request, pageable)
+            .map(propertyMapper::toPropertySearchDTO);
+    }
+
+//    public void evictCache(PropertySearchRequest request, Pageable pageable) {
+//        String cacheKey = generateCacheKey(request, pageable);
+//        redisTemplate.delete(cacheKey);
+//    }
+
+    public Page<PropertySearchProjection> searchPropertiesForClient(PropertySearchRequest request, Pageable pageable) {
+        return propertyRepository.findPropertiesForClient(request, pageable);
     }
 
 

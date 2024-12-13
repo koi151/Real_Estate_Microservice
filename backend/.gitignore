@@ -23,10 +23,11 @@ buildNumber.property
 .mvn/timing.property
 .mvn/wrapper/maven-wrapper.jar
 .mvn
-
 mvnw
 mvnw.*
 HELP.md
+
+frontend/
 
 ### STS ###
 .apt_generated

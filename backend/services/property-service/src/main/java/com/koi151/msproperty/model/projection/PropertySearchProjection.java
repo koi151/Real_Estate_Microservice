@@ -8,31 +8,25 @@ import com.koi151.msproperty.enums.StatusEnum;
 import lombok.Builder;
 
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
 @Builder
-public record PropertySearchProjection (
-     Long propertyId,
-     String title,
-     PropertyTypeEnum type,
-     Integer categoryId,
-     BigDecimal area,
-     BigDecimal rentalPrice,
-     BigDecimal salePrice,
-     Integer view,
-     String description,
-     Short totalFloor,
-     StatusEnum status,
-     Address address,
-     String imageUrls,
-     LegalDocumentEnum legalDocument,
-     FurnitureEnum furniture,
-     List<RoomSearchProjection> rooms,
-     LocalDateTime createdDate
-//     PropertyPostServiceProjection propertyPostService
+public record PropertySearchProjection(
+    Long propertyId,
+    String title,
+    PropertyForRentProjection propertyForRent,
+    PropertyForSaleProjection propertyForSale,
+    List<RoomSearchProjection> rooms,
+    Integer categoryId,
+    BigDecimal area,
+    Integer view,
+    String description,
+    Short totalFloor,
+    StatusEnum status,
+    Address address,
+    String imageUrls,
+    LegalDocumentEnum legalDocument,
+    FurnitureEnum furniture,
+    LocalDateTime createdDate
 ) {}
-
-
-

@@ -16,7 +16,9 @@ import java.util.List;
 @NamedEntityGraph(name = "property-with-details",
     attributeNodes = {
         @NamedAttributeNode("propertyForRent"),
-        @NamedAttributeNode("propertyForSale")
+        @NamedAttributeNode("propertyForSale"),
+        @NamedAttributeNode("address"),
+        @NamedAttributeNode("rooms")
     })
 @Table(
     indexes = {
@@ -29,10 +31,7 @@ import java.util.List;
         @Index(name = "idx_house_direction", columnList = "house_direction"),
         @Index(name = "idx_balcony_direction", columnList = "balcony_direction"),
         @Index(name = "idx_legal_document", columnList = "legal_document"),
-        @Index(name = "idx_furnitures", columnList = "balcony_direction")
-
-        // Composite Indexes
-//        @Index(name = "idx_title_area_category", columnList = "title, area, category_id"),
+        @Index(name = "idx_furnitures", columnList = "furnitures")
 
     }
 )

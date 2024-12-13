@@ -18,7 +18,8 @@ import java.util.Map;
 
 public interface PropertiesService {
 
-    Page<PropertySearchDTO> findProperties(PropertySearchRequest request, Pageable pageable);
+//    Page<PropertySearchDTO> findProperties(PropertySearchRequest request, Pageable pageable);
+    Page<PropertySearchDTO> searchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable);
     Page<PropertiesHomeDTO> getHomeProperties(Map<String, Object> params, Pageable pageable);
     DetailedPropertyDTO getPropertyById(Long id);
     Page<PropertiesHomeDTO> findAllPropertiesByCategory(Integer categoryId, Pageable pageable);

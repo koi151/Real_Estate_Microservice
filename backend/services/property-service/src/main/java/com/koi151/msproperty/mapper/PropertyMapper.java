@@ -65,21 +65,24 @@ public interface PropertyMapper {
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(entity.getImageUrls(), \",\"))")
     PropertySearchDTO toPropertySearchDTO(Property entity);
 
-    @Mapping(target = "type", expression = "java(getPropertyTypeFromProjection(projection))")
     @Mapping(target = "status", source = "status.statusName")
     @Mapping(target = "legalDocument", source = "legalDocument.legalDocumentName")
     @Mapping(target = "furniture", source = "furniture.furnitureName")
+    @Mapping(target = "rentalPrice", source = "propertyForRent.rentalPrice")
+    @Mapping(target = "salePrice", source = "propertyForSale.salePrice")
+    @Mapping(target = "type", expression = "java(getPropertyTypeFromProjection(projection))")
     @Mapping(target = "address", expression = "java(getFullAddressString(projection.address()))")
     @Mapping(target = "imageUrls", expression = "java(ListUtil.splitStringByRegexToList(projection.imageUrls(), \",\"))")
     @Mapping(target = "rooms", expression = "java(projectionToRoomNameQuantityDTOs(projection.rooms()))")
     PropertySearchDTO toPropertySearchDTO(PropertySearchProjection projection);
+
 
     default List<RoomNameQuantityDTO> projectionToRoomNameQuantityDTOs(List<RoomSearchProjection> rooms) {
         return (rooms == null || rooms.isEmpty()) ? null
             : rooms.stream()
             .filter(room -> room != null && room.roomType() != null && room.quantity() != null)
             .map(room -> RoomNameQuantityDTO.builder()
-                .roomType(room.roomType().getName())
+                .roomType(room.roomType())
                 .quantity(room.quantity())
                 .build())
             .collect(Collectors.toList());
@@ -132,9 +135,7 @@ public interface PropertyMapper {
         boolean forRent = entity.getPropertyForRent() != null;
         boolean forSale = entity.getPropertyForSale() != null;
 
-        if (forRent && forSale) {
-            return "For rent and sale";
-        } else if (forRent) {
+        if (forRent) {
             return "For rent";
         } else if (forSale) {
             return "For sale";
@@ -143,12 +144,9 @@ public interface PropertyMapper {
     }
 
     default String getPropertyTypeFromProjection(PropertySearchProjection projection) {
-        boolean forRent = projection.salePrice() != null;
-        boolean forSale = projection.rentalPrice() != null;
-
-        if (forRent && forSale) {
-            return "For rent and sale";
-        } else if (forRent) {
+        boolean forRent = projection.propertyForRent() != null;
+        boolean forSale = projection.propertyForSale() != null;
+         if (forRent) {
             return "For rent";
         } else if (forSale) {
             return "For sale";

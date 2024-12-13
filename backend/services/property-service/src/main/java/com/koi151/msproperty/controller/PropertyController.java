@@ -18,6 +18,7 @@ import com.koi151.msproperty.model.request.propertyPostService.PropertyPostServi
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperty.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperty.service.PropertiesService;
+import com.koi151.msproperty.utils.SortUtil;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
@@ -65,10 +66,10 @@ public class PropertyController {
     ) {
         int pageSize = Math.min(limit, MAX_PAGE_SIZE);
 
-        Sort sorting = createSortOrders(sort);
+        Sort sorting = SortUtil.createSortOrders(sort);
         Pageable pageable = PageRequest.of(page - 1, pageSize, sorting);
 
-        var propertiesPage = propertiesService.findProperties(request, pageable);
+        var propertiesPage = propertiesService.searchPropertiesForAdmin(request, pageable);
 
         ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
         responseData.setDesc(propertiesPage.isEmpty()
@@ -76,31 +77,6 @@ public class PropertyController {
             : "Get properties succeed");
 
         return ResponseEntity.ok(responseData);
-    }
-
-    private Sort createSortOrders(String[] sortParams) {
-        List<Sort.Order> orders = new ArrayList<>();
-
-        if (sortParams != null) {
-            for (String sortParam : sortParams) {
-                String[] parts = sortParam.split("-");
-                if (parts.length > 0) {
-                    String property = parts[0].trim();
-                    Sort.Direction direction = parts.length > 1 && "desc".equalsIgnoreCase(parts[1])
-                        ? Sort.Direction.DESC
-                        : Sort.Direction.ASC;
-
-                    orders.add(Sort.Order.by(property).with(direction));
-                }
-            }
-        }
-
-        // Add default sort by createdDate if not present
-        if (orders.stream().noneMatch(order -> order.getProperty().equals("createdDate"))) {
-            orders.add(Sort.Order.desc("createdDate"));
-        }
-
-        return Sort.by(orders);
     }
 
 
