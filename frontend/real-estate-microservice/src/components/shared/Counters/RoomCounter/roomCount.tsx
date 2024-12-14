@@ -25,7 +25,7 @@ const RoomCountTooltip: React.FC<RoomCountTooltipProps> = ({ roomType, quantity 
   const icon = getIcon(roomType);
 
   return (
-    <Tooltip title={title} className="d-flex align-items-center mb-2 ml-1">
+    <Tooltip title={title} className="d-flex align-items-center mb-2">
       {icon}
       {quantity !== null ? <span className="mb-1 ml-1">{quantity}</span> : <span>...</span>}
     </Tooltip>

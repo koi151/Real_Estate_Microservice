@@ -65,6 +65,7 @@ const Properties: React.FC = () => {
         setLoading(true);
 
         const query = location.search;
+        console.log("query: ", query)
 
         const response = await propertiesService.getAllProperties(query);
         console.log('RES PROPERTIES:', response);
@@ -99,46 +100,8 @@ const Properties: React.FC = () => {
     };
 
     fetchData();
-  }, [location.search, navigate, status, keyword, priceRange]);
+  }, [location.search, navigate, status, keyword, priceRange, category]);
  
-
-
-  // update url
-  // useEffect(() => {
-  //   navigate(buildURL());
-  // // eslint-disable-next-line react-hooks/exhaustive-deps
-  // }, [status, listingType, keyword, sorting, priceRange, areaRange,
-  //   category, bedrooms, direction, bathrooms])
-
-  // const buildURL = () => {
-  //   const params: { [key: string]: string } = {};
-  
-  //   if (keyword) params['keyword'] = keyword;
-  //   if (listingType) params['listingType'] = listingType;
-  //   if (status) params['status'] = status;
-  //   if (category) params['category'] = category;
-  //   if (bedrooms) params['bedrooms'] = bedrooms;
-  //   if (bathrooms) params['bathrooms'] = bathrooms;
-  //   if(direction) params['direction'] = direction;
-
-  //   if (sorting.sortKey && sorting.sortValue) {
-  //     params['sortKey'] = sorting.sortKey;
-  //     params['sortValue'] = sorting.sortValue;
-  //   }
-    
-  //   const [minPrice, maxPrice] = priceRange ?? [];
-  //   if (minPrice) params['minPrice'] = String(minPrice);
-  //   if (maxPrice) params['maxPrice'] = String(maxPrice); 
-
-  //   const [minArea, maxArea] = areaRange ?? [];
-  //   if (minArea) params['minArea'] = String(minArea);
-  //   if (maxArea) params['maxArea'] = String(maxArea);    
-  
-  //   // Short-circuiting for performance
-  //   const queryString = Object.keys(params).length > 0 ? `?${new URLSearchParams(params)}` : '';
-    
-  //   return `${location.pathname}${queryString}`;
-  // };
 
   
   const handleCheckboxChange = (id: string | undefined) => (e: CheckboxChangeEvent) => {
@@ -334,13 +297,13 @@ const Properties: React.FC = () => {
                                         quantity={room.quantity}
                                       />
                                     ))}
-                                  {/* <ViewCount propertyView={property.view || 0} /> */}
+                                  <ViewCount propertyView={property.view || 0} />
                                 </div>
                               ) : (
                                 <>
                                   <RoomCountTooltip roomType="Bedroom" quantity={null} />
                                   <RoomCountTooltip roomType="Bathroom" quantity={null} />
-                                  {/* <ViewCount propertyView={property.view || 0} /> */}
+                                  <ViewCount propertyView={property.view || 0} />
                                 </>
                               )}
                             </div>
@@ -360,7 +323,7 @@ const Properties: React.FC = () => {
                               <div className='item-wrapper__upper-content--listing-type'>
                                 <p className='tag-text'>Tags: </p>
                                 <Space size={[0, 8]} wrap>
-                                  {(property.type === 'sale' || property.type === 'forRent') 
+                                  {(property.type === 'For sale' || property.type === 'For rent') 
                                     && renderTag(property.type, { forSale: 'green', forRent: 'orange' })}
                                   {property.propertyDetails?.propertyCategory === 'house' 
                                   && renderTag(property.propertyDetails.propertyCategory, { house: 'purple', apartment: 'blue' })}
@@ -401,7 +364,7 @@ const Properties: React.FC = () => {
                         <Col span={24}>
                           <div className='item-wrapper__lower-content'>
                             <div className='item-wrapper__lower-content--date-created'>
-                              Available from: {property.availableFrom ? new Date(property.availableFrom).toLocaleString() : 'No data'}
+                              Available from: {property.createdDate ? new Date(property.createdDate).toLocaleString() : 'No data'}
                             </div>
                             <div className='item-wrapper__lower-content--date-created'>
                               Expire: {property.expireTime ? new Date(property.expireTime).toLocaleString() : 'No data'}

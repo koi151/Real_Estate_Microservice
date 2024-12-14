@@ -1,88 +1,91 @@
-import { TreeSelect, message } from "antd";
 import React, { useEffect, useState } from "react";
-import { setCategory, setIsLoading } from "../../../../redux/reduxSlices/filtersSlice";
+import { TreeSelect, message } from "antd";
 import { useDispatch } from "react-redux";
-
+import { setCategory, setIsLoading } from "../../../../redux/reduxSlices/filtersSlice";
 import propertyCategoriesService from "../../../../services/admin/property-categories.service";
-
-import { useNavigate } from "react-router-dom";
-
-import './categoryTree.scss'
-import { DataNode } from "antd/es/tree";
-import { CategoryNode } from "../../../../commonTypes";
+import { useNavigate, useLocation } from "react-router-dom";
 import { formatTreeData } from "../../../../helpers/treeHelper";
+import { CategoryNode } from "../../../../commonTypes";
+
+import "./categoryTree.scss";
+import { DataNode } from "antd/es/tree";
 
 interface CategoryTreeProps {
   label?: string;
   width?: string;
   text?: string;
-  userType: "admin" | "client"
+  userType: "admin" | "client";
 }
 
-const CategoryTree: React.FC<CategoryTreeProps> = ({ 
+const CategoryTree: React.FC<CategoryTreeProps> = ({
   label,
   text,
-  width = "100%", 
-  userType
+  width = "100%",
+  userType,
 }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
 
-  const [ categoryTitle ] = useState<string>();
-  const [categoryTree, setCategoryTree] = useState<DataNode[] | undefined>(undefined);
+  const [categoryTitle, setCategoryTitle] = useState<string | undefined>();
+  const [categoryTree, setCategoryTree] = useState<DataNode[] | undefined>();
 
-  // fetch categories
   useEffect(() => {
     const fetchData = async () => {
       try {
         dispatch(setIsLoading(true));
-        let response: any;
-        response = await propertyCategoriesService.getCategoryTree();
-      
+        const response = await propertyCategoriesService.getCategoryTree();
+
         if (response.status >= 200 && response.status < 300) {
-          const formattedTreeData = response.data.data.map((item: CategoryNode) => formatTreeData(item));
+          const formattedTreeData = response.data.data.map((item: CategoryNode) =>
+            formatTreeData(item)
+          );
           setCategoryTree(formattedTreeData);
         } else {
           message.error(response.error, 3);
-          return;
         }
-
       } catch (err: any) {
-        if (err.response && err.response.status === 401) {
-          message.error('Unauthorized - Please log in to access this feature.', 3);
-          navigate(`${userType === 'admin' && userType}/auth/login`);
+        if (err.response?.status === 401) {
+          message.error("Unauthorized - Please log in to access this feature.", 3);
+          navigate(`${userType === "admin" && userType}/auth/login`);
         } else {
-          message.error('Error occurred while fetching data', 2);
-          console.log('Error occurred:', err);
+          message.error("Error occurred while fetching data", 2);
+          console.error("Error occurred:", err);
         }
       } finally {
         dispatch(setIsLoading(false));
       }
-    }
+    };
 
     fetchData();
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const handleChange = (selectedNode: string) => {
+    setCategoryTitle(selectedNode);
+    dispatch(setCategory(selectedNode));
+
+    const params = new URLSearchParams(location.search);
+    params.set("categoryId", selectedNode);
+    navigate(`${location.pathname}?${params.toString()}`);
+  };
 
   return (
-    <div className='category-filter'>
-      {label && (
-        <span style={{marginBottom: ".5rem"}}>{ label }</span>
-      )}
+    <div className="category-filter">
+      {label && <span style={{ marginBottom: ".5rem" }}>{label}</span>}
       <TreeSelect
-        style={{ width: `${width}` }}
+        style={{ width }}
         value={categoryTitle}
-        dropdownStyle={{ maxHeight: 400, overflow: 'auto' }}
+        dropdownStyle={{ maxHeight: 400, overflow: "auto" }}
         treeData={categoryTree}
-        placeholder={text}
+        placeholder={text || "Please select"}
         className="custom-tree-select"
         treeDefaultExpandAll
-        onChange={(selectedNode: any) => dispatch(setCategory(selectedNode.value))}
-        labelInValue
+        onChange={handleChange}
         treeLine
       />
     </div>
-  )
-}
+  );
+};
 
 export default CategoryTree;

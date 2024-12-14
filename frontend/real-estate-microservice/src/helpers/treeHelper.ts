@@ -1,8 +1,13 @@
 import { DataNode } from "antd/es/tree";
 import { CategoryNode } from "../commonTypes";
 
-export const formatTreeData = (node: CategoryNode): DataNode => ({
-  key: node.id.toString(),  
+interface CustomDataNode extends DataNode {
+  value: string; 
+}
+
+export const formatTreeData = (node: CategoryNode): CustomDataNode => ({
+  key: node.id.toString(),
+  value: node.id.toString(), 
   title: node.title,
-  children: node.children?.map((child: CategoryNode) => formatTreeData(child)) || [],
+  children: node.children?.map(formatTreeData) || [], // Recursive format children
 });

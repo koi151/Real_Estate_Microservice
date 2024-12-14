@@ -35,18 +35,17 @@ const KeycloakLogin: React.FC = () => {
         // Generate state
         const state = generateRandomString(32);
 
-        // Lưu code_verifier và state vào sessionStorage
         sessionStorage.setItem('pkce_code_verifier', codeVerifier);
         sessionStorage.setItem('pkce_state', state);
 
-        // Gửi yêu cầu lấy URL đăng nhập Keycloak
+        // request get url login keycloak
         const response = await axios.get(
           `${process.env.REACT_APP_API_PREFIX}/accounts/auth/login`,
           {
             params: {
               code_challenge: codeChallenge,
               code_challenge_method: 'S256',
-              state, // Gửi state đến backend để lưu vào Redis
+              state,
             },
             withCredentials: true,
           }
@@ -54,7 +53,7 @@ const KeycloakLogin: React.FC = () => {
 
         if (response.status === 200 && response.data.loginUrl) {
           const { loginUrl } = response.data;
-          window.location.href = loginUrl; // Redirect đến Keycloak login page
+          window.location.href = loginUrl; // redirect to keycloak login page
         } else {
           throw new Error('Failed to get login URL.');
         }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Button, Col, Row, Segmented, Select, message } from 'antd';
 import { FaPlus } from "react-icons/fa6";
 import Search from 'antd/es/input/Search';
@@ -8,12 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { RootState } from '../../redux/stores';
 import { SegmentedValue } from 'antd/es/segmented';
 
-import propertiesService from '../../services/admin/properties.service';
-
-import { ValidMultiChangeType } from '../../commonTypes';
-import { reverseListingType } from '../../helpers/standardizeData';
-import { setListingType, setKeyword, setStatus, setSorting, 
-        resetFilters } from '../../redux/reduxSlices/filtersSlice';
+import { setListingType, setKeyword, setStatus, setSorting, resetFilters } from '../../redux/reduxSlices/filtersSlice';
 
 import './filterBox.scss';
 import PriceRange from '../shared/FilterComponents/PriceRange/priceRange';
@@ -26,14 +21,14 @@ interface FilterBoxProps {
   priceRangeFilter?: boolean;
   checkedList?: string[] | undefined;
   categoryFilter?: boolean;
-  createPostLink: string,
-  resetFilterLink: string
+  createPostLink: string;
+  resetFilterLink: string;
 }
 
 const FilterBox: React.FC<FilterBoxProps> = ({
-  statusFilter, 
-  priceRangeFilter, 
-  categoryFilter, 
+  statusFilter,
+  priceRangeFilter,
+  categoryFilter,
   multipleChange,
   createPostLink,
   resetFilterLink,
@@ -43,7 +38,6 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   const navigate = useNavigate();
   const [searchParams, setSearchParams] = useSearchParams();
 
-  // Redux state selectors
   const { listingType, status } = useSelector((state: RootState) => state.filters);
 
   const currentRole = useSelector((state: any) =>
@@ -51,6 +45,13 @@ const FilterBox: React.FC<FilterBoxProps> = ({
   );
 
   const [isFilterDetailVisible, setIsFilterDetailVisible] = useState<boolean>(true);
+
+  // Default value for "Segmented"
+  useEffect(() => {
+    const defaultType = 'rent';
+    dispatch(setListingType(defaultType));
+    updateQueryParams('type', defaultType);
+  }, [dispatch]);
 
   const updateQueryParams = (key: string, value: string) => {
     const params = new URLSearchParams(searchParams.toString());
@@ -98,40 +99,38 @@ const FilterBox: React.FC<FilterBoxProps> = ({
             >
               Filters <IoFilter style={{ marginLeft: '.75rem' }} />
             </Button>
-            {/* {createAllowed && ( */}
-              <Link to={createPostLink} className='custom-link'>
-                <Button className='add-new-button'>
-                  Add new <FaPlus />
-                </Button>
-              </Link>
-            {/* )} */}
+            <Link to={createPostLink} className='custom-link'>
+              <Button className='add-new-button'>
+                Add new <FaPlus />
+              </Button>
+            </Link>
           </div>
         </div>
       </div>
 
-      <Segmented 
-        options={['All', 'For rent', 'For sale']} 
+      <Segmented
+        options={['For rent', 'For sale']}
+        defaultValue={'For rent'}
         onChange={(value: SegmentedValue) => {
           if (typeof value === 'string') {
-            const newValue = 
-              value === 'All' ? '' :
+            const newValue =
               value === 'For rent' ? 'rent' :
               value === 'For sale' ? 'sale' : '';
-            
-            dispatch(setListingType(newValue)); 
+
+            dispatch(setListingType(newValue));
             updateQueryParams("type", newValue);
           }
         }}
         className={`listing-type ${isFilterDetailVisible ? '' : 'fade-out'}`}
       />
 
-      <div 
+      <div
         className={`filter-box__detail 
           ${isFilterDetailVisible ? '' : 'fade-out'} 
           ${listingType ? '' : 'mt-3'} 
         `}
       >
-        <Row className='custom-row d-flex align-items-center' style={{width: "100%"}}>
+        <Row className='custom-row d-flex align-items-center' style={{ width: "100%" }}>
           {statusFilter && (
             <Col xxl={8} xl={8} lg={8}>
               <div className='status-filter'>
@@ -194,7 +193,7 @@ const FilterBox: React.FC<FilterBoxProps> = ({
           )}
           {priceRangeFilter && (
             <Col xxl={8} xl={8} lg={8}>
-              <PriceRange 
+              <PriceRange
                 label='Price range:' width='80%'
                 text='Select to apply'
               />

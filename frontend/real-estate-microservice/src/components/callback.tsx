@@ -1,6 +1,6 @@
 import React, { useEffect } from 'react';
 import axios from 'axios';
-import { message } from 'antd';
+import { message, Spin } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 const Callback: React.FC = () => {
@@ -9,21 +9,25 @@ const Callback: React.FC = () => {
   useEffect(() => {
     const handleCallback = async () => {
       try {
-        // Lấy Authorization Code và state từ URL callback
+        // get auth code & state from callback URL
         const params = new URLSearchParams(window.location.search);
         const code = params.get('code');
-        const state = params.get('state'); // Lấy state từ URL
+        const state = params.get('state');
 
         if (!code || !state) {
           throw new Error('Authorization code or state is missing.');
         }
 
-        // Lấy code_verifier từ sessionStorage
         const codeVerifier = sessionStorage.getItem('pkce_code_verifier');
+        const storedState = sessionStorage.getItem('pkce_state');
+        
         if (!codeVerifier) {
           throw new Error('Code verifier is missing or expired.');
         }
 
+        if (storedState !== state) {
+          throw new Error('State mismatch. Possible CSRF attack.');
+        }
 
         await axios.post(
           `${process.env.REACT_APP_API_PREFIX}/accounts/auth/token`,
@@ -41,10 +45,13 @@ const Callback: React.FC = () => {
             },
           }
         );
+
+        // remove to avoid replay attack
+        sessionStorage.removeItem('pkce_state');
+        sessionStorage.removeItem('pkce_code_verifier');
         
         message.success('Login successful!', 2);
         navigate('/admin/properties');
-
       } catch (error) {
         console.error('Error during callback:', error);
         message.error('Failed to complete login. Please try again.', 3);
@@ -54,7 +61,11 @@ const Callback: React.FC = () => {
     handleCallback();
   }, [navigate]);
 
-  return <div>Processing login...</div>;
+  return (
+    <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh' }}>
+      <Spin size="large" tip="Processing login..." />
+    </div>
+  );
 };
 
 export default Callback;

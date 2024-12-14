@@ -8,16 +8,12 @@ interface ViewCountProps {
 
 const ViewCount: React.FC<ViewCountProps> = ({ propertyView }) => {
   return (
-    <>
-      {propertyView && (
-        <Tooltip title={`${propertyView} views`} placement="bottom">
-          <div className='d-flex justify-content-center align-items-center'>
-            <FaRegEye />
-            {propertyView}
-          </div>
-        </Tooltip>
-      )}
-    </>
+    <Tooltip title={`${propertyView} views`} placement="bottom">
+      <div className='d-flex justify-content-center align-items-center'>
+        <FaRegEye/>
+        <span className="ml-1">{propertyView}</span>
+      </div>
+    </Tooltip>
   );
 }
 
