@@ -2,10 +2,8 @@ package com.koi151.msproperty.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.koi151.msproperty.enums.CategoryStatusEnum;
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.mapper.ResponseDataMapper;
-import com.koi151.msproperty.model.request.property.PropertySearchRequest;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryStatusUpdateRequest;
 import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.model.request.propertyCategory.PropertyCategoryCreateRequest;
@@ -37,26 +35,26 @@ public class PropertyCategoryController {
     private final ResponseDataMapper responseDataMapper;
     private static final int MAX_PAGE_SIZE = 20;
 
-    @GetMapping("")
-//    @PreAuthorize("hasAuthority('SCOPE_property_category_view')")
-    public ResponseEntity<ResponseData> getCategoriesHomePage(
-        @RequestParam(required = false, defaultValue = "1")
-        @Min(value = 1, message = "Page number must be at least 1") int page,
-        @RequestParam(required = false, defaultValue = "10")
-        @Min(value = 1, message = "Page size must be at least 1") int limit,
-        @ModelAttribute @Valid PropertyCategorySearchRequest request
-    ) {
-        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
-        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
-
-        var categoriesPage = propertyCategoryService.getCategoriesHomePage(request, pageable);
-
-        ResponseData responseData = responseDataMapper.toResponseData(categoriesPage, page, limit);
-        responseData.setDesc(categoriesPage.isEmpty() ?
-                "No property category found" : "Get home property categories succeed");
-
-        return ResponseEntity.ok(responseData);
-    }
+//    @GetMapping("")
+////    @PreAuthorize("hasAuthority('SCOPE_property_category_view')")
+//    public ResponseEntity<ResponseData> getCategoriesHomePage(
+//        @RequestParam(required = false, defaultValue = "1")
+//        @Min(value = 1, message = "Page number must be at least 1") int page,
+//        @RequestParam(required = false, defaultValue = "10")
+//        @Min(value = 1, message = "Page size must be at least 1") int limit,
+//        @ModelAttribute @Valid PropertyCategorySearchRequest request
+//    ) {
+//        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
+//        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
+//
+//        var categoriesPage = propertyCategoryService.getCategoriesHomePage(request, pageable);
+//
+//        ResponseData responseData = responseDataMapper.toResponseData(categoriesPage, page, limit);
+//        responseData.setDesc(categoriesPage.isEmpty() ?
+//                "No property category found" : "Get home property categories succeed");
+//
+//        return ResponseEntity.ok(responseData);
+//    }
 
     @GetMapping("/title/{id}")
     public ResponseEntity<ResponseData> getCategoryTitleById(@PathVariable(name = "id") int id) {

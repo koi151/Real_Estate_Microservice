@@ -5,8 +5,7 @@ import com.koi151.msproperty.model.projection.PropertyForRentProjection;
 import com.koi151.msproperty.model.projection.PropertyForSaleProjection;
 import com.koi151.msproperty.model.projection.PropertySearchProjection;
 import com.koi151.msproperty.model.projection.RoomSearchProjection;
-import com.koi151.msproperty.model.request.property.PropertySearchRequest;
-import com.koi151.msproperty.repository.PropertyRepository;
+import com.koi151.msproperty.model.request.property.PropertyFilterRequest;
 import com.koi151.msproperty.repository.custom.PropertyRepositoryCustom;
 import com.koi151.msproperty.specification.PropertySpecifications;
 import jakarta.persistence.EntityManager;
@@ -17,7 +16,6 @@ import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Order;
 import jakarta.persistence.criteria.Root;
 import lombok.RequiredArgsConstructor;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Primary;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
@@ -35,16 +33,16 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
     private final EntityManager entityManager;
 
     @Override
-    public Page<PropertySearchProjection> findPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
+    public Page<PropertySearchProjection> findPropertiesForAdmin(PropertyFilterRequest request, Pageable pageable) {
         return searchProperties(request, pageable, false);
     }
 
     @Override
-    public Page<PropertySearchProjection> findPropertiesForClient(PropertySearchRequest request, Pageable pageable) {
+    public Page<PropertySearchProjection> findPropertiesForClient(PropertyFilterRequest request, Pageable pageable) {
         return searchProperties(request, pageable, true);
     }
 
-    private Page<PropertySearchProjection> searchProperties(PropertySearchRequest request, Pageable pageable, boolean isClientView) {
+    private Page<PropertySearchProjection> searchProperties(PropertyFilterRequest request, Pageable pageable, boolean isClientView) {
         Specification<Property> spec = PropertySpecifications.buildSpecification(request, isClientView);
 
         // build criteriaQuery
@@ -53,10 +51,9 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
         Root<Property> root = cq.from(Property.class);
         cq.select(root).where(spec.toPredicate(root, cq, cb));
 
-        // Tính toán tổng số phần tử
         long total = getTotalCount(spec);
 
-        // Thêm sắp xếp
+        // sort
         if (pageable.getSort().isSorted()) {
             List<Order> orders = pageable.getSort().stream()
                 .map(order -> order.isAscending() ? cb.asc(root.get(order.getProperty())) : cb.desc(root.get(order.getProperty())))
@@ -64,7 +61,7 @@ public class PropertyRepositoryImpl implements PropertyRepositoryCustom {
             cq.orderBy(orders);
         }
 
-        // Thực hiện truy vấn với phân trang
+        // query with pagination
         TypedQuery<Property> query = entityManager.createQuery(cq);
         query.setFirstResult((int) pageable.getOffset());
         query.setMaxResults(pageable.getPageSize());

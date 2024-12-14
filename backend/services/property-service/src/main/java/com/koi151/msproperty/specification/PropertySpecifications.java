@@ -1,10 +1,10 @@
 package com.koi151.msproperty.specification;
 
 import com.koi151.msproperty.entity.Property;
-import com.koi151.msproperty.model.request.property.PropertySearchRequest;
+import com.koi151.msproperty.model.request.property.PropertyFilterRequest;
 import com.koi151.msproperty.enums.StatusEnum;
-import com.koi151.msproperty.model.request.rooms.RoomSearchRequest;
-import com.koi151.msproperty.utils.StringUtil;
+import com.koi151.msproperty.model.request.rooms.RoomFilterRequest;
+import com.koi151.msproperty.utils.StringUtils;
 import jakarta.persistence.criteria.*;
 import org.springframework.data.jpa.domain.Specification;
 
@@ -13,9 +13,18 @@ import java.util.List;
 
 public class PropertySpecifications {
 
-    public static Specification<Property> buildSpecification(PropertySearchRequest request, boolean isClientView) {
+    public static Specification<Property> buildSpecification(PropertyFilterRequest request, boolean isClientView) {
         return (Root<Property> root, CriteriaQuery<?> query, CriteriaBuilder cb) -> {
             List<Predicate> predicates = new ArrayList<>();
+
+            // property type
+            if (request.type() != null) {
+                if (request.type().isPropertyForRent()) {
+                    predicates.add(cb.isNotNull(root.get("propertyForRent")));
+                } else if (request.type().isPropertyForSale()) {
+                    predicates.add(cb.isNotNull(root.get("propertyForSale")));
+                }
+            }
 
             if (request.status() != null) {
                 predicates.add(cb.equal(root.get("status"), request.status()));
@@ -23,8 +32,8 @@ public class PropertySpecifications {
                 predicates.add(cb.equal(root.get("status"), StatusEnum.ACTIVE));
             }
 
-            if (request.propertyCategory() != null) {
-                predicates.add(cb.equal(root.get("categoryId"), request.propertyCategory().categoryId()));
+            if (request.categoryId() != null) {
+                predicates.add(cb.equal(root.get("categoryId"), request.categoryId()));
             }
 
             if (request.areaFrom() != null) {
@@ -37,23 +46,23 @@ public class PropertySpecifications {
 
             if (request.address() != null) {
                 Join<Object, Object> address = root.join("address", JoinType.LEFT);
-                if (StringUtil.checkString(request.address().city())) {
+                if (StringUtils.checkString(request.address().city())) {
                     predicates.add(cb.like(cb.lower(address.get("city")), "%" + request.address().city().toLowerCase() + "%"));
                 }
-                if (StringUtil.checkString(request.address().district())) {
+                if (StringUtils.checkString(request.address().district())) {
                     predicates.add(cb.like(cb.lower(address.get("district")), "%" + request.address().district().toLowerCase() + "%"));
                 }
-                if (StringUtil.checkString(request.address().ward())) {
+                if (StringUtils.checkString(request.address().ward())) {
                     predicates.add(cb.like(cb.lower(address.get("ward")), "%" + request.address().ward().toLowerCase() + "%"));
                 }
-                if (StringUtil.checkString(request.address().streetAddress())) {
+                if (StringUtils.checkString(request.address().streetAddress())) {
                     predicates.add(cb.like(cb.lower(address.get("streetAddress")), "%" + request.address().streetAddress().toLowerCase() + "%"));
                 }
             }
 
             if (request.rooms() != null && !request.rooms().isEmpty()) {
                 for (int i = 0; i < request.rooms().size(); i++) {
-                    RoomSearchRequest room = request.rooms().get(i);
+                    RoomFilterRequest room = request.rooms().get(i);
                     Subquery<Long> subquery = query.subquery(Long.class);
                     Root<Property> subRoot = subquery.from(Property.class);
                     Join<Object, Object> rooms = subRoot.join("rooms", JoinType.LEFT);
@@ -67,19 +76,19 @@ public class PropertySpecifications {
                 }
             }
 
-            if (request.overallPriceFrom() != null || request.overallPriceTo() != null) {
-                Predicate salePricePredicate = cb.conjunction();
-                Predicate rentPricePredicate = cb.conjunction();
-                if (request.overallPriceFrom() != null) {
-                    salePricePredicate = cb.ge(root.join("propertyForSale", JoinType.LEFT).get("salePrice"), request.overallPriceFrom());
-                    rentPricePredicate = cb.ge(root.join("propertyForRent", JoinType.LEFT).get("rentalPrice"), request.overallPriceFrom());
-                }
-                if (request.overallPriceTo() != null) {
-                    salePricePredicate = cb.and(salePricePredicate, cb.le(root.join("propertyForSale", JoinType.LEFT).get("salePrice"), request.overallPriceTo()));
-                    rentPricePredicate = cb.and(rentPricePredicate, cb.le(root.join("propertyForRent", JoinType.LEFT).get("rentalPrice"), request.overallPriceTo()));
-                }
-                predicates.add(cb.or(salePricePredicate, rentPricePredicate));
-            }
+//            if (request.overallPriceFrom() != null || request.overallPriceTo() != null) {
+//                Predicate salePricePredicate = cb.conjunction();
+//                Predicate rentPricePredicate = cb.conjunction();
+//                if (request.overallPriceFrom() != null) {
+//                    salePricePredicate = cb.ge(root.join("propertyForSale", JoinType.LEFT).get("salePrice"), request.overallPriceFrom());
+//                    rentPricePredicate = cb.ge(root.join("propertyForRent", JoinType.LEFT).get("rentalPrice"), request.overallPriceFrom());
+//                }
+//                if (request.overallPriceTo() != null) {
+//                    salePricePredicate = cb.and(salePricePredicate, cb.le(root.join("propertyForSale", JoinType.LEFT).get("salePrice"), request.overallPriceTo()));
+//                    rentPricePredicate = cb.and(rentPricePredicate, cb.le(root.join("propertyForRent", JoinType.LEFT).get("rentalPrice"), request.overallPriceTo()));
+//                }
+//                predicates.add(cb.or(salePricePredicate, rentPricePredicate));
+//            }
 
             return cb.and(predicates.toArray(new Predicate[0]));
         };

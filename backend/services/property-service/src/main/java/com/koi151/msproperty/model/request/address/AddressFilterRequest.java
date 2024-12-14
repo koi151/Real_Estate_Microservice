@@ -2,7 +2,7 @@ package com.koi151.msproperty.model.request.address;
 
 import jakarta.validation.constraints.Size;
 
-public record AddressSearchRequest (
+public record AddressFilterRequest (
         @Size(max = 50, message = "City search cannot exceed {max} characters length")
         String city,
 

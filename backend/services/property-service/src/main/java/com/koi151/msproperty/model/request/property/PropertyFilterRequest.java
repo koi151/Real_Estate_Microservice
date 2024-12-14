@@ -1,13 +1,12 @@
 package com.koi151.msproperty.model.request.property;
 
-import com.fasterxml.jackson.annotation.JsonFormat;
 import com.koi151.msproperty.enums.DirectionEnum;
+import com.koi151.msproperty.enums.PropertyTypeEnum;
 import com.koi151.msproperty.enums.StatusEnum;
-import com.koi151.msproperty.model.request.address.AddressSearchRequest;
-import com.koi151.msproperty.model.request.propertyCategory.PropertyCategorySearchRequest;
-import com.koi151.msproperty.model.request.propertyForRent.PropertyForRentSearchRequest;
-import com.koi151.msproperty.model.request.propertyForSale.PropertyForSaleSearchRequest;
-import com.koi151.msproperty.model.request.rooms.RoomSearchRequest;
+import com.koi151.msproperty.model.request.address.AddressFilterRequest;
+import com.koi151.msproperty.model.request.propertyForRent.PropertyForRentFilterRequest;
+import com.koi151.msproperty.model.request.propertyForSale.PropertyForSaleFilterRequest;
+import com.koi151.msproperty.model.request.rooms.RoomFilterRequest;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.*;
 
@@ -15,15 +14,15 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
-public record PropertySearchRequest (
+public record PropertyFilterRequest (
     @Size(max = 100, message = "Title searching must at most {max} characters")
     String title,
+    Long categoryId,
+    PropertyTypeEnum type,
     @Valid
-    PropertyForRentSearchRequest propertyForRent,
+    PropertyForRentFilterRequest propertyForRent,
     @Valid
-    PropertyForSaleSearchRequest propertyForSale,
-    @Valid
-    PropertyCategorySearchRequest propertyCategory,
+    PropertyForSaleFilterRequest propertyForSale,
     DirectionEnum houseDirection,
     DirectionEnum balconyDirection,
     StatusEnum status,
@@ -47,17 +46,17 @@ public record PropertySearchRequest (
     @Size(max = 1000, message = "Term searching cannot exceed {max} characters long")
     String term,
 
-    @PositiveOrZero(message = "Overall price must be non-negative")
-    BigDecimal overallPriceFrom,
+    @PositiveOrZero(message = "Min price must be non-negative")
+    BigDecimal priceFrom,
 
-    @PositiveOrZero(message = "Overall price must be non-negative")
-    BigDecimal overallPriceTo,
-
-    @Valid
-    AddressSearchRequest address,
+    @PositiveOrZero(message = "Max price must be non-negative")
+    BigDecimal priceTo,
 
     @Valid
-    List<RoomSearchRequest> rooms,
+    AddressFilterRequest address,
+
+    @Valid
+    List<RoomFilterRequest> rooms,
 
     LocalDateTime createdDate
 ){}

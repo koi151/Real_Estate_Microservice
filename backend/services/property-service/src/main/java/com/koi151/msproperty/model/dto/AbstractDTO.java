@@ -21,9 +21,9 @@ public abstract class AbstractDTO<T> implements Serializable {
     private static final long serialVersionUID = -699889113463942885L;
 
     private LocalDateTime createdDate;
-    //    private String createdBy;
+    private String createdBy;
     private LocalDateTime modifiedDate;
-    //    private String modifiedBy;
+    private String modifiedBy;
     private Integer maxPageItems;
     private Integer currentPage = 1;
     private String tableId;

@@ -20,6 +20,4 @@ public class ResponseData extends AbstractDTO<Object> {
 
     private Object data;
     private String desc;
-//    private int status = 200;
-//    private boolean isSuccess = true;
 }

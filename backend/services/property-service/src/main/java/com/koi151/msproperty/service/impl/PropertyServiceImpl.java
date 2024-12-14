@@ -13,14 +13,13 @@ import com.koi151.msproperty.model.dto.*;
 import com.koi151.msproperty.model.projection.PropertySearchProjection;
 import com.koi151.msproperty.model.request.PropertyServicePackageCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
-import com.koi151.msproperty.model.request.property.PropertySearchRequest;
+import com.koi151.msproperty.model.request.property.PropertyFilterRequest;
 import com.koi151.msproperty.model.request.property.PropertyStatusUpdateRequest;
 import com.koi151.msproperty.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.repository.*;
-import com.koi151.msproperty.repository.custom.impl.PropertyRepositoryImpl;
-import com.koi151.msproperty.service.PropertiesService;
+import com.koi151.msproperty.service.PropertyService;
 import com.koi151.msproperty.customExceptions.MaxImagesExceededException;
 import com.koi151.msproperty.customExceptions.PropertyNotFoundException;
 import com.koi151.msproperty.service.converter.PropertyConverter;
@@ -28,16 +27,11 @@ import com.koi151.msproperty.validator.PropertyValidator;
 import com.koi151.property_submissions.customExceptions.EntityNotFoundException;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.cache.CacheManager;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.DigestUtils;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
@@ -47,7 +41,7 @@ import java.util.concurrent.TimeUnit;
 @Service
 @RequiredArgsConstructor
 @Slf4j
-public class PropertyServiceImpl implements PropertiesService {
+public class PropertyServiceImpl implements PropertyService {
 
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final RoomRepository roomRepository;
@@ -63,26 +57,8 @@ public class PropertyServiceImpl implements PropertiesService {
     private static final String CACHE_KEY_PATTERN = "properties:%s:%d:%d";
     private static final int CACHE_TTL_SECONDS = 20;
 
-//    public Page searchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
-//        String redisKey = "properties:" + request.toString() + ":" + pageable.getPageNumber() + ":" + pageable.getPageSize();
-//        String redisData = redisTemplate.opsForValue().get(redisKey);
-//        try {
-//            if (redisData == null) {
-//                Page<PropertySearchProjection> pages = propertyRepository.findPropertiesForAdmin(request, pageable);
-//                String jsonData = objectMapper.writeValueAsString(result);
-//                redisTemplate.opsForValue().set(redisKey, jsonData, 20, TimeUnit.SECONDS);
-//                return result;
-//            } else {
-//                JavaType pageType = objectMapper.getTypeFactory().constructParametricType(Page.class, PropertySearchDTO.class);
-//                return objectMapper.readValue(redisData, pageType);
-//            }
-//        } catch (JsonProcessingException ex) {
-//            log.error("Json processing error occurred "  + ex.getMessage());
-//            throw new RuntimeException("Json processing error occurred");
-//        }
-//    }
 
-    public Page<PropertySearchDTO> searchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
+    public Page<PropertySearchDTO> searchPropertiesForAdmin(PropertyFilterRequest request, Pageable pageable) {
         String cacheKey = generateCacheKey(request, pageable);
         try {
             String cachedData = redisTemplate.opsForValue().get(cacheKey);
@@ -98,7 +74,7 @@ public class PropertyServiceImpl implements PropertiesService {
         }
     }
 
-    private String generateCacheKey(PropertySearchRequest request, Pageable pageable) {
+    private String generateCacheKey(PropertyFilterRequest request, Pageable pageable) {
         return String.format(CACHE_KEY_PATTERN,
             request.toString(),
             pageable.getPageNumber(),
@@ -112,7 +88,7 @@ public class PropertyServiceImpl implements PropertiesService {
     }
 
     private Page<PropertySearchDTO> fetchAndCacheData(
-        PropertySearchRequest request,
+        PropertyFilterRequest request,
         Pageable pageable,
         String cacheKey) throws JsonProcessingException
     {
@@ -124,7 +100,7 @@ public class PropertyServiceImpl implements PropertiesService {
         return result;
     }
 
-    private Page<PropertySearchDTO> fetchPropertiesForAdmin(PropertySearchRequest request, Pageable pageable) {
+    private Page<PropertySearchDTO> fetchPropertiesForAdmin(PropertyFilterRequest request, Pageable pageable) {
         return propertyRepository.findPropertiesForAdmin(request, pageable)
             .map(propertyMapper::toPropertySearchDTO);
     }
@@ -134,7 +110,7 @@ public class PropertyServiceImpl implements PropertiesService {
 //        redisTemplate.delete(cacheKey);
 //    }
 
-    public Page<PropertySearchProjection> searchPropertiesForClient(PropertySearchRequest request, Pageable pageable) {
+    public Page<PropertySearchProjection> searchPropertiesForClient(PropertyFilterRequest request, Pageable pageable) {
         return propertyRepository.findPropertiesForClient(request, pageable);
     }
 

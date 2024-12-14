@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 
 @Builder
 @PriceRangeConstraint
-public record PropertyForSaleSearchRequest(
+public record PropertyForSaleFilterRequest(
     @PositiveOrZero(message = "Property sale max price searching must be non-negative value")
     @DecimalMax(value = "9000000000", message = "Property rental max price cannot exceed 90,000,000,000")
     BigDecimal priceFrom,

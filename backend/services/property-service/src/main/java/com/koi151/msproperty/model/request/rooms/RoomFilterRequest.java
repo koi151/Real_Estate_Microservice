@@ -3,7 +3,7 @@ package com.koi151.msproperty.model.request.rooms;
 import com.koi151.msproperty.enums.RoomTypeEnum;
 import jakarta.validation.constraints.*;
 
-public record RoomSearchRequest(
+public record RoomFilterRequest(
     Long roomId,
     RoomTypeEnum roomType,
     @PositiveOrZero(message = "Room quantity searching must be non-negative value")

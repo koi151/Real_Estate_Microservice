@@ -7,10 +7,11 @@ import org.springframework.data.domain.Page;
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE)
 public interface ResponseDataMapper {
 
-    @Mapping(target = "data", source = "propertyPages.content")
-    @Mapping(target = "totalPages", source = "propertyPages.totalPages")
-    @Mapping(target = "totalItems", source = "propertyPages.totalElements")
-    @Mapping(target = "currentPage", source = "page")
-    @Mapping(target = "maxPageItems", source = "pageSize")
-    ResponseData toResponseData(Page<?> propertyPages, int page, int pageSize);
+    @Mapping(target = "data", source = "content")
+    @Mapping(target = "totalPages", source = "totalPages")
+    @Mapping(target = "totalItems", source = "totalElements")
+    @Mapping(target = "currentPage", expression = "java(page.getNumber() + 1)") // page.getNumber() start from 0
+    @Mapping(target = "maxPageItems", source = "size")
+    ResponseData toResponseData(Page<?> page);
+
 }
