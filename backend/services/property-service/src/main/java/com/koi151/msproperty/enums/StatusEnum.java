@@ -11,11 +11,11 @@ import java.util.Arrays;
 @Getter
 @RequiredArgsConstructor
 public enum StatusEnum {
-
-    ACTIVE ("Active"),
-    INACTIVE ("Inactive"),
-    DRAFT("Draft"),
-    PENDING ("Pending");
+    CREATING("Creating"),
+    CANCELED("Canceled"),
+    PENDING("Pending"),
+    ACTIVE("Active"),
+    INACTIVE("Inactive");
 
     private final String statusName;
     private static final StatusEnum[] VALUES = values(); // Cache enum values for performance

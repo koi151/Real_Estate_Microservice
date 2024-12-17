@@ -5,11 +5,13 @@ import com.koi151.listing_services.entity.PostServicePackage;
 import com.koi151.listing_services.entity.PostServicePricing;
 import com.koi151.listing_services.entity.Promotion;
 import com.koi151.listing_services.entity.keys.PostServicePackageKey;
+import com.koi151.listing_services.enums.Status;
 import com.koi151.listing_services.model.dto.*;
 import com.koi151.listing_services.model.request.PostServiceCreateRequest;
 import org.mapstruct.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Mapper(componentModel = "spring", unmappedTargetPolicy = ReportingPolicy.IGNORE,
         collectionMappingStrategy = CollectionMappingStrategy.TARGET_IMMUTABLE
@@ -17,14 +19,53 @@ import java.util.List;
 )
 public interface PostServiceMapper {
 
+    @Mapping(target = "status", defaultValue = "ACTIVE")
     PostService toPostServiceEntity(PostServiceCreateRequest request);
 
     PostService toPostServiceEntity(PostServiceBasicInfoDTO request);
 
     @Mapping(target = "postServicePricings.packageType", expression = "java(mapPostServicePricingsDTO(entity.getPostServicePricings))")
+    @Mapping(target = "postServiceCategoryId", source = "postServiceCategory.postServiceCategoryId")
     @Mapping(target = "promotions.packageType", expression = "java(mapPostServicePromotionsCreateDTO(entity.getPromotions))")
     @Mapping(target = "postServiceId", source = "postServiceId")
-    PostServiceCreateDTO toPostServiceCreateDTO(PostService entity);
+    @Mapping(target = "status", source = "status", qualifiedByName = "enumToString")
+    PostServiceDTO toPostServiceDTO(PostService entity);
+
+    List<PostServiceDTO> toPostServiceDTOList(List<PostService> entities);
+
+    @Named("mapPostServicePricings")
+    default List<PostServicePricingCreateDTO> mapPostServicePricings(List<PostServicePricing> pricings) {
+        if (pricings == null) return null;
+        return pricings.stream()
+            .map(p -> PostServicePricingCreateDTO.builder()
+                .price(p.getPrice())
+                .startDate(p.getStartDate())
+                .endDate(p.getEndDate())
+                .packageType(p.getPackageType() != null ? p.getPackageType().name() : null)
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    @Named("mapPromotions")
+    default List<PromotionCreateDTO> mapPromotions(List<Promotion> promotions) {
+        if (promotions == null) return null;
+        return promotions.stream()
+            .map(p -> PromotionCreateDTO.builder()
+                .discountPercentage(p.getDiscountPercentage())
+                .priceDiscount(p.getPriceDiscount())
+                .packageType(
+                    p.getPackageType() != null
+                        ? p.getPackageType().name()
+                        : null
+                )
+                .build())
+            .collect(Collectors.toList());
+    }
+
+    @Named("enumToString")
+    default String enumToString(Status status) {
+        return status != null ? status.name() : null;
+    }
 
     @Mapping(target = "packageType", expression = "java(entity.getPackageType().getPackageName())")
     PostServicePricingCreateDTO toPostServicePricingCreateDTO(PostServicePricing entity);

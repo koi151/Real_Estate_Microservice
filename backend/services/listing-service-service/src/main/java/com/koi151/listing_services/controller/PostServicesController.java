@@ -19,8 +19,13 @@ public class PostServicesController {
     private final PostServiceService postServiceService;
 
     @GetMapping("/")
-    public ResponseEntity<String> findAllListingServices() {
-        return ResponseEntity.ok("OK");
+//    @PreAuthorize("hasAuthority('SCOPE_listing-service_view')")
+    public ResponseEntity<ResponseData> findListingServices() {
+        var services = postServiceService.findActiveServices();
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(services)
+            .desc("Get current active listing services successful")
+            .build());
     }
 
     @PostMapping("/")

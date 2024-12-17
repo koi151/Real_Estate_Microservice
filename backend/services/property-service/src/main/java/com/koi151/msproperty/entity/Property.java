@@ -32,7 +32,6 @@ import java.util.List;
         @Index(name = "idx_balcony_direction", columnList = "balcony_direction"),
         @Index(name = "idx_legal_document", columnList = "legal_document"),
         @Index(name = "idx_furnitures", columnList = "furnitures")
-
     }
 )
 @Entity(name = "property")
@@ -120,4 +119,17 @@ public class Property extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(name = "furnitures", length = 20)
     private FurnitureEnum furniture;
+
+//    @Column(name = "contact_name", length = 100)
+//    @NotBlank(message = "Contact name is mandatory")
+//    @Pattern(regexp = "^[a-zA-Z\\s]+$", message = "Contact name must contain only letters and spaces")
+//    private String contactName;
+//
+//    @Column(name = "contact_phone", length = 100)
+//    @NotBlank(message = "Phone number is mandatory")
+//    private String contactPhone;
+//
+//    @Column(name = "contact_email", length = 100)
+//    @Email(message = "Invalid email")
+//    private String contactEmail;
 }

@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import java.time.DateTimeException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -135,6 +136,14 @@ public class ControllerAdvisor {
         return ResponseEntity.badRequest()
             .body(ErrorResponse.builder()
                 .error(ex.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(EventPublishingException.class)
+    public ResponseEntity<ErrorResponse> handleEventPublishingException(EventPublishingException ex) {
+        return ResponseEntity.internalServerError()
+            .body(ErrorResponse.builder()
+                .details(Collections.singletonList(ex.getMessage()))
                 .build());
     }
 }

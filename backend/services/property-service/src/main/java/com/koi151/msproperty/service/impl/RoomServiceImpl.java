@@ -21,7 +21,7 @@ public class RoomServiceImpl implements RoomService {
     PropertyRepository propertyRepository;
 
     @Override
-    public RoomDTO createRoom(Integer propertyId, RoomCreateUpdateRequest request) {
+    public RoomDTO createRoom(Long propertyId, RoomCreateUpdateRequest request) {
         Property property = propertyRepository.findById(propertyId)
                 .orElseThrow(() -> new PropertyNotFoundException("No property found with id " + propertyId));
 

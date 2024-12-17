@@ -19,9 +19,6 @@ import com.koi151.msproperty.service.PropertyService;
 import com.koi151.msproperty.utils.PageUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -58,26 +55,6 @@ public class PropertyController {
         return ResponseEntity.ok(responseData);
     }
 
-
-//    @GetMapping("/home")
-//    @PreAuthorize("hasAuthority('SCOPE_properties_view')")
-//    public ResponseEntity<?> findHomeProperties(
-//        @RequestParam Map<String, Object> params,
-//        @RequestParam(required = false, defaultValue = "1") int page,
-//        @RequestParam(required = false, defaultValue = "10") int limit
-//    ) {
-//        int pageSize = Math.min(limit, MAX_PAGE_SIZE);
-//        Pageable pageable = PageRequest.of(page - 1, pageSize, Sort.by("createdDate").descending());
-//
-//        var propertiesPage = propertyService.getHomeProperties(params, pageable);
-//
-//        ResponseData responseData = responseDataMapper.toResponseData(propertiesPage, page, pageSize);
-//        responseData.setDesc(propertiesPage.isEmpty()
-//            ? "No property found"
-//            : "Get properties succeed");
-//
-//        return ResponseEntity.ok(responseData);
-//    }
 
     @GetMapping("/{id}")
     @PreAuthorize("hasAuthority('SCOPE_properties_view')")
@@ -241,7 +218,7 @@ public class PropertyController {
 
         return ResponseEntity.status(HttpStatus.CREATED)
             .body(ResponseData.builder()
-                .desc("Property post created successfully")
+                .desc("Property post created successfully with pending status")
                 .build());
     }
 

@@ -8,7 +8,7 @@ import java.util.List;
 
 @Data
 @Builder
-public class PostServiceCreateDTO {
+public class PostServiceDTO {
     private Long postServiceId;
     private Long postServiceCategoryId;
     private List<PostServicePricingCreateDTO> postServicePricings;

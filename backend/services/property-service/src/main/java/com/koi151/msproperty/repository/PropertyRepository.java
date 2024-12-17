@@ -12,7 +12,7 @@ import org.springframework.stereotype.Repository;
 import java.util.Optional;
 
 @Repository
-public interface PropertyRepository extends JpaRepository<Property, Integer>
+public interface PropertyRepository extends JpaRepository<Property, Long>
                                         , PropertyRepositoryCustom
                                         , JpaSpecificationExecutor<Property> {
 

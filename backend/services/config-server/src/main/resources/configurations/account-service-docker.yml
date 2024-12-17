@@ -21,7 +21,7 @@ application:
 eureka:
   client:
     service-url:
-      defaultZone: http://localhost:8761/eureka/
+      defaultZone: http://discovery-server:8761/eureka/
 
 api:
   admin-acc-prefix: api/v1/admin/accounts

@@ -18,7 +18,7 @@ public class RoomController {
 
     @PostMapping(value = "/{propertyId}/rooms")
     public ResponseEntity<ResponseData> createRoom(
-            @PathVariable("propertyId") Integer propertyId,
+            @PathVariable("propertyId") Long propertyId,
             @RequestBody RoomCreateUpdateRequest request
     ) {
 

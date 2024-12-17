@@ -3,21 +3,19 @@ package com.koi151.msproperty.service.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JavaType;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.koi151.msproperty.client.PropertyClient;
+import com.koi151.msproperty.customExceptions.EventPublishingException;
 import com.koi151.msproperty.entity.*;
 import com.koi151.msproperty.enums.RoomTypeEnum;
-import com.koi151.msproperty.enums.Status;
 import com.koi151.msproperty.enums.StatusEnum;
+import com.koi151.msproperty.events.ListingCreatedEvent;
 import com.koi151.msproperty.mapper.PropertyMapper;
 import com.koi151.msproperty.model.dto.*;
 import com.koi151.msproperty.model.projection.PropertySearchProjection;
-import com.koi151.msproperty.model.request.PropertyServicePackageCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertyCreateRequest;
 import com.koi151.msproperty.model.request.property.PropertyFilterRequest;
 import com.koi151.msproperty.model.request.property.PropertyStatusUpdateRequest;
 import com.koi151.msproperty.model.request.property.PropertyUpdateRequest;
 import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
-import com.koi151.msproperty.model.response.ResponseData;
 import com.koi151.msproperty.repository.*;
 import com.koi151.msproperty.service.PropertyService;
 import com.koi151.msproperty.customExceptions.MaxImagesExceededException;
@@ -30,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -52,7 +51,8 @@ public class PropertyServiceImpl implements PropertyService {
 
     private final RedisTemplate<String, String> redisTemplate;
     private final ObjectMapper objectMapper;
-    private final PropertyClient propertyClient;
+//    private final PropertyClient propertyClient;
+    private final KafkaTemplate<String, String> kafkaTemplate;
 
     private static final String CACHE_KEY_PATTERN = "properties:%s:%d:%d";
     private static final int CACHE_TTL_SECONDS = 20;
@@ -150,36 +150,60 @@ public class PropertyServiceImpl implements PropertyService {
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
+//    @Transactional // Open feign
+//    @Override
+//    public void createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+//        try {
+//            propertyValidator.checkValidPropertyCreateRequest(request);
+//            Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
+//
+//            Property savedProperty;
+//            try {
+//                savedProperty = propertyRepository.save(property);
+//                System.out.println("Property saved successfully with ID: " + savedProperty.getPropertyId());
+//            } catch (Exception e) {
+//                System.err.println("Error occurred while saving Property: " + e.getMessage());
+//                throw new RuntimeException("Failed to save Property", e);
+//            }
+//
+//
+//            PropertyServicePackageCreateRequest packageRequest = PropertyServicePackageCreateRequest.builder()
+//                .propertyId(savedProperty.getPropertyId())
+//                .packageType(request.packageType())
+//                .status(Status.ACTIVE)
+//                .postServiceIds(request.postServiceIds())
+//                .build();
+//
+//            ResponseData response = propertyClient.createPropertyServicePackage(packageRequest).getBody();
+//
+//            if (response == null || !response.getDesc().equals("Property service package created successfully")) {
+//                throw new RuntimeException("Failed to create Property Service Package");
+//            }
+//        } catch (Exception e) {
+//            System.err.println("Error: " + e.getMessage());
+//        }
+//    }
+
+
     @Transactional
     @Override
     public void createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
+        propertyValidator.checkValidPropertyCreateRequest(request);
+        Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
+
+        Property savedProperty;
+        savedProperty = propertyRepository.save(property);
+        ListingCreatedEvent event = ListingCreatedEvent.builder()
+            .propertyId(savedProperty.getPropertyId())
+            .postServiceIds(request.postServiceIds())
+            .packageType(request.packageType())
+            .build();
+
         try {
-            propertyValidator.checkValidPropertyCreateRequest(request);
-            Property property = propertyConverter.toPropertyEntity(request, imageFiles, false);
-
-            Property savedProperty;
-            try {
-                savedProperty = propertyRepository.save(property);
-                System.out.println("Property saved successfully with ID: " + savedProperty.getPropertyId());
-            } catch (Exception e) {
-                System.err.println("Error occurred while saving Property: " + e.getMessage());
-                throw new RuntimeException("Failed to save Property", e);
-            }
-
-            PropertyServicePackageCreateRequest packageRequest = PropertyServicePackageCreateRequest.builder()
-                .propertyId(savedProperty.getPropertyId())
-                .packageType(request.packageType())
-                .status(Status.ACTIVE)
-                .postServiceIds(request.postServiceIds())
-                .build();
-
-            ResponseData response = propertyClient.createPropertyServicePackage(packageRequest).getBody();
-
-            if (response == null || !response.getDesc().equals("Property service package created successfully")) {
-                throw new RuntimeException("Failed to create Property Service Package");
-            }
+            String json = objectMapper.writeValueAsString(event);
+            kafkaTemplate.send("ListingCreated", json);
         } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
+            throw new EventPublishingException("Failed to publish ListingCreated event", e);
         }
     }
 
@@ -344,7 +368,7 @@ public class PropertyServiceImpl implements PropertyService {
     @Override
     @Transactional
     public void deleteProperty(Long id) throws PropertyNotFoundException {
-        propertyRepository.findById(Math.toIntExact(id))
+        propertyRepository.findById(id)
             .map(existingProperty -> {
                 existingProperty.setDeleted(true);
                 return propertyRepository.save(existingProperty);

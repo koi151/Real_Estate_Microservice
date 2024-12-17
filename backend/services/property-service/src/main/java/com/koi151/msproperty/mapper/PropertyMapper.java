@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 public interface PropertyMapper {
 
     // included rooms, propertyForRent, propertyForSale, propertyPostService, address entities
-    @Mapping(target = "status", expression = ("java(StatusEnum.DRAFT)"))
+    @Mapping(target = "status", expression = ("java(StatusEnum.PENDING)"))
     Property toPropertyEntity(PropertyCreateRequest request);
 
     @Mapping(target = "view", expression = "java(NumberUtils.generateRandomInteger(0, 20000))")

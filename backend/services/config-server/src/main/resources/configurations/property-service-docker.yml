@@ -45,6 +45,11 @@ jpa:
 api:
   prefix: api/v1/properties
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
+
 management:
   tracing:
     sampling:

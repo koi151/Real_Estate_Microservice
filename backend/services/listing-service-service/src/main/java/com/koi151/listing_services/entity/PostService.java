@@ -50,7 +50,7 @@ public class PostService {
 
     @Column(name = "status")
     @Enumerated(EnumType.STRING)
-    Status status = Status.ACTIVE;
+    Status status;
 
     @Column(name = "description", length = 2000)
     @Size(max = 2000, message = "Post service description cannot exceed {max} characters")

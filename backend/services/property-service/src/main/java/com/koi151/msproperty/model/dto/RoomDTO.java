@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 public class RoomDTO {
     private long roomId;
-    private int propertyId;
+    private long propertyId;
     private String roomType;
     private int quantity;
 }

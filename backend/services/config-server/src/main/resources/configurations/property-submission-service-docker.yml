@@ -54,6 +54,11 @@ management:
       probes:
         enabled: true
 
+eureka:
+  client:
+    service-url:
+      defaultZone: http://discovery-server:8761/eureka/
+
 application:
   config:
     property-url: http://gateway-service:9090/api/v1/properties

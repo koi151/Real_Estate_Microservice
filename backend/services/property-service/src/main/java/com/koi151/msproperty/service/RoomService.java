@@ -5,6 +5,6 @@ import com.koi151.msproperty.model.request.rooms.RoomCreateUpdateRequest;
 
 public interface RoomService {
 
-    RoomDTO createRoom(Integer id, RoomCreateUpdateRequest request);
+    RoomDTO createRoom(Long id, RoomCreateUpdateRequest request);
 
 }

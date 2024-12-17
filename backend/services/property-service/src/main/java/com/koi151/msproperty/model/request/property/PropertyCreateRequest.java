@@ -60,7 +60,6 @@ public record PropertyCreateRequest(
     FurnitureEnum furniture,
     LegalDocumentEnum legalDocument,
 
-
     // for other service
     PackageType packageType,
     @NotNull(message = "Post service ids used for that property service package is mandatory")
