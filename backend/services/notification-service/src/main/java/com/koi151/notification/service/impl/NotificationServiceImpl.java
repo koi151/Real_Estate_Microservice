@@ -22,9 +22,9 @@ public class NotificationServiceImpl implements NotificationService {
         try {
             JsonNode node = objectMapper.readTree(message);
 
-            String recipientId = node.has("accountId") ? node.get("accountId").asText() : "UNKNOWN";
-            String propertyId = node.has("propertyId") ? node.get("propertyId").asText() : "N/A";
-            String reason = node.has("reason") ? node.get("reason").asText() : "No reason provided";
+            String recipientId = node.has("accountId") ? node.get("accountId").asText() : null;
+            String propertyId = node.has("propertyId") ? node.get("propertyId").asText() : null;
+            String reason = node.has("reason") ? node.get("reason").asText() : "No information";
 
             Notification notification = Notification.builder()
                 .notificationType(NotificationType.PROPERTY_POST)
@@ -40,6 +40,6 @@ public class NotificationServiceImpl implements NotificationService {
         } catch (Exception e) {
             throw new JsonProcessingException(e.getMessage());
         }
-
     }
+
 }

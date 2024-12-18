@@ -1,5 +1,6 @@
 package com.example.msaccount.service;
 
+import com.example.msaccount.events.ServiceValidatedEvent;
 import com.example.msaccount.model.dto.AccountDetailDTO;
 import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
@@ -16,6 +17,7 @@ public interface AccountService {
     AccountDetailDTO getCurrentAccountInfo(String authorizationHeader);
 //    ===String login(String userName, String password) throws Exception;
     AccountDetailDTO updateCurrentAccount(String authorizationHeader, AccountUpdateRequest request, MultipartFile avatar);
+    boolean updateAccountBalance(ServiceValidatedEvent event);
 //    List<AccountSearchDTO> getAccountsByStatus(AccountStatusEnum status, Integer pageSize);
 //    void deleteAdminAccount(Long id);
 }

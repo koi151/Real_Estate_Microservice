@@ -30,6 +30,6 @@ public interface PropertyService {
     DetailedPropertyDTO updateProperty(Long id, PropertyUpdateRequest request, List<MultipartFile> imageFiles);
     void deleteProperty(Long id) throws PropertyNotFoundException;
     void updatePropertyStatus(Long id, PropertyStatusUpdateRequest request);
-
+    void updatePropertyStatus(Long propertyId, StatusEnum newStatus);
     boolean propertyActiveCheck(Long id);
 }

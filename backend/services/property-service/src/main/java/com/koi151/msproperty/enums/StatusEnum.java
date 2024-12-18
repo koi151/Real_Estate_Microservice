@@ -12,8 +12,9 @@ import java.util.Arrays;
 @RequiredArgsConstructor
 public enum StatusEnum {
     CREATING("Creating"),
-    CANCELED("Canceled"),
+    CREATED("Created"),
     PENDING("Pending"),
+    CANCELED("Canceled"),
     ACTIVE("Active"),
     INACTIVE("Inactive");
 

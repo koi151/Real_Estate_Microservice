@@ -16,7 +16,7 @@ import com.example.msaccount.repository.AccountRepository;
 import com.example.msaccount.repository.admin.AdminAccountRepository;
 import com.example.msaccount.repository.client.ClientAccountRepository;
 import com.example.msaccount.service.admin.AccountAdminService;
-import com.example.msaccount.service.KeycloakUserService;
+import com.example.msaccount.service.impl.KeycloakUserService;
 import com.example.msaccount.service.converter.AccountConverter;
 import com.example.msaccount.service.impl.AuthServiceImpl;
 import com.example.msaccount.service.impl.CloudinaryServiceImpl;

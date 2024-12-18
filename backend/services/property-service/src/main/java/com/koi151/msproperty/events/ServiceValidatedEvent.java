@@ -1,4 +1,4 @@
-package com.koi151.listing_services.events;
+package com.koi151.msproperty.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -6,7 +6,6 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.math.BigDecimal;
-
 
 @Data
 @AllArgsConstructor

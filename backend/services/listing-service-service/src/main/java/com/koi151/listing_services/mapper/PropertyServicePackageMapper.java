@@ -20,7 +20,7 @@ public interface PropertyServicePackageMapper {
     @Mapping(target = "packageType", source = "entity.packageType.packageName")
     @Mapping(target = "status", source = "entity.status.statusName")
     @Mapping(target = "postServices.postServicePricings.packageType", source = "postServices")
-//    @Mapping(target = "totalFee", source = "totalFee")
+    @Mapping(target = "totalFee", source = "totalFee")
     PropertyServicePackageCreateDTO toPropertyServicePackageCreateDTO(PropertyServicePackage entity, List<PostServiceBasicInfoDTO> postServices, BigDecimal totalFee);
 
     PropertyServicePackageCreateRequest toPropertyServicePackageCreateRequest(ListingCreatedEvent event);

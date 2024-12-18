@@ -15,7 +15,7 @@ public class NotificationConsumer {
 
     @KafkaListener(topics = {"PropertyCanceled"}, groupId = "notification_group")
     public void onPropertyCanceled(String message) {
-        log.info("Received PropertyCanceled message: {}", message);
+        log.warn("Received PropertyCanceled message: {}", message);
         notificationService.processPropertyCanceled(message);
     }
 

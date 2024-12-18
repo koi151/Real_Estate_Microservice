@@ -5,7 +5,7 @@ import com.example.msaccount.entity.admin.AdminAccount;
 import com.example.msaccount.entity.client.ClientAccount;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
-import com.example.msaccount.service.KeycloakUserService;
+import com.example.msaccount.service.impl.KeycloakUserService;
 import com.example.msaccount.utils.CloudinaryUploadUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;

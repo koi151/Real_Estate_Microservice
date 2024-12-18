@@ -1,4 +1,4 @@
-package com.koi151.payment.events;
+package com.example.msaccount.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,8 +9,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentFailedEvent {
+public class PaymentCompletedEvent {
     private Long propertyId;
     private String accountId;
-    private String reason;
 }

@@ -5,6 +5,8 @@ import com.example.msaccount.customExceptions.EntityNotFoundException;
 import com.example.msaccount.customExceptions.KeycloakResourceNotFoundException;
 import com.example.msaccount.customExceptions.RedisDataNotFound;
 import com.example.msaccount.entity.Account;
+import com.example.msaccount.entity.client.ClientAccount;
+import com.example.msaccount.events.ServiceValidatedEvent;
 import com.example.msaccount.mapper.AccountMapper;
 import com.example.msaccount.model.dto.AccountDetailDTO;
 import com.example.msaccount.model.dto.AccountWithNameAndRoleDTO;
@@ -12,7 +14,7 @@ import com.example.msaccount.model.dto.KeycloakUserDTO;
 import com.example.msaccount.model.request.admin.AccountCreateRequest;
 import com.example.msaccount.model.request.admin.AccountUpdateRequest;
 import com.example.msaccount.repository.AccountRepository;
-import com.example.msaccount.service.KeycloakUserService;
+import com.example.msaccount.repository.client.ClientAccountRepository;
 import com.example.msaccount.service.AccountService;
 import com.example.msaccount.service.converter.AccountConverter;
 import com.example.msaccount.validator.AccountValidator;
@@ -24,20 +26,18 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.math.BigDecimal;
+
 @Service
 @RequiredArgsConstructor
 @Slf4j
 public class AccountServiceImpl implements AccountService {
 
-//    private final PasswordEncoder passwordEncoder;
-//    private final AccountRepository accountRepository;
-//    private final AdminAccountRepository adminAccountRepository;
     private final CloudinaryServiceImpl cloudinaryServiceImpl;
     private final AccountConverter accountConverter;
 
-//    private final PropertiesClient propertiesClient;
-
     private final AccountRepository accountRepository;
+    private final ClientAccountRepository clientAccountRepository;
     private final AccountValidator accountValidator;
     private final KeycloakUserService keycloakUserService;
     private final AccountMapper accountMapper;
@@ -68,7 +68,7 @@ public class AccountServiceImpl implements AccountService {
 
         String accountId = authServiceImpl.extractUserIDFromAuthHeader(authorizationHeader);
 
-        KeycloakUserDTO kcDTO =  keycloakUserService.updateAccount(request, accountId); // keycloak update
+        KeycloakUserDTO kcDTO = keycloakUserService.updateAccount(request, accountId); // keycloak update
         return accountRepository.findByAccountIdAndAccountEnableAndDeleted(accountId, true, false)
             .map(existingEntity -> {
                 accountMapper.updateAccountFromRequest(request, existingEntity); // db update
@@ -76,6 +76,26 @@ public class AccountServiceImpl implements AccountService {
             })
             .map(entity -> accountMapper.entityToAccountDTO(entity, kcDTO))
             .orElseThrow(() -> new EntityNotFoundException("Account not found with id: " + accountId));
+    }
+
+
+
+    @Transactional
+    public boolean updateAccountBalance(ServiceValidatedEvent event) {
+        String accountId = event.getAccountId();
+        ClientAccount clientAccount = clientAccountRepository.findById(event.getAccountId())
+            .orElseThrow(() -> new EntityNotFoundException("ClientAccount not found for accountId: " + accountId));
+
+        BigDecimal amountToSubtract = BigDecimal.valueOf(event.getTotalAmount());
+
+        if (clientAccount.getBalance().compareTo(amountToSubtract) < 0) { // insufficient balance
+            return false;
+        }
+
+        clientAccount.setBalance(clientAccount.getBalance().subtract(amountToSubtract));
+        clientAccountRepository.save(clientAccount);
+
+        return true;
     }
 
 

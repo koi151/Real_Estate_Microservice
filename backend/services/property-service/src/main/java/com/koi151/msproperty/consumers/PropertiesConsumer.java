@@ -1,22 +1,29 @@
 package com.koi151.msproperty.consumers;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.koi151.msproperty.customExceptions.EntityNotFoundException;
 import com.koi151.msproperty.entity.Property;
 import com.koi151.msproperty.enums.StatusEnum;
 import com.koi151.msproperty.events.*;
+import com.koi151.msproperty.messaging.PropertyStatusMessage;
 import com.koi151.msproperty.repository.PropertyRepository;
+import com.koi151.msproperty.service.PropertyService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class PropertiesConsumer {
 
     private final PropertyRepository propertyRepository;
+    private final PropertyService propertyService;
     private final ObjectMapper objectMapper;
     private final KafkaTemplate<String, String> kafkaTemplate;
 
@@ -39,11 +46,21 @@ public class PropertiesConsumer {
         }
     }
 
-    @KafkaListener(topics = "ListingRejected", groupId = "properties_group")
-    public void onListingRejected(String message) {
+    @KafkaListener(topics = "ServiceValidated", groupId = "properties_group")
+    public void onPropertyPostServiceValid(String message) {
         try {
-            ListingRejectedEvent event = objectMapper.readValue(message, ListingRejectedEvent.class);
-            cancelProperty(event.getPropertyId(), event.getAccountId(), "Rejected: " + event.getReason());
+            ServiceValidatedEvent event = objectMapper.readValue(message, ServiceValidatedEvent.class);
+            propertyService.updatePropertyStatus(event.getPropertyId(), StatusEnum.CREATED);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @KafkaListener(topics = "PaymentCompleted", groupId = "properties_group")
+    public void onPaymentCompleted(String message) {
+        try {
+            PaymentCompletedEvent event = objectMapper.readValue(message, PaymentCompletedEvent.class);
+            propertyService.updatePropertyStatus(event.getPropertyId(), StatusEnum.PENDING);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -70,20 +87,14 @@ public class PropertiesConsumer {
     }
 
     private void cancelProperty(Long propertyId, String accountId, String reason) {
-        Optional<Property> propOpt = propertyRepository.findById(propertyId);
+        propertyService.updatePropertyStatus(propertyId, StatusEnum.CANCELED);
 
-        if (propOpt.isPresent()) {
-            Property propertyEntity = propOpt.get();
-            propertyEntity.setStatus(StatusEnum.PENDING);
-            propertyRepository.save(propertyEntity);
-
-            ListingCanceledEvent canceled = new ListingCanceledEvent(propertyId, accountId, reason);
-            try {
-                String json = objectMapper.writeValueAsString(canceled);
-                kafkaTemplate.send("PropertyCanceled", json);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+        ListingCanceledEvent canceled = new ListingCanceledEvent(propertyId, accountId, reason);
+        try {
+            String json = objectMapper.writeValueAsString(canceled);
+            kafkaTemplate.send("PropertyCanceled", json);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 }

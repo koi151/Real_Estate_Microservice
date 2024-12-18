@@ -18,7 +18,6 @@ public interface PropertyRepository extends JpaRepository<Property, Long>
 
 //    @Query("SELECT p.propertyPostService FROM property p WHERE p.propertyId = :id")
 //    PropertyPostServiceEntity findPropertyPostServiceByPropertyId(@Param("id") Long id);
-
     boolean existsByPropertyIdAndDeletedAndStatus(Long propertyId, boolean deleted, StatusEnum status);
     Page<Property> findByDeleted(boolean deleted, Pageable pageable);
     Page<Property> findByCategoryIdAndDeleted(Integer categoryId, boolean deleted, Pageable pageable);

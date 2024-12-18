@@ -1,12 +1,9 @@
-package com.koi151.listing_services.events;
+package com.example.msaccount.events;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-
-import java.math.BigDecimal;
-
 
 @Data
 @AllArgsConstructor
@@ -14,5 +11,6 @@ import java.math.BigDecimal;
 @Builder
 public class ServiceValidatedEvent {
     private Long propertyId;
-    private BigDecimal totalFee;
+    private String accountId;
+    private double totalAmount;
 }

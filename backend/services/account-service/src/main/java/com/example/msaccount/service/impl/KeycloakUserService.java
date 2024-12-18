@@ -1,4 +1,4 @@
-package com.example.msaccount.service;
+package com.example.msaccount.service.impl;
 
 import com.example.msaccount.config.KeycloakProvider;
 import com.example.msaccount.customExceptions.*;

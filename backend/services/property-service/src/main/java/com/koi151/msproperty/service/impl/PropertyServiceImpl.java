@@ -150,6 +150,16 @@ public class PropertyServiceImpl implements PropertyService {
         return properties.map(propertyMapper::toPropertiesHomeDTO);
     }
 
+    @Override
+    @Transactional
+    public void updatePropertyStatus(Long propertyId, StatusEnum newStatus) {
+        Property property = propertyRepository.findByPropertyIdAndDeleted(propertyId, false)
+            .orElseThrow(() -> new com.koi151.msproperty.customExceptions.EntityNotFoundException("Property not existed with id: " + propertyId));
+
+        property.setStatus(newStatus);
+        propertyRepository.save(property);
+    }
+
 //    @Transactional // Open feign
 //    @Override
 //    public void createProperty(PropertyCreateRequest request, List<MultipartFile> imageFiles) {
@@ -183,7 +193,6 @@ public class PropertyServiceImpl implements PropertyService {
 //            System.err.println("Error: " + e.getMessage());
 //        }
 //    }
-
 
     @Transactional
     @Override
@@ -271,13 +280,6 @@ public class PropertyServiceImpl implements PropertyService {
         existingProperty.setImageUrls(updatedImageUrls.isEmpty() ? null : updatedImageUrls);
     }
 
-//    @Transactional
-//    protected void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {
-//        if (request != null) {
-//            updateExistingPropertyRooms(existingProperty, request.rooms()); // update rooms info separately
-//            propertyMapper.updatePropertyFromDto(request, existingProperty);
-//        }
-//    }
 
     @Transactional
     protected void updatePropertyDetails(Property existingProperty, PropertyUpdateRequest request) {

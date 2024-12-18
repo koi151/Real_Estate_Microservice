@@ -9,7 +9,8 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
-public class PaymentCompletedEvent {
+public class PaymentRequestedEvent {
     private Long propertyId;
     private String accountId;
+    private double totalAmount;
 }
