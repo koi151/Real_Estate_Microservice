@@ -22,11 +22,11 @@ public interface PropertyCategoryService {
 
     Page<PropertyCategoryHomeDTO> getCategoriesHomePage(PropertyCategorySearchRequest request, Pageable pageable);
     List<PropertyCategoryHomeDTO> getCategoriesByStatus(StatusEnum statusEnum);
-    PropertyCategory getCategoryById(Integer id);
-    PropertyCategoryTitleDTO getCategoryTitleById(Integer id);
+    PropertyCategory getCategoryById(Long id);
+    PropertyCategoryTitleDTO getCategoryTitleByIdAndActive(Long id);
 //    FullCategoryResponse findCategoryWithProperties(Integer categoryId);
     PropertyCategoryHomeDTO createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> images);
-    PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> files);
+    PropertyCategoryDetailDTO updateCategory(Long id, PropertyCategoryUpdateRequest request, List<MultipartFile> files);
     void deleteCategory(Long id) throws CategoryNotFoundException;
 
     void updateCategoryStatus(Long id, PropertyCategoryStatusUpdateRequest status);

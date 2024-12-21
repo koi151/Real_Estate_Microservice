@@ -57,19 +57,18 @@ public class PropertyCategoryController {
 //    }
 
     @GetMapping("/title/{id}")
-    public ResponseEntity<ResponseData> getCategoryTitleById(@PathVariable(name = "id") int id) {
-        var category = propertyCategoryService.getCategoryTitleById(id);
+    public ResponseEntity<ResponseData> getCategoryTitleByIdAndActive(@PathVariable(name = "id") Long id) {
+        var category = propertyCategoryService.getCategoryTitleByIdAndActive(id);
 
-        ResponseData responseData = new ResponseData();
-        responseData.setData(category);
-        responseData.setDesc("Get property category title by id succeed");
-
-        return ResponseEntity.ok(responseData);
+        return ResponseEntity.ok(ResponseData.builder()
+            .data(category)
+            .desc("Get property category title by id succeed")
+            .build());
     }
 
     @GetMapping("/detail/{id}")
 //    @PreAuthorize("hasAuthority('SCOPE_property_category_view')")
-    public ResponseEntity<ResponseData> getCategoryById(@PathVariable(name = "id") Integer id) {
+    public ResponseEntity<ResponseData> getCategoryById(@PathVariable(name = "id") Long id) {
         var category = propertyCategoryService.getCategoryById(id);
 
         ResponseData responseData = new ResponseData();
@@ -138,7 +137,7 @@ public class PropertyCategoryController {
     @PatchMapping("/{id}")
 //    @PreAuthorize("hasAuthority('SCOPE_property_category_update')")
     public ResponseEntity<ResponseData> updateCategory(
-            @PathVariable(name = "id") Integer id,
+            @PathVariable(name = "id") Long id,
             @RequestPart @Valid PropertyCategoryUpdateRequest category,
             @RequestPart List<MultipartFile> images
     ){

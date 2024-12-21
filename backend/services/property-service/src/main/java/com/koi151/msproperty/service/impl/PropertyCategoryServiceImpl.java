@@ -61,16 +61,15 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     }
 
     @Override
-    public PropertyCategory getCategoryById(Integer id) {
+    public PropertyCategory getCategoryById(Long id) {
         return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
                 .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
     }
 
     @Override
-    public PropertyCategoryTitleDTO getCategoryTitleById(Integer id){
-        PropertyCategory category = propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
-                .orElseThrow(() -> new CategoryNotFoundException("No property category found with id " + id));
-        return new PropertyCategoryTitleDTO(category.getTitle());
+    public PropertyCategoryTitleDTO getCategoryTitleByIdAndActive(Long id){
+        return propertyCategoryRepository.findByCategoryIdAndStatus(id, CategoryStatusEnum.ACTIVE)
+            .orElseThrow(() -> new EntityNotFoundException("No property category found with id " + id));
     }
 
     public PropertyCategoryHomeDTO createCategory(PropertyCategoryCreateRequest request, List<MultipartFile> imageFiles) {
@@ -96,7 +95,7 @@ public class PropertyCategoryServiceImpl implements PropertyCategoryService {
     }
 
     @Override
-    public PropertyCategoryDetailDTO updateCategory(Integer id, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
+    public PropertyCategoryDetailDTO updateCategory(Long id, PropertyCategoryUpdateRequest request, List<MultipartFile> imageFiles) {
         return propertyCategoryRepository.findByCategoryIdAndDeleted(id, false)
             .map(existingCategory -> {
                 updateCategoryDetails(existingCategory, request);

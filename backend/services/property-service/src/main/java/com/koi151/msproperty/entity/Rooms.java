@@ -39,3 +39,4 @@ public class Rooms {
     @Max(value = 999, message = "{roomType} quantity cannot exceed 999")
     private short quantity;
 }
+

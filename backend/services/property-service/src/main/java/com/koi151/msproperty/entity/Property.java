@@ -9,17 +9,10 @@ import jakarta.validation.constraints.*;
 import lombok.*;
 import java.io.Serial;
 import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 
-@NamedEntityGraph(name = "property-with-details",
-    attributeNodes = {
-        @NamedAttributeNode("propertyForRent"),
-        @NamedAttributeNode("propertyForSale"),
-        @NamedAttributeNode("address"),
-        @NamedAttributeNode("rooms")
-    })
+@Entity(name = "property")
 @Table(
     indexes = {
         @Index(name = "idx_area", columnList = "area"),
@@ -31,15 +24,28 @@ import java.util.List;
         @Index(name = "idx_house_direction", columnList = "house_direction"),
         @Index(name = "idx_balcony_direction", columnList = "balcony_direction"),
         @Index(name = "idx_legal_document", columnList = "legal_document"),
-        @Index(name = "idx_furnitures", columnList = "furnitures")
+        @Index(name = "idx_furnitures", columnList = "furnitures"),
+        @Index(name = "idx_category_status", columnList = "category_id, status")
+    },
+    uniqueConstraints = {
+        @UniqueConstraint(name = "uq_title", columnNames = {"title"})
     }
 )
-@Entity(name = "property")
+
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@NamedEntityGraph(
+    name = "property-with-details",
+    attributeNodes = {
+        @NamedAttributeNode("propertyForRent"),
+        @NamedAttributeNode("propertyForSale"),
+        @NamedAttributeNode("address"),
+        @NamedAttributeNode("rooms")
+    }
+)
 public class Property extends BaseEntity {
 
     @Serial
